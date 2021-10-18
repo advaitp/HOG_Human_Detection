@@ -1,11 +1,13 @@
 set(GTEST_SHUFFLE 1)
 cmake_minimum_required(VERSION 2.8) 
-find_package(OpenCV REQUIRED )
+find_package(OpenCV REQUIRED)
 
 add_executable(
     cpp-test
     main.cpp
-    test.cpp
+    BoxTest.cpp
+    Cameratest.cpp
+    HumanTest.cpp
 )
 
 target_include_directories(cpp-test PUBLIC ../vendor/googletest/googletest/include 
