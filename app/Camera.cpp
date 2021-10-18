@@ -33,7 +33,16 @@
 #include<opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 
-void Camera :: capturevideo(int webcam) {
+
+Camera::Camera() {
+  webcam = 0;
+}
+
+Camera::Camera(int &x) {
+  webcam = x;
+}
+
+void Camera :: capturevideo() {
   /// Capture the frame of video
   cv::VideoCapture cap(webcam) ;
   std::string window_name = "My Camera" ;
