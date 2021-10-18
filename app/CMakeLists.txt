@@ -11,6 +11,7 @@ add_executable(
 )
 
 target_include_directories(shell-app PUBLIC ${CMAKE_SOURCE_DIR}/include
-                                            ${CMAKE_SOURCE_DIR}/include/Eigen)
+                                            ${CMAKE_SOURCE_DIR}/include/Eigen
+                                            ${OpenCV_INCLUDE_DIRS})
 
 target_link_libraries(shell-app ${OpenCV_LIBS}) 
