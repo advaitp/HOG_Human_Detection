@@ -27,6 +27,13 @@
  * SOFTWARE.
  */
 
+#include<Camera.hpp>
 #include <gtest/gtest.h>
+
+TEST(CameraTest1, testcamerawebcam) {
+  Camera cam;
+  EXPECT_EQ(cam.Camera(1), 1);
+  EXPECT_EQ(cam.Camera(2), 2);
+}
 
 
