@@ -18,7 +18,7 @@
 ///
 class Box {
  public:
-  Box(int* x1, int* y1, int* x2, int* y2);
+  Box(int* x1, int* y1, int* x2, int* y2, double* confidence);
   // variable initialization constructor
   Box();  // default constructor
   int coordinates[4];  // The four co-ordinates will show the upper
