@@ -5,6 +5,7 @@
 # Build Status Coverage Status
 [![Build Status](https://app.travis-ci.com/gauraut/HOG_Human_Detection.svg?branch=main)](https://app.travis-ci.com/gauraut/HOG_Human_Detection)
 [![Coverage Status](https://coveralls.io/repos/github/gauraut/HOG_Human_Detection/badge.svg?branch=main)](https://coveralls.io/github/gauraut/HOG_Human_Detection?branch=main)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ## License
 MIT License
 
