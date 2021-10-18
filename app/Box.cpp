@@ -1,16 +1,18 @@
 ///============================================================================
-/// @file        : main.cpp
+/// @file        : Box.cpp
 /// @author      : gauraut (Driver)
 /// @author      : Advait Patole (Navigator)
 /// @version     : 1.0.1
 /// @copyright   : MIT License
-/// @brief       : The main file to run our HOG_Human_Descriptor program
+/// @brief       : Box class definition
 ///============================================================================
 
-#include <iostream>
-#include <opencv2/opencv.hpp>
+#include "Box.h"
 
+Box::Box(int &x1, int &y1, int &x2, int &y2) {
+  coordinates = {x1, y1, x2, y2};
+}
 
-int main() {
-  return 0;
+Box::Box() {
+  coordinates = {0, 0, 0, 0};
 }
