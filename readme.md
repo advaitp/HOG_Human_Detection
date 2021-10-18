@@ -1,7 +1,7 @@
 # HOG_Human_Detection
 ## Project Contributors
-- Gaurav Raut
-- Advait Patole
+- Gaurav Raut - M.Eng. Robotics student. I like to make puns.
+- Advait Patole - Graduate student at University of Maryland pursuing M.Eng. Robotics. Likes rock music.
 # Build Status Coverage Status
 [![Build Status](https://app.travis-ci.com/gauraut/HOG_Human_Detection.svg?branch=main)](https://app.travis-ci.com/gauraut/HOG_Human_Detection)
 [![Coverage Status](https://coveralls.io/repos/github/gauraut/HOG_Human_Detection/badge.svg?branch=main)](https://coveralls.io/github/gauraut/HOG_Human_Detection?branch=main)
@@ -46,6 +46,22 @@ The HOG descriptors convert image into a feature vector. The input image (641283
 
 The monocular camera inputs a stream of images, i.e., video, to our microprocessor. Every frame in the image will be converted into a feature vector by our custom-made HOG feature descriptor. The feature vector will be given as an input to our pre-trained custom-made linear SVM which will classify the features as Human and Non-Human. Further, if there is a human in the frame, the algorithm will calculate the distance of the human from the caddy based on the pixel location and pre-defined equations and assumptions.
 ![Technology](https://user-images.githubusercontent.com/77606010/137650666-c4d7e0d4-4021-4aa9-a76d-2000d07be1b2.png)
+
+## Risks and Mitigation: 
+ 
+A  HOG  is  not  a  rotation  invariant  representation.  This  means 
+that  HOG  can  only  vectorize  features  of  images  within  a 
+certain orientation range for object detection assignment. This 
+can be corrected if we train images with different orientation. 
+Monocular camera we have made calibration before 
+implementing  while  comparing  the  given  distance  with  the 
+calibrated  calculations  instead  we  can  use  depth  cameras  for 
+more  accurate  results  like  Intel®  RealSense™ depth camera 
+D435. 
+HOG is not scale invariant we need to normalize the data to a 
+particular scale to overcome this. 
+Multiple  detection  boxes  get  created  during  detection  we  can 
+use non max suppression to solve that problem.
 
 ## Standard install via command-line
 ```
