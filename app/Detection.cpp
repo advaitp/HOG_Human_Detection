@@ -27,14 +27,13 @@
  * SOFTWARE.
  */
 
+#include <vector>
 #include <iostream>
 #include<Detection.hpp>
 #include<Box.hpp>
-#include <string>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
-#include <vector>
 
 
 void Detection :: humandetection(cv::Mat frame) {}

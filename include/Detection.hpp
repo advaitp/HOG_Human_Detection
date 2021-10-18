@@ -31,35 +31,38 @@
 #define INCLUDE_DETECTION_HPP_
 
 #include <iostream>
-#include <string>
+#include <vector>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
-#include <vector>
 #include <Box.hpp>
 
-class Detection
-{
-  private :
+class Detection{
+ private :
   /// variable to access HOG descriptor
-  cv::HOGDescriptor hog ;
+  cv::HOGDescriptor hog;
 
-  public :
+ public :
   /// variable to hold the all the bounding boxes after detection
-  std::vector<Box> detection ;
+  std::vector<Box> detection;
 
-  /**
-   * @brief Function to get all the detection boxes after detection using HOG and SVM
-   * @param frame cv::Mat
-   */
+ /**
+  * @brief Function to get all the detection boxes after detection using HOG and SVM
+  * @param frame cv::Mat
+  */
   void humandetection(cv::Mat frame);
 
+ /**
+  * @brief Function to overlapping bounding boxes
+  *
+  */
+  void nms();
+
   /**
-   * @brief Function to overlapping bounding boxes
+   * @brief Function to draw boundary around human
    *
    */
-  void nms() ;
-
+  void drawboxes();
 };
 
-#endif  /* INCLUDE_DETECTION_HPP_ */
+#endif  // INCLUDE_DETECTION_HPP_

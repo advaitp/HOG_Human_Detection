@@ -31,22 +31,20 @@
 #define INCLUDE_CAMERA_HPP_
 
 #include<iostream>
-#include <string>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 
-class Camera
-{
-	public :
-	cv::Mat frame ; // variable to hold each frame of video
+class Camera{
+ public :
+  // variable to hold each frame of video
+  cv::Mat frame;
 
 	/**
 	 * @brief Function to take input from camera as stream of frames
 	 * @param webcam int
 	 */
-	void capturevideo(int webcam);
-
+  void capturevideo(int webcam);
 };
 
-#endif  /* INCLUDE CAMERA_HPP_ */
+#endif  // INCLUDE_CAMERA_HPP_

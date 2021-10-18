@@ -11,7 +11,7 @@ if (COVERAGE)
     include(CodeCoverage)
     set(LCOV_REMOVE_EXTRA "'vendor/*'")
     setup_target_for_coverage(code_coverage test/cpp-test coverage)
-    set(COVERAGE_SRCS app/main.cpp app/Camera.cpp app/Detection.cpp app/Box.cpp app/main.cpp app/Human.cpp include/lib.hpp include/Detection.hpp include/Box.hpp include/Camera.hpp include/Human.hpp)
+    set(COVERAGE_SRCS app/main.cpp app/Camera.cpp app/Detection.cpp  app/main.cpp include/lib.hpp include/Detection.hpp  include/Camera.hpp )
 
     SET(CMAKE_CXX_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
     SET(CMAKE_C_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
