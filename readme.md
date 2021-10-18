@@ -63,6 +63,13 @@ particular scale to overcome this.
 Multiple  detection  boxes  get  created  during  detection  we  can 
 use non max suppression to solve that problem.
 
+## Technology Used:
+- Ubuntu 18.04 (Operating System)
+- Modern C++ (Programming Language)
+- CMake (Build System)
+- OpenCV library (new BSD License)
+- Eigen library (new BSD License)
+
 ## Standard install via command-line
 ```
 git clone --recursive https://github.com/dpiet/cpp-boilerplate
