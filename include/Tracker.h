@@ -1,18 +1,17 @@
 ///============================================================================
-/// @file        : Human.cpp
+/// @file        : Tracker.h
 /// @author      : gauraut (Driver)
 /// @author      : Advait Patole (Navigator)
 /// @version     : 1.0.1
 /// @copyright   : MIT License
-/// @brief       : Human class definition
+/// @brief       : Tracker.h include file
 ///============================================================================
 
 #include "Human.h"
+#include <unordered_map>
 
-void Human::calc_centre(const Box &box) {
-  centre = {box.x+(box.width/2), box.y+(box.height/2)};
-}
-
-void transormation(const Box &box) {
-
-}
+class Box {
+ public:
+  unordered_map<Human> storage;
+  bool is_same(storage);
+};

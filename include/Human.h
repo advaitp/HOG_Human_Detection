@@ -13,6 +13,7 @@
 #include "Box.h"
 
 class Human: public Box {
+ public:
   int centre[2];  // This array will store the x and y coordinates
   // of the Human CoG in camera frame
 
