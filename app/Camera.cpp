@@ -28,8 +28,32 @@
  */
 
 #include<Camera.hpp>
+#include<string>
 #include<opencv2/highgui/highgui.hpp>
 #include<opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 
-void Camera :: capturevideo(int webcam) {}
+
+Camera::Camera() {
+  webcam = 0;
+}
+
+Camera::Camera(const int* x) {
+  webcam = *x;
+}
+
+void Camera :: capturevideo() {
+  /// Capture the frame of video
+  cv::VideoCapture cap(webcam) ;
+  std::string window_name = "My Camera" ;
+
+  /// variable to store frame of video
+  cv::Mat frame;
+
+  /// Reading frame of video
+  cap.read(frame);
+
+  /// show the frame in the created window
+  cv::imshow(window_name, frame);
+
+}

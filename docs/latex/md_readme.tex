@@ -1,0 +1,134 @@
+\hypertarget{md_readme_autotoc_md1}{}\doxysection{Project Contributors}\label{md_readme_autotoc_md1}
+
+\begin{DoxyItemize}
+\item Gaurav Raut -\/ M.\+Eng. Robotics student. I like to make puns.
+\item Advait Patole -\/ Graduate student at University of Maryland pursuing M.\+Eng. Robotics. Likes rock music. 
+\end{DoxyItemize}\hypertarget{md_readme_autotoc_md2}{}\doxysection{Build Status Coverage Status}\label{md_readme_autotoc_md2}
+\href{https://app.travis-ci.com/gauraut/HOG_Human_Detection}{\texttt{ }} \href{https://coveralls.io/github/gauraut/HOG_Human_Detection?branch=main}{\texttt{ }} \href{https://opensource.org/licenses/MIT}{\texttt{ }} \hypertarget{md_readme_autotoc_md3}{}\doxysubsection{License}\label{md_readme_autotoc_md3}
+MIT License
+
+Copyright (c) 2021 Gaurav Raut, Advait Patole
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \char`\"{}\+Software\char`\"{}), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions\+:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED \char`\"{}\+AS IS\char`\"{}, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\hypertarget{md_readme_autotoc_md4}{}\doxysubsection{Planning and management documents}\label{md_readme_autotoc_md4}
+
+\begin{DoxyItemize}
+\item Product and Iteration backlogs, Work logs -\/ \href{https://docs.google.com/spreadsheets/d/1AqmzROpvQzZs42nM-5xIrxISOKAmEnqSZvvMMRmAUtc/edit?usp=sharing}{\texttt{ https\+://docs.\+google.\+com/spreadsheets/d/1\+Aqmz\+ROpv\+Qz\+Zs42n\+M-\/5x\+Irx\+ISOKAm\+Enq\+SZvv\+MMRm\+AUtc/edit?usp=sharing}}
+\item Sprint Document -\/ \href{https://docs.google.com/document/d/148LJN0tJzzBdqmiuJV0zaLxc1Qg-1pK8uLO6xgxRnHk/edit?usp=sharing}{\texttt{ https\+://docs.\+google.\+com/document/d/148\+LJN0t\+Jzz\+Bdqmiu\+JV0za\+Lxc1\+Qg-\/1p\+K8u\+LO6xgx\+Rn\+Hk/edit?usp=sharing}}
+\item Gantt Chart(\+Timeline) -\/ \href{https://docs.google.com/spreadsheets/d/111fKcOGjVEq8wXLX9FNTWaAUSNsgvVnWToeZoKKRCYU/edit?usp=sharing}{\texttt{ https\+://docs.\+google.\+com/spreadsheets/d/111f\+Kc\+OGj\+VEq8w\+XLX9\+FNTWa\+AUSNsgv\+Vn\+WToe\+Zo\+KKRCYU/edit?usp=sharing}}
+\end{DoxyItemize}\hypertarget{md_readme_autotoc_md5}{}\doxysubsection{Overview}\label{md_readme_autotoc_md5}
+Our design uses monocular camera to detect humans and get their positions in the robot’s reference frame. The module is developed in such a way that it detects humans (N\texorpdfstring{$>$}{>}=1) and then creates bounding box around it. The distance of human is calculated from the pixel values of the bounding boxes. This system is perfect for use in robots like autonomous caddies in malls or airports for transportation which is under-\/development by Acme. The module detects humans and if the distance is below a threshold, the vehicle slows down. The distance measurements can be fed to the odometry of the robot in order to control its motion. The project could be easily expanded and trained to detect more objects and take actions based on the type of the object. The AIP design process allows continuous development. Because of this, new features and modules could be added over new sprints and thus making the module highly customizable. \hypertarget{md_readme_autotoc_md6}{}\doxysubsection{Algorithm}\label{md_readme_autotoc_md6}
+The HOG descriptors convert image into a feature vector. The input image (641283) is converted to a 3780-\/length vector. The SVM classifier is trained by fitting appropriate parameters to train whether image has human or not. Once it is trained, a sliding window is created of size 64$\ast$128 which creates different image patches each of length 3780 feature vector. The SVM is used on each of the feature vector to get whether human is found in that image or not. If it is found, then we store the coordinates to create the bounding boxes. In-\/order to solve the problem of multiple bounding boxes, we can use a non max suppression to remove overlapping boxes.  \hypertarget{md_readme_autotoc_md7}{}\doxysubsection{Technology}\label{md_readme_autotoc_md7}
+The monocular camera inputs a stream of images, i.\+e., video, to our microprocessor. Every frame in the image will be converted into a feature vector by our custom-\/made HOG feature descriptor. The feature vector will be given as an input to our pre-\/trained custom-\/made linear SVM which will classify the features as Human and Non-\/\+Human. Further, if there is a human in the frame, the algorithm will calculate the distance of the human from the caddy based on the pixel location and pre-\/defined equations and assumptions. \hypertarget{md_readme_autotoc_md8}{}\doxysubsection{Risks and Mitigation\+:}\label{md_readme_autotoc_md8}
+A HOG is not a rotation invariant representation. This means that HOG can only vectorize features of images within a certain orientation range for object detection assignment. This can be corrected if we train images with different orientation. Monocular camera we have made calibration before implementing while comparing the given distance with the calibrated calculations instead we can use depth cameras for more accurate results like Intel® Real\+Sense™ depth camera D435. HOG is not scale invariant we need to normalize the data to a particular scale to overcome this. Multiple detection boxes get created during detection we can use non max suppression to solve that problem.\hypertarget{md_readme_autotoc_md9}{}\doxysubsection{Technology Used\+:}\label{md_readme_autotoc_md9}
+
+\begin{DoxyItemize}
+\item Ubuntu 18.\+04 (Operating System)
+\item Modern C++ (Programming Language)
+\item CMake (Build System)
+\item Open\+CV library (new BSD License)
+\item Eigen library (new BSD License)
+\end{DoxyItemize}\hypertarget{md_readme_autotoc_md10}{}\doxysubsection{Standard install via command-\/line}\label{md_readme_autotoc_md10}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{git clone -\/-\/recursive https://github.com/dpiet/cpp-\/boilerplate}
+\DoxyCodeLine{cd <path to repository>}
+\DoxyCodeLine{mkdir build}
+\DoxyCodeLine{cd build}
+\DoxyCodeLine{cmake ..}
+\DoxyCodeLine{make}
+\DoxyCodeLine{Run tests: ./test/cpp-\/test}
+\DoxyCodeLine{Run program: ./app/shell-\/app}
+
+\end{DoxyCode}
+\hypertarget{md_readme_autotoc_md11}{}\doxysubsection{Building for code coverage (for assignments beginning in Week 4)}\label{md_readme_autotoc_md11}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{sudo apt-\/get install lcov}
+\DoxyCodeLine{cmake -\/D COVERAGE=ON -\/D CMAKE\_BUILD\_TYPE=Debug ../}
+\DoxyCodeLine{make}
+\DoxyCodeLine{make code\_coverage}
+
+\end{DoxyCode}
+ \hypertarget{md_readme_autotoc_md12}{}\doxysubsection{Making Doxygen documentation}\label{md_readme_autotoc_md12}
+This generates a index.\+html page in the build/coverage sub-\/directory that can be viewed locally in a web browser. How to Generate Doxygen Documentation
+
+To install doxygen run the following command\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{sudo apt-\/get install doxygen}
+\DoxyCodeLine{}
+\DoxyCodeLine{Now from the cloned directory run:}
+\DoxyCodeLine{}
+\DoxyCodeLine{doxygen doxygen}
+
+\end{DoxyCode}
+ Generated doxygen files are in html format and you can find them in ./docs folder. With the following command 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cd docs}
+\DoxyCodeLine{cd html}
+\DoxyCodeLine{google-\/chrome index.html}
+
+\end{DoxyCode}
+ \hypertarget{md_readme_autotoc_md13}{}\doxysubsection{Working with Eclipse IDE}\label{md_readme_autotoc_md13}
+\hypertarget{md_readme_autotoc_md14}{}\doxysubsection{Installation}\label{md_readme_autotoc_md14}
+In your Eclipse workspace directory (or create a new one), checkout the repo (and submodules) 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{mkdir -\/p \string~/workspace}
+\DoxyCodeLine{cd \string~/workspace}
+\DoxyCodeLine{git clone -\/-\/recursive https://github.com/dpiet/cpp-\/boilerplate}
+
+\end{DoxyCode}
+
+
+In your work directory, use cmake to create an Eclipse project for an \mbox{[}out-\/of-\/source build\mbox{]} of cpp-\/boilerplate
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cd \string~/workspace}
+\DoxyCodeLine{mkdir -\/p boilerplate-\/eclipse}
+\DoxyCodeLine{cd boilerplate-\/eclipse}
+\DoxyCodeLine{cmake -\/G "{}Eclipse CDT4 -\/ Unix Makefiles"{} -\/D CMAKE\_BUILD\_TYPE=Debug -\/D CMAKE\_ECLIPSE\_VERSION=4.7.0 -\/D CMAKE\_CXX\_COMPILER\_ARG1=-\/std=c++14 ../cpp-\/boilerplate/}
+
+\end{DoxyCode}
+\hypertarget{md_readme_autotoc_md15}{}\doxysubsection{Import}\label{md_readme_autotoc_md15}
+Open Eclipse, go to File -\/\texorpdfstring{$>$}{>} Import -\/\texorpdfstring{$>$}{>} General -\/\texorpdfstring{$>$}{>} Existing Projects into Workspace -\/\texorpdfstring{$>$}{>} Select \char`\"{}boilerplate-\/eclipse\char`\"{} directory created previously as root directory -\/\texorpdfstring{$>$}{>} Finish\hypertarget{md_readme_autotoc_md16}{}\doxysection{Edit}\label{md_readme_autotoc_md16}
+Source files may be edited under the \char`\"{}\mbox{[}\+Source Directory\mbox{]}\char`\"{} label in the Project Explorer.\hypertarget{md_readme_autotoc_md17}{}\doxysubsection{Build}\label{md_readme_autotoc_md17}
+To build the project, in Eclipse, unfold boilerplate-\/eclipse project in Project Explorer, unfold Build Targets, double click on \char`\"{}all\char`\"{} to build all projects.\hypertarget{md_readme_autotoc_md18}{}\doxysubsection{Run}\label{md_readme_autotoc_md18}
+
+\begin{DoxyEnumerate}
+\item In Eclipse, right click on the boilerplate-\/eclipse in Project Explorer, select Run As -\/\texorpdfstring{$>$}{>} Local C/\+C++ Application
+\item Choose the binaries to run (e.\+g. shell-\/app, cpp-\/test for unit testing)
+\end{DoxyEnumerate}\hypertarget{md_readme_autotoc_md19}{}\doxysubsection{Debug}\label{md_readme_autotoc_md19}
+
+\begin{DoxyEnumerate}
+\item Set breakpoint in source file (i.\+e. double click in the left margin on the line you want the program to break).
+\item In Eclipse, right click on the boilerplate-\/eclipse in Project Explorer, select Debug As -\/\texorpdfstring{$>$}{>} Local C/\+C++ Application, choose the binaries to run (e.\+g. shell-\/app).
+\item If prompt to \char`\"{}\+Confirm Perspective Switch\char`\"{}, select yes.
+\item Program will break at the breakpoint you set.
+\item Press Step Into (F5), Step Over (F6), Step Return (F7) to step/debug your program.
+\item Right click on the variable in editor to add watch expression to watch the variable in debugger window.
+\item Press Terminate icon to terminate debugging and press C/\+C++ icon to switch back to C/\+C++ perspetive view (or Windows-\/\texorpdfstring{$>$}{>}Perspective-\/\texorpdfstring{$>$}{>}Open Perspective-\/\texorpdfstring{$>$}{>}C/\+C++).
+\end{DoxyEnumerate}\hypertarget{md_readme_autotoc_md20}{}\doxysubsection{Plugins}\label{md_readme_autotoc_md20}
+
+\begin{DoxyItemize}
+\item Cpp\+Ch\+Eclipse
+
+To install and run cppcheck in Eclipse
+\begin{DoxyEnumerate}
+\item In Eclipse, go to Window -\/\texorpdfstring{$>$}{>} Preferences -\/\texorpdfstring{$>$}{>} C/\+C++ -\/\texorpdfstring{$>$}{>} cppcheclipse. Set cppcheck binary path to \char`\"{}/usr/bin/cppcheck\char`\"{}.
+\item To run CPPCheck on a project, right click on the project name in the Project Explorer and choose cppcheck -\/\texorpdfstring{$>$}{>} Run cppcheck.
+\end{DoxyEnumerate}
+\item Google C++ Sytle
+
+To include and use Google C++ Style formatter in Eclipse
+\begin{DoxyEnumerate}
+\item In Eclipse, go to Window -\/\texorpdfstring{$>$}{>} Preferences -\/\texorpdfstring{$>$}{>} C/\+C++ -\/\texorpdfstring{$>$}{>} Code Style -\/\texorpdfstring{$>$}{>} Formatter. Import \href{https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-cpp-google-style.xml}{\texttt{ eclipse-\/cpp-\/google-\/style}} and apply.
+\item To use Google C++ style formatter, right click on the source code or folder in Project Explorer and choose Source -\/\texorpdfstring{$>$}{>} Format
+\end{DoxyEnumerate}
+\item Git
+
+It is possible to manage version control through Eclipse and the git plugin, but it typically requires creating another project. If you\textquotesingle{}re interested in this, try it out yourself and contact me on Canvas. 
+\end{DoxyItemize}

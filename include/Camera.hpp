@@ -37,14 +37,16 @@
 
 class Camera{
  public :
+  Camera();
+  Camera(const int* x);
   // variable to hold each frame of video
   cv::Mat frame;
-
+  int webcam;
 	/**
 	 * @brief Function to take input from camera as stream of frames
 	 * @param webcam int
 	 */
-  void capturevideo(int webcam);
+  void capturevideo();
 };
 
 #endif  // INCLUDE_CAMERA_HPP_

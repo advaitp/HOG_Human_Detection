@@ -18,12 +18,13 @@
 ///
 class Box {
  public:
-  Box(int* x1, int* y1, int* x2, int* y2);
+  Box(const int x1, const int y1, const int x2, const int y2, const double confi);
+  Box(const int x1, const int y1, const int x2, const int y2);
   // variable initialization constructor
   Box();  // default constructor
   int coordinates[4];  // The four co-ordinates will show the upper
   // left and lower right  and y coordinates [x1, y1, x2, y2]
-
+  double confidence;
   cv::Rect box;  // Will inherit attributes from cv::Rect
 };
 

@@ -29,13 +29,81 @@
 
 #include <vector>
 #include <iostream>
-#include<Detection.hpp>
-#include<Box.hpp>
+#include <Detection.hpp>
+#include <Box.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
+#include <opencv2/dnn.hpp>
 
+void Detection :: humandetection(cv::Mat frame) {
+  /// Set SVM pretrained model for human detection
+  hog.setSVMDetector(cv::HOGDescriptor::getDefaultPeopleDetector());
 
-void Detection :: humandetection(cv::Mat frame) {}
+  /// Set SVM model parameters like foundLocations, foundWeights, winStride for human detection
+  hog.detectMultiScale(frame, Boxes, confidences, 0, cv::Size(4,4), cv::Size(16,16), 1.2, 1.02);
 
-void Detection :: nms() {}
+  /// Iterate over the collection of bounding boxes
+  for(auto i : Boxes) {
+       cv::Rect r = i;
+       int start_x, start_y, end_x, end_y;
+
+       start_x = r.x;
+       start_y = r.y;
+       end_x = r.x + r.width;
+       end_y = r.y + r.height;
+
+       Box bbox(start_x, start_y, end_x, end_y);
+
+       detections.push_back(bbox);
+    }
+}
+
+//void Detection :: nms() {
+//  /// Apply non-maximum suppression procedure.
+//  std::vector<int> indices;
+//
+//  /// Setting nms_threshold and score_threshold for NMS
+//  double nms_threshold = 0.7;
+//  double confidence_threshold = 0.6;
+//  cv::dnn::dnn4_v20191202::NMSBoxes(Boxes, confidences, confidence_threshold, nms_threshold, indices);
+//}
+
+void Detection :: drawboxes(cv::Mat frame) {
+  /// Iterate over the updated detections after nms to draw rectangle
+//  for(int index : indices){
+//    cv::Rect box = Boxes[index];
+//    int start_x, start_y, end_x, end_y ;
+//    start_x = box.x;
+//    start_y = box.y;
+//    end_x = box.x + box.width;
+//    end_y = box.y + box.height;
+//
+//    /// Top Left corner of bounding box
+//    cv::Point pt1(start_x, start_y);
+//
+//    /// Bottom Right corner of bounding box
+//    cv::Point pt2(end_x, end_y);
+//
+//    /// Draw corresponding rectangle with green color
+//    cv::rectangle(frame, pt1, pt2, cv::Scalar(0, 255, 0));
+//  }
+
+  for(auto Box : Boxes){
+    cv::Rect box = Box;
+    int start_x, start_y, end_x, end_y ;
+    start_x = box.x;
+    start_y = box.y;
+    end_x = box.x + box.width;
+    end_y = box.y + box.height;
+
+    /// Top Left corner of bounding box
+    cv::Point pt1(start_x, start_y);
+
+    /// Bottom Right corner of bounding box
+    cv::Point pt2(end_x, end_y);
+
+    /// Draw corresponding rectangle with green color
+    cv::rectangle(frame, pt1, pt2, cv::Scalar(0, 255, 0));
+  }
+}

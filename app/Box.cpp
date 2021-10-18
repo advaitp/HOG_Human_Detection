@@ -9,10 +9,38 @@
 
 #include "Box.h"
 
-Box::Box(int &x1, int &y1, int &x2, int &y2) {
-  coordinates = {x1, y1, x2, y2};
+Box::Box(const int x1, const int y1, const int x2, const int y2) {
+  coordinates[0] = x1;
+  coordinates[1] = y1;
+  coordinates[2] = x2;
+  coordinates[3] = y2;
+  box.x = x1;
+  box.y = y1;
+  box.width = x2 - x1;
+  box.height = y2 - y1;
+  confidence = 1;
+}
+
+Box::Box(const int x1, const int y1, const int x2, const int y2, const double confi) {
+  coordinates[0] = x1;
+  coordinates[1] = y1;
+  coordinates[2] = x2;
+  coordinates[3] = y2;
+  box.x = x1;
+  box.y = y1;
+  box.width = x2 - x1;
+  box.height = y2 - y1;
+  confidence = confi;
 }
 
 Box::Box() {
-  coordinates = {0, 0, 0, 0};
+  coordinates[0] = 0;
+  coordinates[1] = 0;
+  coordinates[2] = 0;
+  coordinates[3] = 0;
+  box.x = 0;
+  box.y = 0;
+  box.width = 0;
+  box.height = 0;
+  confidence = 1;
 }

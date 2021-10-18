@@ -35,16 +35,24 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
-#include <Box.hpp>
+#include <Box.h>
 
 class Detection{
  private :
   /// variable to access HOG descriptor
   cv::HOGDescriptor hog;
 
+  std::vector<double> confidences;
+
+  /// Store collection of boxes
+  std::vector<cv::Rect> Boxes ;
+
+  /// Store indices of bounding boxes after Non Max Suppression.
+  std::vector<int> indices;
+
  public :
-  /// variable to hold the all the bounding boxes after detection
-  std::vector<Box> detection;
+  /// variable to hold the all the bounding boxes coordinates after detection
+  std::vector<Box> detections;
 
  /**
   * @brief Function to get all the detection boxes after detection using HOG and SVM
@@ -62,7 +70,7 @@ class Detection{
    * @brief Function to draw boundary around human
    *
    */
-  void drawboxes();
+  void drawboxes(cv::Mat frame);
 };
 
 #endif  // INCLUDE_DETECTION_HPP_
