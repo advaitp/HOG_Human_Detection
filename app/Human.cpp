@@ -9,10 +9,18 @@
 
 #include "Human.h"
 
-void Human::calc_centre(const Box &box) {
-  centre = {box.x+(box.width/2), box.y+(box.height/2)};
+Human::Human() {
+  coordinates[0] = 0;
+  coordinates[1] = 0;
+  coordinates[2] = 30;
+  coordinates[3] = 40;
 }
 
+void Human::calc_centre(const Box in) {
+  centre[0] = in.box.x+(in.box.width/2);
+  centre[1] = in.box.y+(in.box.height/2);
+}
+/*
 void transormation(const Box &box) {
 
-}
+}*/

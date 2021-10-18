@@ -14,6 +14,8 @@
 
 class Human: public Box {
  public:
+
+  Human();
   int centre[2];  // This array will store the x and y coordinates
   // of the Human CoG in camera frame
 
@@ -24,7 +26,7 @@ class Human: public Box {
   /// @pre
   /// @post
   /// @param
-  void calc_centre(Box&);
+  void calc_centre(const Box);
   /// @fn void transformation(Box&)
   /// @brief This function will transform the co-ordinates
   /// of the human in robot reference frame
@@ -32,7 +34,7 @@ class Human: public Box {
   /// @pre
   /// @post
   /// @param
-  void transormation(Box&);
+  void transormation(Box);
 };
 
 #endif  // INCLUDE_HUMAN_H_

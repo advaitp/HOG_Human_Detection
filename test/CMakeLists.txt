@@ -4,7 +4,10 @@ find_package(OpenCV REQUIRED)
 
 add_executable(
     cpp-test
-    test.cpp
+    main.cpp
+    BoxTest.cpp
+    Cameratest.cpp
+    HumanTest.cpp
 )
 
 target_include_directories(cpp-test PUBLIC ../vendor/googletest/googletest/include 
