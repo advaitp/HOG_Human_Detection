@@ -4,7 +4,7 @@
 /// @author      : Advait Patole (Navigator)
 /// @version     : 1.0.1
 /// @copyright   : MIT License
-/// @brief       : HumanTest.cpp include file
+/// @brief       : HumanTest.cpp test file
 ///============================================================================
 
 #include <gtest/gtest.h>
