@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 2.8) 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules)
 find_package(OpenCV REQUIRED )
 
 add_executable(
@@ -9,6 +8,10 @@ add_executable(
     Detection.cpp
     Human.cpp
     Box.cpp
+)
+
+include_directories(
+    ${CMAKE_SOURCE_DIR}/include
 )
 
 target_include_directories(shell-app PUBLIC ${CMAKE_SOURCE_DIR}/include
