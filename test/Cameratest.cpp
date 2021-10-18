@@ -1,6 +1,6 @@
 /**
- * @file Camera.cpp
- * @brief initializing video from the camera with class deinition
+ * @file Cameratest.cpp
+ * @brief Test file for Camera class
  * @author Advait Patole
  * @author Gaurav Raut
  *
@@ -28,40 +28,12 @@
  */
 
 #include<Camera.hpp>
-#include<string>
-#include<opencv2/highgui/highgui.hpp>
-#include<opencv2/imgproc/imgproc.hpp>
-#include <opencv2/opencv.hpp>
+#include <gtest/gtest.h>
 
-
-Camera::Camera() {
-  webcam = 0;
+TEST(CameraTest1, testcamerawebcam) {
+  Camera cam;
+  EXPECT_EQ(cam.Camera(1), 1);
+  EXPECT_EQ(cam.Camera(2), 2);
 }
 
-Camera::Camera(int &x) {
-  webcam = x;
-}
 
-void Camera :: capturevideo() {
-  /// Capture the frame of video
-  cv::VideoCapture cap(webcam) ;
-  std::string window_name = "My Camera" ;
-
-  /// variable to store frame of video
-  cv::Mat frame;
-
-  /// Reading frame of video
-  cap.read(frame);
-
-  /// show the frame in the created window
-  cv::imshow(window_name, frame);
-
-  /// wait for for 10 ms until any key is pressed.
-  /// If the 'Esc' key is pressed, break the while loop.
-  /// If the any other key is pressed, continue the loop
-  /// If any key is not pressed withing 10 ms, continue the loop
-  if (cv::waitKey(10) == 27){
-      std::cout<<"Escape the video when Esc key pressed"<<std::endl;
-      break;
-  }
-}

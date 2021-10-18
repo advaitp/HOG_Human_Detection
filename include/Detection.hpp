@@ -45,6 +45,9 @@ class Detection{
   /// Store collection of boxes
   vector<cv::Rect> Boxes ;
 
+  /// Store indices of bounding boxes after Non Max Suppression.
+  vector<int> indices;
+
  public :
   /// variable to hold the all the bounding boxes coordinates after detection
   std::vector<Box> detections;
