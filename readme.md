@@ -1,4 +1,7 @@
 # HOG_Human_Detection
+## Project Contributors
+- Gaurav Raut
+- Advait Patole
 # Build Status Coverage Status
 [![Build Status](https://app.travis-ci.com/gauraut/HOG_Human_Detection.svg?branch=main)](https://app.travis-ci.com/gauraut/HOG_Human_Detection)
 [![Coverage Status](https://coveralls.io/repos/github/gauraut/HOG_Human_Detection/badge.svg?branch=main)](https://coveralls.io/github/gauraut/HOG_Human_Detection?branch=main)
@@ -15,7 +18,7 @@ Our design uses monocular camera to detect humans and get their positions in the
 ## Algorithm
 
 The HOG descriptors convert image into a feature vector. The input image (641283) is converted to a 3780-length vector. The SVM classifier is trained by fitting appropriate parameters to train whether image has human or not. Once it is trained, a sliding window is created of size 64*128 which creates different image patches each of length 3780 feature vector. The SVM is used on each of the feature vector to get whether human is found in that image or not. If it is found, then we store the coordinates to create the bounding boxes. In-order to solve the problem of multiple bounding boxes, we can use a non max suppression to remove overlapping boxes.
-https://learnopencv.com/wp-content/uploads/2016/12/hog-cell-gradients-768x432.png
+![image](https://learnopencv.com/wp-content/uploads/2016/12/hog-cell-gradients-768x432.png)
 ## Technology
 
 The monocular camera inputs a stream of images, i.e., video, to our microprocessor. Every frame in the image will be converted into a feature vector by our custom-made HOG feature descriptor. The feature vector will be given as an input to our pre-trained custom-made linear SVM which will classify the features as Human and Non-Human. Further, if there is a human in the frame, the algorithm will calculate the distance of the human from the caddy based on the pixel location and pre-defined equations and assumptions.
@@ -40,8 +43,25 @@ cmake -D COVERAGE=ON -D CMAKE_BUILD_TYPE=Debug ../
 make
 make code_coverage
 ```
-This generates a index.html page in the build/coverage sub-directory that can be viewed locally in a web browser.
+## Making Doxygen documentation
 
+This generates a index.html page in the build/coverage sub-directory that can be viewed locally in a web browser.
+How to Generate Doxygen Documentation
+
+To install doxygen run the following command:
+```
+sudo apt-get install doxygen
+
+Now from the cloned directory run:
+
+doxygen doxygen
+```
+Generated doxygen files are in html format and you can find them in ./docs folder. With the following command
+```
+cd docs
+cd html
+google-chrome index.html
+```
 ## Working with Eclipse IDE ##
 
 ## Installation
