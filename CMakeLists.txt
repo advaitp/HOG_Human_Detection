@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.2.1)
 project (HOG_Human_Detection)
+find_package(OpenCV REQUIRED)
 
 # Add project cmake modules to path.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
@@ -9,7 +10,7 @@ option(COVERAGE "Generate Coverage Data" ON)
 
 if (COVERAGE)
     include(CodeCoverage)
-    set(LCOV_REMOVE_EXTRA "'vendor/*'")
+    set(LCOV_REMOVE_EXTRA "'vendor/*'" "'include/Eigen/*'" "'opencv-3.3.0/*'")
     setup_target_for_coverage(code_coverage test/cpp-test coverage)
     set(COVERAGE_SRCS  app/main.cpp app/Detection.cpp app/Human.cpp app/Box.cpp app/Camera.cpp include/Camera.hpp include/Detection.hpp include/Human.h
     include/Box.h)
