@@ -2,7 +2,7 @@
 /// @file        : Box.h
 /// @author      : gauraut (Driver)
 /// @author      : Advait Patole (Navigator)
-/// @version     : 1.0
+/// @version     : 1.0.1
 /// @copyright   : MIT License
 /// @brief       : Box.h include file
 ///============================================================================
@@ -18,6 +18,9 @@
 ///
 class Box {
  public:
+  Box(int* x1, int* y1, int* x2, int* y2);
+  // variable initialization constructor
+  Box();  // default constructor
   int coordinates[4];  // The four co-ordinates will show the upper
   // left and lower right  and y coordinates [x1, y1, x2, y2]
 

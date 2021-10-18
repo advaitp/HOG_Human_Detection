@@ -2,7 +2,7 @@
 /// @file        : Human.h
 /// @author      : gauraut (Driver)
 /// @author      : Advait Patole (Navigator)
-/// @version     : 1.0
+/// @version     : 1.0.1
 /// @copyright   : MIT License
 /// @brief       : Human.h include file
 ///============================================================================
@@ -10,7 +10,7 @@
 #ifndef INCLUDE_HUMAN_H_
 #define INCLUDE_HUMAN_H_
 
-#include <Box.h>
+#include "Box.h"
 
 class Human: public Box {
   int centre[2];  // This array will store the x and y coordinates

@@ -1,16 +1,16 @@
 ///============================================================================
-/// @file        : main.cpp
+/// @file        : Human.cpp
 /// @author      : gauraut (Driver)
 /// @author      : Advait Patole (Navigator)
 /// @version     : 1.0.1
 /// @copyright   : MIT License
-/// @brief       : The main file to run our HOG_Human_Descriptor program
+/// @brief       : Human class definition
 ///============================================================================
 
-#include <iostream>
-#include <opencv2/opencv.hpp>
+#include "Human.h"
 
+void Human::calc_centre(const Box &box) {
+}
 
-int main() {
-  return 0;
+void transormation(const Box &box) {
 }
