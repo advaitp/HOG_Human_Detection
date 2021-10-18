@@ -40,21 +40,18 @@ void Detection :: humandetection(cv::Mat frame) {
   /// Set SVM pretrained model for human detection
   hog.setSVMDetector(cv::HOGDescriptor::getDefaultPeopleDetector());
 
-  /// variable that stores the weight of each bounding box
-
-
   /// Set SVM model parameters like foundLocations, foundWeights, winStride for human detection
   hog.detectMultiScale(frame, confidences, Boxes, 0, Size(2,2), Size(10,10), 1.2, 1.02);
 
   /// Iterate over the collection of bounding boxes
-  for(size_t i = 0; i < found.size(); i++ ){
-       cv::Rect r = found[i];
+  for(size_t i = 0; i < Boxes.size(); i++ ){
+       cv::Rect r = Boxes[i];
        int start_x, start_y, end_x, end_y;
 
-       start_x = found[i].x;
-       start_y = found[i].y;
-       end_x = found[i].x + found[i].width;
-       end_y = found[i].y + found[i].height;
+       start_x = r.x;
+       start_y = r.y;
+       end_x = r.x + r.width;
+       end_y = r.y + r.height;
 
        Box bbox = new Box(start_x, start_y, end_x, end_y) ;
 
@@ -63,8 +60,10 @@ void Detection :: humandetection(cv::Mat frame) {
 }
 
 void Detection :: nms() {
-  // Apply non-maximum suppression procedure.
+  /// Apply non-maximum suppression procedure.
   std::vector<int> indices;
+
+  /// Setting nms_threshold and score_threshold for NMS
   double nms_threshold = 0.7;
   double confidence_threshold = 0.6;
   NMSBoxes(Boxes, confidences, confidence_threshold, nms_threshold, indices);
@@ -72,12 +71,13 @@ void Detection :: nms() {
 
 void Detection :: drawboxes(cv::Mat frame) {
   /// Iterate over the updated detections after nms to draw rectangle
-  for(Box bbox : detections){
+  for(int index : indices){
+    cv::Rect box = Boxes[index];
     int start_x, start_y, end_x, end_y ;
-    start_x = bbox[0];
-    start_y = bbox[1];
-    end_x = bbox[2];
-    end_y = bbox[3];
+    start_x = box.x;
+    start_y = box.y;
+    end_x = box.x + box.width;
+    end_y = box.y + box.height;
 
     /// Top Left corner of bounding box
     cv::Point pt1(start_x, start_y);

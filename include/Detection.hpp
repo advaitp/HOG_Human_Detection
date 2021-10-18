@@ -46,7 +46,7 @@ class Detection{
   vector<cv::Rect> Boxes ;
 
  public :
-  /// variable to hold the all the bounding boxes after detection
+  /// variable to hold the all the bounding boxes coordinates after detection
   std::vector<Box> detections;
 
  /**
