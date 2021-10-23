@@ -36,23 +36,30 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 #include <Box.h>
+#include <Human.h>
 
 class Detection{
  private :
-  /// variable to access HOG descriptor
+  // variable to access HOG descriptor
   cv::HOGDescriptor hog;
 
+  // Vector to store confidence score of each detection
   std::vector<double> confidences;
 
-  /// Store collection of boxes
+  // Store collection of boxes
   std::vector<cv::Rect> Boxes ;
 
-  /// Store indices of bounding boxes after Non Max Suppression.
+  // Store indices of bounding boxes after Non Max Suppression.
   std::vector<int> indices;
 
+  // Count of humans detected
+  int humans;
+
  public :
-  /// variable to hold the all the bounding boxes coordinates after detection
-  std::vector<Box> detections;
+  // variable to hold the all the bounding boxes coordinates after detection
+  std::vector<Box*> detections;
+
+  Detection();
 
  /**
   * @brief Function to get all the detection boxes after detection using HOG and SVM

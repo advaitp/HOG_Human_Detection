@@ -28,82 +28,99 @@
  */
 
 #include <vector>
+#include <string>
 #include <iostream>
 #include <Detection.hpp>
-#include <Box.h>
+#include "Box.h"
+#include <Human.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/dnn.hpp>
 
+Detection :: Detection(){
+  confidences = {};
+  Boxes = {};
+  indices = {};
+  detections = {};
+  humans = 0 ;
+}
+
 void Detection :: humandetection(cv::Mat frame) {
-  /// Set SVM pretrained model for human detection
-  hog.setSVMDetector(cv::HOGDescriptor::getDefaultPeopleDetector());
+  try{
+    // Set SVM pretrained model for human detection
+    hog.setSVMDetector(cv::HOGDescriptor::getDefaultPeopleDetector());
 
-  /// Set SVM model parameters like foundLocations, foundWeights, winStride for human detection
-  hog.detectMultiScale(frame, Boxes, confidences, 0, cv::Size(4,4), cv::Size(16,16), 1.2, 1.02);
+    // Set SVM model parameters like foundLocations, foundWeights, winStride for human detection
+    hog.detectMultiScale(frame, Boxes, confidences, 0, cv::Size(4,4), cv::Size(16,16), 1.2, 1.02);
+  }
+  catch(...){
+    std::cout << "Caught exception in humandetection function"<<std::endl;
+  }
+}
 
-  /// Iterate over the collection of bounding boxes
-  for(auto i : Boxes) {
-       cv::Rect r = i;
-       int start_x, start_y, end_x, end_y;
+void Detection :: nms() {
+  try{
+    // Setting nms_threshold and score_threshold for NMS
+    double nms_threshold = 0.7;
+    double confidence_threshold = 0.7;
 
-       start_x = r.x;
-       start_y = r.y;
-       end_x = r.x + r.width;
-       end_y = r.y + r.height;
+    //Converting the dataype to float
+    std::vector<float> scores(confidences.begin(), confidences.end());
 
-       Box bbox(start_x, start_y, end_x, end_y);
-
-       detections.push_back(bbox);
+    // Apply non-maximum suppression procedure.
+    cv::dnn::NMSBoxes(Boxes, scores, confidence_threshold, nms_threshold, indices);
+    std::cout<<"Count of Boxes before Non-Max Suppression "<<Boxes.size()<<std::endl;
+  }
+  catch(...){
+      std::cout << "Caught exception in nms function"<<std::endl;
     }
 }
 
-//void Detection :: nms() {
-//  /// Apply non-maximum suppression procedure.
-//  std::vector<int> indices;
-//
-//  /// Setting nms_threshold and score_threshold for NMS
-//  double nms_threshold = 0.7;
-//  double confidence_threshold = 0.6;
-//  cv::dnn::dnn4_v20191202::NMSBoxes(Boxes, confidences, confidence_threshold, nms_threshold, indices);
-//}
-
 void Detection :: drawboxes(cv::Mat frame) {
-  /// Iterate over the updated detections after nms to draw rectangle
-//  for(int index : indices){
-//    cv::Rect box = Boxes[index];
-//    int start_x, start_y, end_x, end_y ;
-//    start_x = box.x;
-//    start_y = box.y;
-//    end_x = box.x + box.width;
-//    end_y = box.y + box.height;
-//
-//    /// Top Left corner of bounding box
-//    cv::Point pt1(start_x, start_y);
-//
-//    /// Bottom Right corner of bounding box
-//    cv::Point pt2(end_x, end_y);
-//
-//    /// Draw corresponding rectangle with green color
-//    cv::rectangle(frame, pt1, pt2, cv::Scalar(0, 255, 0));
-//  }
+  try{
+    // Iterate over the updated detections after nms to draw rectangle
+    std::cout<<"Count of Boxes after Non-Max Suppression "<<indices.size()<<std::endl;
+    std::vector<double> human_coordinates ;
+    for(int index : indices){
+      std::cout<<"Box detected after Non Max Suppression at index "<<index<<std::endl;
+      cv::Rect box = Boxes[index];
+      int start_x, start_y, end_x, end_y ;
+      start_x = box.x;
+      start_y = box.y;
+      end_x = box.x + box.width;
+      end_y = box.y + box.height;
 
-  for(auto Box : Boxes){
-    cv::Rect box = Box;
-    int start_x, start_y, end_x, end_y ;
-    start_x = box.x;
-    start_y = box.y;
-    end_x = box.x + box.width;
-    end_y = box.y + box.height;
+      //filling each box as Box object
+      Box* bbox = new Box(start_x, start_y, end_x, end_y, box);
+      detections.push_back(bbox);
 
-    /// Top Left corner of bounding box
-    cv::Point pt1(start_x, start_y);
+      //Applying transformations camera frame to robot frame
+      Human hum;
+      hum.calc_centre(bbox);
 
-    /// Bottom Right corner of bounding box
-    cv::Point pt2(end_x, end_y);
+      //Getting transformed human coordinates in mm
+      human_coordinates = hum.transformation(frame);
 
-    /// Draw corresponding rectangle with green color
-    cv::rectangle(frame, pt1, pt2, cv::Scalar(0, 255, 0));
+      std::cout<<"Start positions are "<<start_x<<" "<<start_y<<std::endl;
+      std::cout<<"End positions are "<<end_x<<" "<<end_y<<std::endl;
+
+      // Top Left corner of bounding box
+      cv::Point pt1(start_x, start_y);
+
+      // Bottom Right corner of bounding box
+      cv::Point pt2(end_x, end_y);
+
+      // Draw corresponding rectangle with green color
+      cv::rectangle(frame, pt1, pt2, cv::Scalar(0, 255, 0));
+      std::string text = "(" + std::to_string(human_coordinates[0]) + "," + std::to_string(human_coordinates[1]) + "," + std::to_string(human_coordinates[2]) + ")";
+
+      // Writing the coordinates in mm
+      cv::putText(frame, text, cv::Point(start_x, start_y), cv::FONT_HERSHEY_DUPLEX, 1.0, CV_RGB(255, 0, 0), 2);
+    }
   }
+  catch(...){
+      std::cout << "Caught exception in drawboxes function"<<std::endl;
+    }
+
 }

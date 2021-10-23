@@ -11,30 +11,52 @@
 #define INCLUDE_HUMAN_H_
 
 #include "Box.h"
+#include <vector>
+#include <Eigen/Geometry>
+#include <Eigen/Dense>
+#include <Eigen/Core>
 
-class Human: public Box {
+class Human{
+ private:
+  // Centre of gravity of human
+  int centre[2];
+
+  // Average height of human
+  int height;
+
+  // Dots per inches(DPI) of device
+  int DPI;
+
  public:
-
   Human();
-  int centre[2];  // This array will store the x and y coordinates
-  // of the Human CoG in camera frame
 
-  /// @fn void calc_centre(Box&)
+  /// @fn void pixel_to_mm(int pixel)
+  /// @brief Function to convert pixel values to mm
+  ///
+  /// @pre
+  /// @post
+  /// @param pixel
+  /// @return coordinates in mm
+  double pixel_to_mm(int pixel);
+
+  /// @fn void calc_centre(Box* bbox)
   /// @brief This function will calculate the CoG (int centre[2])
   /// coordinates of the human in camera frame
   ///
   /// @pre
   /// @post
   /// @param
-  void calc_centre(const Box);
-  /// @fn void transformation(Box&)
+  void calc_centre(Box* bbox);
+
+  /// @fn void transformation(cv::Mat frame)
   /// @brief This function will transform the co-ordinates
   /// of the human in robot reference frame
   ///
   /// @pre
   /// @post
-  /// @param
-  void transormation(Box);
+  /// @param frame
+  /// @return vector of coordinates
+  std::vector<double> transformation(cv::Mat frame);
 };
 
 #endif  // INCLUDE_HUMAN_H_
