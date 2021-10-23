@@ -33,11 +33,14 @@
 TEST(dummycamera, camerashould_pass) {
   EXPECT_EQ(1, 1);
 }
-/*
-TEST(CameraTest1, testcamerawebcam) {
-  int x = 1;
-  Camera cam(&x);
+
+TEST(CameraTest1, testboxparameterconstructor) {
+  Camera cam(1);
   EXPECT_EQ(cam.webcam, 1);
 }
-*/
+
+TEST(CameraTest2, testboxconstructor) {
+  Camera cam;
+  EXPECT_EQ(cam.webcam, 0);
+}
 
