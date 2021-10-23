@@ -45,17 +45,17 @@ std::vector<double> Human::transformation(cv::Mat frame) {
 
     R = Eigen::Matrix3d::Identity();
 
-    T(0,0) = width/2;
-    T(1,0) = height/2;
-    T(2,0) = 0;
+    T(1,0) = width/2;
+    T(2,0) = height/2;
+    T(0,0) = 0;
 
     Trans.setIdentity();
     Trans.block<3,3>(0,0) = R;
     Trans.block<3,1>(0,3) = T;
 
-    Coord(0,0) = centre[0];
-    Coord(1,0) = centre[1];
-    Coord(2,0) = 0;
+    Coord(0,0) = 0;
+    Coord(1,0) = centre[0];
+    Coord(2,0) = centre[1];
     Coord(3,0) = 1;
 
     std::cout<<"Initial X coord : "<<Coord(0,0)<<std::endl;
