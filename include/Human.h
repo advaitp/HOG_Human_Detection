@@ -18,9 +18,6 @@
 
 class Human{
  private:
-  // Centre of gravity of human
-  int centre[2];
-
   // Average height of human
   int height;
 
@@ -29,6 +26,9 @@ class Human{
 
  public:
   Human();
+
+  // Centre of gravity of human
+  int centre[2];
 
   /// @fn void pixel_to_mm(int pixel)
   /// @brief Function to convert pixel values to mm

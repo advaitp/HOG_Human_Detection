@@ -9,7 +9,7 @@
 
 #include "Box.h"
 
-Box::Box(const int x1, const int y1, const int x2, const int y2, cv::Rect Box) {
+Box::Box(int x1, int y1, int x2, int y2, cv::Rect Box) {
   coordinates[0] = x1;
   coordinates[1] = y1;
   coordinates[2] = x2;

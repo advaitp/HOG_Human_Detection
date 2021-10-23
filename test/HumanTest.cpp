@@ -8,22 +8,32 @@
 ///============================================================================
 
 #include <gtest/gtest.h>
-#include "Human.h"
+#include <vector>
+#include <string>
+#include <iostream>
+#include <Detection.hpp>
+#include "Box.h"
+#include <Human.h>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/dnn.hpp>
 
 TEST(humandummy, humanshould_pass) {
   EXPECT_EQ(1, 1);
 }
-//TEST(HumanTest1, testHumancalc_centre) {
-//  Human test;
-//  test.coordinates[0] = 0;
-//  test.coordinates[1] = 0;
-//  test.coordinates[2] = 30;
-//  test.coordinates[3] = 40;
-//  EXPECT_EQ(test.centre[0], 15);
-//  EXPECT_EQ(test.centre[1], 20);
-//}
 
-/*TEST(HumanTest2, testHumantransformation) {
-  Human test;
-  test.coordinates(20,20,80,110);
-}*/
+TEST(HumanTest1, testHumancalc_centre) {
+  Human htest;
+  cv::Rect box(0,0,100,120);
+  Box* hbox = new Box(0, 0, 100, 120, box);
+
+  htest.calc_centre(hbox);
+  EXPECT_EQ(htest.centre[0], 50);
+  EXPECT_EQ(htest.centre[1], 60);
+}
+
+TEST(HumanTest2, testpixel_to_mm) {
+  Human htest;
+  EXPECT_DOUBLE_EQ(htest.pixel_to_mm(141), 25.4);
+}
