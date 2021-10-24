@@ -30,7 +30,7 @@ TEST(HumanTest1, testHumancalc_centre) {
 
   htest.calc_centre(hbox);
   EXPECT_EQ(htest.centre[0], 50);
-  EXPECT_EQ(htest.centre[1], 70);
+  EXPECT_EQ(htest.centre[1], 80);
 }
 
 TEST(HumanTest2, testpixel_to_mm) {

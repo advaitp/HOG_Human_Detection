@@ -30,7 +30,7 @@ void Human::calc_centre(Box* box) {
 
 double Human::get_distance(double z_coord){
   int proj_angle = angle/2;
-  return (z_coord/tan(proj_angle));
+  return abs((z_coord/tan(proj_angle)));
 }
 
 double Human::pixel_to_mm(int pixel){
