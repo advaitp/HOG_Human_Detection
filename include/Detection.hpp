@@ -46,20 +46,21 @@ class Detection{
   // Vector to store confidence score of each detection
   std::vector<double> confidences;
 
-  // Store collection of boxes
-  std::vector<cv::Rect> Boxes ;
-
-  // Store indices of bounding boxes after Non Max Suppression.
-  std::vector<int> indices;
-
   // Count of humans detected
   int humans;
 
  public :
   // variable to hold the all the bounding boxes coordinates after detection
   std::vector<Box*> detections;
+
+  //Storage to store previous image's humans
   std::vector<std::vector<int>> storage;
 
+  // Store collection of boxes
+  std::vector<cv::Rect> Boxes ;
+
+  // Store indices of bounding boxes after Non Max Suppression.
+  std::vector<int> indices;
   Detection();
 
  /**
@@ -81,7 +82,8 @@ class Detection{
   void drawboxes(cv::Mat frame);
   /**
      * @fn void track(cv::Mat)
-   * @brief
+   * @brief The track function is used to track and
+   *  identify human in two consecutive frames
    *
    * @pre
    * @post
@@ -90,7 +92,8 @@ class Detection{
   void track(cv::Mat);
   /**
      * @fn bool is_same(int[], int[])
-   * @brief
+   * @brief The is_same function asserts if two input
+   *  arrays are in close proximity to one another
    *
    * @pre
    * @post
