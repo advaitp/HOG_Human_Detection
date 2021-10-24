@@ -52,9 +52,9 @@ std::vector<double> Human::transformation(cv::Mat frame) {
 
     R = Eigen::Matrix3d::Identity();
 
+    T(0,0) = 0;
     T(1,0) = width/2;
     T(2,0) = height/2;
-    T(0,0) = 0;
 
     Trans.setIdentity();
     Trans.block<3,3>(0,0) = R;
