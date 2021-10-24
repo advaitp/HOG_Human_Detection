@@ -78,6 +78,27 @@ class Detection{
    *
    */
   void drawboxes(cv::Mat frame);
+  /**
+     * @fn void track(cv::Mat)
+   * @brief
+   *
+   * @pre
+   * @post
+   * @param
+   */
+  void track(cv::Mat);
+  /**
+     * @fn bool is_same(int[], int[])
+   * @brief
+   *
+   * @pre
+   * @post
+   * @param
+   * @param
+   * @return
+   */
+  bool is_same (int[2], int[2]);
 };
+
 
 #endif  // INCLUDE_DETECTION_HPP_

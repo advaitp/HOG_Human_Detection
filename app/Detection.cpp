@@ -123,4 +123,55 @@ void Detection :: drawboxes(cv::Mat frame) {
       std::cout << "Caught exception in drawboxes function"<<std::endl;
     }
 
+  void Detection::track(cv::Mat img) {
+    try {
+      std::cout << "Starting tracker\n";
+      if (!indices.empty()) {
+        //auto temp = storage;
+        //storage.clear();
+        std::cout << "indices not empty works\n";
+        // Condition 1: Check if storage is empty
+       if (storage.empty()) {
+          std::cout << "storage empty works\n";
+          //storage.clear();
+          for (auto i = 0 ; i < detections.size(); i++) {
+            Human sam;
+            sam.calc_centre(detections[i]);
+            std::cout << "Centre" << sam.centre[0] << "," << sam.centre[1] << "\n";
+            storage.push_back({{1, sam.centre[0], sam.centre[1]}});
+          }
+          //temp = storage;
+        }
+       else {
+         for (auto j = 0 ; j < detections.size(); j++) {
+             Human sam;
+             sam.calc_centre(detections[j]);
+             auto temp = storage;
+             storage.clear();
+             for (i : temp) {
+               int tem[2] = {i[1] , i[2]};
+               if (is_same(sam.centre,tem)) {
+                 s
+               }
+             }
+           }
+         }
+       }
+        for (auto o : storage) {
+          std::string text = "ID " + std::to_string(o[0]);
+          cv::putText(img, text, cv::Point(o[1],o[2]), cv::FONT_HERSHEY_DUPLEX, 1.0, CV_RGB(0, 255, 0), 2);
+        }
+        //storage.clear();
+      }
+      //else if (!storage.empty())
+      else {
+        storage.clear();
+        std::cout << "Condition not satisfied\n";
+      }
+    }
+    catch(...) {
+      std::cout << "\nError in track function";
+    }
+  }
+
 }
