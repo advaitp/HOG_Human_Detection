@@ -2,7 +2,8 @@ set(GTEST_SHUFFLE 1)
 cmake_minimum_required(VERSION 2.8) 
 find_package(OpenCV REQUIRED)
 
-add_executable(cpp-test main.cpp HumanTest.cpp BoxTest.cpp Cameratest.cpp ${CMAKE_SOURCE_DIR}/app/Human.cpp ${CMAKE_SOURCE_DIR}/app/Box.cpp ${CMAKE_SOURCE_DIR}/app/Camera.cpp)
+add_executable(cpp-test main.cpp HumanTest.cpp BoxTest.cpp Cameratest.cpp DetectionTest.cpp
+${CMAKE_SOURCE_DIR}/app/Detection.cpp ${CMAKE_SOURCE_DIR}/app/Camera.cpp ${CMAKE_SOURCE_DIR}/app/Human.cpp ${CMAKE_SOURCE_DIR}/app/Box.cpp ${CMAKE_SOURCE_DIR}/app/Camera.cpp)
 include_directories(
     ${CMAKE_SOURCE_DIR}/include
 )
