@@ -18,11 +18,14 @@
 
 class Human{
  private:
-  // Average height of human
+  /// Average height of human
   int height;
 
-  // Dots per inches(DPI) of device
+  /// Dots per inches(DPI) of device
   int DPI;
+
+  /// Camera Viewing angle
+  int angle;
 
  public:
   Human();
@@ -30,7 +33,7 @@ class Human{
   // Centre of gravity of human
   int centre[2];
 
-  /// @fn void pixel_to_mm(int pixel)
+  /// @fn double pixel_to_mm(int pixel)
   /// @brief Function to convert pixel values to mm
   ///
   /// @pre
@@ -38,6 +41,15 @@ class Human{
   /// @param pixel
   /// @return coordinates in mm
   double pixel_to_mm(int pixel);
+
+  /// @fn double get_distance(double z_coord)
+  /// @brief Function to get the x distance of human from robot
+  ///
+  /// @pre
+  /// @post
+  /// @param z_coord
+  /// @return distance in mm
+  double get_distance(double z_coord);
 
   /// @fn void calc_centre(Box* bbox)
   /// @brief This function will calculate the CoG (int centre[2])

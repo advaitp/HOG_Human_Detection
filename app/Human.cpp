@@ -12,6 +12,7 @@
 #include <Eigen/Geometry>
 #include <Eigen/Dense>
 #include <Eigen/Core>
+#include <cmath>
 
 Human::Human() {
   // Average height of human in mm
@@ -19,6 +20,7 @@ Human::Human() {
   DPI = 141;
   centre[0] = 0;
   centre[1] = 0;
+  angle = 74;
 }
 
 void Human::calc_centre(Box* box) {
@@ -26,8 +28,13 @@ void Human::calc_centre(Box* box) {
   centre[1] = box->bbox.y+(box->bbox.height/2);
 }
 
+double Human::get_distance(double z_coord){
+  int proj_angle = angle/2;
+  return (z_coord/tan(proj_angle));
+}
+
 double Human::pixel_to_mm(int pixel){
-  return (pixel * 25.4 ) / DPI;
+  return (pixel * 25.4)/DPI;
 }
 
 std::vector<double> Human::transformation(cv::Mat frame) {
@@ -63,13 +70,16 @@ std::vector<double> Human::transformation(cv::Mat frame) {
     std::cout<<"Initial Z coord : "<<Coord(2,0)<<std::endl;
 
     Transform = Trans*Coord;
-    std::cout<<"Transformed X coord : "<<Transform(0,0)<<std::endl;
-    std::cout<<"Transformed Y coord : "<<Transform(1,0)<<std::endl;
-    std::cout<<"Transformed Z coord : "<<Transform(2,0)<<std::endl;
 
     xmm = static_cast<double>(pixel_to_mm(Transform(0,0)));
     ymm = static_cast<double>(pixel_to_mm(Transform(1,0)));
     zmm = static_cast<double>(pixel_to_mm(Transform(2,0)));
+
+    xmm = get_distance(zmm);
+
+    std::cout<<"Transformed X coord : "<<xmm<<std::endl;
+    std::cout<<"Transformed Y coord : "<<ymm<<std::endl;
+    std::cout<<"Transformed Z coord : "<<zmm<<std::endl;
 
     return {xmm, ymm, zmm};
   }

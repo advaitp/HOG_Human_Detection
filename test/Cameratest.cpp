@@ -35,8 +35,8 @@ TEST(dummycamera, camerashould_pass) {
 }
 
 TEST(CameraTest1, testboxparameterconstructor) {
-  Camera cam(1);
-  EXPECT_EQ(cam.webcam, 1);
+  Camera cam(2);
+  EXPECT_EQ(cam.webcam, 2);
 }
 
 TEST(CameraTest2, testboxconstructor) {

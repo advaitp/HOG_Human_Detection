@@ -24,12 +24,12 @@ TEST(boxdummy, boxshould_pass) {
 }
 
 TEST(BoxTest1, testboxparameterconstructor) {
-  cv::Rect ibox(0,0,100,120);
-  Box* box = new Box(0, 0, 100, 120, ibox);
+  cv::Rect ibox(0,0,100,160);
+  Box* box = new Box(0, 0, 100, 160, ibox);
   EXPECT_EQ(box->coordinates[0], 0);
   EXPECT_EQ(box->coordinates[1], 0);
   EXPECT_EQ(box->coordinates[2], 100);
-  EXPECT_EQ(box->coordinates[3], 120);
+  EXPECT_EQ(box->coordinates[3], 160);
 }
 
 TEST(BoxTest2, testboxconstructor) {
