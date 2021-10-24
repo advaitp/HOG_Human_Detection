@@ -2,7 +2,7 @@
 /// @file        : BoxTest.cpp
 /// @author      : gauraut (Driver)
 /// @author      : Advait Patole (Navigator)
-/// @version     : 1.0.1
+/// @version     : 2.0.1
 /// @copyright   : MIT License
 /// @brief       : BoxTest.cpp test file
 ///============================================================================
@@ -19,17 +19,13 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/dnn.hpp>
 
-TEST(boxdummy, boxshould_pass) {
-  EXPECT_EQ(1, 1);
-}
-
 TEST(BoxTest1, testboxparameterconstructor) {
-  cv::Rect ibox(0,0,100,120);
-  Box* box = new Box(0, 0, 100, 120, ibox);
+  cv::Rect ibox(0,0,100,180);
+  Box* box = new Box(0, 0, 100, 180, ibox);
   EXPECT_EQ(box->coordinates[0], 0);
   EXPECT_EQ(box->coordinates[1], 0);
   EXPECT_EQ(box->coordinates[2], 100);
-  EXPECT_EQ(box->coordinates[3], 120);
+  EXPECT_EQ(box->coordinates[3], 180);
 }
 
 TEST(BoxTest2, testboxconstructor) {
