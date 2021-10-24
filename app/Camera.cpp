@@ -45,7 +45,7 @@ Camera::Camera(int x) {
 
 void Camera :: capturevideo() {
   // Capture the frame of video
-  cv::VideoCapture cap(webcam) ;
+  cv::VideoCapture cap(webcam);
 
   // Reading frame of video
   cap.read(frame);

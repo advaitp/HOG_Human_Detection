@@ -38,74 +38,81 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/dnn.hpp>
 
-Detection :: Detection(){
+Detection :: Detection() {
   confidences = {};
   Boxes = {};
   indices = {};
   detections = {};
-  humans = 0 ;
-  storage = {{0,0,0}};
+  humans = 0;
+  storage = {{0, 0, 0}};
 }
 
 void Detection :: humandetection(cv::Mat frame) {
-  try{
+  try {
     // Set SVM pretrained model for human detection
     hog.setSVMDetector(cv::HOGDescriptor::getDefaultPeopleDetector());
 
-    // Set SVM model parameters like foundLocations, foundWeights, winStride for human detection
-    hog.detectMultiScale(frame, Boxes, confidences, 0, cv::Size(4,4), cv::Size(16,16), 1.2, 1.02);
+    // Set SVM model parameters like
+    // foundLocations, foundWeights, winStride for human detection
+    hog.detectMultiScale(frame, Boxes, confidences, 0,
+                         cv::Size(4, 4), cv::Size(16, 16), 1.2, 1.02);
   }
-  catch(...){
-    std::cout << "Caught exception in humandetection function"<<std::endl;
+  catch(...) {
+    std::cout << "Caught exception in humandetection function" << std::endl;
   }
 }
 
 void Detection :: nms() {
-  try{
+  try {
     // Setting nms_threshold and score_threshold for NMS
     double nms_threshold = 0.7;
     double confidence_threshold = 0.7;
 
-    //Converting the dataype to float
+    // Converting the dataype to float
     std::vector<float> scores(confidences.begin(), confidences.end());
 
     // Apply non-maximum suppression procedure.
-    cv::dnn::NMSBoxes(Boxes, scores, confidence_threshold, nms_threshold, indices);
-    std::cout<<"Count of Boxes before Non-Max Suppression "<<Boxes.size()<<std::endl;
+    cv::dnn::NMSBoxes(Boxes, scores,
+                      confidence_threshold, nms_threshold, indices);
+    std::cout << "Count of Boxes before"
+        " Non-Max Suppression " << Boxes.size() << std::endl;
   }
-  catch(...){
-      std::cout << "Caught exception in nms function"<<std::endl;
+  catch(...) {
+      std::cout << "Caught exception in nms function" << std::endl;
     }
 }
 
 void Detection :: drawboxes(cv::Mat frame) {
-  try{
+  try {
     // Iterate over the updated detections after nms to draw rectangle
-    std::cout<<"Count of Boxes after Non-Max Suppression "<<indices.size()<<std::endl;
-    std::vector<double> human_coordinates ;
+    std::cout << "Count of Boxes after Non-Max"
+        " Suppression " << indices.size() << std::endl;
+    std::vector<double> human_coordinates;
     detections.clear();
-    for(int index : indices){
-      std::cout<<"Box detected after Non Max Suppression at index "<<index<<std::endl;
+    for (int index : indices) {
+      std::cout << "Box detected after"
+          " Non Max Suppression at index " << index << std::endl;
       cv::Rect box = Boxes[index];
-      int start_x, start_y, end_x, end_y ;
+      int start_x, start_y, end_x, end_y;
       start_x = box.x;
       start_y = box.y;
       end_x = box.x + box.width;
       end_y = box.y + box.height;
 
-      //filling each box as Box object
+      // filling each box as Box object
       Box* bbox = new Box(start_x, start_y, end_x, end_y, box);
       detections.push_back(bbox);
 
-      //Applying transformations camera frame to robot frame
+      // Applying transformations camera frame to robot frame
       Human hum;
       hum.calc_centre(bbox);
 
-      //Getting transformed human coordinates in mm
+      // Getting transformed human coordinates in mm
       human_coordinates = hum.transformation(frame);
 
-      std::cout<<"Start positions are "<<start_x<<" "<<start_y<<std::endl;
-      std::cout<<"End positions are "<<end_x<<" "<<end_y<<std::endl;
+      std::cout << "Start positions are " << start_x
+          << " " << start_y << std::endl;
+      std::cout << "End positions are " << end_x << " " << end_y << std::endl;
 
       // Top Left corner of bounding box
       cv::Point pt1(start_x, start_y);
@@ -115,46 +122,48 @@ void Detection :: drawboxes(cv::Mat frame) {
 
       // Draw corresponding rectangle with green color
       cv::rectangle(frame, pt1, pt2, cv::Scalar(0, 255, 0));
-      std::string text = "(" + std::to_string(human_coordinates[0]) + "," + std::to_string(human_coordinates[1]) + "," + std::to_string(human_coordinates[2]) + ")";
+      std::string text = "(" + std::to_string(human_coordinates[0])
+          + "," + std::to_string(human_coordinates[1]) +
+          "," + std::to_string(human_coordinates[2]) + ")";
 
       // Writing the coordinates in mm
-      cv::putText(frame, text, cv::Point(start_x, start_y), cv::FONT_HERSHEY_DUPLEX, 1.0, CV_RGB(255, 0, 0), 2);
+      cv::putText(frame, text, cv::Point(start_x, start_y),
+                  cv::FONT_HERSHEY_DUPLEX, 1.0, CV_RGB(255, 0, 0), 2);
     }
   }
-  catch(...){
-      std::cout << "Caught exception in drawboxes function"<<std::endl;
+  catch(...) {
+      std::cout << "Caught exception in drawboxes function" << std::endl;
     }
 }
 
 bool Detection::is_same(int x[2], int y[2]) {
   try {
-    if (x[0]-y[0] < 2 && x[1]-y[1] < 2) {return true;}
-    else {return false;}
+    if (x[0] - y[0] < 2 && x[1] - y[1] < 2) {return true;}
+    else {
+      return false;
+    }
   }
   catch(...) {
     std::cout << "\n Error in is_same";
   }
 }
 
-void Detection::track (cv::Mat img) {
+void Detection::track(cv::Mat img) {
     try {
       std::cout << "Starting tracker\n";
       if (!indices.empty()) {
-        //auto temp = storage;
-        //storage.clear();
         std::cout << "indices not empty works\n";
         // Condition 1: Check if storage is empty
        if (storage.empty()) {
           std::cout << "storage empty works\n";
-          //storage.clear();
           for (auto i = 0 ; i < detections.size(); i++) {
             Human sam;
             sam.calc_centre(detections[i]);
-            std::cout << "Centre" << sam.centre[0] << "," << sam.centre[1] << "\n";
+            std::cout << "Centre" <<
+                sam.centre[0] << "," << sam.centre[1] << "\n";
             std::vector<int> psh = {i, sam.centre[0], sam.centre[1]};
             storage.push_back(psh);
           }
-          //temp = storage;
         }
        else {
          for (auto j = 0 ; j < detections.size(); j++) {
@@ -175,9 +184,7 @@ void Detection::track (cv::Mat img) {
           std::string text = "ID " + std::to_string(o[0]);
           cv::putText(img, text, cv::Point(o[1],o[2]), cv::FONT_HERSHEY_DUPLEX, 1.0, CV_RGB(0, 255, 0), 2);
         }
-        //storage.clear();
       }
-      //else if (!storage.empty())
       else {
         storage.clear();
         std::cout << "Condition not satisfied\n";
