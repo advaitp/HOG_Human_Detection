@@ -58,6 +58,7 @@ class Detection{
  public :
   // variable to hold the all the bounding boxes coordinates after detection
   std::vector<Box*> detections;
+  std::vector<std::vector<int>> storage;
 
   Detection();
 

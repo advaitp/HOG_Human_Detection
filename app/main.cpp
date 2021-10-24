@@ -50,6 +50,8 @@ int main() {
     // Draw Bounding boxes around human
     human_detection_demo.drawboxes(cap);
 
+    human_detection_demo.track(cap);
+
     // show the frame in the created window
     cv::imshow(window_name, cap);
 

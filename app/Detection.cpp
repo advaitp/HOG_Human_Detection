@@ -44,6 +44,7 @@ Detection :: Detection(){
   indices = {};
   detections = {};
   humans = 0 ;
+  storage = {{0,0,0}};
 }
 
 void Detection :: humandetection(cv::Mat frame) {
@@ -82,6 +83,7 @@ void Detection :: drawboxes(cv::Mat frame) {
     // Iterate over the updated detections after nms to draw rectangle
     std::cout<<"Count of Boxes after Non-Max Suppression "<<indices.size()<<std::endl;
     std::vector<double> human_coordinates ;
+    detections.clear();
     for(int index : indices){
       std::cout<<"Box detected after Non Max Suppression at index "<<index<<std::endl;
       cv::Rect box = Boxes[index];
@@ -122,8 +124,19 @@ void Detection :: drawboxes(cv::Mat frame) {
   catch(...){
       std::cout << "Caught exception in drawboxes function"<<std::endl;
     }
+}
 
-  void Detection::track(cv::Mat img) {
+bool Detection::is_same(int x[2], int y[2]) {
+  try {
+    if (x[0]-y[0] < 2 && x[1]-y[1] < 2) {return true;}
+    else {return false;}
+  }
+  catch(...) {
+    std::cout << "\n Error in is_same";
+  }
+}
+
+void Detection::track (cv::Mat img) {
     try {
       std::cout << "Starting tracker\n";
       if (!indices.empty()) {
@@ -138,7 +151,8 @@ void Detection :: drawboxes(cv::Mat frame) {
             Human sam;
             sam.calc_centre(detections[i]);
             std::cout << "Centre" << sam.centre[0] << "," << sam.centre[1] << "\n";
-            storage.push_back({{1, sam.centre[0], sam.centre[1]}});
+            std::vector<int> psh = {i, sam.centre[0], sam.centre[1]};
+            storage.push_back(psh);
           }
           //temp = storage;
         }
@@ -148,15 +162,15 @@ void Detection :: drawboxes(cv::Mat frame) {
              sam.calc_centre(detections[j]);
              auto temp = storage;
              storage.clear();
-             for (i : temp) {
+             for (auto i : temp) {
                int tem[2] = {i[1] , i[2]};
                if (is_same(sam.centre,tem)) {
-                 s
+                 std::vector<int> psh = {j, sam.centre[0], sam.centre[1]};
+                 storage.push_back(psh);
                }
              }
            }
          }
-       }
         for (auto o : storage) {
           std::string text = "ID " + std::to_string(o[0]);
           cv::putText(img, text, cv::Point(o[1],o[2]), cv::FONT_HERSHEY_DUPLEX, 1.0, CV_RGB(0, 255, 0), 2);
@@ -172,6 +186,5 @@ void Detection :: drawboxes(cv::Mat frame) {
     catch(...) {
       std::cout << "\nError in track function";
     }
-  }
-
 }
+
