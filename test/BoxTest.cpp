@@ -2,7 +2,7 @@
 /// @file        : BoxTest.cpp
 /// @author      : gauraut (Driver)
 /// @author      : Advait Patole (Navigator)
-/// @version     : 1.0.1
+/// @version     : 2.0.1
 /// @copyright   : MIT License
 /// @brief       : BoxTest.cpp test file
 ///============================================================================
@@ -18,10 +18,6 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/dnn.hpp>
-
-TEST(boxdummy, boxshould_pass) {
-  EXPECT_EQ(1, 1);
-}
 
 TEST(BoxTest1, testboxparameterconstructor) {
   cv::Rect ibox(0,0,100,180);

@@ -30,10 +30,6 @@
 #include<Camera.hpp>
 #include <gtest/gtest.h>
 
-TEST(dummycamera, camerashould_pass) {
-  EXPECT_EQ(1, 1);
-}
-
 TEST(CameraTest1, testboxparameterconstructor) {
   Camera cam(3);
   EXPECT_EQ(cam.webcam, 3);

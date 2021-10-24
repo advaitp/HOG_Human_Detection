@@ -30,7 +30,7 @@ class Human{
  public:
   Human();
 
-  // Centre of gravity of human
+  /// Centre of gravity of human
   int centre[2];
 
   /// @fn double pixel_to_mm(int pixel)

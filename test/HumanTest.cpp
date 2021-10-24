@@ -2,7 +2,7 @@
 /// @file        : HumanTest.cpp
 /// @author      : gauraut (Driver)
 /// @author      : Advait Patole (Navigator)
-/// @version     : 1.0.1
+/// @version     : 2.0.1
 /// @copyright   : MIT License
 /// @brief       : HumanTest.cpp test file
 ///============================================================================
@@ -18,10 +18,6 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/dnn.hpp>
-
-TEST(humandummy, humanshould_pass) {
-  EXPECT_EQ(1, 1);
-}
 
 TEST(HumanTest1, testHumancalc_centre) {
   Human htest;
