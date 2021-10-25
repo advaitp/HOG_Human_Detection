@@ -84,6 +84,10 @@ use non max suppression to solve that problem.
 - OpenCV library (new BSD License)
 - Eigen library (new BSD License)
 
+## Importance of OpenCV and Eigen
+- OpenCV is the huge open-source library for the computer vision, machine learning, and image processing and now it plays a major role in real-time operation which is very important in today’s systems. By using it, one can process images and videos to identify objects, faces, or even detect humans.In this project we have used HOG and SVM human detector to detect humans.
+- Eigen library is used for transformation of human coordinates from camera frame to world frame.We are using transformation matrix to transform the coordinates to world frame.
+
 ## Standard install via command-line
 ```
 git clone --recursive https://github.com/gauraut/HOG_Human_Detection
