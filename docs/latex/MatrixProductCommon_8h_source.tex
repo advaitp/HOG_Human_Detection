@@ -1,0 +1,229 @@
+\hypertarget{MatrixProductCommon_8h_source}{}\doxysection{Matrix\+Product\+Common.\+h}
+\label{MatrixProductCommon_8h_source}\index{include/Eigen/src/Core/arch/AltiVec/MatrixProductCommon.h@{include/Eigen/src/Core/arch/AltiVec/MatrixProductCommon.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{//\#define EIGEN\_POWER\_USE\_PREFETCH  // Use prefetching in gemm routines}}
+\DoxyCodeLine{2 \textcolor{preprocessor}{\#ifdef EIGEN\_POWER\_USE\_PREFETCH}}
+\DoxyCodeLine{3 \textcolor{preprocessor}{\#define EIGEN\_POWER\_PREFETCH(p)  prefetch(p)}}
+\DoxyCodeLine{4 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{5 \textcolor{preprocessor}{\#define EIGEN\_POWER\_PREFETCH(p)}}
+\DoxyCodeLine{6 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{7 }
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#include "{}../../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{11 }
+\DoxyCodeLine{12 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Packet, \textcolor{keyword}{typename} DataMapper, \textcolor{keyword}{typename} Index, const Index accRows>}
+\DoxyCodeLine{15 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} gemm\_extra\_col(}
+\DoxyCodeLine{16   \textcolor{keyword}{const} DataMapper\& res,}
+\DoxyCodeLine{17   \textcolor{keyword}{const} Scalar* lhs\_base,}
+\DoxyCodeLine{18   \textcolor{keyword}{const} Scalar* rhs\_base,}
+\DoxyCodeLine{19   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} depth,}
+\DoxyCodeLine{20   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} strideA,}
+\DoxyCodeLine{21   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} offsetA,}
+\DoxyCodeLine{22   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row,}
+\DoxyCodeLine{23   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col,}
+\DoxyCodeLine{24   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} remaining\_rows,}
+\DoxyCodeLine{25   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} remaining\_cols,}
+\DoxyCodeLine{26   \textcolor{keyword}{const} Packet\& pAlpha);}
+\DoxyCodeLine{27 }
+\DoxyCodeLine{28 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Packet, \textcolor{keyword}{typename} DataMapper, \textcolor{keyword}{typename} Index, const Index accRows, const Index accCols>}
+\DoxyCodeLine{29 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} gemm\_extra\_row(}
+\DoxyCodeLine{30   \textcolor{keyword}{const} DataMapper\& res,}
+\DoxyCodeLine{31   \textcolor{keyword}{const} Scalar* lhs\_base,}
+\DoxyCodeLine{32   \textcolor{keyword}{const} Scalar* rhs\_base,}
+\DoxyCodeLine{33   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} depth,}
+\DoxyCodeLine{34   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} strideA,}
+\DoxyCodeLine{35   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} offsetA,}
+\DoxyCodeLine{36   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row,}
+\DoxyCodeLine{37   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col,}
+\DoxyCodeLine{38   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows,}
+\DoxyCodeLine{39   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols,}
+\DoxyCodeLine{40   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} remaining\_rows,}
+\DoxyCodeLine{41   \textcolor{keyword}{const} Packet\& pAlpha,}
+\DoxyCodeLine{42   \textcolor{keyword}{const} Packet\& pMask);}
+\DoxyCodeLine{43 }
+\DoxyCodeLine{44 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Packet, \textcolor{keyword}{typename} DataMapper, \textcolor{keyword}{typename} Index, const Index accCols>}
+\DoxyCodeLine{45 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} gemm\_unrolled\_col(}
+\DoxyCodeLine{46   \textcolor{keyword}{const} DataMapper\& res,}
+\DoxyCodeLine{47   \textcolor{keyword}{const} Scalar* lhs\_base,}
+\DoxyCodeLine{48   \textcolor{keyword}{const} Scalar* rhs\_base,}
+\DoxyCodeLine{49   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} depth,}
+\DoxyCodeLine{50   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} strideA,}
+\DoxyCodeLine{51   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} offsetA,}
+\DoxyCodeLine{52   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}\& row,}
+\DoxyCodeLine{53   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows,}
+\DoxyCodeLine{54   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col,}
+\DoxyCodeLine{55   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} remaining\_cols,}
+\DoxyCodeLine{56   \textcolor{keyword}{const} Packet\& pAlpha);}
+\DoxyCodeLine{57 }
+\DoxyCodeLine{58 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{59 EIGEN\_ALWAYS\_INLINE Packet bmask(\textcolor{keyword}{const} \textcolor{keywordtype}{int} remaining\_rows);}
+\DoxyCodeLine{60 }
+\DoxyCodeLine{61 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Packet, \textcolor{keyword}{typename} Packetc, \textcolor{keyword}{typename} DataMapper, \textcolor{keyword}{typename} Index, const Index accRows, const Index accCols, \textcolor{keywordtype}{bool} ConjugateLhs, \textcolor{keywordtype}{bool} ConjugateRhs, \textcolor{keywordtype}{bool} LhsIsReal, \textcolor{keywordtype}{bool} RhsIsReal>}
+\DoxyCodeLine{62 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} gemm\_complex\_extra\_col(}
+\DoxyCodeLine{63   \textcolor{keyword}{const} DataMapper\& res,}
+\DoxyCodeLine{64   \textcolor{keyword}{const} Scalar* lhs\_base,}
+\DoxyCodeLine{65   \textcolor{keyword}{const} Scalar* rhs\_base,}
+\DoxyCodeLine{66   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} depth,}
+\DoxyCodeLine{67   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} strideA,}
+\DoxyCodeLine{68   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} offsetA,}
+\DoxyCodeLine{69   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} strideB,}
+\DoxyCodeLine{70   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row,}
+\DoxyCodeLine{71   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col,}
+\DoxyCodeLine{72   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} remaining\_rows,}
+\DoxyCodeLine{73   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} remaining\_cols,}
+\DoxyCodeLine{74   \textcolor{keyword}{const} Packet\& pAlphaReal,}
+\DoxyCodeLine{75   \textcolor{keyword}{const} Packet\& pAlphaImag);}
+\DoxyCodeLine{76 }
+\DoxyCodeLine{77 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Packet, \textcolor{keyword}{typename} Packetc, \textcolor{keyword}{typename} DataMapper, \textcolor{keyword}{typename} Index, const Index accRows, const Index accCols, \textcolor{keywordtype}{bool} ConjugateLhs, \textcolor{keywordtype}{bool} ConjugateRhs, \textcolor{keywordtype}{bool} LhsIsReal, \textcolor{keywordtype}{bool} RhsIsReal>}
+\DoxyCodeLine{78 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} gemm\_complex\_extra\_row(}
+\DoxyCodeLine{79   \textcolor{keyword}{const} DataMapper\& res,}
+\DoxyCodeLine{80   \textcolor{keyword}{const} Scalar* lhs\_base,}
+\DoxyCodeLine{81   \textcolor{keyword}{const} Scalar* rhs\_base,}
+\DoxyCodeLine{82   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} depth,}
+\DoxyCodeLine{83   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} strideA,}
+\DoxyCodeLine{84   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} offsetA,}
+\DoxyCodeLine{85   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} strideB,}
+\DoxyCodeLine{86   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row,}
+\DoxyCodeLine{87   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col,}
+\DoxyCodeLine{88   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows,}
+\DoxyCodeLine{89   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols,}
+\DoxyCodeLine{90   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} remaining\_rows,}
+\DoxyCodeLine{91   \textcolor{keyword}{const} Packet\& pAlphaReal,}
+\DoxyCodeLine{92   \textcolor{keyword}{const} Packet\& pAlphaImag,}
+\DoxyCodeLine{93   \textcolor{keyword}{const} Packet\& pMask);}
+\DoxyCodeLine{94 }
+\DoxyCodeLine{95 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Packet, \textcolor{keyword}{typename} Packetc, \textcolor{keyword}{typename} DataMapper, \textcolor{keyword}{typename} Index, const Index accCols, \textcolor{keywordtype}{bool} ConjugateLhs, \textcolor{keywordtype}{bool} ConjugateRhs, \textcolor{keywordtype}{bool} LhsIsReal, \textcolor{keywordtype}{bool} RhsIsReal>}
+\DoxyCodeLine{96 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} gemm\_complex\_unrolled\_col(}
+\DoxyCodeLine{97   \textcolor{keyword}{const} DataMapper\& res,}
+\DoxyCodeLine{98   \textcolor{keyword}{const} Scalar* lhs\_base,}
+\DoxyCodeLine{99   \textcolor{keyword}{const} Scalar* rhs\_base,}
+\DoxyCodeLine{100   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} depth,}
+\DoxyCodeLine{101   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} strideA,}
+\DoxyCodeLine{102   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} offsetA,}
+\DoxyCodeLine{103   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} strideB,}
+\DoxyCodeLine{104   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}\& row,}
+\DoxyCodeLine{105   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows,}
+\DoxyCodeLine{106   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col,}
+\DoxyCodeLine{107   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} remaining\_cols,}
+\DoxyCodeLine{108   \textcolor{keyword}{const} Packet\& pAlphaReal,}
+\DoxyCodeLine{109   \textcolor{keyword}{const} Packet\& pAlphaImag);}
+\DoxyCodeLine{110 }
+\DoxyCodeLine{111 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{112 EIGEN\_ALWAYS\_INLINE Packet ploadLhs(\textcolor{keyword}{const} Scalar* lhs);}
+\DoxyCodeLine{113 }
+\DoxyCodeLine{114 \textcolor{keyword}{template}<\textcolor{keyword}{typename} DataMapper, \textcolor{keyword}{typename} Packet, \textcolor{keyword}{typename} Index, const Index accCols, \textcolor{keywordtype}{int} N, \textcolor{keywordtype}{int} StorageOrder>}
+\DoxyCodeLine{115 EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} bload(PacketBlock<Packet,4>\& acc, \textcolor{keyword}{const} DataMapper\& res, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col);}
+\DoxyCodeLine{116 }
+\DoxyCodeLine{117 \textcolor{keyword}{template}<\textcolor{keyword}{typename} DataMapper, \textcolor{keyword}{typename} Packet, \textcolor{keyword}{typename} Index, const Index accCols, \textcolor{keywordtype}{int} N, \textcolor{keywordtype}{int} StorageOrder>}
+\DoxyCodeLine{118 EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} bload(PacketBlock<Packet,8>\& acc, \textcolor{keyword}{const} DataMapper\& res, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col);}
+\DoxyCodeLine{119 }
+\DoxyCodeLine{120 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{121 EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} bscale(PacketBlock<Packet,4>\& acc, PacketBlock<Packet,4>\& accZ, \textcolor{keyword}{const} Packet\& pAlpha);}
+\DoxyCodeLine{122 }
+\DoxyCodeLine{123 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet, \textcolor{keywordtype}{int} N>}
+\DoxyCodeLine{124 EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} bscalec(PacketBlock<Packet,N>\& aReal, PacketBlock<Packet,N>\& aImag, \textcolor{keyword}{const} Packet\& bReal, \textcolor{keyword}{const} Packet\& bImag, PacketBlock<Packet,N>\& cReal, PacketBlock<Packet,N>\& cImag);}
+\DoxyCodeLine{125 }
+\DoxyCodeLine{126 \textcolor{keyword}{const} \textcolor{keyword}{static} Packet16uc p16uc\_SETCOMPLEX32\_FIRST = \{  0,  1,  2,  3,}
+\DoxyCodeLine{127                                                      16, 17, 18, 19,}
+\DoxyCodeLine{128                                                       4,  5,  6,  7,}
+\DoxyCodeLine{129                                                      20, 21, 22, 23\};}
+\DoxyCodeLine{130 }
+\DoxyCodeLine{131 \textcolor{keyword}{const} \textcolor{keyword}{static} Packet16uc p16uc\_SETCOMPLEX32\_SECOND = \{  8,  9, 10, 11,}
+\DoxyCodeLine{132                                                       24, 25, 26, 27,}
+\DoxyCodeLine{133                                                       12, 13, 14, 15,}
+\DoxyCodeLine{134                                                       28, 29, 30, 31\};}
+\DoxyCodeLine{135 \textcolor{comment}{//[a,b],[ai,bi] = [a,ai] -\/ This is equivalent to p16uc\_GETREAL64}}
+\DoxyCodeLine{136 \textcolor{keyword}{const} \textcolor{keyword}{static} Packet16uc p16uc\_SETCOMPLEX64\_FIRST = \{  0,  1,  2,  3,  4,  5,  6,  7,}
+\DoxyCodeLine{137                                                      16, 17, 18, 19, 20, 21, 22, 23\};}
+\DoxyCodeLine{138 }
+\DoxyCodeLine{139 \textcolor{comment}{//[a,b],[ai,bi] = [b,bi] -\/ This is equivalent to p16uc\_GETIMAG64}}
+\DoxyCodeLine{140 \textcolor{keyword}{const} \textcolor{keyword}{static} Packet16uc p16uc\_SETCOMPLEX64\_SECOND = \{  8,  9, 10, 11, 12, 13, 14, 15,}
+\DoxyCodeLine{141                                                       24, 25, 26, 27, 28, 29, 30, 31\};}
+\DoxyCodeLine{142 }
+\DoxyCodeLine{143 }
+\DoxyCodeLine{144 \textcolor{comment}{// Grab two decouples real/imaginary PacketBlocks and return two coupled (real/imaginary pairs) PacketBlocks.}}
+\DoxyCodeLine{145 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet, \textcolor{keyword}{typename} Packetc>}
+\DoxyCodeLine{146 EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} bcouple\_common(PacketBlock<Packet,4>\& taccReal, PacketBlock<Packet,4>\& taccImag, PacketBlock<Packetc, 4>\& acc1, PacketBlock<Packetc, 4>\& acc2)}
+\DoxyCodeLine{147 \{}
+\DoxyCodeLine{148   acc1.packet[0].v = vec\_perm(taccReal.packet[0], taccImag.packet[0], p16uc\_SETCOMPLEX32\_FIRST);}
+\DoxyCodeLine{149   acc1.packet[1].v = vec\_perm(taccReal.packet[1], taccImag.packet[1], p16uc\_SETCOMPLEX32\_FIRST);}
+\DoxyCodeLine{150   acc1.packet[2].v = vec\_perm(taccReal.packet[2], taccImag.packet[2], p16uc\_SETCOMPLEX32\_FIRST);}
+\DoxyCodeLine{151   acc1.packet[3].v = vec\_perm(taccReal.packet[3], taccImag.packet[3], p16uc\_SETCOMPLEX32\_FIRST);}
+\DoxyCodeLine{152 }
+\DoxyCodeLine{153   acc2.packet[0].v = vec\_perm(taccReal.packet[0], taccImag.packet[0], p16uc\_SETCOMPLEX32\_SECOND);}
+\DoxyCodeLine{154   acc2.packet[1].v = vec\_perm(taccReal.packet[1], taccImag.packet[1], p16uc\_SETCOMPLEX32\_SECOND);}
+\DoxyCodeLine{155   acc2.packet[2].v = vec\_perm(taccReal.packet[2], taccImag.packet[2], p16uc\_SETCOMPLEX32\_SECOND);}
+\DoxyCodeLine{156   acc2.packet[3].v = vec\_perm(taccReal.packet[3], taccImag.packet[3], p16uc\_SETCOMPLEX32\_SECOND);}
+\DoxyCodeLine{157 \}}
+\DoxyCodeLine{158 }
+\DoxyCodeLine{159 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet, \textcolor{keyword}{typename} Packetc>}
+\DoxyCodeLine{160 EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} bcouple(PacketBlock<Packet,4>\& taccReal, PacketBlock<Packet,4>\& taccImag, PacketBlock<Packetc,8>\& tRes, PacketBlock<Packetc, 4>\& acc1, PacketBlock<Packetc, 4>\& acc2)}
+\DoxyCodeLine{161 \{}
+\DoxyCodeLine{162   bcouple\_common<Packet, Packetc>(taccReal, taccImag, acc1, acc2);}
+\DoxyCodeLine{163 }
+\DoxyCodeLine{164   acc1.packet[0] = padd<Packetc>(tRes.packet[0], acc1.packet[0]);}
+\DoxyCodeLine{165   acc1.packet[1] = padd<Packetc>(tRes.packet[1], acc1.packet[1]);}
+\DoxyCodeLine{166   acc1.packet[2] = padd<Packetc>(tRes.packet[2], acc1.packet[2]);}
+\DoxyCodeLine{167   acc1.packet[3] = padd<Packetc>(tRes.packet[3], acc1.packet[3]);}
+\DoxyCodeLine{168 }
+\DoxyCodeLine{169   acc2.packet[0] = padd<Packetc>(tRes.packet[4], acc2.packet[0]);}
+\DoxyCodeLine{170   acc2.packet[1] = padd<Packetc>(tRes.packet[5], acc2.packet[1]);}
+\DoxyCodeLine{171   acc2.packet[2] = padd<Packetc>(tRes.packet[6], acc2.packet[2]);}
+\DoxyCodeLine{172   acc2.packet[3] = padd<Packetc>(tRes.packet[7], acc2.packet[3]);}
+\DoxyCodeLine{173 \}}
+\DoxyCodeLine{174 }
+\DoxyCodeLine{175 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet, \textcolor{keyword}{typename} Packetc>}
+\DoxyCodeLine{176 EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} bcouple\_common(PacketBlock<Packet,1>\& taccReal, PacketBlock<Packet,1>\& taccImag, PacketBlock<Packetc, 1>\& acc1, PacketBlock<Packetc, 1>\& acc2)}
+\DoxyCodeLine{177 \{}
+\DoxyCodeLine{178   acc1.packet[0].v = vec\_perm(taccReal.packet[0], taccImag.packet[0], p16uc\_SETCOMPLEX32\_FIRST);}
+\DoxyCodeLine{179 }
+\DoxyCodeLine{180   acc2.packet[0].v = vec\_perm(taccReal.packet[0], taccImag.packet[0], p16uc\_SETCOMPLEX32\_SECOND);}
+\DoxyCodeLine{181 \}}
+\DoxyCodeLine{182 }
+\DoxyCodeLine{183 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet, \textcolor{keyword}{typename} Packetc>}
+\DoxyCodeLine{184 EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} bcouple(PacketBlock<Packet,1>\& taccReal, PacketBlock<Packet,1>\& taccImag, PacketBlock<Packetc,2>\& tRes, PacketBlock<Packetc, 1>\& acc1, PacketBlock<Packetc, 1>\& acc2)}
+\DoxyCodeLine{185 \{}
+\DoxyCodeLine{186   bcouple\_common<Packet, Packetc>(taccReal, taccImag, acc1, acc2);}
+\DoxyCodeLine{187 }
+\DoxyCodeLine{188   acc1.packet[0] = padd<Packetc>(tRes.packet[0], acc1.packet[0]);}
+\DoxyCodeLine{189 }
+\DoxyCodeLine{190   acc2.packet[0] = padd<Packetc>(tRes.packet[1], acc2.packet[0]);}
+\DoxyCodeLine{191 \}}
+\DoxyCodeLine{192 }
+\DoxyCodeLine{193 \textcolor{keyword}{template}<>}
+\DoxyCodeLine{194 EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} bcouple\_common<Packet2d, Packet1cd>(PacketBlock<Packet2d,4>\& taccReal, PacketBlock<Packet2d,4>\& taccImag, PacketBlock<Packet1cd, 4>\& acc1, PacketBlock<Packet1cd, 4>\& acc2)}
+\DoxyCodeLine{195 \{}
+\DoxyCodeLine{196   acc1.packet[0].v = vec\_perm(taccReal.packet[0], taccImag.packet[0], p16uc\_SETCOMPLEX64\_FIRST);}
+\DoxyCodeLine{197   acc1.packet[1].v = vec\_perm(taccReal.packet[1], taccImag.packet[1], p16uc\_SETCOMPLEX64\_FIRST);}
+\DoxyCodeLine{198   acc1.packet[2].v = vec\_perm(taccReal.packet[2], taccImag.packet[2], p16uc\_SETCOMPLEX64\_FIRST);}
+\DoxyCodeLine{199   acc1.packet[3].v = vec\_perm(taccReal.packet[3], taccImag.packet[3], p16uc\_SETCOMPLEX64\_FIRST);}
+\DoxyCodeLine{200 }
+\DoxyCodeLine{201   acc2.packet[0].v = vec\_perm(taccReal.packet[0], taccImag.packet[0], p16uc\_SETCOMPLEX64\_SECOND);}
+\DoxyCodeLine{202   acc2.packet[1].v = vec\_perm(taccReal.packet[1], taccImag.packet[1], p16uc\_SETCOMPLEX64\_SECOND);}
+\DoxyCodeLine{203   acc2.packet[2].v = vec\_perm(taccReal.packet[2], taccImag.packet[2], p16uc\_SETCOMPLEX64\_SECOND);}
+\DoxyCodeLine{204   acc2.packet[3].v = vec\_perm(taccReal.packet[3], taccImag.packet[3], p16uc\_SETCOMPLEX64\_SECOND);}
+\DoxyCodeLine{205 \}}
+\DoxyCodeLine{206 }
+\DoxyCodeLine{207 \textcolor{keyword}{template}<>}
+\DoxyCodeLine{208 EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} bcouple\_common<Packet2d, Packet1cd>(PacketBlock<Packet2d,1>\& taccReal, PacketBlock<Packet2d,1>\& taccImag, PacketBlock<Packet1cd, 1>\& acc1, PacketBlock<Packet1cd, 1>\& acc2)}
+\DoxyCodeLine{209 \{}
+\DoxyCodeLine{210   acc1.packet[0].v = vec\_perm(taccReal.packet[0], taccImag.packet[0], p16uc\_SETCOMPLEX64\_FIRST);}
+\DoxyCodeLine{211 }
+\DoxyCodeLine{212   acc2.packet[0].v = vec\_perm(taccReal.packet[0], taccImag.packet[0], p16uc\_SETCOMPLEX64\_SECOND);}
+\DoxyCodeLine{213 \}}
+\DoxyCodeLine{214 }
+\DoxyCodeLine{215 \textcolor{comment}{// This is necessary because ploadRhs for double returns a pair of vectors when MMA is enabled.}}
+\DoxyCodeLine{216 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{217 EIGEN\_ALWAYS\_INLINE Packet ploadRhs(\textcolor{keyword}{const} Scalar* rhs)}
+\DoxyCodeLine{218 \{}
+\DoxyCodeLine{219   \textcolor{keywordflow}{return} ploadu<Packet>(rhs);}
+\DoxyCodeLine{220 \}}
+\DoxyCodeLine{221 }
+\DoxyCodeLine{222 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{223 \} \textcolor{comment}{// end namespace Eigen}}
+
+\end{DoxyCode}

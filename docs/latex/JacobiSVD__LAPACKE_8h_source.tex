@@ -1,0 +1,97 @@
+\hypertarget{JacobiSVD__LAPACKE_8h_source}{}\doxysection{Jacobi\+SVD\+\_\+\+LAPACKE.\+h}
+\label{JacobiSVD__LAPACKE_8h_source}\index{include/Eigen/src/SVD/JacobiSVD\_LAPACKE.h@{include/Eigen/src/SVD/JacobiSVD\_LAPACKE.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{/*}}
+\DoxyCodeLine{2 \textcolor{comment}{ Copyright (c) 2011, Intel Corporation. All rights reserved.}}
+\DoxyCodeLine{3 \textcolor{comment}{}}
+\DoxyCodeLine{4 \textcolor{comment}{ Redistribution and use in source and binary forms, with or without modification,}}
+\DoxyCodeLine{5 \textcolor{comment}{ are permitted provided that the following conditions are met:}}
+\DoxyCodeLine{6 \textcolor{comment}{}}
+\DoxyCodeLine{7 \textcolor{comment}{ * Redistributions of source code must retain the above copyright notice, this}}
+\DoxyCodeLine{8 \textcolor{comment}{   list of conditions and the following disclaimer.}}
+\DoxyCodeLine{9 \textcolor{comment}{ * Redistributions in binary form must reproduce the above copyright notice,}}
+\DoxyCodeLine{10 \textcolor{comment}{   this list of conditions and the following disclaimer in the documentation}}
+\DoxyCodeLine{11 \textcolor{comment}{   and/or other materials provided with the distribution.}}
+\DoxyCodeLine{12 \textcolor{comment}{ * Neither the name of Intel Corporation nor the names of its contributors may}}
+\DoxyCodeLine{13 \textcolor{comment}{   be used to endorse or promote products derived from this software without}}
+\DoxyCodeLine{14 \textcolor{comment}{   specific prior written permission.}}
+\DoxyCodeLine{15 \textcolor{comment}{}}
+\DoxyCodeLine{16 \textcolor{comment}{ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "{}AS IS"{} AND}}
+\DoxyCodeLine{17 \textcolor{comment}{ ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED}}
+\DoxyCodeLine{18 \textcolor{comment}{ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE}}
+\DoxyCodeLine{19 \textcolor{comment}{ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR}}
+\DoxyCodeLine{20 \textcolor{comment}{ ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES}}
+\DoxyCodeLine{21 \textcolor{comment}{ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;}}
+\DoxyCodeLine{22 \textcolor{comment}{ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON}}
+\DoxyCodeLine{23 \textcolor{comment}{ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT}}
+\DoxyCodeLine{24 \textcolor{comment}{ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS}}
+\DoxyCodeLine{25 \textcolor{comment}{ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.}}
+\DoxyCodeLine{26 \textcolor{comment}{}}
+\DoxyCodeLine{27 \textcolor{comment}{ ********************************************************************************}}
+\DoxyCodeLine{28 \textcolor{comment}{ *   Content : Eigen bindings to LAPACKe}}
+\DoxyCodeLine{29 \textcolor{comment}{ *    Singular Value Decomposition -\/ SVD.}}
+\DoxyCodeLine{30 \textcolor{comment}{ ********************************************************************************}}
+\DoxyCodeLine{31 \textcolor{comment}{*/}}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33 \textcolor{preprocessor}{\#ifndef EIGEN\_JACOBISVD\_LAPACKE\_H}}
+\DoxyCodeLine{34 \textcolor{preprocessor}{\#define EIGEN\_JACOBISVD\_LAPACKE\_H}}
+\DoxyCodeLine{35 }
+\DoxyCodeLine{36 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{37 }
+\DoxyCodeLine{38 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{39 }
+\DoxyCodeLine{42 \textcolor{preprocessor}{\#define EIGEN\_LAPACKE\_SVD(EIGTYPE, LAPACKE\_TYPE, LAPACKE\_RTYPE, LAPACKE\_PREFIX, EIGCOLROW, LAPACKE\_COLROW) \(\backslash\)}}
+\DoxyCodeLine{43 \textcolor{preprocessor}{template<> inline \(\backslash\)}}
+\DoxyCodeLine{44 \textcolor{preprocessor}{JacobiSVD<Matrix<EIGTYPE, Dynamic, Dynamic, EIGCOLROW, Dynamic, Dynamic>, ColPivHouseholderQRPreconditioner>\& \(\backslash\)}}
+\DoxyCodeLine{45 \textcolor{preprocessor}{JacobiSVD<Matrix<EIGTYPE, Dynamic, Dynamic, EIGCOLROW, Dynamic, Dynamic>, ColPivHouseholderQRPreconditioner>::compute(const Matrix<EIGTYPE, Dynamic, Dynamic, EIGCOLROW, Dynamic, Dynamic>\& matrix, unsigned int computationOptions) \(\backslash\)}}
+\DoxyCodeLine{46 \textcolor{preprocessor}{\{ \(\backslash\)}}
+\DoxyCodeLine{47 \textcolor{preprocessor}{  typedef Matrix<EIGTYPE, Dynamic, Dynamic, EIGCOLROW, Dynamic, Dynamic> MatrixType; \(\backslash\)}}
+\DoxyCodeLine{48 \textcolor{preprocessor}{  }\textcolor{comment}{/*typedef MatrixType::Scalar Scalar;*/}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{49 \textcolor{preprocessor}{  }\textcolor{comment}{/*typedef MatrixType::RealScalar RealScalar;*/}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{50 \textcolor{preprocessor}{  allocate(matrix.rows(), matrix.cols(), computationOptions); \(\backslash\)}}
+\DoxyCodeLine{51 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{52 \textcolor{preprocessor}{  }\textcolor{comment}{/*const RealScalar precision = RealScalar(2) * NumTraits<Scalar>::epsilon();*/}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{53 \textcolor{preprocessor}{  m\_nonzeroSingularValues = m\_diagSize; \(\backslash\)}}
+\DoxyCodeLine{54 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{55 \textcolor{preprocessor}{  lapack\_int lda = internal::convert\_index<lapack\_int>(matrix.outerStride()), ldu, ldvt; \(\backslash\)}}
+\DoxyCodeLine{56 \textcolor{preprocessor}{  lapack\_int matrix\_order = LAPACKE\_COLROW; \(\backslash\)}}
+\DoxyCodeLine{57 \textcolor{preprocessor}{  char jobu, jobvt; \(\backslash\)}}
+\DoxyCodeLine{58 \textcolor{preprocessor}{  LAPACKE\_TYPE *u, *vt, dummy; \(\backslash\)}}
+\DoxyCodeLine{59 \textcolor{preprocessor}{  jobu  = (m\_computeFullU) ? 'A' : (m\_computeThinU) ? 'S' : 'N'; \(\backslash\)}}
+\DoxyCodeLine{60 \textcolor{preprocessor}{  jobvt = (m\_computeFullV) ? 'A' : (m\_computeThinV) ? 'S' : 'N'; \(\backslash\)}}
+\DoxyCodeLine{61 \textcolor{preprocessor}{  if (computeU()) \{ \(\backslash\)}}
+\DoxyCodeLine{62 \textcolor{preprocessor}{    ldu  = internal::convert\_index<lapack\_int>(m\_matrixU.outerStride()); \(\backslash\)}}
+\DoxyCodeLine{63 \textcolor{preprocessor}{    u    = (LAPACKE\_TYPE*)m\_matrixU.data(); \(\backslash\)}}
+\DoxyCodeLine{64 \textcolor{preprocessor}{  \} else \{ ldu=1; u=\&dummy; \}\(\backslash\)}}
+\DoxyCodeLine{65 \textcolor{preprocessor}{  MatrixType localV; \(\backslash\)}}
+\DoxyCodeLine{66 \textcolor{preprocessor}{  lapack\_int vt\_rows = (m\_computeFullV) ? internal::convert\_index<lapack\_int>(m\_cols) : (m\_computeThinV) ? internal::convert\_index<lapack\_int>(m\_diagSize) : 1; \(\backslash\)}}
+\DoxyCodeLine{67 \textcolor{preprocessor}{  if (computeV()) \{ \(\backslash\)}}
+\DoxyCodeLine{68 \textcolor{preprocessor}{    localV.resize(vt\_rows, m\_cols); \(\backslash\)}}
+\DoxyCodeLine{69 \textcolor{preprocessor}{    ldvt  = internal::convert\_index<lapack\_int>(localV.outerStride()); \(\backslash\)}}
+\DoxyCodeLine{70 \textcolor{preprocessor}{    vt   = (LAPACKE\_TYPE*)localV.data(); \(\backslash\)}}
+\DoxyCodeLine{71 \textcolor{preprocessor}{  \} else \{ ldvt=1; vt=\&dummy; \}\(\backslash\)}}
+\DoxyCodeLine{72 \textcolor{preprocessor}{  Matrix<LAPACKE\_RTYPE, Dynamic, Dynamic> superb; superb.resize(m\_diagSize, 1); \(\backslash\)}}
+\DoxyCodeLine{73 \textcolor{preprocessor}{  MatrixType m\_temp; m\_temp = matrix; \(\backslash\)}}
+\DoxyCodeLine{74 \textcolor{preprocessor}{  LAPACKE\_\#\#LAPACKE\_PREFIX\#\#gesvd( matrix\_order, jobu, jobvt, internal::convert\_index<lapack\_int>(m\_rows), internal::convert\_index<lapack\_int>(m\_cols), (LAPACKE\_TYPE*)m\_temp.data(), lda, (LAPACKE\_RTYPE*)m\_singularValues.data(), u, ldu, vt, ldvt, superb.data()); \(\backslash\)}}
+\DoxyCodeLine{75 \textcolor{preprocessor}{  if (computeV()) m\_matrixV = localV.adjoint(); \(\backslash\)}}
+\DoxyCodeLine{76 \textcolor{preprocessor}{ }\textcolor{comment}{/* for(int i=0;i<m\_diagSize;i++) if (m\_singularValues.coeffRef(i) < precision) \{ m\_nonzeroSingularValues-\/-\/; m\_singularValues.coeffRef(i)=RealScalar(0);\}*/}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{77 \textcolor{preprocessor}{  m\_isInitialized = true; \(\backslash\)}}
+\DoxyCodeLine{78 \textcolor{preprocessor}{  return *this; \(\backslash\)}}
+\DoxyCodeLine{79 \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{80 }
+\DoxyCodeLine{81 EIGEN\_LAPACKE\_SVD(\textcolor{keywordtype}{double},   \textcolor{keywordtype}{double},                \textcolor{keywordtype}{double}, d, \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}, LAPACK\_COL\_MAJOR)}
+\DoxyCodeLine{82 EIGEN\_LAPACKE\_SVD(\textcolor{keywordtype}{float},    \textcolor{keywordtype}{float},                 \textcolor{keywordtype}{float} , s, \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}, LAPACK\_COL\_MAJOR)}
+\DoxyCodeLine{83 EIGEN\_LAPACKE\_SVD(dcomplex, lapack\_complex\_double, \textcolor{keywordtype}{double}, z, \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}, LAPACK\_COL\_MAJOR)}
+\DoxyCodeLine{84 EIGEN\_LAPACKE\_SVD(scomplex, lapack\_complex\_float,  \textcolor{keywordtype}{float} , c, \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}, LAPACK\_COL\_MAJOR)}
+\DoxyCodeLine{85 }
+\DoxyCodeLine{86 EIGEN\_LAPACKE\_SVD(\textcolor{keywordtype}{double},   \textcolor{keywordtype}{double},                \textcolor{keywordtype}{double}, d, \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}}, LAPACK\_ROW\_MAJOR)}
+\DoxyCodeLine{87 EIGEN\_LAPACKE\_SVD(\textcolor{keywordtype}{float},    \textcolor{keywordtype}{float},                 \textcolor{keywordtype}{float} , s, \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}}, LAPACK\_ROW\_MAJOR)}
+\DoxyCodeLine{88 EIGEN\_LAPACKE\_SVD(dcomplex, lapack\_complex\_double, \textcolor{keywordtype}{double}, z, \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}}, LAPACK\_ROW\_MAJOR)}
+\DoxyCodeLine{89 EIGEN\_LAPACKE\_SVD(scomplex, lapack\_complex\_float,  \textcolor{keywordtype}{float} , c, \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}}, LAPACK\_ROW\_MAJOR)}
+\DoxyCodeLine{90 }
+\DoxyCodeLine{91 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{92 }
+\DoxyCodeLine{93 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_JACOBISVD\_LAPACKE\_H}}
+
+\end{DoxyCode}

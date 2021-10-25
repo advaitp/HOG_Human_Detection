@@ -1,0 +1,214 @@
+\hypertarget{Diagonal_8h_source}{}\doxysection{Diagonal.\+h}
+\label{Diagonal_8h_source}\index{include/Eigen/src/Core/Diagonal.h@{include/Eigen/src/Core/Diagonal.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2007-\/2009 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2009-\/2010 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_DIAGONAL\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_DIAGONAL\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{37 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{38 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{int} DiagIndex>}
+\DoxyCodeLine{39 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{classEigen_1_1Diagonal}{Diagonal}}<MatrixType,DiagIndex> >}
+\DoxyCodeLine{40  : \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<MatrixType>}
+\DoxyCodeLine{41 \{}
+\DoxyCodeLine{42   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1ref__selector}{ref\_selector<MatrixType>::type}} MatrixTypeNested;}
+\DoxyCodeLine{43   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_reference<MatrixTypeNested>::type \_MatrixTypeNested;}
+\DoxyCodeLine{44   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::StorageKind StorageKind;}
+\DoxyCodeLine{45   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{46     RowsAtCompileTime = (int(DiagIndex) == \mbox{\hyperlink{namespaceEigen_a73c597189a4a99127175e8167c456fff}{DynamicIndex}} || int(MatrixType::SizeAtCompileTime) == \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}) ? \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}}
+\DoxyCodeLine{47                       : (EIGEN\_PLAIN\_ENUM\_MIN(MatrixType::RowsAtCompileTime -\/ EIGEN\_PLAIN\_ENUM\_MAX(-\/DiagIndex, 0),}
+\DoxyCodeLine{48                                               MatrixType::ColsAtCompileTime -\/ EIGEN\_PLAIN\_ENUM\_MAX( DiagIndex, 0))),}
+\DoxyCodeLine{49     ColsAtCompileTime = 1,}
+\DoxyCodeLine{50     MaxRowsAtCompileTime = \textcolor{keywordtype}{int}(MatrixType::MaxSizeAtCompileTime) == \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} ? \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}}
+\DoxyCodeLine{51                          : DiagIndex == \mbox{\hyperlink{namespaceEigen_a73c597189a4a99127175e8167c456fff}{DynamicIndex}} ? EIGEN\_SIZE\_MIN\_PREFER\_FIXED(MatrixType::MaxRowsAtCompileTime,}
+\DoxyCodeLine{52                                                                               MatrixType::MaxColsAtCompileTime)}
+\DoxyCodeLine{53                          : (EIGEN\_PLAIN\_ENUM\_MIN(MatrixType::MaxRowsAtCompileTime -\/ EIGEN\_PLAIN\_ENUM\_MAX(-\/DiagIndex, 0),}
+\DoxyCodeLine{54                                                  MatrixType::MaxColsAtCompileTime -\/ EIGEN\_PLAIN\_ENUM\_MAX( DiagIndex, 0))),}
+\DoxyCodeLine{55     MaxColsAtCompileTime = 1,}
+\DoxyCodeLine{56     MaskLvalueBit = \mbox{\hyperlink{structEigen_1_1internal_1_1is__lvalue}{is\_lvalue<MatrixType>::value}} ? \mbox{\hyperlink{group__flags_gae2c323957f20dfdc6cb8f44428eaec1a}{LvalueBit}} : 0,}
+\DoxyCodeLine{57     Flags = (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int})\_MatrixTypeNested::Flags \& (\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}} | MaskLvalueBit | \mbox{\hyperlink{group__flags_gabf1e9d0516a933445a4c307ad8f14915}{DirectAccessBit}}) \& \string~\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}, \textcolor{comment}{// FIXME DirectAccessBit should not be handled by expressions}}
+\DoxyCodeLine{58     MatrixTypeOuterStride = \mbox{\hyperlink{structEigen_1_1internal_1_1outer__stride__at__compile__time}{outer\_stride\_at\_compile\_time<MatrixType>::ret}},}
+\DoxyCodeLine{59     InnerStrideAtCompileTime = MatrixTypeOuterStride == \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} ? \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} : MatrixTypeOuterStride+1,}
+\DoxyCodeLine{60     OuterStrideAtCompileTime = 0}
+\DoxyCodeLine{61   \};}
+\DoxyCodeLine{62 \};}
+\DoxyCodeLine{63 \}}
+\DoxyCodeLine{64 }
+\DoxyCodeLine{65 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{int} DiagIndex\_> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1Diagonal}{Diagonal}}}
+\DoxyCodeLine{66    : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1dense__xpr__base}{internal::dense\_xpr\_base}}< Diagonal<MatrixType,DiagIndex\_> >::type}
+\DoxyCodeLine{67 \{}
+\DoxyCodeLine{68   \textcolor{keyword}{public}:}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70     \textcolor{keyword}{enum} \{ DiagIndex = DiagIndex\_ \};}
+\DoxyCodeLine{71     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1dense__xpr__base}{internal::dense\_xpr\_base<Diagonal>::type}} \mbox{\hyperlink{classBase}{Base}};}
+\DoxyCodeLine{72     EIGEN\_DENSE\_PUBLIC\_INTERFACE(\mbox{\hyperlink{classEigen_1_1Diagonal}{Diagonal}})}
+\DoxyCodeLine{73 }
+\DoxyCodeLine{74     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{75     \textcolor{keyword}{explicit} \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Diagonal}{Diagonal}}(MatrixType\& matrix, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} a\_index = DiagIndex) : m\_matrix(matrix), m\_index(a\_index)}
+\DoxyCodeLine{76     \{}
+\DoxyCodeLine{77       eigen\_assert( a\_index <= m\_matrix.cols() \&\& -\/a\_index <= m\_matrix.rows() );}
+\DoxyCodeLine{78     \}}
+\DoxyCodeLine{79 }
+\DoxyCodeLine{80     EIGEN\_INHERIT\_ASSIGNMENT\_OPERATORS(\mbox{\hyperlink{classEigen_1_1Diagonal}{Diagonal}})}
+\DoxyCodeLine{81 }
+\DoxyCodeLine{82     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{83     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows()\textcolor{keyword}{ const}}
+\DoxyCodeLine{84 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{85       \textcolor{keywordflow}{return} m\_index.value()<0 ? numext::mini<Index>(m\_matrix.cols(),m\_matrix.rows()+m\_index.value())}
+\DoxyCodeLine{86                                : numext::mini<Index>(m\_matrix.rows(),m\_matrix.cols()-\/m\_index.value());}
+\DoxyCodeLine{87     \}}
+\DoxyCodeLine{88 }
+\DoxyCodeLine{89     EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{90     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} 1; \}}
+\DoxyCodeLine{91 }
+\DoxyCodeLine{92     EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{93     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} innerStride() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{}
+\DoxyCodeLine{94       \textcolor{keywordflow}{return} m\_matrix.outerStride() + 1;}
+\DoxyCodeLine{95     \}}
+\DoxyCodeLine{96 }
+\DoxyCodeLine{97     EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{98     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outerStride() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} 0; \}}
+\DoxyCodeLine{99 }
+\DoxyCodeLine{100     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1conditional}{internal::conditional}}<}
+\DoxyCodeLine{101                        \mbox{\hyperlink{structEigen_1_1internal_1_1is__lvalue}{internal::is\_lvalue<MatrixType>::value}},}
+\DoxyCodeLine{102                        Scalar,}
+\DoxyCodeLine{103                        \textcolor{keyword}{const} Scalar}
+\DoxyCodeLine{104                      >::type \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{ScalarWithConstIfNotLvalue}};}
+\DoxyCodeLine{105 }
+\DoxyCodeLine{106     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{107     \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{ScalarWithConstIfNotLvalue}}* data() \{ \textcolor{keywordflow}{return} \&(m\_matrix.coeffRef(rowOffset(), colOffset())); \}}
+\DoxyCodeLine{108     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{109     \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar* data()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} \&(m\_matrix.coeffRef(rowOffset(), colOffset())); \}}
+\DoxyCodeLine{110 }
+\DoxyCodeLine{111     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{112     \textcolor{keyword}{inline} Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}})}
+\DoxyCodeLine{113     \{}
+\DoxyCodeLine{114       EIGEN\_STATIC\_ASSERT\_LVALUE(MatrixType)}
+\DoxyCodeLine{115       \textcolor{keywordflow}{return} m\_matrix.coeffRef(row+rowOffset(), row+colOffset());}
+\DoxyCodeLine{116     \}}
+\DoxyCodeLine{117 }
+\DoxyCodeLine{118     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{119     \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}})\textcolor{keyword}{ const}}
+\DoxyCodeLine{120 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{121       \textcolor{keywordflow}{return} m\_matrix.coeffRef(row+rowOffset(), row+colOffset());}
+\DoxyCodeLine{122     \}}
+\DoxyCodeLine{123 }
+\DoxyCodeLine{124     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{125     \textcolor{keyword}{inline} CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}})\textcolor{keyword}{ const}}
+\DoxyCodeLine{126 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{127       \textcolor{keywordflow}{return} m\_matrix.coeff(row+rowOffset(), row+colOffset());}
+\DoxyCodeLine{128     \}}
+\DoxyCodeLine{129 }
+\DoxyCodeLine{130     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{131     \textcolor{keyword}{inline} Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} idx)}
+\DoxyCodeLine{132     \{}
+\DoxyCodeLine{133       EIGEN\_STATIC\_ASSERT\_LVALUE(MatrixType)}
+\DoxyCodeLine{134       \textcolor{keywordflow}{return} m\_matrix.coeffRef(idx+rowOffset(), idx+colOffset());}
+\DoxyCodeLine{135     \}}
+\DoxyCodeLine{136 }
+\DoxyCodeLine{137     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{138     \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} idx)\textcolor{keyword}{ const}}
+\DoxyCodeLine{139 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{140       \textcolor{keywordflow}{return} m\_matrix.coeffRef(idx+rowOffset(), idx+colOffset());}
+\DoxyCodeLine{141     \}}
+\DoxyCodeLine{142 }
+\DoxyCodeLine{143     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{144     \textcolor{keyword}{inline} CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} idx)\textcolor{keyword}{ const}}
+\DoxyCodeLine{145 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{146       \textcolor{keywordflow}{return} m\_matrix.coeff(idx+rowOffset(), idx+colOffset());}
+\DoxyCodeLine{147     \}}
+\DoxyCodeLine{148 }
+\DoxyCodeLine{149     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{150     \textcolor{keyword}{inline} \textcolor{keyword}{const} \textcolor{keyword}{typename} internal::remove\_all<typename MatrixType::Nested>::type\&}
+\DoxyCodeLine{151     nestedExpression()\textcolor{keyword}{ const}}
+\DoxyCodeLine{152 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{153       \textcolor{keywordflow}{return} m\_matrix;}
+\DoxyCodeLine{154     \}}
+\DoxyCodeLine{155 }
+\DoxyCodeLine{156     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{157     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index()\textcolor{keyword}{ const}}
+\DoxyCodeLine{158 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{159       \textcolor{keywordflow}{return} m\_index.value();}
+\DoxyCodeLine{160     \}}
+\DoxyCodeLine{161 }
+\DoxyCodeLine{162   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{163     \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::ref\_selector<MatrixType>::non\_const\_type}} m\_matrix;}
+\DoxyCodeLine{164     \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1variable__if__dynamicindex}{internal::variable\_if\_dynamicindex<Index, DiagIndex>}} m\_index;}
+\DoxyCodeLine{165 }
+\DoxyCodeLine{166   \textcolor{keyword}{private}:}
+\DoxyCodeLine{167     \textcolor{comment}{// some compilers may fail to optimize std::max etc in case of compile-\/time constants...}}
+\DoxyCodeLine{168     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE EIGEN\_CONSTEXPR}
+\DoxyCodeLine{169     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} absDiagIndex() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_index.value()>0 ? m\_index.value() : -\/m\_index.value(); \}}
+\DoxyCodeLine{170     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE EIGEN\_CONSTEXPR}
+\DoxyCodeLine{171     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rowOffset() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_index.value()>0 ? 0 : -\/m\_index.value(); \}}
+\DoxyCodeLine{172     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE EIGEN\_CONSTEXPR}
+\DoxyCodeLine{173     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} colOffset() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_index.value()>0 ? m\_index.value() : 0; \}}
+\DoxyCodeLine{174     \textcolor{comment}{// trigger a compile-\/time error if someone try to call packet}}
+\DoxyCodeLine{175     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode> \textcolor{keyword}{typename} MatrixType::PacketReturnType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}) \textcolor{keyword}{const};}
+\DoxyCodeLine{176     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode> \textcolor{keyword}{typename} MatrixType::PacketReturnType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}},\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}) \textcolor{keyword}{const};}
+\DoxyCodeLine{177 \};}
+\DoxyCodeLine{178 }
+\DoxyCodeLine{187 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{188 EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Diagonal}{MatrixBase<Derived>::DiagonalReturnType}}}
+\DoxyCodeLine{189 \mbox{\hyperlink{classEigen_1_1MatrixBase_ac9a3bd1cc2e80a4f1379fee552b5ce4f}{MatrixBase<Derived>::diagonal}}()}
+\DoxyCodeLine{190 \{}
+\DoxyCodeLine{191   \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Diagonal}{DiagonalReturnType}}(derived());}
+\DoxyCodeLine{192 \}}
+\DoxyCodeLine{193 }
+\DoxyCodeLine{195 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{196 EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Diagonal}{MatrixBase<Derived>::ConstDiagonalReturnType}}}
+\DoxyCodeLine{197 \mbox{\hyperlink{classEigen_1_1MatrixBase_ac9a3bd1cc2e80a4f1379fee552b5ce4f}{MatrixBase<Derived>::diagonal}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{198 \textcolor{keyword}{}\{}
+\DoxyCodeLine{199   \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Diagonal}{ConstDiagonalReturnType}}(derived());}
+\DoxyCodeLine{200 \}}
+\DoxyCodeLine{201 }
+\DoxyCodeLine{213 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{214 EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Diagonal}{MatrixBase<Derived>::DiagonalDynamicIndexReturnType}}}
+\DoxyCodeLine{215 \mbox{\hyperlink{classEigen_1_1MatrixBase_ac9a3bd1cc2e80a4f1379fee552b5ce4f}{MatrixBase<Derived>::diagonal}}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)}
+\DoxyCodeLine{216 \{}
+\DoxyCodeLine{217   \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Diagonal}{DiagonalDynamicIndexReturnType}}(derived(), index);}
+\DoxyCodeLine{218 \}}
+\DoxyCodeLine{219 }
+\DoxyCodeLine{221 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{222 EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Diagonal}{MatrixBase<Derived>::ConstDiagonalDynamicIndexReturnType}}}
+\DoxyCodeLine{223 \mbox{\hyperlink{classEigen_1_1MatrixBase_ac9a3bd1cc2e80a4f1379fee552b5ce4f}{MatrixBase<Derived>::diagonal}}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{224 \textcolor{keyword}{}\{}
+\DoxyCodeLine{225   \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Diagonal}{ConstDiagonalDynamicIndexReturnType}}(derived(), index);}
+\DoxyCodeLine{226 \}}
+\DoxyCodeLine{227 }
+\DoxyCodeLine{239 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{240 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Index\_>}
+\DoxyCodeLine{241 EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{242 \textcolor{keyword}{inline} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Derived>::template}} DiagonalIndexReturnType<Index\_>::Type}
+\DoxyCodeLine{243 \mbox{\hyperlink{classEigen_1_1MatrixBase_ac9a3bd1cc2e80a4f1379fee552b5ce4f}{MatrixBase<Derived>::diagonal}}()}
+\DoxyCodeLine{244 \{}
+\DoxyCodeLine{245   \textcolor{keywordflow}{return} \textcolor{keyword}{typename} DiagonalIndexReturnType<Index\_>::Type(derived());}
+\DoxyCodeLine{246 \}}
+\DoxyCodeLine{247 }
+\DoxyCodeLine{249 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{250 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Index\_>}
+\DoxyCodeLine{251 EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{252 \textcolor{keyword}{inline} \textcolor{keyword}{typename} MatrixBase<Derived>::template ConstDiagonalIndexReturnType<Index\_>::Type}
+\DoxyCodeLine{253 \mbox{\hyperlink{classEigen_1_1MatrixBase_ac9a3bd1cc2e80a4f1379fee552b5ce4f}{MatrixBase<Derived>::diagonal}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{254 \textcolor{keyword}{}\{}
+\DoxyCodeLine{255   \textcolor{keywordflow}{return} \textcolor{keyword}{typename} ConstDiagonalIndexReturnType<Index\_>::Type(derived());}
+\DoxyCodeLine{256 \}}
+\DoxyCodeLine{257 }
+\DoxyCodeLine{258 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{259 }
+\DoxyCodeLine{260 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_DIAGONAL\_H}}
+
+\end{DoxyCode}

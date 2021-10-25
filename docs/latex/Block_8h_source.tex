@@ -1,0 +1,400 @@
+\hypertarget{Block_8h_source}{}\doxysection{Block.\+h}
+\label{Block_8h_source}\index{include/Eigen/src/Core/Block.h@{include/Eigen/src/Core/Block.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2006-\/2010 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_BLOCK\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_BLOCK\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{19 \textcolor{keyword}{template}<\textcolor{keyword}{typename} XprType, \textcolor{keywordtype}{int} BlockRows, \textcolor{keywordtype}{int} BlockCols, \textcolor{keywordtype}{bool} InnerPanel>}
+\DoxyCodeLine{20 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{classEigen_1_1Block}{Block}}<XprType, BlockRows, BlockCols, InnerPanel> > : \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<XprType>}
+\DoxyCodeLine{21 \{}
+\DoxyCodeLine{22   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<XprType>::Scalar}} Scalar;}
+\DoxyCodeLine{23   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<XprType>::StorageKind}} StorageKind;}
+\DoxyCodeLine{24   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<XprType>::XprKind}} XprKind;}
+\DoxyCodeLine{25   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1ref__selector}{ref\_selector<XprType>::type}} XprTypeNested;}
+\DoxyCodeLine{26   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_reference<XprTypeNested>::type \_XprTypeNested;}
+\DoxyCodeLine{27   \textcolor{keyword}{enum}\{}
+\DoxyCodeLine{28     MatrixRows = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<XprType>::RowsAtCompileTime}},}
+\DoxyCodeLine{29     MatrixCols = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<XprType>::ColsAtCompileTime}},}
+\DoxyCodeLine{30     RowsAtCompileTime = MatrixRows == 0 ? 0 : BlockRows,}
+\DoxyCodeLine{31     ColsAtCompileTime = MatrixCols == 0 ? 0 : BlockCols,}
+\DoxyCodeLine{32     MaxRowsAtCompileTime = BlockRows==0 ? 0}
+\DoxyCodeLine{33                          : RowsAtCompileTime != \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} ? int(RowsAtCompileTime)}
+\DoxyCodeLine{34                          : int(\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<XprType>::MaxRowsAtCompileTime}}),}
+\DoxyCodeLine{35     MaxColsAtCompileTime = BlockCols==0 ? 0}
+\DoxyCodeLine{36                          : ColsAtCompileTime != \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} ? int(ColsAtCompileTime)}
+\DoxyCodeLine{37                          : int(\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<XprType>::MaxColsAtCompileTime}}),}
+\DoxyCodeLine{38 }
+\DoxyCodeLine{39     XprTypeIsRowMajor = (int(\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<XprType>::Flags}})\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) != 0,}
+\DoxyCodeLine{40     IsRowMajor = (MaxRowsAtCompileTime==1\&\&MaxColsAtCompileTime!=1) ? 1}
+\DoxyCodeLine{41                : (MaxColsAtCompileTime==1\&\&MaxRowsAtCompileTime!=1) ? 0}
+\DoxyCodeLine{42                : XprTypeIsRowMajor,}
+\DoxyCodeLine{43     HasSameStorageOrderAsXprType = (IsRowMajor == XprTypeIsRowMajor),}
+\DoxyCodeLine{44     InnerSize = IsRowMajor ? int(ColsAtCompileTime) : int(RowsAtCompileTime),}
+\DoxyCodeLine{45     InnerStrideAtCompileTime = HasSameStorageOrderAsXprType}
+\DoxyCodeLine{46                              ? int(\mbox{\hyperlink{structEigen_1_1internal_1_1inner__stride__at__compile__time}{inner\_stride\_at\_compile\_time<XprType>::ret}})}
+\DoxyCodeLine{47                              : int(\mbox{\hyperlink{structEigen_1_1internal_1_1outer__stride__at__compile__time}{outer\_stride\_at\_compile\_time<XprType>::ret}}),}
+\DoxyCodeLine{48     OuterStrideAtCompileTime = HasSameStorageOrderAsXprType}
+\DoxyCodeLine{49                              ? int(\mbox{\hyperlink{structEigen_1_1internal_1_1outer__stride__at__compile__time}{outer\_stride\_at\_compile\_time<XprType>::ret}})}
+\DoxyCodeLine{50                              : int(\mbox{\hyperlink{structEigen_1_1internal_1_1inner__stride__at__compile__time}{inner\_stride\_at\_compile\_time<XprType>::ret}}),}
+\DoxyCodeLine{51 }
+\DoxyCodeLine{52     \textcolor{comment}{// FIXME, this traits is rather specialized for dense object and it needs to be cleaned further}}
+\DoxyCodeLine{53     FlagsLvalueBit = \mbox{\hyperlink{structEigen_1_1internal_1_1is__lvalue}{is\_lvalue<XprType>::value}} ? \mbox{\hyperlink{group__flags_gae2c323957f20dfdc6cb8f44428eaec1a}{LvalueBit}} : 0,}
+\DoxyCodeLine{54     FlagsRowMajorBit = IsRowMajor ? \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}} : 0,}
+\DoxyCodeLine{55     Flags = (\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<XprType>::Flags}} \& (\mbox{\hyperlink{group__flags_gabf1e9d0516a933445a4c307ad8f14915}{DirectAccessBit}} | (InnerPanel?\mbox{\hyperlink{group__flags_gaed0244284da47a2b8661261431173caf}{CompressedAccessBit}}:0))) | FlagsLvalueBit | FlagsRowMajorBit,}
+\DoxyCodeLine{56     \textcolor{comment}{// FIXME DirectAccessBit should not be handled by expressions}}
+\DoxyCodeLine{57     \textcolor{comment}{//}}
+\DoxyCodeLine{58     \textcolor{comment}{// Alignment is needed by MapBase's assertions}}
+\DoxyCodeLine{59     \textcolor{comment}{// We can sefely set it to false here. Internal alignment errors will be detected by an eigen\_internal\_assert in the respective evaluator}}
+\DoxyCodeLine{60     Alignment = 0}
+\DoxyCodeLine{61   \};}
+\DoxyCodeLine{62 \};}
+\DoxyCodeLine{63 }
+\DoxyCodeLine{64 \textcolor{keyword}{template}<\textcolor{keyword}{typename} XprType, \textcolor{keywordtype}{int} BlockRows=\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}, \textcolor{keywordtype}{int} BlockCols=\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}, \textcolor{keywordtype}{bool} InnerPanel = \textcolor{keyword}{false},}
+\DoxyCodeLine{65          \textcolor{keywordtype}{bool} HasDirectAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1has__direct__access}{internal::has\_direct\_access<XprType>::ret}}> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1BlockImpl__dense}{BlockImpl\_dense}};}
+\DoxyCodeLine{66 }
+\DoxyCodeLine{67 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{69 \textcolor{keyword}{template}<\textcolor{keyword}{typename} XprType, \textcolor{keywordtype}{int} BlockRows, \textcolor{keywordtype}{int} BlockCols, \textcolor{keywordtype}{bool} InnerPanel, \textcolor{keyword}{typename} StorageKind> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1BlockImpl}{BlockImpl}};}
+\DoxyCodeLine{70 }
+\DoxyCodeLine{105 \textcolor{keyword}{template}<\textcolor{keyword}{typename} XprType, \textcolor{keywordtype}{int} BlockRows, \textcolor{keywordtype}{int} BlockCols, \textcolor{keywordtype}{bool} InnerPanel> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1Block}{Block}}}
+\DoxyCodeLine{106   : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1BlockImpl}{BlockImpl}}<XprType, BlockRows, BlockCols, InnerPanel, typename internal::traits<XprType>::StorageKind>}
+\DoxyCodeLine{107 \{}
+\DoxyCodeLine{108     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1BlockImpl}{BlockImpl<XprType, BlockRows, BlockCols, InnerPanel, typename internal::traits<XprType>::StorageKind}}> \mbox{\hyperlink{classEigen_1_1BlockImpl}{Impl}};}
+\DoxyCodeLine{109   \textcolor{keyword}{public}:}
+\DoxyCodeLine{110     \textcolor{comment}{//typedef typename Impl::Base Base;}}
+\DoxyCodeLine{111     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1BlockImpl}{Impl}} \mbox{\hyperlink{classEigen_1_1BlockImpl}{Base}};}
+\DoxyCodeLine{112     EIGEN\_GENERIC\_PUBLIC\_INTERFACE(\mbox{\hyperlink{classEigen_1_1Block}{Block}})}
+\DoxyCodeLine{113     EIGEN\_INHERIT\_ASSIGNMENT\_OPERATORS(\mbox{\hyperlink{classEigen_1_1Block}{Block}})}
+\DoxyCodeLine{114 }
+\DoxyCodeLine{115     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<XprType>::type NestedExpression;}
+\DoxyCodeLine{116 }
+\DoxyCodeLine{119     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{120     \mbox{\hyperlink{classEigen_1_1Block_ac54dae9c1a3ff48769e442b217dc01e3}{Block}}(XprType\& xpr, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i) : \mbox{\hyperlink{classEigen_1_1BlockImpl}{Impl}}(xpr,i)}
+\DoxyCodeLine{121     \{}
+\DoxyCodeLine{122       eigen\_assert( (i>=0) \&\& (}
+\DoxyCodeLine{123           ((BlockRows==1) \&\& (BlockCols==XprType::ColsAtCompileTime) \&\& i<xpr.rows())}
+\DoxyCodeLine{124         ||((BlockRows==XprType::RowsAtCompileTime) \&\& (BlockCols==1) \&\& i<xpr.cols())));}
+\DoxyCodeLine{125     \}}
+\DoxyCodeLine{126 }
+\DoxyCodeLine{129     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{130     \mbox{\hyperlink{classEigen_1_1Block_a2dc0829eff9133f4ff23dc92860aad73}{Block}}(XprType\& xpr, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} startRow, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} startCol)}
+\DoxyCodeLine{131       : \mbox{\hyperlink{classEigen_1_1BlockImpl}{Impl}}(xpr, startRow, startCol)}
+\DoxyCodeLine{132     \{}
+\DoxyCodeLine{133       EIGEN\_STATIC\_ASSERT(RowsAtCompileTime!=\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} \&\& ColsAtCompileTime!=\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}},THIS\_METHOD\_IS\_ONLY\_FOR\_FIXED\_SIZE)}
+\DoxyCodeLine{134       eigen\_assert(startRow >= 0 \&\& BlockRows >= 0 \&\& startRow + BlockRows <= xpr.rows()}
+\DoxyCodeLine{135              \&\& startCol >= 0 \&\& BlockCols >= 0 \&\& startCol + BlockCols <= xpr.cols());}
+\DoxyCodeLine{136     \}}
+\DoxyCodeLine{137 }
+\DoxyCodeLine{140     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{141     \mbox{\hyperlink{classEigen_1_1Block_a7921bc64472d6e2fdf6fdd6122023dbc}{Block}}(XprType\& xpr,}
+\DoxyCodeLine{142           \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} startRow, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} startCol,}
+\DoxyCodeLine{143           \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} blockRows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} blockCols)}
+\DoxyCodeLine{144       : \mbox{\hyperlink{classEigen_1_1BlockImpl}{Impl}}(xpr, startRow, startCol, blockRows, blockCols)}
+\DoxyCodeLine{145     \{}
+\DoxyCodeLine{146       eigen\_assert((RowsAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} || RowsAtCompileTime==blockRows)}
+\DoxyCodeLine{147           \&\& (ColsAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} || ColsAtCompileTime==blockCols));}
+\DoxyCodeLine{148       eigen\_assert(startRow >= 0 \&\& blockRows >= 0 \&\& startRow  <= xpr.rows() -\/ blockRows}
+\DoxyCodeLine{149           \&\& startCol >= 0 \&\& blockCols >= 0 \&\& startCol <= xpr.cols() -\/ blockCols);}
+\DoxyCodeLine{150     \}}
+\DoxyCodeLine{151 \};}
+\DoxyCodeLine{152 }
+\DoxyCodeLine{153 \textcolor{comment}{// The generic default implementation for dense block simplu forward to the internal::BlockImpl\_dense}}
+\DoxyCodeLine{154 \textcolor{comment}{// that must be specialized for direct and non-\/direct access...}}
+\DoxyCodeLine{155 \textcolor{keyword}{template}<\textcolor{keyword}{typename} XprType, \textcolor{keywordtype}{int} BlockRows, \textcolor{keywordtype}{int} BlockCols, \textcolor{keywordtype}{bool} InnerPanel>}
+\DoxyCodeLine{156 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1BlockImpl}{BlockImpl}}<XprType, BlockRows, BlockCols, InnerPanel, \mbox{\hyperlink{structEigen_1_1Dense}{Dense}}>}
+\DoxyCodeLine{157   : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1internal_1_1BlockImpl__dense}{internal::BlockImpl\_dense}}<XprType, BlockRows, BlockCols, InnerPanel>}
+\DoxyCodeLine{158 \{}
+\DoxyCodeLine{159     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1internal_1_1BlockImpl__dense}{internal::BlockImpl\_dense<XprType, BlockRows, BlockCols, InnerPanel>}} \mbox{\hyperlink{classEigen_1_1internal_1_1BlockImpl__dense}{Impl}};}
+\DoxyCodeLine{160     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::StorageIndex StorageIndex;}
+\DoxyCodeLine{161   \textcolor{keyword}{public}:}
+\DoxyCodeLine{162     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1internal_1_1BlockImpl__dense}{Impl}} \mbox{\hyperlink{classEigen_1_1internal_1_1BlockImpl__dense}{Base}};}
+\DoxyCodeLine{163     EIGEN\_INHERIT\_ASSIGNMENT\_OPERATORS(\mbox{\hyperlink{classEigen_1_1BlockImpl}{BlockImpl}})}
+\DoxyCodeLine{164     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \mbox{\hyperlink{classEigen_1_1BlockImpl}{BlockImpl}}(XprType\& xpr, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i) : \mbox{\hyperlink{classEigen_1_1internal_1_1BlockImpl__dense}{Impl}}(xpr,i) \{\}}
+\DoxyCodeLine{165     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \mbox{\hyperlink{classEigen_1_1BlockImpl}{BlockImpl}}(XprType\& xpr, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} startRow, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} startCol) : \mbox{\hyperlink{classEigen_1_1internal_1_1BlockImpl__dense}{Impl}}(xpr, startRow, startCol) \{\}}
+\DoxyCodeLine{166     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{167     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{classEigen_1_1BlockImpl}{BlockImpl}}(XprType\& xpr, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} startRow, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} startCol, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} blockRows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} blockCols)}
+\DoxyCodeLine{168       : \mbox{\hyperlink{classEigen_1_1internal_1_1BlockImpl__dense}{Impl}}(xpr, startRow, startCol, blockRows, blockCols) \{\}}
+\DoxyCodeLine{169 \};}
+\DoxyCodeLine{170 }
+\DoxyCodeLine{171 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{172 }
+\DoxyCodeLine{174 \textcolor{keyword}{template}<\textcolor{keyword}{typename} XprType, \textcolor{keywordtype}{int} BlockRows, \textcolor{keywordtype}{int} BlockCols, \textcolor{keywordtype}{bool} InnerPanel, \textcolor{keywordtype}{bool} HasDirectAccess> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1BlockImpl__dense}{BlockImpl\_dense}}}
+\DoxyCodeLine{175   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1dense__xpr__base}{internal::dense\_xpr\_base}}<Block<XprType, BlockRows, BlockCols, InnerPanel> >::type}
+\DoxyCodeLine{176 \{}
+\DoxyCodeLine{177     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Block}{Block<XprType, BlockRows, BlockCols, InnerPanel>}} \mbox{\hyperlink{classEigen_1_1Block}{BlockType}};}
+\DoxyCodeLine{178     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::ref\_selector<XprType>::non\_const\_type}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{XprTypeNested}};}
+\DoxyCodeLine{179   \textcolor{keyword}{public}:}
+\DoxyCodeLine{180 }
+\DoxyCodeLine{181     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1dense__xpr__base}{internal::dense\_xpr\_base<BlockType>::type}} \mbox{\hyperlink{classBase}{Base}};}
+\DoxyCodeLine{182     EIGEN\_DENSE\_PUBLIC\_INTERFACE(\mbox{\hyperlink{classEigen_1_1Block}{BlockType}})}
+\DoxyCodeLine{183     EIGEN\_INHERIT\_ASSIGNMENT\_OPERATORS(\mbox{\hyperlink{classEigen_1_1internal_1_1BlockImpl__dense}{BlockImpl\_dense}})}
+\DoxyCodeLine{184 }
+\DoxyCodeLine{185     \textcolor{comment}{// class InnerIterator; // FIXME apparently never used}}
+\DoxyCodeLine{186 }
+\DoxyCodeLine{187     }
+\DoxyCodeLine{189     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{190     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1internal_1_1BlockImpl__dense_af68c0eafb607bb884cfe507bee39052e}{BlockImpl\_dense}}(XprType\& xpr, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i)}
+\DoxyCodeLine{191       : m\_xpr(xpr),}
+\DoxyCodeLine{192         \textcolor{comment}{// It is a row if and only if BlockRows==1 and BlockCols==XprType::ColsAtCompileTime,}}
+\DoxyCodeLine{193         \textcolor{comment}{// and it is a column if and only if BlockRows==XprType::RowsAtCompileTime and BlockCols==1,}}
+\DoxyCodeLine{194         \textcolor{comment}{// all other cases are invalid.}}
+\DoxyCodeLine{195         \textcolor{comment}{// The case a 1x1 matrix seems ambiguous, but the result is the same anyway.}}
+\DoxyCodeLine{196         m\_startRow( (BlockRows==1) \&\& (BlockCols==XprType::ColsAtCompileTime) ? i : 0),}
+\DoxyCodeLine{197         m\_startCol( (BlockRows==XprType::RowsAtCompileTime) \&\& (BlockCols==1) ? i : 0),}
+\DoxyCodeLine{198         m\_blockRows(BlockRows==1 ? 1 : xpr.rows()),}
+\DoxyCodeLine{199         m\_blockCols(BlockCols==1 ? 1 : xpr.cols())}
+\DoxyCodeLine{200     \{\}}
+\DoxyCodeLine{201 }
+\DoxyCodeLine{204     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{205     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1internal_1_1BlockImpl__dense_aa77daae8d8aef85ce9445cfd23363cbf}{BlockImpl\_dense}}(XprType\& xpr, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} startRow, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} startCol)}
+\DoxyCodeLine{206       : m\_xpr(xpr), m\_startRow(startRow), m\_startCol(startCol),}
+\DoxyCodeLine{207                     m\_blockRows(BlockRows), m\_blockCols(BlockCols)}
+\DoxyCodeLine{208     \{\}}
+\DoxyCodeLine{209 }
+\DoxyCodeLine{212     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{213     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1internal_1_1BlockImpl__dense_a187c7918e6f200bf1d7d9a9c2f608547}{BlockImpl\_dense}}(XprType\& xpr,}
+\DoxyCodeLine{214           \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} startRow, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} startCol,}
+\DoxyCodeLine{215           \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} blockRows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} blockCols)}
+\DoxyCodeLine{216       : m\_xpr(xpr), m\_startRow(startRow), m\_startCol(startCol),}
+\DoxyCodeLine{217                     m\_blockRows(blockRows), m\_blockCols(blockCols)}
+\DoxyCodeLine{218     \{\}}
+\DoxyCodeLine{219 }
+\DoxyCodeLine{220     EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_blockRows.value(); \}}
+\DoxyCodeLine{221     EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_blockCols.value(); \}}
+\DoxyCodeLine{222 }
+\DoxyCodeLine{223     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{224     \textcolor{keyword}{inline} Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rowId, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} colId)}
+\DoxyCodeLine{225     \{}
+\DoxyCodeLine{226       EIGEN\_STATIC\_ASSERT\_LVALUE(XprType)}
+\DoxyCodeLine{227       \textcolor{keywordflow}{return} m\_xpr.coeffRef(rowId + m\_startRow.value(), colId + m\_startCol.value());}
+\DoxyCodeLine{228     \}}
+\DoxyCodeLine{229 }
+\DoxyCodeLine{230     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{231     \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rowId, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} colId)\textcolor{keyword}{ const}}
+\DoxyCodeLine{232 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{233       \textcolor{keywordflow}{return} m\_xpr.derived().coeffRef(rowId + m\_startRow.value(), colId + m\_startCol.value());}
+\DoxyCodeLine{234     \}}
+\DoxyCodeLine{235 }
+\DoxyCodeLine{236     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{237     EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rowId, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} colId)\textcolor{keyword}{ const}}
+\DoxyCodeLine{238 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{239       \textcolor{keywordflow}{return} m\_xpr.coeff(rowId + m\_startRow.value(), colId + m\_startCol.value());}
+\DoxyCodeLine{240     \}}
+\DoxyCodeLine{241 }
+\DoxyCodeLine{242     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{243     \textcolor{keyword}{inline} Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)}
+\DoxyCodeLine{244     \{}
+\DoxyCodeLine{245       EIGEN\_STATIC\_ASSERT\_LVALUE(XprType)}
+\DoxyCodeLine{246       \textcolor{keywordflow}{return} m\_xpr.coeffRef(m\_startRow.value() + (RowsAtCompileTime == 1 ? 0 : index),}
+\DoxyCodeLine{247                             m\_startCol.value() + (RowsAtCompileTime == 1 ? index : 0));}
+\DoxyCodeLine{248     \}}
+\DoxyCodeLine{249 }
+\DoxyCodeLine{250     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{251     \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{252 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{253       \textcolor{keywordflow}{return} m\_xpr.coeffRef(m\_startRow.value() + (RowsAtCompileTime == 1 ? 0 : index),}
+\DoxyCodeLine{254                             m\_startCol.value() + (RowsAtCompileTime == 1 ? index : 0));}
+\DoxyCodeLine{255     \}}
+\DoxyCodeLine{256 }
+\DoxyCodeLine{257     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{258     \textcolor{keyword}{inline} \textcolor{keyword}{const} CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{259 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{260       \textcolor{keywordflow}{return} m\_xpr.coeff(m\_startRow.value() + (RowsAtCompileTime == 1 ? 0 : index),}
+\DoxyCodeLine{261                          m\_startCol.value() + (RowsAtCompileTime == 1 ? index : 0));}
+\DoxyCodeLine{262     \}}
+\DoxyCodeLine{263 }
+\DoxyCodeLine{264     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode>}
+\DoxyCodeLine{265     EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} PacketScalar packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rowId, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} colId)\textcolor{keyword}{ const}}
+\DoxyCodeLine{266 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{267       \textcolor{keywordflow}{return} m\_xpr.template packet<Unaligned>(rowId + m\_startRow.value(), colId + m\_startCol.value());}
+\DoxyCodeLine{268     \}}
+\DoxyCodeLine{269 }
+\DoxyCodeLine{270     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode>}
+\DoxyCodeLine{271     EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keywordtype}{void} writePacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rowId, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} colId, \textcolor{keyword}{const} PacketScalar\& val)}
+\DoxyCodeLine{272     \{}
+\DoxyCodeLine{273       m\_xpr.template writePacket<Unaligned>(rowId + m\_startRow.value(), colId + m\_startCol.value(), val);}
+\DoxyCodeLine{274     \}}
+\DoxyCodeLine{275 }
+\DoxyCodeLine{276     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode>}
+\DoxyCodeLine{277     EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} PacketScalar packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{278 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{279       \textcolor{keywordflow}{return} m\_xpr.template packet<Unaligned>}
+\DoxyCodeLine{280               (m\_startRow.value() + (RowsAtCompileTime == 1 ? 0 : index),}
+\DoxyCodeLine{281                m\_startCol.value() + (RowsAtCompileTime == 1 ? index : 0));}
+\DoxyCodeLine{282     \}}
+\DoxyCodeLine{283 }
+\DoxyCodeLine{284     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode>}
+\DoxyCodeLine{285     EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keywordtype}{void} writePacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index, \textcolor{keyword}{const} PacketScalar\& val)}
+\DoxyCodeLine{286     \{}
+\DoxyCodeLine{287       m\_xpr.template writePacket<Unaligned>}
+\DoxyCodeLine{288          (m\_startRow.value() + (RowsAtCompileTime == 1 ? 0 : index),}
+\DoxyCodeLine{289           m\_startCol.value() + (RowsAtCompileTime == 1 ? index : 0), val);}
+\DoxyCodeLine{290     \}}
+\DoxyCodeLine{291 }
+\DoxyCodeLine{292 \textcolor{preprocessor}{    \#ifdef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{294     EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar* data() \textcolor{keyword}{const};}
+\DoxyCodeLine{295     EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} innerStride() \textcolor{keyword}{const};}
+\DoxyCodeLine{296     EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outerStride() \textcolor{keyword}{const};}
+\DoxyCodeLine{297 \textcolor{preprocessor}{    \#endif}}
+\DoxyCodeLine{298 }
+\DoxyCodeLine{299     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{300     \textcolor{keyword}{const} \textcolor{keyword}{typename} internal::remove\_all<XprTypeNested>::type\& nestedExpression()\textcolor{keyword}{ const}}
+\DoxyCodeLine{301 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{302       \textcolor{keywordflow}{return} m\_xpr;}
+\DoxyCodeLine{303     \}}
+\DoxyCodeLine{304 }
+\DoxyCodeLine{305     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{306     XprType\& nestedExpression() \{ \textcolor{keywordflow}{return} m\_xpr; \}}
+\DoxyCodeLine{307 }
+\DoxyCodeLine{308     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE EIGEN\_CONSTEXPR}
+\DoxyCodeLine{309     StorageIndex startRow() const EIGEN\_NOEXCEPT}
+\DoxyCodeLine{310     \{}
+\DoxyCodeLine{311       \textcolor{keywordflow}{return} m\_startRow.value();}
+\DoxyCodeLine{312     \}}
+\DoxyCodeLine{313 }
+\DoxyCodeLine{314     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE EIGEN\_CONSTEXPR}
+\DoxyCodeLine{315     StorageIndex startCol() const EIGEN\_NOEXCEPT}
+\DoxyCodeLine{316     \{}
+\DoxyCodeLine{317       \textcolor{keywordflow}{return} m\_startCol.value();}
+\DoxyCodeLine{318     \}}
+\DoxyCodeLine{319 }
+\DoxyCodeLine{320   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{321 }
+\DoxyCodeLine{322     XprTypeNested m\_xpr;}
+\DoxyCodeLine{323     \textcolor{keyword}{const} internal::variable\_if\_dynamic<StorageIndex, (XprType::RowsAtCompileTime == 1 \&\& BlockRows==1) ? 0 : \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}> m\_startRow;}
+\DoxyCodeLine{324     \textcolor{keyword}{const} internal::variable\_if\_dynamic<StorageIndex, (XprType::ColsAtCompileTime == 1 \&\& BlockCols==1) ? 0 : \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}> m\_startCol;}
+\DoxyCodeLine{325     \textcolor{keyword}{const} internal::variable\_if\_dynamic<StorageIndex, RowsAtCompileTime> m\_blockRows;}
+\DoxyCodeLine{326     \textcolor{keyword}{const} internal::variable\_if\_dynamic<StorageIndex, ColsAtCompileTime> m\_blockCols;}
+\DoxyCodeLine{327 \};}
+\DoxyCodeLine{328 }
+\DoxyCodeLine{330 \textcolor{keyword}{template}<\textcolor{keyword}{typename} XprType, \textcolor{keywordtype}{int} BlockRows, \textcolor{keywordtype}{int} BlockCols, \textcolor{keywordtype}{bool} InnerPanel>}
+\DoxyCodeLine{331 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1BlockImpl__dense}{BlockImpl\_dense}}<XprType,BlockRows,BlockCols, InnerPanel,true>}
+\DoxyCodeLine{332   : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1MapBase}{MapBase}}<Block<XprType, BlockRows, BlockCols, InnerPanel> >}
+\DoxyCodeLine{333 \{}
+\DoxyCodeLine{334     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Block}{Block<XprType, BlockRows, BlockCols, InnerPanel>}} \mbox{\hyperlink{classEigen_1_1Block}{BlockType}};}
+\DoxyCodeLine{335     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::ref\_selector<XprType>::non\_const\_type}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{XprTypeNested}};}
+\DoxyCodeLine{336     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{337       XprTypeIsRowMajor = (int(\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<XprType>::Flags}})\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) != 0}
+\DoxyCodeLine{338     \};}
+\DoxyCodeLine{339   \textcolor{keyword}{public}:}
+\DoxyCodeLine{340 }
+\DoxyCodeLine{341     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1MapBase}{MapBase<BlockType>}} \mbox{\hyperlink{classEigen_1_1MapBase}{Base}};}
+\DoxyCodeLine{342     EIGEN\_DENSE\_PUBLIC\_INTERFACE(\mbox{\hyperlink{classEigen_1_1Block}{BlockType}})}
+\DoxyCodeLine{343     EIGEN\_INHERIT\_ASSIGNMENT\_OPERATORS(\mbox{\hyperlink{classEigen_1_1internal_1_1BlockImpl__dense}{BlockImpl\_dense}})}
+\DoxyCodeLine{344 }
+\DoxyCodeLine{345     }
+\DoxyCodeLine{347     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{348     \mbox{\hyperlink{classEigen_1_1internal_1_1BlockImpl__dense_3_01XprType_00_01BlockRows_00_01BlockCols_00_01InnerPanel_00_01true_01_4_aa21edd181924bd711bfd58fa03c79dc5}{BlockImpl\_dense}}(XprType\& xpr, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i)}
+\DoxyCodeLine{349       : \mbox{\hyperlink{classEigen_1_1MapBase}{Base}}(xpr.data() + i * (    ((BlockRows==1) \&\& (BlockCols==XprType::ColsAtCompileTime) \&\& (!XprTypeIsRowMajor))}
+\DoxyCodeLine{350                                 || ((BlockRows==XprType::RowsAtCompileTime) \&\& (BlockCols==1) \&\& ( XprTypeIsRowMajor)) ? xpr.innerStride() : xpr.outerStride()),}
+\DoxyCodeLine{351              BlockRows==1 ? 1 : xpr.rows(),}
+\DoxyCodeLine{352              BlockCols==1 ? 1 : xpr.cols()),}
+\DoxyCodeLine{353         m\_xpr(xpr),}
+\DoxyCodeLine{354         m\_startRow( (BlockRows==1) \&\& (BlockCols==XprType::ColsAtCompileTime) ? i : 0),}
+\DoxyCodeLine{355         m\_startCol( (BlockRows==XprType::RowsAtCompileTime) \&\& (BlockCols==1) ? i : 0)}
+\DoxyCodeLine{356     \{}
+\DoxyCodeLine{357       init();}
+\DoxyCodeLine{358     \}}
+\DoxyCodeLine{359 }
+\DoxyCodeLine{362     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{363     \mbox{\hyperlink{classEigen_1_1internal_1_1BlockImpl__dense_3_01XprType_00_01BlockRows_00_01BlockCols_00_01InnerPanel_00_01true_01_4_ab317cc38062a360ea1732dbf08b338fd}{BlockImpl\_dense}}(XprType\& xpr, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} startRow, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} startCol)}
+\DoxyCodeLine{364       : \mbox{\hyperlink{classEigen_1_1MapBase}{Base}}(xpr.data()+xpr.innerStride()*(XprTypeIsRowMajor?startCol:startRow) + xpr.outerStride()*(XprTypeIsRowMajor?startRow:startCol)),}
+\DoxyCodeLine{365         m\_xpr(xpr), m\_startRow(startRow), m\_startCol(startCol)}
+\DoxyCodeLine{366     \{}
+\DoxyCodeLine{367       init();}
+\DoxyCodeLine{368     \}}
+\DoxyCodeLine{369 }
+\DoxyCodeLine{372     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{373     \mbox{\hyperlink{classEigen_1_1internal_1_1BlockImpl__dense_3_01XprType_00_01BlockRows_00_01BlockCols_00_01InnerPanel_00_01true_01_4_a44e810cf225450bad0f536191c7df637}{BlockImpl\_dense}}(XprType\& xpr,}
+\DoxyCodeLine{374           \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} startRow, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} startCol,}
+\DoxyCodeLine{375           \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} blockRows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} blockCols)}
+\DoxyCodeLine{376       : \mbox{\hyperlink{classEigen_1_1MapBase}{Base}}(xpr.data()+xpr.innerStride()*(XprTypeIsRowMajor?startCol:startRow) + xpr.outerStride()*(XprTypeIsRowMajor?startRow:startCol), blockRows, blockCols),}
+\DoxyCodeLine{377         m\_xpr(xpr), m\_startRow(startRow), m\_startCol(startCol)}
+\DoxyCodeLine{378     \{}
+\DoxyCodeLine{379       init();}
+\DoxyCodeLine{380     \}}
+\DoxyCodeLine{381 }
+\DoxyCodeLine{382     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{383     \textcolor{keyword}{const} \textcolor{keyword}{typename} internal::remove\_all<XprTypeNested>::type\& nestedExpression() const EIGEN\_NOEXCEPT}
+\DoxyCodeLine{384     \{}
+\DoxyCodeLine{385       \textcolor{keywordflow}{return} m\_xpr;}
+\DoxyCodeLine{386     \}}
+\DoxyCodeLine{387 }
+\DoxyCodeLine{388     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{389     XprType\& nestedExpression() \{ \textcolor{keywordflow}{return} m\_xpr; \}}
+\DoxyCodeLine{390 }
+\DoxyCodeLine{392     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE EIGEN\_CONSTEXPR}
+\DoxyCodeLine{393     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1BlockImpl__dense_3_01XprType_00_01BlockRows_00_01BlockCols_00_01InnerPanel_00_01true_01_4_a84afa5332fc4e10801d4d64091c04936}{innerStride}}() const EIGEN\_NOEXCEPT}
+\DoxyCodeLine{394     \{}
+\DoxyCodeLine{395       \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<BlockType>::HasSameStorageOrderAsXprType}}}
+\DoxyCodeLine{396              ? m\_xpr.innerStride()}
+\DoxyCodeLine{397              : m\_xpr.outerStride();}
+\DoxyCodeLine{398     \}}
+\DoxyCodeLine{399 }
+\DoxyCodeLine{401     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE EIGEN\_CONSTEXPR}
+\DoxyCodeLine{402     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1BlockImpl__dense_3_01XprType_00_01BlockRows_00_01BlockCols_00_01InnerPanel_00_01true_01_4_a6084bff4510e9de372ccfc0c648fe781}{outerStride}}() const EIGEN\_NOEXCEPT}
+\DoxyCodeLine{403     \{}
+\DoxyCodeLine{404       \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<BlockType>::HasSameStorageOrderAsXprType}}}
+\DoxyCodeLine{405                     ? m\_xpr.outerStride()}
+\DoxyCodeLine{406                     : m\_xpr.innerStride();}
+\DoxyCodeLine{407     \}}
+\DoxyCodeLine{408 }
+\DoxyCodeLine{409     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE EIGEN\_CONSTEXPR}
+\DoxyCodeLine{410     StorageIndex startRow() const EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_startRow.value(); \}}
+\DoxyCodeLine{411 }
+\DoxyCodeLine{412     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE EIGEN\_CONSTEXPR}
+\DoxyCodeLine{413     StorageIndex startCol() const EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_startCol.value(); \}}
+\DoxyCodeLine{414 }
+\DoxyCodeLine{415 \textcolor{preprocessor}{  \#ifndef \_\_SUNPRO\_CC}}
+\DoxyCodeLine{416   \textcolor{comment}{// FIXME sunstudio is not friendly with the above friend...}}
+\DoxyCodeLine{417   \textcolor{comment}{// META-\/FIXME there is no 'friend' keyword around here. Is this obsolete?}}
+\DoxyCodeLine{418   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{419 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{420 }
+\DoxyCodeLine{421 \textcolor{preprocessor}{    \#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{423     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{424     \mbox{\hyperlink{classEigen_1_1internal_1_1BlockImpl__dense_af68c0eafb607bb884cfe507bee39052e}{BlockImpl\_dense}}(XprType\& xpr, \textcolor{keyword}{const} Scalar* data, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} blockRows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} blockCols)}
+\DoxyCodeLine{425       : Base(data, blockRows, blockCols), m\_xpr(xpr)}
+\DoxyCodeLine{426     \{}
+\DoxyCodeLine{427       init();}
+\DoxyCodeLine{428     \}}
+\DoxyCodeLine{429 \textcolor{preprocessor}{    \#endif}}
+\DoxyCodeLine{430 }
+\DoxyCodeLine{431   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{432     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{433     \textcolor{keywordtype}{void} init()}
+\DoxyCodeLine{434     \{}
+\DoxyCodeLine{435       m\_outerStride = internal::traits<BlockType>::HasSameStorageOrderAsXprType}
+\DoxyCodeLine{436                     ? m\_xpr.outerStride()}
+\DoxyCodeLine{437                     : m\_xpr.innerStride();}
+\DoxyCodeLine{438     \}}
+\DoxyCodeLine{439 }
+\DoxyCodeLine{440     XprTypeNested m\_xpr;}
+\DoxyCodeLine{441     \textcolor{keyword}{const} internal::variable\_if\_dynamic<StorageIndex, (XprType::RowsAtCompileTime == 1 \&\& BlockRows==1) ? 0 : \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}> m\_startRow;}
+\DoxyCodeLine{442     \textcolor{keyword}{const} internal::variable\_if\_dynamic<StorageIndex, (XprType::ColsAtCompileTime == 1 \&\& BlockCols==1) ? 0 : \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}> m\_startCol;}
+\DoxyCodeLine{443     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m\_outerStride;}
+\DoxyCodeLine{444 \};}
+\DoxyCodeLine{445 }
+\DoxyCodeLine{446 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{447 }
+\DoxyCodeLine{448 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{449 }
+\DoxyCodeLine{450 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_BLOCK\_H}}
+
+\end{DoxyCode}

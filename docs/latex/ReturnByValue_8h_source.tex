@@ -1,0 +1,123 @@
+\hypertarget{ReturnByValue_8h_source}{}\doxysection{Return\+By\+Value.\+h}
+\label{ReturnByValue_8h_source}\index{include/Eigen/src/Core/ReturnByValue.h@{include/Eigen/src/Core/ReturnByValue.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2009-\/2010 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2009-\/2010 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_RETURNBYVALUE\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_RETURNBYVALUE\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{19 }
+\DoxyCodeLine{20 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{21 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{classEigen_1_1ReturnByValue}{ReturnByValue}}<Derived> >}
+\DoxyCodeLine{22   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<typename traits<Derived>::ReturnType>}
+\DoxyCodeLine{23 \{}
+\DoxyCodeLine{24   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{25     \textcolor{comment}{// We're disabling the DirectAccess because e.g. the constructor of}}
+\DoxyCodeLine{26     \textcolor{comment}{// the Block-\/with-\/DirectAccess expression requires to have a coeffRef method.}}
+\DoxyCodeLine{27     \textcolor{comment}{// Also, we don't want to have to implement the stride stuff.}}
+\DoxyCodeLine{28     Flags = (\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<typename traits<Derived>::ReturnType}}>::Flags}
+\DoxyCodeLine{29              | \mbox{\hyperlink{group__flags_gaa34e83bae46a8eeae4e69ebe3aaecbed}{EvalBeforeNestingBit}}) \& \string~\mbox{\hyperlink{group__flags_gabf1e9d0516a933445a4c307ad8f14915}{DirectAccessBit}}}
+\DoxyCodeLine{30   \};}
+\DoxyCodeLine{31 \};}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33 \textcolor{comment}{/* The ReturnByValue object doesn't even have a coeff() method.}}
+\DoxyCodeLine{34 \textcolor{comment}{ * So the only way that nesting it in an expression can work, is by evaluating it into a plain matrix.}}
+\DoxyCodeLine{35 \textcolor{comment}{ * So internal::nested always gives the plain return matrix type.}}
+\DoxyCodeLine{36 \textcolor{comment}{ *}}
+\DoxyCodeLine{37 \textcolor{comment}{ * FIXME: I don't understand why we need this specialization: isn't this taken care of by the EvalBeforeNestingBit ??}}
+\DoxyCodeLine{38 \textcolor{comment}{ * Answer: EvalBeforeNestingBit should be deprecated since we have the evaluators}}
+\DoxyCodeLine{39 \textcolor{comment}{ */}}
+\DoxyCodeLine{40 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived,\textcolor{keywordtype}{int} n,\textcolor{keyword}{typename} PlainObject>}
+\DoxyCodeLine{41 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1nested__eval}{nested\_eval}}<\mbox{\hyperlink{classEigen_1_1ReturnByValue}{ReturnByValue}}<Derived>, n, PlainObject>}
+\DoxyCodeLine{42 \{}
+\DoxyCodeLine{43   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<Derived>::ReturnType}} type;}
+\DoxyCodeLine{44 \};}
+\DoxyCodeLine{45 }
+\DoxyCodeLine{46 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{47 }
+\DoxyCodeLine{52 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1ReturnByValue}{ReturnByValue}}}
+\DoxyCodeLine{53   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1dense__xpr__base}{internal::dense\_xpr\_base}}< ReturnByValue<Derived> >::type, \mbox{\hyperlink{classEigen_1_1internal_1_1no__assignment__operator}{internal::no\_assignment\_operator}}}
+\DoxyCodeLine{54 \{}
+\DoxyCodeLine{55   \textcolor{keyword}{public}:}
+\DoxyCodeLine{56     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::ReturnType}} ReturnType;}
+\DoxyCodeLine{57 }
+\DoxyCodeLine{58     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1dense__xpr__base}{internal::dense\_xpr\_base<ReturnByValue>::type}} \mbox{\hyperlink{classBase}{Base}};}
+\DoxyCodeLine{59     EIGEN\_DENSE\_PUBLIC\_INTERFACE(\mbox{\hyperlink{classEigen_1_1ReturnByValue}{ReturnByValue}})}
+\DoxyCodeLine{60 }
+\DoxyCodeLine{61     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{62     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{63     \textcolor{keyword}{inline} \textcolor{keywordtype}{void} evalTo(Dest\& dst)\textcolor{keyword}{ const}}
+\DoxyCodeLine{64 \textcolor{keyword}{    }\{ \textcolor{keyword}{static\_cast<}\textcolor{keyword}{const }Derived*\textcolor{keyword}{>}(\textcolor{keyword}{this})-\/>evalTo(dst); \}}
+\DoxyCodeLine{65     EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{66     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} \textcolor{keyword}{static\_cast<}\textcolor{keyword}{const }Derived*\textcolor{keyword}{>}(\textcolor{keyword}{this})-\/>rows(); \}}
+\DoxyCodeLine{67     EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{68     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} \textcolor{keyword}{static\_cast<}\textcolor{keyword}{const }Derived*\textcolor{keyword}{>}(\textcolor{keyword}{this})-\/>cols(); \}}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70 \textcolor{preprocessor}{\#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{71 \textcolor{preprocessor}{\#define Unusable YOU\_ARE\_TRYING\_TO\_ACCESS\_A\_SINGLE\_COEFFICIENT\_IN\_A\_SPECIAL\_EXPRESSION\_WHERE\_THAT\_IS\_NOT\_ALLOWED\_BECAUSE\_THAT\_WOULD\_BE\_INEFFICIENT}}
+\DoxyCodeLine{72     \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1ReturnByValue_1_1Unusable}{Unusable}}\{}
+\DoxyCodeLine{73       \mbox{\hyperlink{classEigen_1_1ReturnByValue_1_1Unusable}{Unusable}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1ReturnByValue_1_1Unusable}{Unusable}}\&) \{\}}
+\DoxyCodeLine{74       \mbox{\hyperlink{classEigen_1_1ReturnByValue_1_1Unusable}{Unusable}}\& operator=(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1ReturnByValue_1_1Unusable}{Unusable}}\&) \{\textcolor{keywordflow}{return} *\textcolor{keyword}{this};\}}
+\DoxyCodeLine{75     \};}
+\DoxyCodeLine{76     \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1ReturnByValue_1_1Unusable}{Unusable}}\& coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}})\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const }\mbox{\hyperlink{classEigen_1_1ReturnByValue_1_1Unusable}{Unusable}}*\textcolor{keyword}{>}(\textcolor{keyword}{this}); \}}
+\DoxyCodeLine{77     \textcolor{keyword}{const} Unusable\& coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}},\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}})\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const }Unusable*\textcolor{keyword}{>}(\textcolor{keyword}{this}); \}}
+\DoxyCodeLine{78     Unusable\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}) \{ \textcolor{keywordflow}{return} *\textcolor{keyword}{reinterpret\_cast<}Unusable*\textcolor{keyword}{>}(\textcolor{keyword}{this}); \}}
+\DoxyCodeLine{79     Unusable\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}},\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}) \{ \textcolor{keywordflow}{return} *\textcolor{keyword}{reinterpret\_cast<}Unusable*\textcolor{keyword}{>}(\textcolor{keyword}{this}); \}}
+\DoxyCodeLine{80 \textcolor{preprocessor}{\#undef Unusable}}
+\DoxyCodeLine{81 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{82 \};}
+\DoxyCodeLine{83 }
+\DoxyCodeLine{84 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{85 \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{86 EIGEN\_DEVICE\_FUNC Derived\& \mbox{\hyperlink{classEigen_1_1DenseBase_a581a7a353bd007b5352f11688e3bc5fa}{DenseBase<Derived>::operator=}}(\textcolor{keyword}{const} ReturnByValue<OtherDerived>\& other)}
+\DoxyCodeLine{87 \{}
+\DoxyCodeLine{88   other.evalTo(derived());}
+\DoxyCodeLine{89   \textcolor{keywordflow}{return} derived();}
+\DoxyCodeLine{90 \}}
+\DoxyCodeLine{91 }
+\DoxyCodeLine{92 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{93 }
+\DoxyCodeLine{94 \textcolor{comment}{// Expression is evaluated in a temporary; default implementation of Assignment is bypassed so that}}
+\DoxyCodeLine{95 \textcolor{comment}{// when a ReturnByValue expression is assigned, the evaluator is not constructed.}}
+\DoxyCodeLine{96 \textcolor{comment}{// TODO: Finalize port to new regime; ReturnByValue should not exist in the expression world}}
+\DoxyCodeLine{97 }
+\DoxyCodeLine{98 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{99 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<\mbox{\hyperlink{classEigen_1_1ReturnByValue}{ReturnByValue}}<Derived> >}
+\DoxyCodeLine{100   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<typename internal::traits<Derived>::ReturnType>}
+\DoxyCodeLine{101 \{}
+\DoxyCodeLine{102   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1ReturnByValue}{ReturnByValue<Derived>}} \mbox{\hyperlink{classEigen_1_1ReturnByValue}{XprType}};}
+\DoxyCodeLine{103   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::ReturnType}} PlainObject;}
+\DoxyCodeLine{104   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<PlainObject>}} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}};}
+\DoxyCodeLine{105 }
+\DoxyCodeLine{106   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1ReturnByValue}{XprType}}\& xpr)}
+\DoxyCodeLine{107     : m\_result(xpr.rows(), xpr.cols())}
+\DoxyCodeLine{108   \{}
+\DoxyCodeLine{109     ::new (\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})) \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}(m\_result);}
+\DoxyCodeLine{110     xpr.evalTo(m\_result);}
+\DoxyCodeLine{111   \}}
+\DoxyCodeLine{112 }
+\DoxyCodeLine{113 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{114   PlainObject m\_result;}
+\DoxyCodeLine{115 \};}
+\DoxyCodeLine{116 }
+\DoxyCodeLine{117 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{118 }
+\DoxyCodeLine{119 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{120 }
+\DoxyCodeLine{121 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_RETURNBYVALUE\_H}}
+
+\end{DoxyCode}

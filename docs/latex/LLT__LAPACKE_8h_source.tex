@@ -1,0 +1,107 @@
+\hypertarget{LLT__LAPACKE_8h_source}{}\doxysection{LLT\+\_\+\+LAPACKE.\+h}
+\label{LLT__LAPACKE_8h_source}\index{include/Eigen/src/Cholesky/LLT\_LAPACKE.h@{include/Eigen/src/Cholesky/LLT\_LAPACKE.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{/*}}
+\DoxyCodeLine{2 \textcolor{comment}{ Copyright (c) 2011, Intel Corporation. All rights reserved.}}
+\DoxyCodeLine{3 \textcolor{comment}{}}
+\DoxyCodeLine{4 \textcolor{comment}{ Redistribution and use in source and binary forms, with or without modification,}}
+\DoxyCodeLine{5 \textcolor{comment}{ are permitted provided that the following conditions are met:}}
+\DoxyCodeLine{6 \textcolor{comment}{}}
+\DoxyCodeLine{7 \textcolor{comment}{ * Redistributions of source code must retain the above copyright notice, this}}
+\DoxyCodeLine{8 \textcolor{comment}{   list of conditions and the following disclaimer.}}
+\DoxyCodeLine{9 \textcolor{comment}{ * Redistributions in binary form must reproduce the above copyright notice,}}
+\DoxyCodeLine{10 \textcolor{comment}{   this list of conditions and the following disclaimer in the documentation}}
+\DoxyCodeLine{11 \textcolor{comment}{   and/or other materials provided with the distribution.}}
+\DoxyCodeLine{12 \textcolor{comment}{ * Neither the name of Intel Corporation nor the names of its contributors may}}
+\DoxyCodeLine{13 \textcolor{comment}{   be used to endorse or promote products derived from this software without}}
+\DoxyCodeLine{14 \textcolor{comment}{   specific prior written permission.}}
+\DoxyCodeLine{15 \textcolor{comment}{}}
+\DoxyCodeLine{16 \textcolor{comment}{ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "{}AS IS"{} AND}}
+\DoxyCodeLine{17 \textcolor{comment}{ ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED}}
+\DoxyCodeLine{18 \textcolor{comment}{ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE}}
+\DoxyCodeLine{19 \textcolor{comment}{ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR}}
+\DoxyCodeLine{20 \textcolor{comment}{ ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES}}
+\DoxyCodeLine{21 \textcolor{comment}{ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;}}
+\DoxyCodeLine{22 \textcolor{comment}{ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON}}
+\DoxyCodeLine{23 \textcolor{comment}{ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT}}
+\DoxyCodeLine{24 \textcolor{comment}{ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS}}
+\DoxyCodeLine{25 \textcolor{comment}{ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.}}
+\DoxyCodeLine{26 \textcolor{comment}{}}
+\DoxyCodeLine{27 \textcolor{comment}{ ********************************************************************************}}
+\DoxyCodeLine{28 \textcolor{comment}{ *   Content : Eigen bindings to LAPACKe}}
+\DoxyCodeLine{29 \textcolor{comment}{ *     LLt decomposition based on LAPACKE\_?potrf function.}}
+\DoxyCodeLine{30 \textcolor{comment}{ ********************************************************************************}}
+\DoxyCodeLine{31 \textcolor{comment}{*/}}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33 \textcolor{preprocessor}{\#ifndef EIGEN\_LLT\_LAPACKE\_H}}
+\DoxyCodeLine{34 \textcolor{preprocessor}{\#define EIGEN\_LLT\_LAPACKE\_H}}
+\DoxyCodeLine{35 }
+\DoxyCodeLine{36 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{37 }
+\DoxyCodeLine{38 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{39 }
+\DoxyCodeLine{40 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{41 }
+\DoxyCodeLine{42 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1lapacke__llt}{lapacke\_llt}};}
+\DoxyCodeLine{43 }
+\DoxyCodeLine{44 \textcolor{preprocessor}{\#define EIGEN\_LAPACKE\_LLT(EIGTYPE, BLASTYPE, LAPACKE\_PREFIX) \(\backslash\)}}
+\DoxyCodeLine{45 \textcolor{preprocessor}{template<> struct lapacke\_llt<EIGTYPE> \(\backslash\)}}
+\DoxyCodeLine{46 \textcolor{preprocessor}{\{ \(\backslash\)}}
+\DoxyCodeLine{47 \textcolor{preprocessor}{  template<typename MatrixType> \(\backslash\)}}
+\DoxyCodeLine{48 \textcolor{preprocessor}{  static inline Index potrf(MatrixType\& m, char uplo) \(\backslash\)}}
+\DoxyCodeLine{49 \textcolor{preprocessor}{  \{ \(\backslash\)}}
+\DoxyCodeLine{50 \textcolor{preprocessor}{    lapack\_int matrix\_order; \(\backslash\)}}
+\DoxyCodeLine{51 \textcolor{preprocessor}{    lapack\_int size, lda, info, StorageOrder; \(\backslash\)}}
+\DoxyCodeLine{52 \textcolor{preprocessor}{    EIGTYPE* a; \(\backslash\)}}
+\DoxyCodeLine{53 \textcolor{preprocessor}{    eigen\_assert(m.rows()==m.cols()); \(\backslash\)}}
+\DoxyCodeLine{54 \textcolor{preprocessor}{    }\textcolor{comment}{/* Set up parameters for ?potrf */}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{55 \textcolor{preprocessor}{    size = convert\_index<lapack\_int>(m.rows()); \(\backslash\)}}
+\DoxyCodeLine{56 \textcolor{preprocessor}{    StorageOrder = MatrixType::Flags\&RowMajorBit?RowMajor:ColMajor; \(\backslash\)}}
+\DoxyCodeLine{57 \textcolor{preprocessor}{    matrix\_order = StorageOrder==RowMajor ? LAPACK\_ROW\_MAJOR : LAPACK\_COL\_MAJOR; \(\backslash\)}}
+\DoxyCodeLine{58 \textcolor{preprocessor}{    a = \&(m.coeffRef(0,0)); \(\backslash\)}}
+\DoxyCodeLine{59 \textcolor{preprocessor}{    lda = convert\_index<lapack\_int>(m.outerStride()); \(\backslash\)}}
+\DoxyCodeLine{60 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{61 \textcolor{preprocessor}{    info = LAPACKE\_\#\#LAPACKE\_PREFIX\#\#potrf( matrix\_order, uplo, size, (BLASTYPE*)a, lda ); \(\backslash\)}}
+\DoxyCodeLine{62 \textcolor{preprocessor}{    info = (info==0) ? -\/1 : info>0 ? info-\/1 : size; \(\backslash\)}}
+\DoxyCodeLine{63 \textcolor{preprocessor}{    return info; \(\backslash\)}}
+\DoxyCodeLine{64 \textcolor{preprocessor}{  \} \(\backslash\)}}
+\DoxyCodeLine{65 \textcolor{preprocessor}{\}; \(\backslash\)}}
+\DoxyCodeLine{66 \textcolor{preprocessor}{template<> struct llt\_inplace<EIGTYPE, Lower> \(\backslash\)}}
+\DoxyCodeLine{67 \textcolor{preprocessor}{\{ \(\backslash\)}}
+\DoxyCodeLine{68 \textcolor{preprocessor}{  template<typename MatrixType> \(\backslash\)}}
+\DoxyCodeLine{69 \textcolor{preprocessor}{  static Index blocked(MatrixType\& m) \(\backslash\)}}
+\DoxyCodeLine{70 \textcolor{preprocessor}{  \{ \(\backslash\)}}
+\DoxyCodeLine{71 \textcolor{preprocessor}{    return lapacke\_llt<EIGTYPE>::potrf(m, 'L'); \(\backslash\)}}
+\DoxyCodeLine{72 \textcolor{preprocessor}{  \} \(\backslash\)}}
+\DoxyCodeLine{73 \textcolor{preprocessor}{  template<typename MatrixType, typename VectorType> \(\backslash\)}}
+\DoxyCodeLine{74 \textcolor{preprocessor}{  static Index rankUpdate(MatrixType\& mat, const VectorType\& vec, const typename MatrixType::RealScalar\& sigma) \(\backslash\)}}
+\DoxyCodeLine{75 \textcolor{preprocessor}{  \{ return Eigen::internal::llt\_rank\_update\_lower(mat, vec, sigma); \} \(\backslash\)}}
+\DoxyCodeLine{76 \textcolor{preprocessor}{\}; \(\backslash\)}}
+\DoxyCodeLine{77 \textcolor{preprocessor}{template<> struct llt\_inplace<EIGTYPE, Upper> \(\backslash\)}}
+\DoxyCodeLine{78 \textcolor{preprocessor}{\{ \(\backslash\)}}
+\DoxyCodeLine{79 \textcolor{preprocessor}{  template<typename MatrixType> \(\backslash\)}}
+\DoxyCodeLine{80 \textcolor{preprocessor}{  static Index blocked(MatrixType\& m) \(\backslash\)}}
+\DoxyCodeLine{81 \textcolor{preprocessor}{  \{ \(\backslash\)}}
+\DoxyCodeLine{82 \textcolor{preprocessor}{    return lapacke\_llt<EIGTYPE>::potrf(m, 'U'); \(\backslash\)}}
+\DoxyCodeLine{83 \textcolor{preprocessor}{  \} \(\backslash\)}}
+\DoxyCodeLine{84 \textcolor{preprocessor}{  template<typename MatrixType, typename VectorType> \(\backslash\)}}
+\DoxyCodeLine{85 \textcolor{preprocessor}{  static Index rankUpdate(MatrixType\& mat, const VectorType\& vec, const typename MatrixType::RealScalar\& sigma) \(\backslash\)}}
+\DoxyCodeLine{86 \textcolor{preprocessor}{  \{ \(\backslash\)}}
+\DoxyCodeLine{87 \textcolor{preprocessor}{    Transpose<MatrixType> matt(mat); \(\backslash\)}}
+\DoxyCodeLine{88 \textcolor{preprocessor}{    return llt\_inplace<EIGTYPE, Lower>::rankUpdate(matt, vec.conjugate(), sigma); \(\backslash\)}}
+\DoxyCodeLine{89 \textcolor{preprocessor}{  \} \(\backslash\)}}
+\DoxyCodeLine{90 \textcolor{preprocessor}{\};}}
+\DoxyCodeLine{91 }
+\DoxyCodeLine{92 EIGEN\_LAPACKE\_LLT(\textcolor{keywordtype}{double}, \textcolor{keywordtype}{double}, d)}
+\DoxyCodeLine{93 EIGEN\_LAPACKE\_LLT(\textcolor{keywordtype}{float}, \textcolor{keywordtype}{float}, s)}
+\DoxyCodeLine{94 EIGEN\_LAPACKE\_LLT(dcomplex, lapack\_complex\_double, z)}
+\DoxyCodeLine{95 EIGEN\_LAPACKE\_LLT(scomplex, lapack\_complex\_float, c)}
+\DoxyCodeLine{96 }
+\DoxyCodeLine{97 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{98 }
+\DoxyCodeLine{99 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{100 }
+\DoxyCodeLine{101 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_LLT\_LAPACKE\_H}}
+
+\end{DoxyCode}

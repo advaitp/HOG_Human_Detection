@@ -1,0 +1,281 @@
+\hypertarget{Tuple_8h_source}{}\doxysection{Tuple.\+h}
+\label{Tuple_8h_source}\index{include/Eigen/src/Core/arch/GPU/Tuple.h@{include/Eigen/src/Core/arch/GPU/Tuple.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2021 The Eigen Team}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_TUPLE\_GPU}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_TUPLE\_GPU}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include <type\_traits>}}
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include <utility>}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{comment}{// This is a replacement of std::tuple that can be used in device code.}}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{19 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{20 \textcolor{keyword}{namespace }tuple\_impl \{}
+\DoxyCodeLine{21 }
+\DoxyCodeLine{22 \textcolor{comment}{// Internal tuple implementation.}}
+\DoxyCodeLine{23 \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t} N, \textcolor{keyword}{typename}... Types>}
+\DoxyCodeLine{24 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}};}
+\DoxyCodeLine{25 }
+\DoxyCodeLine{26 \textcolor{comment}{// Generic recursive tuple.}}
+\DoxyCodeLine{27 \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t} N, \textcolor{keyword}{typename} T1, \textcolor{keyword}{typename}... Ts>}
+\DoxyCodeLine{28 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}}<N, T1, Ts...> \{}
+\DoxyCodeLine{29  \textcolor{keyword}{public}:}
+\DoxyCodeLine{30   \textcolor{comment}{// Tuple may contain Eigen types.}}
+\DoxyCodeLine{31   EIGEN\_MAKE\_ALIGNED\_OPERATOR\_NEW}
+\DoxyCodeLine{32   }
+\DoxyCodeLine{33   \textcolor{comment}{// Default constructor, enable if all types are default-\/constructible.}}
+\DoxyCodeLine{34   \textcolor{keyword}{template}<\textcolor{keyword}{typename} U1 = T1, \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1EnableIf}{EnableIf}} = \textcolor{keyword}{typename} std::enable\_if<}
+\DoxyCodeLine{35       std::is\_default\_constructible<U1>::value}
+\DoxyCodeLine{36       \&\& reduce\_all<std::is\_default\_constructible<Ts>::value...>::value}
+\DoxyCodeLine{37     >::type>}
+\DoxyCodeLine{38   EIGEN\_CONSTEXPR EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{39   \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}}() : head\_\{\}, tail\_\{\} \{\}}
+\DoxyCodeLine{40  }
+\DoxyCodeLine{41   \textcolor{comment}{// Element constructor.}}
+\DoxyCodeLine{42   \textcolor{keyword}{template}<\textcolor{keyword}{typename} U1, \textcolor{keyword}{typename}... Us, }
+\DoxyCodeLine{43            \textcolor{comment}{// Only enable if...}}
+\DoxyCodeLine{44            \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1EnableIf}{EnableIf}} = \textcolor{keyword}{typename} std::enable\_if<}
+\DoxyCodeLine{45               \textcolor{comment}{// the number of input arguments match, and ...}}
+\DoxyCodeLine{46               \textcolor{keyword}{sizeof}...(Us) == \textcolor{keyword}{sizeof}...(Ts) \&\& (}
+\DoxyCodeLine{47                 \textcolor{comment}{// this does not look like a copy/move constructor.}}
+\DoxyCodeLine{48                 N > 1 || std::is\_convertible<U1, T1>::value)}
+\DoxyCodeLine{49            >::type>}
+\DoxyCodeLine{50   EIGEN\_CONSTEXPR EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{51   \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}}(U1\&\& arg1, Us\&\&... args) }
+\DoxyCodeLine{52     : head\_(std::forward<U1>(arg1)), tail\_(std::forward<Us>(args)...) \{\}}
+\DoxyCodeLine{53  }
+\DoxyCodeLine{54   \textcolor{comment}{// The first stored value. }}
+\DoxyCodeLine{55   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE}
+\DoxyCodeLine{56   T1\& head() \{}
+\DoxyCodeLine{57     \textcolor{keywordflow}{return} head\_;}
+\DoxyCodeLine{58   \}}
+\DoxyCodeLine{59   }
+\DoxyCodeLine{60   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE}
+\DoxyCodeLine{61   \textcolor{keyword}{const} T1\& head()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{62     \textcolor{keywordflow}{return} head\_;}
+\DoxyCodeLine{63   \}}
+\DoxyCodeLine{64   }
+\DoxyCodeLine{65   \textcolor{comment}{// The tail values.}}
+\DoxyCodeLine{66   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE}
+\DoxyCodeLine{67   \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}}<N-\/1, Ts...>\& tail() \{}
+\DoxyCodeLine{68     \textcolor{keywordflow}{return} tail\_;}
+\DoxyCodeLine{69   \}}
+\DoxyCodeLine{70   }
+\DoxyCodeLine{71   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE}
+\DoxyCodeLine{72   \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}}<N-\/1, Ts...>\& tail()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{73     \textcolor{keywordflow}{return} tail\_;}
+\DoxyCodeLine{74   \}}
+\DoxyCodeLine{75   }
+\DoxyCodeLine{76   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{77   \textcolor{keywordtype}{void} swap(\mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}}\& other) \{}
+\DoxyCodeLine{78     \textcolor{keyword}{using} numext::swap;}
+\DoxyCodeLine{79     swap(head\_, other.head\_);}
+\DoxyCodeLine{80     swap(tail\_, other.tail\_);}
+\DoxyCodeLine{81   \}}
+\DoxyCodeLine{82   }
+\DoxyCodeLine{83   \textcolor{keyword}{template}<\textcolor{keyword}{typename}... UTypes>}
+\DoxyCodeLine{84   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{85   \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}}\& operator=(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl<N, UTypes...>}}\& other) \{}
+\DoxyCodeLine{86     head\_ = other.head\_;}
+\DoxyCodeLine{87     tail\_ = other.tail\_;}
+\DoxyCodeLine{88     \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{89   \}}
+\DoxyCodeLine{90   }
+\DoxyCodeLine{91   \textcolor{keyword}{template}<\textcolor{keyword}{typename}... UTypes>}
+\DoxyCodeLine{92   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{93   \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}}\& operator=(\mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl<N, UTypes...>}}\&\& other) \{}
+\DoxyCodeLine{94     head\_ = std::move(other.head\_);}
+\DoxyCodeLine{95     tail\_ = std::move(other.tail\_);}
+\DoxyCodeLine{96     \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{97   \}}
+\DoxyCodeLine{98   }
+\DoxyCodeLine{99  \textcolor{keyword}{private}:}
+\DoxyCodeLine{100   \textcolor{comment}{// Allow related tuples to reference head\_/tail\_.}}
+\DoxyCodeLine{101   \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t} M, \textcolor{keyword}{typename}... UTypes>}
+\DoxyCodeLine{102   \textcolor{keyword}{friend} \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}};}
+\DoxyCodeLine{103  }
+\DoxyCodeLine{104   T1 head\_;}
+\DoxyCodeLine{105   \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}}<N-\/1, Ts...> tail\_;}
+\DoxyCodeLine{106 \};}
+\DoxyCodeLine{107 }
+\DoxyCodeLine{108 \textcolor{comment}{// Empty tuple specialization.}}
+\DoxyCodeLine{109 \textcolor{keyword}{template}<>}
+\DoxyCodeLine{110 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}}<size\_t(0)> \{\};}
+\DoxyCodeLine{111 }
+\DoxyCodeLine{112 \textcolor{keyword}{template}<\textcolor{keyword}{typename} TupleType>}
+\DoxyCodeLine{113 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1tuple__impl_1_1is__tuple}{is\_tuple}} : std::false\_type \{\};}
+\DoxyCodeLine{114 }
+\DoxyCodeLine{115 \textcolor{keyword}{template}<\textcolor{keyword}{typename}... Types>}
+\DoxyCodeLine{116 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1tuple__impl_1_1is__tuple}{is\_tuple}}< \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}}<sizeof...(Types), Types...> > : std::true\_type \{\};}
+\DoxyCodeLine{117 }
+\DoxyCodeLine{118 \textcolor{comment}{// Gets an element from a tuple.}}
+\DoxyCodeLine{119 \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t} Idx, \textcolor{keyword}{typename} T1, \textcolor{keyword}{typename}... Ts>}
+\DoxyCodeLine{120 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1tuple__impl_1_1tuple__get__impl}{tuple\_get\_impl}} \{}
+\DoxyCodeLine{121   \textcolor{keyword}{using} \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleType}} = \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}}<\textcolor{keyword}{sizeof}...(Ts) + 1, T1, Ts...>;}
+\DoxyCodeLine{122   \textcolor{keyword}{using} ReturnType = \textcolor{keyword}{typename} tuple\_get\_impl<Idx -\/ 1, Ts...>::ReturnType;}
+\DoxyCodeLine{123   }
+\DoxyCodeLine{124   \textcolor{keyword}{static} EIGEN\_CONSTEXPR EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE}
+\DoxyCodeLine{125   ReturnType\& run(\mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleType}}\& \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{tuple}}) \{}
+\DoxyCodeLine{126     \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1tuple__impl_1_1tuple__get__impl}{tuple\_get\_impl<Idx-\/1, Ts...>::run}}(\mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{tuple}}.tail());}
+\DoxyCodeLine{127   \}}
+\DoxyCodeLine{128 }
+\DoxyCodeLine{129   \textcolor{keyword}{static} EIGEN\_CONSTEXPR EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE}
+\DoxyCodeLine{130   \textcolor{keyword}{const} ReturnType\& run(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleType}}\& \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{tuple}}) \{}
+\DoxyCodeLine{131     \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1tuple__impl_1_1tuple__get__impl}{tuple\_get\_impl<Idx-\/1, Ts...>::run}}(\mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{tuple}}.tail());}
+\DoxyCodeLine{132   \}}
+\DoxyCodeLine{133 \};}
+\DoxyCodeLine{134 }
+\DoxyCodeLine{135 \textcolor{comment}{// Base case, getting the head element.}}
+\DoxyCodeLine{136 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T1, \textcolor{keyword}{typename}... Ts>}
+\DoxyCodeLine{137 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1tuple__impl_1_1tuple__get__impl}{tuple\_get\_impl}}<0, T1, Ts...> \{}
+\DoxyCodeLine{138   \textcolor{keyword}{using} \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleType}} = \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}}<\textcolor{keyword}{sizeof}...(Ts) + 1, T1, Ts...>;}
+\DoxyCodeLine{139   \textcolor{keyword}{using} ReturnType = T1;}
+\DoxyCodeLine{140 }
+\DoxyCodeLine{141   \textcolor{keyword}{static} EIGEN\_CONSTEXPR EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE}
+\DoxyCodeLine{142   T1\& run(\mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleType}}\& \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{tuple}}) \{}
+\DoxyCodeLine{143     \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{tuple}}.head();}
+\DoxyCodeLine{144   \}}
+\DoxyCodeLine{145 }
+\DoxyCodeLine{146   \textcolor{keyword}{static} EIGEN\_CONSTEXPR EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE}
+\DoxyCodeLine{147   \textcolor{keyword}{const} T1\& run(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleType}}\& \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{tuple}}) \{}
+\DoxyCodeLine{148     \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{tuple}}.head();}
+\DoxyCodeLine{149   \}}
+\DoxyCodeLine{150 \};}
+\DoxyCodeLine{151 }
+\DoxyCodeLine{152 \textcolor{comment}{// Concatenates N Tuples.}}
+\DoxyCodeLine{153 \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t} NTuples, \textcolor{keyword}{typename}... Tuples>}
+\DoxyCodeLine{154 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1tuple__impl_1_1tuple__cat__impl}{tuple\_cat\_impl}};}
+\DoxyCodeLine{155 }
+\DoxyCodeLine{156 \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t} NTuples, \textcolor{keywordtype}{size\_t} N1, \textcolor{keyword}{typename}... Args1, \textcolor{keywordtype}{size\_t} N2, \textcolor{keyword}{typename}... Args2, \textcolor{keyword}{typename}... Tuples>}
+\DoxyCodeLine{157 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1tuple__impl_1_1tuple__cat__impl}{tuple\_cat\_impl}}<NTuples, \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}}<N1, Args1...>, \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}}<N2, Args2...>, Tuples...> \{}
+\DoxyCodeLine{158   \textcolor{keyword}{using} \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleType1}} = \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}}<N1, Args1...>;}
+\DoxyCodeLine{159   \textcolor{keyword}{using} \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleType2}} = \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}}<N2, Args2...>;}
+\DoxyCodeLine{160   \textcolor{keyword}{using} \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{MergedTupleType}} = \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}}<N1 + N2, Args1..., Args2...>;}
+\DoxyCodeLine{161   }
+\DoxyCodeLine{162   \textcolor{keyword}{using} ReturnType = \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1tuple__impl_1_1tuple__cat__impl}{tuple\_cat\_impl}}<NTuples-\/1, \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{MergedTupleType}}, Tuples...>::ReturnType;}
+\DoxyCodeLine{163   }
+\DoxyCodeLine{164   \textcolor{comment}{// Uses the index sequences to extract and merge elements from tuple1 and tuple2,}}
+\DoxyCodeLine{165   \textcolor{comment}{// then recursively calls again.}}
+\DoxyCodeLine{166   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Tuple1, \textcolor{keywordtype}{size\_t}... I1s, \textcolor{keyword}{typename} Tuple2, \textcolor{keywordtype}{size\_t}... I2s, \textcolor{keyword}{typename}... MoreTuples>}
+\DoxyCodeLine{167   \textcolor{keyword}{static} EIGEN\_CONSTEXPR EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{168   ReturnType run(Tuple1\&\& tuple1, \mbox{\hyperlink{structEigen_1_1internal_1_1integer__sequence}{index\_sequence<I1s...>}},}
+\DoxyCodeLine{169                  Tuple2\&\& tuple2, \mbox{\hyperlink{structEigen_1_1internal_1_1integer__sequence}{index\_sequence<I2s...>}},}
+\DoxyCodeLine{170                  MoreTuples\&\&... tuples) \{}
+\DoxyCodeLine{171     \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1tuple__impl_1_1tuple__cat__impl}{tuple\_cat\_impl<NTuples-\/1, MergedTupleType, Tuples...>::run}}(}
+\DoxyCodeLine{172         \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{MergedTupleType}}(\mbox{\hyperlink{structEigen_1_1internal_1_1tuple__impl_1_1tuple__get__impl}{tuple\_get\_impl<I1s, Args1...>::run}}(std::forward<Tuple1>(tuple1))...,}
+\DoxyCodeLine{173                         \mbox{\hyperlink{structEigen_1_1internal_1_1tuple__impl_1_1tuple__get__impl}{tuple\_get\_impl<I2s, Args2...>::run}}(std::forward<Tuple2>(tuple2))...),}
+\DoxyCodeLine{174         std::forward<MoreTuples>(tuples)...);}
+\DoxyCodeLine{175   \}}
+\DoxyCodeLine{176   }
+\DoxyCodeLine{177   \textcolor{comment}{// Concatenates the first two tuples.}}
+\DoxyCodeLine{178   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Tuple1, \textcolor{keyword}{typename} Tuple2, \textcolor{keyword}{typename}... MoreTuples>}
+\DoxyCodeLine{179   \textcolor{keyword}{static} EIGEN\_CONSTEXPR EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{180   ReturnType run(Tuple1\&\& tuple1, Tuple2\&\& tuple2, MoreTuples\&\&... tuples) \{}
+\DoxyCodeLine{181     \textcolor{keywordflow}{return} run(std::forward<Tuple1>(tuple1), make\_index\_sequence<N1>\{\},}
+\DoxyCodeLine{182                std::forward<Tuple2>(tuple2), make\_index\_sequence<N2>\{\},}
+\DoxyCodeLine{183                std::forward<MoreTuples>(tuples)...);}
+\DoxyCodeLine{184   \}}
+\DoxyCodeLine{185 \};}
+\DoxyCodeLine{186 }
+\DoxyCodeLine{187 \textcolor{comment}{// Base case with a single tuple.}}
+\DoxyCodeLine{188 \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t} N, \textcolor{keyword}{typename}... Args>}
+\DoxyCodeLine{189 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1tuple__impl_1_1tuple__cat__impl}{tuple\_cat\_impl}}<1, \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}}<N, Args...> > \{ }
+\DoxyCodeLine{190   \textcolor{keyword}{using} \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{ReturnType}} = \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}}<N, Args...>;}
+\DoxyCodeLine{191   }
+\DoxyCodeLine{192   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Tuple1>}
+\DoxyCodeLine{193   \textcolor{keyword}{static} EIGEN\_CONSTEXPR EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{194   \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{ReturnType}} run(Tuple1\&\& tuple1) \{}
+\DoxyCodeLine{195     \textcolor{keywordflow}{return} tuple1;}
+\DoxyCodeLine{196   \}}
+\DoxyCodeLine{197 \};}
+\DoxyCodeLine{198 }
+\DoxyCodeLine{199 \textcolor{comment}{// Special case of no tuples.}}
+\DoxyCodeLine{200 \textcolor{keyword}{template}<>}
+\DoxyCodeLine{201 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1tuple__impl_1_1tuple__cat__impl}{tuple\_cat\_impl}}<0> \{ }
+\DoxyCodeLine{202   \textcolor{keyword}{using} \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{ReturnType}} = \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl<0>}};}
+\DoxyCodeLine{203   \textcolor{keyword}{static} EIGEN\_CONSTEXPR EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{204   \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{ReturnType}} run() \{\textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{ReturnType}}\{\}; \}}
+\DoxyCodeLine{205 \};}
+\DoxyCodeLine{206 }
+\DoxyCodeLine{207 \textcolor{comment}{// For use in make\_tuple, unwraps a reference\_wrapper.}}
+\DoxyCodeLine{208 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{209 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1tuple__impl_1_1unwrap__reference__wrapper}{unwrap\_reference\_wrapper}} \{ \textcolor{keyword}{using} type = T; \};}
+\DoxyCodeLine{210  }
+\DoxyCodeLine{211 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{212 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1tuple__impl_1_1unwrap__reference__wrapper}{unwrap\_reference\_wrapper}}<std::reference\_wrapper<T> > \{ \textcolor{keyword}{using} type = T\&; \};}
+\DoxyCodeLine{213 }
+\DoxyCodeLine{214 \textcolor{comment}{// For use in make\_tuple, decays a type and unwraps a reference\_wrapper.}}
+\DoxyCodeLine{215 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{216 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1tuple__impl_1_1unwrap__decay}{unwrap\_decay}} \{}
+\DoxyCodeLine{217   \textcolor{keyword}{using} type = \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1tuple__impl_1_1unwrap__reference__wrapper}{unwrap\_reference\_wrapper<typename std::decay<T>::type}}>::type;}
+\DoxyCodeLine{218 \};}
+\DoxyCodeLine{219 }
+\DoxyCodeLine{223 \textcolor{keyword}{template}<\textcolor{keyword}{typename}... Types>}
+\DoxyCodeLine{224 \textcolor{keyword}{using} \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{tuple}} = \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{TupleImpl}}<\textcolor{keyword}{sizeof}...(Types), Types...>;}
+\DoxyCodeLine{225 }
+\DoxyCodeLine{229 template<typename Tuple>}
+\DoxyCodeLine{230 \textcolor{keyword}{struct} \mbox{\hyperlink{structEigen_1_1internal_1_1tuple__impl_1_1tuple__size}{tuple\_size}};}
+\DoxyCodeLine{231 }
+\DoxyCodeLine{232 template<typename... Types >}
+\DoxyCodeLine{233 \textcolor{keyword}{struct} \mbox{\hyperlink{structEigen_1_1internal_1_1tuple__impl_1_1tuple__size}{tuple\_size}}< \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{tuple<Types...>}} > : std::integral\_constant<\textcolor{keywordtype}{size\_t}, \textcolor{keyword}{sizeof}...(Types)> \{\};}
+\DoxyCodeLine{234 }
+\DoxyCodeLine{242 \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t} Idx, \textcolor{keyword}{typename}... Types>}
+\DoxyCodeLine{243 EIGEN\_CONSTEXPR EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{244 \textcolor{keyword}{const} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1tuple__impl_1_1tuple__get__impl}{tuple\_get\_impl}}<Idx, Types...>::ReturnType\&}
+\DoxyCodeLine{245 get(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{tuple<Types...>}}\& \mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{tuple}}) \{}
+\DoxyCodeLine{246   \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1tuple__impl_1_1tuple__get__impl}{tuple\_get\_impl<Idx, Types...>::run}}(\mbox{\hyperlink{classEigen_1_1internal_1_1tuple__impl_1_1TupleImpl}{tuple}});}
+\DoxyCodeLine{247 \}}
+\DoxyCodeLine{248 }
+\DoxyCodeLine{249 \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t} Idx, \textcolor{keyword}{typename}... Types>}
+\DoxyCodeLine{250 EIGEN\_CONSTEXPR EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{251 \textcolor{keyword}{typename} tuple\_get\_impl<Idx, Types...>::ReturnType\&}
+\DoxyCodeLine{252 get(tuple<Types...>\& tuple) \{}
+\DoxyCodeLine{253   \textcolor{keywordflow}{return} tuple\_get\_impl<Idx, Types...>::run(tuple);}
+\DoxyCodeLine{254 \}}
+\DoxyCodeLine{255 }
+\DoxyCodeLine{261 \textcolor{keyword}{template}<\textcolor{keyword}{typename}... Tuples,}
+\DoxyCodeLine{262           \textcolor{keyword}{typename} EnableIf = \textcolor{keyword}{typename} std::enable\_if<}
+\DoxyCodeLine{263             internal::reduce\_all<}
+\DoxyCodeLine{264               is\_tuple<typename std::decay<Tuples>::type>::value...>::value>::type>}
+\DoxyCodeLine{265 EIGEN\_CONSTEXPR EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{266 \textcolor{keyword}{typename} tuple\_cat\_impl<\textcolor{keyword}{sizeof}...(Tuples), \textcolor{keyword}{typename} std::decay<Tuples>::type...>::ReturnType}
+\DoxyCodeLine{267 tuple\_cat(Tuples\&\&... tuples) \{}
+\DoxyCodeLine{268   \textcolor{keywordflow}{return} tuple\_cat\_impl<\textcolor{keyword}{sizeof}...(Tuples), \textcolor{keyword}{typename} std::decay<Tuples>::type...>::run(std::forward<Tuples>(tuples)...);}
+\DoxyCodeLine{269 \}}
+\DoxyCodeLine{270 }
+\DoxyCodeLine{274 \textcolor{keyword}{template} <\textcolor{keyword}{typename}... Args, \textcolor{keyword}{typename} ReturnType = tuple<Args\&...> >}
+\DoxyCodeLine{275 EIGEN\_CONSTEXPR EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{276 ReturnType tie(Args\&... args) EIGEN\_NOEXCEPT \{}
+\DoxyCodeLine{277     \textcolor{keywordflow}{return} ReturnType\{args...\};}
+\DoxyCodeLine{278 \}}
+\DoxyCodeLine{279 }
+\DoxyCodeLine{283 \textcolor{keyword}{template} <\textcolor{keyword}{typename}... Args, \textcolor{keyword}{typename} ReturnType = tuple<typename unwrap\_decay<Args>::type...> >}
+\DoxyCodeLine{284 EIGEN\_CONSTEXPR EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{285 ReturnType make\_tuple(Args\&\&... args) \{}
+\DoxyCodeLine{286   \textcolor{keywordflow}{return} ReturnType\{std::forward<Args>(args)...\};}
+\DoxyCodeLine{287 \}}
+\DoxyCodeLine{288 }
+\DoxyCodeLine{292 \textcolor{keyword}{template} <\textcolor{keyword}{typename}... Args>}
+\DoxyCodeLine{293 EIGEN\_CONSTEXPR EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{294 tuple<Args...> forward\_as\_tuple(Args\&\&... args) \{}
+\DoxyCodeLine{295   \textcolor{keywordflow}{return} tuple<Args...>(std::forward<Args>(args)...);}
+\DoxyCodeLine{296 \}}
+\DoxyCodeLine{297 }
+\DoxyCodeLine{298 \}  \textcolor{comment}{// namespace tuple\_impl}}
+\DoxyCodeLine{299 \}  \textcolor{comment}{// namespace internal}}
+\DoxyCodeLine{300 \}  \textcolor{comment}{// namespace Eigen}}
+\DoxyCodeLine{301 }
+\DoxyCodeLine{302 \textcolor{preprocessor}{\#endif  }\textcolor{comment}{// EIGEN\_TUPLE\_GPU}}
+
+\end{DoxyCode}

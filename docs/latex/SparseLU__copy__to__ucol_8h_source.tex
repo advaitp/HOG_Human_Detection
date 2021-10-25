@@ -1,0 +1,101 @@
+\hypertarget{SparseLU__copy__to__ucol_8h_source}{}\doxysection{Sparse\+LU\+\_\+copy\+\_\+to\+\_\+ucol.\+h}
+\label{SparseLU__copy__to__ucol_8h_source}\index{include/Eigen/src/SparseLU/SparseLU\_copy\_to\_ucol.h@{include/Eigen/src/SparseLU/SparseLU\_copy\_to\_ucol.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2012 Désiré Nuentsa-\/Wakam <desire.nuentsa\_wakam@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 \textcolor{comment}{/* }}
+\DoxyCodeLine{10 \textcolor{comment}{ }}
+\DoxyCodeLine{11 \textcolor{comment}{ * NOTE: This file is the modified version of [s,d,c,z]copy\_to\_ucol.c file in SuperLU }}
+\DoxyCodeLine{12 \textcolor{comment}{ }}
+\DoxyCodeLine{13 \textcolor{comment}{ * -\/-\/ SuperLU routine (version 2.0) -\/-\/}}
+\DoxyCodeLine{14 \textcolor{comment}{ * Univ. of California Berkeley, Xerox Palo Alto Research Center,}}
+\DoxyCodeLine{15 \textcolor{comment}{ * and Lawrence Berkeley National Lab.}}
+\DoxyCodeLine{16 \textcolor{comment}{ * November 15, 1997}}
+\DoxyCodeLine{17 \textcolor{comment}{ *}}
+\DoxyCodeLine{18 \textcolor{comment}{ * Copyright (c) 1994 by Xerox Corporation.  All rights reserved.}}
+\DoxyCodeLine{19 \textcolor{comment}{ *}}
+\DoxyCodeLine{20 \textcolor{comment}{ * THIS MATERIAL IS PROVIDED AS IS, WITH ABSOLUTELY NO WARRANTY}}
+\DoxyCodeLine{21 \textcolor{comment}{ * EXPRESSED OR IMPLIED.  ANY USE IS AT YOUR OWN RISK.}}
+\DoxyCodeLine{22 \textcolor{comment}{ *}}
+\DoxyCodeLine{23 \textcolor{comment}{ * Permission is hereby granted to use or copy this program for any}}
+\DoxyCodeLine{24 \textcolor{comment}{ * purpose, provided the above notices are retained on all copies.}}
+\DoxyCodeLine{25 \textcolor{comment}{ * Permission to modify the code and to distribute modified code is}}
+\DoxyCodeLine{26 \textcolor{comment}{ * granted, provided the above notices are retained, and a notice that}}
+\DoxyCodeLine{27 \textcolor{comment}{ * the code was modified is included with the above copyright notice.}}
+\DoxyCodeLine{28 \textcolor{comment}{ */}}
+\DoxyCodeLine{29 \textcolor{preprocessor}{\#ifndef SPARSELU\_COPY\_TO\_UCOL\_H}}
+\DoxyCodeLine{30 \textcolor{preprocessor}{\#define SPARSELU\_COPY\_TO\_UCOL\_H}}
+\DoxyCodeLine{31 }
+\DoxyCodeLine{32 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{33 }
+\DoxyCodeLine{34 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{35 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{51 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} StorageIndex>}
+\DoxyCodeLine{52 \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1SparseLUImpl_ae4867ed1d5f104f9245411c356416a21}{SparseLUImpl<Scalar,StorageIndex>::copy\_to\_ucol}}(\textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} jcol, \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nseg, \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}}\& segrep,}
+\DoxyCodeLine{53                                                       \mbox{\hyperlink{classEigen_1_1Ref}{BlockIndexVector}} repfnz ,\mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}}\& perm\_r, \mbox{\hyperlink{classEigen_1_1Ref}{BlockScalarVector}} dense, \mbox{\hyperlink{structEigen_1_1internal_1_1LU__GlobalLU__t}{GlobalLU\_t}}\& glu)}
+\DoxyCodeLine{54 \{  }
+\DoxyCodeLine{55   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} ksub, krep, ksupno; }
+\DoxyCodeLine{56     }
+\DoxyCodeLine{57   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} jsupno = glu.supno(jcol);}
+\DoxyCodeLine{58   }
+\DoxyCodeLine{59   \textcolor{comment}{// For each nonzero supernode segment of U[*,j] in topological order }}
+\DoxyCodeLine{60   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} k = nseg -\/ 1, i; }
+\DoxyCodeLine{61   StorageIndex nextu = glu.xusub(jcol); }
+\DoxyCodeLine{62   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} kfnz, isub, segsize; }
+\DoxyCodeLine{63   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} new\_next,irow; }
+\DoxyCodeLine{64   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} fsupc, mem; }
+\DoxyCodeLine{65   \textcolor{keywordflow}{for} (ksub = 0; ksub < nseg; ksub++)}
+\DoxyCodeLine{66   \{}
+\DoxyCodeLine{67     krep = segrep(k); k-\/-\/; }
+\DoxyCodeLine{68     ksupno = glu.supno(krep); }
+\DoxyCodeLine{69     \textcolor{keywordflow}{if} (jsupno != ksupno ) \textcolor{comment}{// should go into ucol(); }}
+\DoxyCodeLine{70     \{}
+\DoxyCodeLine{71       kfnz = repfnz(krep); }
+\DoxyCodeLine{72       \textcolor{keywordflow}{if} (kfnz != emptyIdxLU)}
+\DoxyCodeLine{73       \{ \textcolor{comment}{// Nonzero U-\/segment }}
+\DoxyCodeLine{74         fsupc = glu.xsup(ksupno); }
+\DoxyCodeLine{75         isub = glu.xlsub(fsupc) + kfnz -\/ fsupc; }
+\DoxyCodeLine{76         segsize = krep -\/ kfnz + 1; }
+\DoxyCodeLine{77         new\_next = nextu + segsize; }
+\DoxyCodeLine{78         \textcolor{keywordflow}{while} (new\_next > glu.nzumax) }
+\DoxyCodeLine{79         \{}
+\DoxyCodeLine{80           mem = memXpand<ScalarVector>(glu.ucol, glu.nzumax, nextu, UCOL, glu.num\_expansions); }
+\DoxyCodeLine{81           \textcolor{keywordflow}{if} (mem) \textcolor{keywordflow}{return} mem; }
+\DoxyCodeLine{82           mem = memXpand<IndexVector>(glu.usub, glu.nzumax, nextu, USUB, glu.num\_expansions); }
+\DoxyCodeLine{83           \textcolor{keywordflow}{if} (mem) \textcolor{keywordflow}{return} mem; }
+\DoxyCodeLine{84           }
+\DoxyCodeLine{85         \}}
+\DoxyCodeLine{86         }
+\DoxyCodeLine{87         \textcolor{keywordflow}{for} (i = 0; i < segsize; i++)}
+\DoxyCodeLine{88         \{}
+\DoxyCodeLine{89           irow = glu.lsub(isub); }
+\DoxyCodeLine{90           glu.usub(nextu) = perm\_r(irow); \textcolor{comment}{// Unlike the L part, the U part is stored in its final order}}
+\DoxyCodeLine{91           glu.ucol(nextu) = dense(irow); }
+\DoxyCodeLine{92           dense(irow) = Scalar(0.0); }
+\DoxyCodeLine{93           nextu++;}
+\DoxyCodeLine{94           isub++;}
+\DoxyCodeLine{95         \}}
+\DoxyCodeLine{96         }
+\DoxyCodeLine{97       \} \textcolor{comment}{// end nonzero U-\/segment }}
+\DoxyCodeLine{98       }
+\DoxyCodeLine{99     \} \textcolor{comment}{// end if jsupno }}
+\DoxyCodeLine{100     }
+\DoxyCodeLine{101   \} \textcolor{comment}{// end for each segment}}
+\DoxyCodeLine{102   glu.xusub(jcol + 1) = nextu; \textcolor{comment}{// close U(*,jcol)}}
+\DoxyCodeLine{103   \textcolor{keywordflow}{return} 0; }
+\DoxyCodeLine{104 \}}
+\DoxyCodeLine{105 }
+\DoxyCodeLine{106 \} \textcolor{comment}{// namespace internal}}
+\DoxyCodeLine{107 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{108 }
+\DoxyCodeLine{109 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// SPARSELU\_COPY\_TO\_UCOL\_H}}
+
+\end{DoxyCode}

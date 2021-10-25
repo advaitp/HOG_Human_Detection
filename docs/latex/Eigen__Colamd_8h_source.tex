@@ -1,0 +1,1817 @@
+\hypertarget{Eigen__Colamd_8h_source}{}\doxysection{Eigen\+\_\+\+Colamd.\+h}
+\label{Eigen__Colamd_8h_source}\index{include/Eigen/src/OrderingMethods/Eigen\_Colamd.h@{include/Eigen/src/OrderingMethods/Eigen\_Colamd.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// // This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2012 Desire Nuentsa Wakam <desire.nuentsa\_wakam@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{comment}{// This file is modified from the colamd/symamd library. The copyright is below}}
+\DoxyCodeLine{11 }
+\DoxyCodeLine{12 \textcolor{comment}{//   The authors of the code itself are Stefan I. Larimore and Timothy A.}}
+\DoxyCodeLine{13 \textcolor{comment}{//   Davis (davis@cise.ufl.edu), University of Florida.  The algorithm was}}
+\DoxyCodeLine{14 \textcolor{comment}{//   developed in collaboration with John Gilbert, Xerox PARC, and Esmond}}
+\DoxyCodeLine{15 \textcolor{comment}{//   Ng, Oak Ridge National Laboratory.}}
+\DoxyCodeLine{16 \textcolor{comment}{//}}
+\DoxyCodeLine{17 \textcolor{comment}{//     Date:}}
+\DoxyCodeLine{18 \textcolor{comment}{//}}
+\DoxyCodeLine{19 \textcolor{comment}{//   September 8, 2003.  Version 2.3.}}
+\DoxyCodeLine{20 \textcolor{comment}{//}}
+\DoxyCodeLine{21 \textcolor{comment}{//     Acknowledgements:}}
+\DoxyCodeLine{22 \textcolor{comment}{//}}
+\DoxyCodeLine{23 \textcolor{comment}{//   This work was supported by the National Science Foundation, under}}
+\DoxyCodeLine{24 \textcolor{comment}{//   grants DMS-\/9504974 and DMS-\/9803599.}}
+\DoxyCodeLine{25 \textcolor{comment}{//}}
+\DoxyCodeLine{26 \textcolor{comment}{//     Notice:}}
+\DoxyCodeLine{27 \textcolor{comment}{//}}
+\DoxyCodeLine{28 \textcolor{comment}{//   Copyright (c) 1998-\/2003 by the University of Florida.}}
+\DoxyCodeLine{29 \textcolor{comment}{//   All Rights Reserved.}}
+\DoxyCodeLine{30 \textcolor{comment}{//}}
+\DoxyCodeLine{31 \textcolor{comment}{//   THIS MATERIAL IS PROVIDED AS IS, WITH ABSOLUTELY NO WARRANTY}}
+\DoxyCodeLine{32 \textcolor{comment}{//   EXPRESSED OR IMPLIED.  ANY USE IS AT YOUR OWN RISK.}}
+\DoxyCodeLine{33 \textcolor{comment}{//}}
+\DoxyCodeLine{34 \textcolor{comment}{//   Permission is hereby granted to use, copy, modify, and/or distribute}}
+\DoxyCodeLine{35 \textcolor{comment}{//   this program, provided that the Copyright, this License, and the}}
+\DoxyCodeLine{36 \textcolor{comment}{//   Availability of the original version is retained on all copies and made}}
+\DoxyCodeLine{37 \textcolor{comment}{//   accessible to the end-\/user of any code or package that includes COLAMD}}
+\DoxyCodeLine{38 \textcolor{comment}{//   or any modified version of COLAMD.}}
+\DoxyCodeLine{39 \textcolor{comment}{//}}
+\DoxyCodeLine{40 \textcolor{comment}{//     Availability:}}
+\DoxyCodeLine{41 \textcolor{comment}{//}}
+\DoxyCodeLine{42 \textcolor{comment}{//   The colamd/symamd library is available at}}
+\DoxyCodeLine{43 \textcolor{comment}{//}}
+\DoxyCodeLine{44 \textcolor{comment}{//       http://www.suitesparse.com}}
+\DoxyCodeLine{45 }
+\DoxyCodeLine{46 }
+\DoxyCodeLine{47 \textcolor{preprocessor}{\#ifndef EIGEN\_COLAMD\_H}}
+\DoxyCodeLine{48 \textcolor{preprocessor}{\#define EIGEN\_COLAMD\_H}}
+\DoxyCodeLine{49 }
+\DoxyCodeLine{50 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{51 }
+\DoxyCodeLine{52 \textcolor{keyword}{namespace }Colamd \{}
+\DoxyCodeLine{53 }
+\DoxyCodeLine{54 \textcolor{comment}{/* Ensure that debugging is turned off: */}}
+\DoxyCodeLine{55 \textcolor{preprocessor}{\#ifndef COLAMD\_NDEBUG}}
+\DoxyCodeLine{56 \textcolor{preprocessor}{\#define COLAMD\_NDEBUG}}
+\DoxyCodeLine{57 \textcolor{preprocessor}{\#endif }\textcolor{comment}{/* NDEBUG */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{58 }
+\DoxyCodeLine{59 }
+\DoxyCodeLine{60 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{61 \textcolor{comment}{/* === Knob and statistics definitions ====================================== */}}
+\DoxyCodeLine{62 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{63 }
+\DoxyCodeLine{64 \textcolor{comment}{/* size of the knobs [ ] array.  Only knobs [0..1] are currently used. */}}
+\DoxyCodeLine{65 \textcolor{keyword}{const} \textcolor{keywordtype}{int} NKnobs = 20;}
+\DoxyCodeLine{66 }
+\DoxyCodeLine{67 \textcolor{comment}{/* number of output statistics.  Only stats [0..6] are currently used. */}}
+\DoxyCodeLine{68 \textcolor{keyword}{const} \textcolor{keywordtype}{int} NStats = 20;}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70 \textcolor{comment}{/* Indices into knobs and stats array. */}}
+\DoxyCodeLine{71 \textcolor{keyword}{enum} KnobsStatsIndex \{}
+\DoxyCodeLine{72   \textcolor{comment}{/* knobs [0] and stats [0]: dense row knob and output statistic. */}}
+\DoxyCodeLine{73   DenseRow = 0,}
+\DoxyCodeLine{74 }
+\DoxyCodeLine{75   \textcolor{comment}{/* knobs [1] and stats [1]: dense column knob and output statistic. */}}
+\DoxyCodeLine{76   DenseCol = 1,}
+\DoxyCodeLine{77 }
+\DoxyCodeLine{78   \textcolor{comment}{/* stats [2]: memory defragmentation count output statistic */}}
+\DoxyCodeLine{79   DefragCount = 2,}
+\DoxyCodeLine{80 }
+\DoxyCodeLine{81   \textcolor{comment}{/* stats [3]: colamd status:  zero OK, > 0 warning or notice, < 0 error */}}
+\DoxyCodeLine{82   Status = 3,}
+\DoxyCodeLine{83 }
+\DoxyCodeLine{84   \textcolor{comment}{/* stats [4..6]: error info, or info on jumbled columns */}}
+\DoxyCodeLine{85   Info1 = 4,}
+\DoxyCodeLine{86   Info2 = 5,}
+\DoxyCodeLine{87   Info3 = 6}
+\DoxyCodeLine{88 \};}
+\DoxyCodeLine{89 }
+\DoxyCodeLine{90 \textcolor{comment}{/* error codes returned in stats [3]: */}}
+\DoxyCodeLine{91 \textcolor{keyword}{enum} Status \{}
+\DoxyCodeLine{92   Ok = 0,}
+\DoxyCodeLine{93   OkButJumbled = 1,}
+\DoxyCodeLine{94   ErrorANotPresent = -\/1,}
+\DoxyCodeLine{95   ErrorPNotPresent = -\/2,}
+\DoxyCodeLine{96   ErrorNrowNegative = -\/3,}
+\DoxyCodeLine{97   ErrorNcolNegative = -\/4,}
+\DoxyCodeLine{98   ErrorNnzNegative = -\/5,}
+\DoxyCodeLine{99   ErrorP0Nonzero = -\/6,}
+\DoxyCodeLine{100   ErrorATooSmall = -\/7,}
+\DoxyCodeLine{101   ErrorColLengthNegative = -\/8,}
+\DoxyCodeLine{102   ErrorRowIndexOutOfBounds = -\/9,}
+\DoxyCodeLine{103   ErrorOutOfMemory = -\/10,}
+\DoxyCodeLine{104   ErrorInternalError = -\/999}
+\DoxyCodeLine{105 \};}
+\DoxyCodeLine{106 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{107 \textcolor{comment}{/* === Definitions ========================================================== */}}
+\DoxyCodeLine{108 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{109 }
+\DoxyCodeLine{110 \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{111 IndexType ones\_complement(\textcolor{keyword}{const} IndexType r) \{}
+\DoxyCodeLine{112   \textcolor{keywordflow}{return} (-\/(r)-\/1);}
+\DoxyCodeLine{113 \}}
+\DoxyCodeLine{114 }
+\DoxyCodeLine{115 \textcolor{comment}{/* -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ */}}
+\DoxyCodeLine{116 \textcolor{keyword}{const} \textcolor{keywordtype}{int} Empty = -\/1;}
+\DoxyCodeLine{117 }
+\DoxyCodeLine{118 \textcolor{comment}{/* Row and column status */}}
+\DoxyCodeLine{119 \textcolor{keyword}{enum} RowColumnStatus \{}
+\DoxyCodeLine{120   Alive = 0,}
+\DoxyCodeLine{121   Dead = -\/1}
+\DoxyCodeLine{122 \};}
+\DoxyCodeLine{123 }
+\DoxyCodeLine{124 \textcolor{comment}{/* Column status */}}
+\DoxyCodeLine{125 \textcolor{keyword}{enum} ColumnStatus \{}
+\DoxyCodeLine{126   DeadPrincipal = -\/1,}
+\DoxyCodeLine{127   DeadNonPrincipal = -\/2}
+\DoxyCodeLine{128 \};}
+\DoxyCodeLine{129 }
+\DoxyCodeLine{130 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{131 \textcolor{comment}{/* === Colamd reporting mechanism =========================================== */}}
+\DoxyCodeLine{132 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{133 }
+\DoxyCodeLine{134 \textcolor{comment}{// == Row and Column structures ==}}
+\DoxyCodeLine{135 \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{136 \textcolor{keyword}{struct }\mbox{\hyperlink{structinternal_1_1Colamd_1_1ColStructure}{ColStructure}}}
+\DoxyCodeLine{137 \{}
+\DoxyCodeLine{138   IndexType start ;   \textcolor{comment}{/* index for A of first row in this column, or Dead */}}
+\DoxyCodeLine{139   \textcolor{comment}{/* if column is dead */}}
+\DoxyCodeLine{140   IndexType length ;  \textcolor{comment}{/* number of rows in this column */}}
+\DoxyCodeLine{141   \textcolor{keyword}{union}}
+\DoxyCodeLine{142   \{}
+\DoxyCodeLine{143     IndexType thickness ; \textcolor{comment}{/* number of original columns represented by this */}}
+\DoxyCodeLine{144     \textcolor{comment}{/* col, if the column is alive */}}
+\DoxyCodeLine{145     IndexType parent ;  \textcolor{comment}{/* parent in parent tree super-\/column structure, if */}}
+\DoxyCodeLine{146     \textcolor{comment}{/* the column is dead */}}
+\DoxyCodeLine{147   \} shared1 ;}
+\DoxyCodeLine{148   \textcolor{keyword}{union}}
+\DoxyCodeLine{149   \{}
+\DoxyCodeLine{150     IndexType score ; \textcolor{comment}{/* the score used to maintain heap, if col is alive */}}
+\DoxyCodeLine{151     IndexType order ; \textcolor{comment}{/* pivot ordering of this column, if col is dead */}}
+\DoxyCodeLine{152   \} shared2 ;}
+\DoxyCodeLine{153   \textcolor{keyword}{union}}
+\DoxyCodeLine{154   \{}
+\DoxyCodeLine{155     IndexType headhash ;  \textcolor{comment}{/* head of a hash bucket, if col is at the head of */}}
+\DoxyCodeLine{156     \textcolor{comment}{/* a degree list */}}
+\DoxyCodeLine{157     IndexType hash ;  \textcolor{comment}{/* hash value, if col is not in a degree list */}}
+\DoxyCodeLine{158     IndexType prev ;  \textcolor{comment}{/* previous column in degree list, if col is in a */}}
+\DoxyCodeLine{159     \textcolor{comment}{/* degree list (but not at the head of a degree list) */}}
+\DoxyCodeLine{160   \} shared3 ;}
+\DoxyCodeLine{161   \textcolor{keyword}{union}}
+\DoxyCodeLine{162   \{}
+\DoxyCodeLine{163     IndexType degree\_next ; \textcolor{comment}{/* next column, if col is in a degree list */}}
+\DoxyCodeLine{164     IndexType hash\_next ;   \textcolor{comment}{/* next column, if col is in a hash list */}}
+\DoxyCodeLine{165   \} shared4 ;}
+\DoxyCodeLine{166 }
+\DoxyCodeLine{167   \textcolor{keyword}{inline} \textcolor{keywordtype}{bool} is\_dead()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} start < Alive; \}}
+\DoxyCodeLine{168 }
+\DoxyCodeLine{169   \textcolor{keyword}{inline} \textcolor{keywordtype}{bool} is\_alive()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} start >= Alive; \}}
+\DoxyCodeLine{170 }
+\DoxyCodeLine{171   \textcolor{keyword}{inline} \textcolor{keywordtype}{bool} is\_dead\_principal()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} start == DeadPrincipal; \}}
+\DoxyCodeLine{172 }
+\DoxyCodeLine{173   \textcolor{keyword}{inline} \textcolor{keywordtype}{void} kill\_principal() \{ start = DeadPrincipal; \}}
+\DoxyCodeLine{174 }
+\DoxyCodeLine{175   \textcolor{keyword}{inline} \textcolor{keywordtype}{void} kill\_non\_principal() \{ start = DeadNonPrincipal; \}}
+\DoxyCodeLine{176 }
+\DoxyCodeLine{177 \};}
+\DoxyCodeLine{178 }
+\DoxyCodeLine{179 \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{180 \textcolor{keyword}{struct }\mbox{\hyperlink{structinternal_1_1Colamd_1_1RowStructure}{RowStructure}}}
+\DoxyCodeLine{181 \{}
+\DoxyCodeLine{182   IndexType start ;   \textcolor{comment}{/* index for A of first col in this row */}}
+\DoxyCodeLine{183   IndexType length ;  \textcolor{comment}{/* number of principal columns in this row */}}
+\DoxyCodeLine{184   \textcolor{keyword}{union}}
+\DoxyCodeLine{185   \{}
+\DoxyCodeLine{186     IndexType degree ;  \textcolor{comment}{/* number of principal \& non-\/principal columns in row */}}
+\DoxyCodeLine{187     IndexType p ;   \textcolor{comment}{/* used as a row pointer in init\_rows\_cols () */}}
+\DoxyCodeLine{188   \} shared1 ;}
+\DoxyCodeLine{189   \textcolor{keyword}{union}}
+\DoxyCodeLine{190   \{}
+\DoxyCodeLine{191     IndexType mark ;  \textcolor{comment}{/* for computing set differences and marking dead rows*/}}
+\DoxyCodeLine{192     IndexType first\_column ;\textcolor{comment}{/* first column in row (used in garbage collection) */}}
+\DoxyCodeLine{193   \} shared2 ;}
+\DoxyCodeLine{194 }
+\DoxyCodeLine{195   \textcolor{keyword}{inline} \textcolor{keywordtype}{bool} is\_dead()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} shared2.mark < Alive; \}}
+\DoxyCodeLine{196 }
+\DoxyCodeLine{197   \textcolor{keyword}{inline} \textcolor{keywordtype}{bool} is\_alive()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} shared2.mark >= Alive; \}}
+\DoxyCodeLine{198 }
+\DoxyCodeLine{199   \textcolor{keyword}{inline} \textcolor{keywordtype}{void} kill() \{ shared2.mark = Dead; \}}
+\DoxyCodeLine{200 }
+\DoxyCodeLine{201 \};}
+\DoxyCodeLine{202 }
+\DoxyCodeLine{203 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{204 \textcolor{comment}{/* === Colamd recommended memory size ======================================= */}}
+\DoxyCodeLine{205 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{206 }
+\DoxyCodeLine{207 \textcolor{comment}{/*}}
+\DoxyCodeLine{208 \textcolor{comment}{  The recommended length Alen of the array A passed to colamd is given by}}
+\DoxyCodeLine{209 \textcolor{comment}{  the COLAMD\_RECOMMENDED (nnz, n\_row, n\_col) macro.  It returns -\/1 if any}}
+\DoxyCodeLine{210 \textcolor{comment}{  argument is negative.  2*nnz space is required for the row and column}}
+\DoxyCodeLine{211 \textcolor{comment}{  indices of the matrix. colamd\_c (n\_col) + colamd\_r (n\_row) space is}}
+\DoxyCodeLine{212 \textcolor{comment}{  required for the Col and Row arrays, respectively, which are internal to}}
+\DoxyCodeLine{213 \textcolor{comment}{  colamd.  An additional n\_col space is the minimal amount of "{}elbow room"{},}}
+\DoxyCodeLine{214 \textcolor{comment}{  and nnz/5 more space is recommended for run time efficiency.}}
+\DoxyCodeLine{215 \textcolor{comment}{}}
+\DoxyCodeLine{216 \textcolor{comment}{  This macro is not needed when using symamd.}}
+\DoxyCodeLine{217 \textcolor{comment}{}}
+\DoxyCodeLine{218 \textcolor{comment}{  Explicit typecast to IndexType added Sept. 23, 2002, COLAMD version 2.2, to avoid}}
+\DoxyCodeLine{219 \textcolor{comment}{  gcc -\/pedantic warning messages.}}
+\DoxyCodeLine{220 \textcolor{comment}{*/}}
+\DoxyCodeLine{221 \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{222 \textcolor{keyword}{inline} IndexType colamd\_c(IndexType n\_col)}
+\DoxyCodeLine{223 \{ \textcolor{keywordflow}{return} IndexType( ((n\_col) + 1) * \textcolor{keyword}{sizeof} (\mbox{\hyperlink{structinternal_1_1Colamd_1_1ColStructure}{ColStructure<IndexType>}}) / \textcolor{keyword}{sizeof} (IndexType) ) ; \}}
+\DoxyCodeLine{224 }
+\DoxyCodeLine{225 \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{226 \textcolor{keyword}{inline} IndexType  colamd\_r(IndexType n\_row)}
+\DoxyCodeLine{227 \{ \textcolor{keywordflow}{return} IndexType(((n\_row) + 1) * \textcolor{keyword}{sizeof} (RowStructure<IndexType>) / \textcolor{keyword}{sizeof} (IndexType)); \}}
+\DoxyCodeLine{228 }
+\DoxyCodeLine{229 \textcolor{comment}{// Prototypes of non-\/user callable routines}}
+\DoxyCodeLine{230 \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{231 \textcolor{keyword}{static} IndexType init\_rows\_cols (IndexType n\_row, IndexType n\_col, RowStructure<IndexType> Row [], ColStructure<IndexType> col [], IndexType A [], IndexType p [], IndexType stats[NStats] );}
+\DoxyCodeLine{232 }
+\DoxyCodeLine{233 \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{234 \textcolor{keyword}{static} \textcolor{keywordtype}{void} init\_scoring (IndexType n\_row, IndexType n\_col, RowStructure<IndexType> Row [], ColStructure<IndexType> Col [], IndexType A [], IndexType head [], \textcolor{keywordtype}{double} knobs[NKnobs], IndexType *p\_n\_row2, IndexType *p\_n\_col2, IndexType *p\_max\_deg);}
+\DoxyCodeLine{235 }
+\DoxyCodeLine{236 \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{237 \textcolor{keyword}{static} IndexType find\_ordering (IndexType n\_row, IndexType n\_col, IndexType Alen, RowStructure<IndexType> Row [], ColStructure<IndexType> Col [], IndexType A [], IndexType head [], IndexType n\_col2, IndexType max\_deg, IndexType pfree);}
+\DoxyCodeLine{238 }
+\DoxyCodeLine{239 \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{240 \textcolor{keyword}{static} \textcolor{keywordtype}{void} order\_children (IndexType n\_col, ColStructure<IndexType> Col [], IndexType p []);}
+\DoxyCodeLine{241 }
+\DoxyCodeLine{242 \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{243 \textcolor{keyword}{static} \textcolor{keywordtype}{void} detect\_super\_cols (ColStructure<IndexType> Col [], IndexType A [], IndexType head [], IndexType row\_start, IndexType row\_length ) ;}
+\DoxyCodeLine{244 }
+\DoxyCodeLine{245 \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{246 \textcolor{keyword}{static} IndexType garbage\_collection (IndexType n\_row, IndexType n\_col, RowStructure<IndexType> Row [], ColStructure<IndexType> Col [], IndexType A [], IndexType *pfree) ;}
+\DoxyCodeLine{247 }
+\DoxyCodeLine{248 \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{249 \textcolor{keyword}{static} \textcolor{keyword}{inline}  IndexType clear\_mark (IndexType n\_row, RowStructure<IndexType> Row [] ) ;}
+\DoxyCodeLine{250 }
+\DoxyCodeLine{251 \textcolor{comment}{/* === No debugging ========================================================= */}}
+\DoxyCodeLine{252 }
+\DoxyCodeLine{253 \textcolor{preprocessor}{\#define COLAMD\_DEBUG0(params) ;}}
+\DoxyCodeLine{254 \textcolor{preprocessor}{\#define COLAMD\_DEBUG1(params) ;}}
+\DoxyCodeLine{255 \textcolor{preprocessor}{\#define COLAMD\_DEBUG2(params) ;}}
+\DoxyCodeLine{256 \textcolor{preprocessor}{\#define COLAMD\_DEBUG3(params) ;}}
+\DoxyCodeLine{257 \textcolor{preprocessor}{\#define COLAMD\_DEBUG4(params) ;}}
+\DoxyCodeLine{258 }
+\DoxyCodeLine{259 \textcolor{preprocessor}{\#define COLAMD\_ASSERT(expression) ((void) 0)}}
+\DoxyCodeLine{260 }
+\DoxyCodeLine{261 }
+\DoxyCodeLine{276 \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{277 \textcolor{keyword}{inline} IndexType recommended ( IndexType nnz, IndexType n\_row, IndexType n\_col)}
+\DoxyCodeLine{278 \{}
+\DoxyCodeLine{279   \textcolor{keywordflow}{if} ((nnz) < 0 || (n\_row) < 0 || (n\_col) < 0)}
+\DoxyCodeLine{280     \textcolor{keywordflow}{return} (-\/1);}
+\DoxyCodeLine{281   \textcolor{keywordflow}{else}}
+\DoxyCodeLine{282     \textcolor{keywordflow}{return} (2 * (nnz) + colamd\_c (n\_col) + colamd\_r (n\_row) + (n\_col) + ((nnz) / 5));}
+\DoxyCodeLine{283 \}}
+\DoxyCodeLine{284 }
+\DoxyCodeLine{306 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{void} set\_defaults(\textcolor{keywordtype}{double} knobs[NKnobs])}
+\DoxyCodeLine{307 \{}
+\DoxyCodeLine{308   \textcolor{comment}{/* === Local variables ================================================== */}}
+\DoxyCodeLine{309 }
+\DoxyCodeLine{310   \textcolor{keywordtype}{int} i ;}
+\DoxyCodeLine{311 }
+\DoxyCodeLine{312   \textcolor{keywordflow}{if} (!knobs)}
+\DoxyCodeLine{313   \{}
+\DoxyCodeLine{314     return ;      \textcolor{comment}{/* no knobs to initialize */}}
+\DoxyCodeLine{315   \}}
+\DoxyCodeLine{316   \textcolor{keywordflow}{for} (i = 0 ; i < NKnobs ; i++)}
+\DoxyCodeLine{317   \{}
+\DoxyCodeLine{318     knobs [i] = 0 ;}
+\DoxyCodeLine{319   \}}
+\DoxyCodeLine{320   knobs [Colamd::DenseRow] = 0.5 ;  \textcolor{comment}{/* ignore rows over 50\% dense */}}
+\DoxyCodeLine{321   knobs [Colamd::DenseCol] = 0.5 ;  \textcolor{comment}{/* ignore columns over 50\% dense */}}
+\DoxyCodeLine{322 \}}
+\DoxyCodeLine{323 }
+\DoxyCodeLine{341 \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{342 \textcolor{keyword}{static} \textcolor{keywordtype}{bool} compute\_ordering(IndexType n\_row, IndexType n\_col, IndexType Alen, IndexType *A, IndexType *p, \textcolor{keywordtype}{double} knobs[NKnobs], IndexType stats[NStats])}
+\DoxyCodeLine{343 \{}
+\DoxyCodeLine{344   \textcolor{comment}{/* === Local variables ================================================== */}}
+\DoxyCodeLine{345 }
+\DoxyCodeLine{346   IndexType i ;     \textcolor{comment}{/* loop index */}}
+\DoxyCodeLine{347   IndexType nnz ;     \textcolor{comment}{/* nonzeros in A */}}
+\DoxyCodeLine{348   IndexType Row\_size ;    \textcolor{comment}{/* size of Row [], in integers */}}
+\DoxyCodeLine{349   IndexType Col\_size ;    \textcolor{comment}{/* size of Col [], in integers */}}
+\DoxyCodeLine{350   IndexType need ;      \textcolor{comment}{/* minimum required length of A */}}
+\DoxyCodeLine{351   Colamd::RowStructure<IndexType> *Row ;   \textcolor{comment}{/* pointer into A of Row [0..n\_row] array */}}
+\DoxyCodeLine{352   Colamd::ColStructure<IndexType> *Col ;   \textcolor{comment}{/* pointer into A of Col [0..n\_col] array */}}
+\DoxyCodeLine{353   IndexType n\_col2 ;    \textcolor{comment}{/* number of non-\/dense, non-\/empty columns */}}
+\DoxyCodeLine{354   IndexType n\_row2 ;    \textcolor{comment}{/* number of non-\/dense, non-\/empty rows */}}
+\DoxyCodeLine{355   IndexType ngarbage ;    \textcolor{comment}{/* number of garbage collections performed */}}
+\DoxyCodeLine{356   IndexType max\_deg ;   \textcolor{comment}{/* maximum row degree */}}
+\DoxyCodeLine{357   \textcolor{keywordtype}{double} default\_knobs [NKnobs] ; \textcolor{comment}{/* default knobs array */}}
+\DoxyCodeLine{358 }
+\DoxyCodeLine{359 }
+\DoxyCodeLine{360   \textcolor{comment}{/* === Check the input arguments ======================================== */}}
+\DoxyCodeLine{361 }
+\DoxyCodeLine{362   \textcolor{keywordflow}{if} (!stats)}
+\DoxyCodeLine{363   \{}
+\DoxyCodeLine{364     COLAMD\_DEBUG0 ((\textcolor{stringliteral}{"{}colamd: stats not present\(\backslash\)n"{}})) ;}
+\DoxyCodeLine{365     \textcolor{keywordflow}{return} (\textcolor{keyword}{false}) ;}
+\DoxyCodeLine{366   \}}
+\DoxyCodeLine{367   \textcolor{keywordflow}{for} (i = 0 ; i < NStats ; i++)}
+\DoxyCodeLine{368   \{}
+\DoxyCodeLine{369     stats [i] = 0 ;}
+\DoxyCodeLine{370   \}}
+\DoxyCodeLine{371   stats [Colamd::Status] = Colamd::Ok ;}
+\DoxyCodeLine{372   stats [Colamd::Info1] = -\/1 ;}
+\DoxyCodeLine{373   stats [Colamd::Info2] = -\/1 ;}
+\DoxyCodeLine{374 }
+\DoxyCodeLine{375   \textcolor{keywordflow}{if} (!A)   \textcolor{comment}{/* A is not present */}}
+\DoxyCodeLine{376   \{}
+\DoxyCodeLine{377     stats [Colamd::Status] = Colamd::ErrorANotPresent ;}
+\DoxyCodeLine{378     COLAMD\_DEBUG0 ((\textcolor{stringliteral}{"{}colamd: A not present\(\backslash\)n"{}})) ;}
+\DoxyCodeLine{379     \textcolor{keywordflow}{return} (\textcolor{keyword}{false}) ;}
+\DoxyCodeLine{380   \}}
+\DoxyCodeLine{381 }
+\DoxyCodeLine{382   \textcolor{keywordflow}{if} (!p)   \textcolor{comment}{/* p is not present */}}
+\DoxyCodeLine{383   \{}
+\DoxyCodeLine{384     stats [Colamd::Status] = Colamd::ErrorPNotPresent ;}
+\DoxyCodeLine{385     COLAMD\_DEBUG0 ((\textcolor{stringliteral}{"{}colamd: p not present\(\backslash\)n"{}})) ;}
+\DoxyCodeLine{386     \textcolor{keywordflow}{return} (\textcolor{keyword}{false}) ;}
+\DoxyCodeLine{387   \}}
+\DoxyCodeLine{388 }
+\DoxyCodeLine{389   \textcolor{keywordflow}{if} (n\_row < 0)  \textcolor{comment}{/* n\_row must be >= 0 */}}
+\DoxyCodeLine{390   \{}
+\DoxyCodeLine{391     stats [Colamd::Status] = Colamd::ErrorNrowNegative ;}
+\DoxyCodeLine{392     stats [Colamd::Info1] = n\_row ;}
+\DoxyCodeLine{393     COLAMD\_DEBUG0 ((\textcolor{stringliteral}{"{}colamd: nrow negative \%d\(\backslash\)n"{}}, n\_row)) ;}
+\DoxyCodeLine{394     \textcolor{keywordflow}{return} (\textcolor{keyword}{false}) ;}
+\DoxyCodeLine{395   \}}
+\DoxyCodeLine{396 }
+\DoxyCodeLine{397   \textcolor{keywordflow}{if} (n\_col < 0)  \textcolor{comment}{/* n\_col must be >= 0 */}}
+\DoxyCodeLine{398   \{}
+\DoxyCodeLine{399     stats [Colamd::Status] = Colamd::ErrorNcolNegative ;}
+\DoxyCodeLine{400     stats [Colamd::Info1] = n\_col ;}
+\DoxyCodeLine{401     COLAMD\_DEBUG0 ((\textcolor{stringliteral}{"{}colamd: ncol negative \%d\(\backslash\)n"{}}, n\_col)) ;}
+\DoxyCodeLine{402     \textcolor{keywordflow}{return} (\textcolor{keyword}{false}) ;}
+\DoxyCodeLine{403   \}}
+\DoxyCodeLine{404 }
+\DoxyCodeLine{405   nnz = p [n\_col] ;}
+\DoxyCodeLine{406   \textcolor{keywordflow}{if} (nnz < 0)  \textcolor{comment}{/* nnz must be >= 0 */}}
+\DoxyCodeLine{407   \{}
+\DoxyCodeLine{408     stats [Colamd::Status] = Colamd::ErrorNnzNegative ;}
+\DoxyCodeLine{409     stats [Colamd::Info1] = nnz ;}
+\DoxyCodeLine{410     COLAMD\_DEBUG0 ((\textcolor{stringliteral}{"{}colamd: number of entries negative \%d\(\backslash\)n"{}}, nnz)) ;}
+\DoxyCodeLine{411     \textcolor{keywordflow}{return} (\textcolor{keyword}{false}) ;}
+\DoxyCodeLine{412   \}}
+\DoxyCodeLine{413 }
+\DoxyCodeLine{414   \textcolor{keywordflow}{if} (p [0] != 0)}
+\DoxyCodeLine{415   \{}
+\DoxyCodeLine{416     stats [Colamd::Status] = Colamd::ErrorP0Nonzero ;}
+\DoxyCodeLine{417     stats [Colamd::Info1] = p [0] ;}
+\DoxyCodeLine{418     COLAMD\_DEBUG0 ((\textcolor{stringliteral}{"{}colamd: p[0] not zero \%d\(\backslash\)n"{}}, p [0])) ;}
+\DoxyCodeLine{419     \textcolor{keywordflow}{return} (\textcolor{keyword}{false}) ;}
+\DoxyCodeLine{420   \}}
+\DoxyCodeLine{421 }
+\DoxyCodeLine{422   \textcolor{comment}{/* === If no knobs, set default knobs =================================== */}}
+\DoxyCodeLine{423 }
+\DoxyCodeLine{424   \textcolor{keywordflow}{if} (!knobs)}
+\DoxyCodeLine{425   \{}
+\DoxyCodeLine{426     set\_defaults (default\_knobs) ;}
+\DoxyCodeLine{427     knobs = default\_knobs ;}
+\DoxyCodeLine{428   \}}
+\DoxyCodeLine{429 }
+\DoxyCodeLine{430   \textcolor{comment}{/* === Allocate the Row and Col arrays from array A ===================== */}}
+\DoxyCodeLine{431 }
+\DoxyCodeLine{432   Col\_size = colamd\_c (n\_col) ;}
+\DoxyCodeLine{433   Row\_size = colamd\_r (n\_row) ;}
+\DoxyCodeLine{434   need = 2*nnz + n\_col + Col\_size + Row\_size ;}
+\DoxyCodeLine{435 }
+\DoxyCodeLine{436   \textcolor{keywordflow}{if} (need > Alen)}
+\DoxyCodeLine{437   \{}
+\DoxyCodeLine{438     \textcolor{comment}{/* not enough space in array A to perform the ordering */}}
+\DoxyCodeLine{439     stats [Colamd::Status] = Colamd::ErrorATooSmall ;}
+\DoxyCodeLine{440     stats [Colamd::Info1] = need ;}
+\DoxyCodeLine{441     stats [Colamd::Info2] = Alen ;}
+\DoxyCodeLine{442     COLAMD\_DEBUG0 ((\textcolor{stringliteral}{"{}colamd: Need Alen >= \%d, given only Alen = \%d\(\backslash\)n"{}}, need,Alen));}
+\DoxyCodeLine{443     \textcolor{keywordflow}{return} (\textcolor{keyword}{false}) ;}
+\DoxyCodeLine{444   \}}
+\DoxyCodeLine{445 }
+\DoxyCodeLine{446   Alen -\/= Col\_size + Row\_size ;}
+\DoxyCodeLine{447   Col = (ColStructure<IndexType> *) \&A [Alen] ;}
+\DoxyCodeLine{448   Row = (RowStructure<IndexType> *) \&A [Alen + Col\_size] ;}
+\DoxyCodeLine{449 }
+\DoxyCodeLine{450   \textcolor{comment}{/* === Construct the row and column data structures ===================== */}}
+\DoxyCodeLine{451 }
+\DoxyCodeLine{452   \textcolor{keywordflow}{if} (!Colamd::init\_rows\_cols (n\_row, n\_col, Row, Col, A, p, stats))}
+\DoxyCodeLine{453   \{}
+\DoxyCodeLine{454     \textcolor{comment}{/* input matrix is invalid */}}
+\DoxyCodeLine{455     COLAMD\_DEBUG0 ((\textcolor{stringliteral}{"{}colamd: Matrix invalid\(\backslash\)n"{}})) ;}
+\DoxyCodeLine{456     \textcolor{keywordflow}{return} (\textcolor{keyword}{false}) ;}
+\DoxyCodeLine{457   \}}
+\DoxyCodeLine{458 }
+\DoxyCodeLine{459   \textcolor{comment}{/* === Initialize scores, kill dense rows/columns ======================= */}}
+\DoxyCodeLine{460 }
+\DoxyCodeLine{461   Colamd::init\_scoring (n\_row, n\_col, Row, Col, A, p, knobs,}
+\DoxyCodeLine{462         \&n\_row2, \&n\_col2, \&max\_deg) ;}
+\DoxyCodeLine{463 }
+\DoxyCodeLine{464   \textcolor{comment}{/* === Order the supercolumns =========================================== */}}
+\DoxyCodeLine{465 }
+\DoxyCodeLine{466   ngarbage = Colamd::find\_ordering (n\_row, n\_col, Alen, Row, Col, A, p,}
+\DoxyCodeLine{467                 n\_col2, max\_deg, 2*nnz) ;}
+\DoxyCodeLine{468 }
+\DoxyCodeLine{469   \textcolor{comment}{/* === Order the non-\/principal columns ================================== */}}
+\DoxyCodeLine{470 }
+\DoxyCodeLine{471   Colamd::order\_children (n\_col, Col, p) ;}
+\DoxyCodeLine{472 }
+\DoxyCodeLine{473   \textcolor{comment}{/* === Return statistics in stats ======================================= */}}
+\DoxyCodeLine{474 }
+\DoxyCodeLine{475   stats [Colamd::DenseRow] = n\_row -\/ n\_row2 ;}
+\DoxyCodeLine{476   stats [Colamd::DenseCol] = n\_col -\/ n\_col2 ;}
+\DoxyCodeLine{477   stats [Colamd::DefragCount] = ngarbage ;}
+\DoxyCodeLine{478   COLAMD\_DEBUG0 ((\textcolor{stringliteral}{"{}colamd: done.\(\backslash\)n"{}})) ;}
+\DoxyCodeLine{479   \textcolor{keywordflow}{return} (\textcolor{keyword}{true}) ;}
+\DoxyCodeLine{480 \}}
+\DoxyCodeLine{481 }
+\DoxyCodeLine{482 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{483 \textcolor{comment}{/* === NON-\/USER-\/CALLABLE ROUTINES: ========================================== */}}
+\DoxyCodeLine{484 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{485 }
+\DoxyCodeLine{486 \textcolor{comment}{/* There are no user-\/callable routines beyond this point in the file */}}
+\DoxyCodeLine{487 }
+\DoxyCodeLine{488 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{489 \textcolor{comment}{/* === init\_rows\_cols ======================================================= */}}
+\DoxyCodeLine{490 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{491 }
+\DoxyCodeLine{492 \textcolor{comment}{/*}}
+\DoxyCodeLine{493 \textcolor{comment}{  Takes the column form of the matrix in A and creates the row form of the}}
+\DoxyCodeLine{494 \textcolor{comment}{  matrix.  Also, row and column attributes are stored in the Col and Row}}
+\DoxyCodeLine{495 \textcolor{comment}{  structs.  If the columns are un-\/sorted or contain duplicate row indices,}}
+\DoxyCodeLine{496 \textcolor{comment}{  this routine will also sort and remove duplicate row indices from the}}
+\DoxyCodeLine{497 \textcolor{comment}{  column form of the matrix.  Returns false if the matrix is invalid,}}
+\DoxyCodeLine{498 \textcolor{comment}{  true otherwise.  Not user-\/callable.}}
+\DoxyCodeLine{499 \textcolor{comment}{*/}}
+\DoxyCodeLine{500 \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{501 \textcolor{keyword}{static} IndexType init\_rows\_cols  \textcolor{comment}{/* returns true if OK, or false otherwise */}}
+\DoxyCodeLine{502   (}
+\DoxyCodeLine{503     \textcolor{comment}{/* === Parameters ======================================================= */}}
+\DoxyCodeLine{504 }
+\DoxyCodeLine{505     IndexType n\_row,      \textcolor{comment}{/* number of rows of A */}}
+\DoxyCodeLine{506     IndexType n\_col,      \textcolor{comment}{/* number of columns of A */}}
+\DoxyCodeLine{507     RowStructure<IndexType> Row [],    \textcolor{comment}{/* of size n\_row+1 */}}
+\DoxyCodeLine{508     ColStructure<IndexType> Col [],    \textcolor{comment}{/* of size n\_col+1 */}}
+\DoxyCodeLine{509     IndexType A [],     \textcolor{comment}{/* row indices of A, of size Alen */}}
+\DoxyCodeLine{510     IndexType p [],     \textcolor{comment}{/* pointers to columns in A, of size n\_col+1 */}}
+\DoxyCodeLine{511     IndexType stats [NStats]  \textcolor{comment}{/* colamd statistics */}}
+\DoxyCodeLine{512     )}
+\DoxyCodeLine{513 \{}
+\DoxyCodeLine{514   \textcolor{comment}{/* === Local variables ================================================== */}}
+\DoxyCodeLine{515 }
+\DoxyCodeLine{516   IndexType col ;     \textcolor{comment}{/* a column index */}}
+\DoxyCodeLine{517   IndexType row ;     \textcolor{comment}{/* a row index */}}
+\DoxyCodeLine{518   IndexType *cp ;     \textcolor{comment}{/* a column pointer */}}
+\DoxyCodeLine{519   IndexType *cp\_end ;   \textcolor{comment}{/* a pointer to the end of a column */}}
+\DoxyCodeLine{520   IndexType *rp ;     \textcolor{comment}{/* a row pointer */}}
+\DoxyCodeLine{521   IndexType *rp\_end ;   \textcolor{comment}{/* a pointer to the end of a row */}}
+\DoxyCodeLine{522   IndexType last\_row ;    \textcolor{comment}{/* previous row */}}
+\DoxyCodeLine{523 }
+\DoxyCodeLine{524   \textcolor{comment}{/* === Initialize columns, and check column pointers ==================== */}}
+\DoxyCodeLine{525 }
+\DoxyCodeLine{526   \textcolor{keywordflow}{for} (col = 0 ; col < n\_col ; col++)}
+\DoxyCodeLine{527   \{}
+\DoxyCodeLine{528     Col [col].start = p [col] ;}
+\DoxyCodeLine{529     Col [col].length = p [col+1] -\/ p [col] ;}
+\DoxyCodeLine{530 }
+\DoxyCodeLine{531     \textcolor{keywordflow}{if} ((Col [col].length) < 0) \textcolor{comment}{// extra parentheses to work-\/around gcc bug 10200}}
+\DoxyCodeLine{532     \{}
+\DoxyCodeLine{533       \textcolor{comment}{/* column pointers must be non-\/decreasing */}}
+\DoxyCodeLine{534       stats [Colamd::Status] = Colamd::ErrorColLengthNegative ;}
+\DoxyCodeLine{535       stats [Colamd::Info1] = col ;}
+\DoxyCodeLine{536       stats [Colamd::Info2] = Col [col].length ;}
+\DoxyCodeLine{537       COLAMD\_DEBUG0 ((\textcolor{stringliteral}{"{}colamd: col \%d length \%d < 0\(\backslash\)n"{}}, col, Col [col].length)) ;}
+\DoxyCodeLine{538       \textcolor{keywordflow}{return} (\textcolor{keyword}{false}) ;}
+\DoxyCodeLine{539     \}}
+\DoxyCodeLine{540 }
+\DoxyCodeLine{541     Col [col].shared1.thickness = 1 ;}
+\DoxyCodeLine{542     Col [col].shared2.score = 0 ;}
+\DoxyCodeLine{543     Col [col].shared3.prev = Empty ;}
+\DoxyCodeLine{544     Col [col].shared4.degree\_next = Empty ;}
+\DoxyCodeLine{545   \}}
+\DoxyCodeLine{546 }
+\DoxyCodeLine{547   \textcolor{comment}{/* p [0..n\_col] no longer needed, used as "{}head"{} in subsequent routines */}}
+\DoxyCodeLine{548 }
+\DoxyCodeLine{549   \textcolor{comment}{/* === Scan columns, compute row degrees, and check row indices ========= */}}
+\DoxyCodeLine{550 }
+\DoxyCodeLine{551   stats [Info3] = 0 ;  \textcolor{comment}{/* number of duplicate or unsorted row indices*/}}
+\DoxyCodeLine{552 }
+\DoxyCodeLine{553   \textcolor{keywordflow}{for} (row = 0 ; row < n\_row ; row++)}
+\DoxyCodeLine{554   \{}
+\DoxyCodeLine{555     Row [row].length = 0 ;}
+\DoxyCodeLine{556     Row [row].shared2.mark = -\/1 ;}
+\DoxyCodeLine{557   \}}
+\DoxyCodeLine{558 }
+\DoxyCodeLine{559   \textcolor{keywordflow}{for} (col = 0 ; col < n\_col ; col++)}
+\DoxyCodeLine{560   \{}
+\DoxyCodeLine{561     last\_row = -\/1 ;}
+\DoxyCodeLine{562 }
+\DoxyCodeLine{563     cp = \&A [p [col]] ;}
+\DoxyCodeLine{564     cp\_end = \&A [p [col+1]] ;}
+\DoxyCodeLine{565 }
+\DoxyCodeLine{566     \textcolor{keywordflow}{while} (cp < cp\_end)}
+\DoxyCodeLine{567     \{}
+\DoxyCodeLine{568       row = *cp++ ;}
+\DoxyCodeLine{569 }
+\DoxyCodeLine{570       \textcolor{comment}{/* make sure row indices within range */}}
+\DoxyCodeLine{571       \textcolor{keywordflow}{if} (row < 0 || row >= n\_row)}
+\DoxyCodeLine{572       \{}
+\DoxyCodeLine{573     stats [Colamd::Status] = Colamd::ErrorRowIndexOutOfBounds ;}
+\DoxyCodeLine{574     stats [Colamd::Info1] = col ;}
+\DoxyCodeLine{575     stats [Colamd::Info2] = row ;}
+\DoxyCodeLine{576     stats [Colamd::Info3] = n\_row ;}
+\DoxyCodeLine{577     COLAMD\_DEBUG0 ((\textcolor{stringliteral}{"{}colamd: row \%d col \%d out of bounds\(\backslash\)n"{}}, row, col)) ;}
+\DoxyCodeLine{578     \textcolor{keywordflow}{return} (\textcolor{keyword}{false}) ;}
+\DoxyCodeLine{579       \}}
+\DoxyCodeLine{580 }
+\DoxyCodeLine{581       \textcolor{keywordflow}{if} (row <= last\_row || Row [row].shared2.mark == col)}
+\DoxyCodeLine{582       \{}
+\DoxyCodeLine{583     \textcolor{comment}{/* row index are unsorted or repeated (or both), thus col */}}
+\DoxyCodeLine{584     \textcolor{comment}{/* is jumbled.  This is a notice, not an error condition. */}}
+\DoxyCodeLine{585     stats [Colamd::Status] = Colamd::OkButJumbled ;}
+\DoxyCodeLine{586     stats [Colamd::Info1] = col ;}
+\DoxyCodeLine{587     stats [Colamd::Info2] = row ;}
+\DoxyCodeLine{588     (stats [Colamd::Info3]) ++ ;}
+\DoxyCodeLine{589     COLAMD\_DEBUG1 ((\textcolor{stringliteral}{"{}colamd: row \%d col \%d unsorted/duplicate\(\backslash\)n"{}},row,col));}
+\DoxyCodeLine{590       \}}
+\DoxyCodeLine{591 }
+\DoxyCodeLine{592       \textcolor{keywordflow}{if} (Row [row].shared2.mark != col)}
+\DoxyCodeLine{593       \{}
+\DoxyCodeLine{594     Row [row].length++ ;}
+\DoxyCodeLine{595       \}}
+\DoxyCodeLine{596       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{597       \{}
+\DoxyCodeLine{598     \textcolor{comment}{/* this is a repeated entry in the column, */}}
+\DoxyCodeLine{599     \textcolor{comment}{/* it will be removed */}}
+\DoxyCodeLine{600     Col [col].length-\/-\/ ;}
+\DoxyCodeLine{601       \}}
+\DoxyCodeLine{602 }
+\DoxyCodeLine{603       \textcolor{comment}{/* mark the row as having been seen in this column */}}
+\DoxyCodeLine{604       Row [row].shared2.mark = col ;}
+\DoxyCodeLine{605 }
+\DoxyCodeLine{606       last\_row = row ;}
+\DoxyCodeLine{607     \}}
+\DoxyCodeLine{608   \}}
+\DoxyCodeLine{609 }
+\DoxyCodeLine{610   \textcolor{comment}{/* === Compute row pointers ============================================= */}}
+\DoxyCodeLine{611 }
+\DoxyCodeLine{612   \textcolor{comment}{/* row form of the matrix starts directly after the column */}}
+\DoxyCodeLine{613   \textcolor{comment}{/* form of matrix in A */}}
+\DoxyCodeLine{614   Row [0].start = p [n\_col] ;}
+\DoxyCodeLine{615   Row [0].shared1.p = Row [0].start ;}
+\DoxyCodeLine{616   Row [0].shared2.mark = -\/1 ;}
+\DoxyCodeLine{617   \textcolor{keywordflow}{for} (row = 1 ; row < n\_row ; row++)}
+\DoxyCodeLine{618   \{}
+\DoxyCodeLine{619     Row [row].start = Row [row-\/1].start + Row [row-\/1].length ;}
+\DoxyCodeLine{620     Row [row].shared1.p = Row [row].start ;}
+\DoxyCodeLine{621     Row [row].shared2.mark = -\/1 ;}
+\DoxyCodeLine{622   \}}
+\DoxyCodeLine{623 }
+\DoxyCodeLine{624   \textcolor{comment}{/* === Create row form ================================================== */}}
+\DoxyCodeLine{625 }
+\DoxyCodeLine{626   \textcolor{keywordflow}{if} (stats [Status] == OkButJumbled)}
+\DoxyCodeLine{627   \{}
+\DoxyCodeLine{628     \textcolor{comment}{/* if cols jumbled, watch for repeated row indices */}}
+\DoxyCodeLine{629     \textcolor{keywordflow}{for} (col = 0 ; col < n\_col ; col++)}
+\DoxyCodeLine{630     \{}
+\DoxyCodeLine{631       cp = \&A [p [col]] ;}
+\DoxyCodeLine{632       cp\_end = \&A [p [col+1]] ;}
+\DoxyCodeLine{633       \textcolor{keywordflow}{while} (cp < cp\_end)}
+\DoxyCodeLine{634       \{}
+\DoxyCodeLine{635     row = *cp++ ;}
+\DoxyCodeLine{636     \textcolor{keywordflow}{if} (Row [row].shared2.mark != col)}
+\DoxyCodeLine{637     \{}
+\DoxyCodeLine{638       A [(Row [row].shared1.p)++] = col ;}
+\DoxyCodeLine{639       Row [row].shared2.mark = col ;}
+\DoxyCodeLine{640     \}}
+\DoxyCodeLine{641       \}}
+\DoxyCodeLine{642     \}}
+\DoxyCodeLine{643   \}}
+\DoxyCodeLine{644   \textcolor{keywordflow}{else}}
+\DoxyCodeLine{645   \{}
+\DoxyCodeLine{646     \textcolor{comment}{/* if cols not jumbled, we don't need the mark (this is faster) */}}
+\DoxyCodeLine{647     \textcolor{keywordflow}{for} (col = 0 ; col < n\_col ; col++)}
+\DoxyCodeLine{648     \{}
+\DoxyCodeLine{649       cp = \&A [p [col]] ;}
+\DoxyCodeLine{650       cp\_end = \&A [p [col+1]] ;}
+\DoxyCodeLine{651       \textcolor{keywordflow}{while} (cp < cp\_end)}
+\DoxyCodeLine{652       \{}
+\DoxyCodeLine{653     A [(Row [*cp++].shared1.p)++] = col ;}
+\DoxyCodeLine{654       \}}
+\DoxyCodeLine{655     \}}
+\DoxyCodeLine{656   \}}
+\DoxyCodeLine{657 }
+\DoxyCodeLine{658   \textcolor{comment}{/* === Clear the row marks and set row degrees ========================== */}}
+\DoxyCodeLine{659 }
+\DoxyCodeLine{660   \textcolor{keywordflow}{for} (row = 0 ; row < n\_row ; row++)}
+\DoxyCodeLine{661   \{}
+\DoxyCodeLine{662     Row [row].shared2.mark = 0 ;}
+\DoxyCodeLine{663     Row [row].shared1.degree = Row [row].length ;}
+\DoxyCodeLine{664   \}}
+\DoxyCodeLine{665 }
+\DoxyCodeLine{666   \textcolor{comment}{/* === See if we need to re-\/create columns ============================== */}}
+\DoxyCodeLine{667 }
+\DoxyCodeLine{668   \textcolor{keywordflow}{if} (stats [Status] == OkButJumbled)}
+\DoxyCodeLine{669   \{}
+\DoxyCodeLine{670     COLAMD\_DEBUG0 ((\textcolor{stringliteral}{"{}colamd: reconstructing column form, matrix jumbled\(\backslash\)n"{}})) ;}
+\DoxyCodeLine{671 }
+\DoxyCodeLine{672 }
+\DoxyCodeLine{673     \textcolor{comment}{/* === Compute col pointers ========================================= */}}
+\DoxyCodeLine{674 }
+\DoxyCodeLine{675     \textcolor{comment}{/* col form of the matrix starts at A [0]. */}}
+\DoxyCodeLine{676     \textcolor{comment}{/* Note, we may have a gap between the col form and the row */}}
+\DoxyCodeLine{677     \textcolor{comment}{/* form if there were duplicate entries, if so, it will be */}}
+\DoxyCodeLine{678     \textcolor{comment}{/* removed upon the first garbage collection */}}
+\DoxyCodeLine{679     Col [0].start = 0 ;}
+\DoxyCodeLine{680     p [0] = Col [0].start ;}
+\DoxyCodeLine{681     \textcolor{keywordflow}{for} (col = 1 ; col < n\_col ; col++)}
+\DoxyCodeLine{682     \{}
+\DoxyCodeLine{683       \textcolor{comment}{/* note that the lengths here are for pruned columns, i.e. */}}
+\DoxyCodeLine{684       \textcolor{comment}{/* no duplicate row indices will exist for these columns */}}
+\DoxyCodeLine{685       Col [col].start = Col [col-\/1].start + Col [col-\/1].length ;}
+\DoxyCodeLine{686       p [col] = Col [col].start ;}
+\DoxyCodeLine{687     \}}
+\DoxyCodeLine{688 }
+\DoxyCodeLine{689     \textcolor{comment}{/* === Re-\/create col form =========================================== */}}
+\DoxyCodeLine{690 }
+\DoxyCodeLine{691     \textcolor{keywordflow}{for} (row = 0 ; row < n\_row ; row++)}
+\DoxyCodeLine{692     \{}
+\DoxyCodeLine{693       rp = \&A [Row [row].start] ;}
+\DoxyCodeLine{694       rp\_end = rp + Row [row].length ;}
+\DoxyCodeLine{695       \textcolor{keywordflow}{while} (rp < rp\_end)}
+\DoxyCodeLine{696       \{}
+\DoxyCodeLine{697     A [(p [*rp++])++] = row ;}
+\DoxyCodeLine{698       \}}
+\DoxyCodeLine{699     \}}
+\DoxyCodeLine{700   \}}
+\DoxyCodeLine{701 }
+\DoxyCodeLine{702   \textcolor{comment}{/* === Done.  Matrix is not (or no longer) jumbled ====================== */}}
+\DoxyCodeLine{703 }
+\DoxyCodeLine{704   \textcolor{keywordflow}{return} (\textcolor{keyword}{true}) ;}
+\DoxyCodeLine{705 \}}
+\DoxyCodeLine{706 }
+\DoxyCodeLine{707 }
+\DoxyCodeLine{708 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{709 \textcolor{comment}{/* === init\_scoring ========================================================= */}}
+\DoxyCodeLine{710 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{711 }
+\DoxyCodeLine{712 \textcolor{comment}{/*}}
+\DoxyCodeLine{713 \textcolor{comment}{  Kills dense or empty columns and rows, calculates an initial score for}}
+\DoxyCodeLine{714 \textcolor{comment}{  each column, and places all columns in the degree lists.  Not user-\/callable.}}
+\DoxyCodeLine{715 \textcolor{comment}{*/}}
+\DoxyCodeLine{716 \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{717 \textcolor{keyword}{static} \textcolor{keywordtype}{void} init\_scoring}
+\DoxyCodeLine{718   (}
+\DoxyCodeLine{719     \textcolor{comment}{/* === Parameters ======================================================= */}}
+\DoxyCodeLine{720 }
+\DoxyCodeLine{721     IndexType n\_row,      \textcolor{comment}{/* number of rows of A */}}
+\DoxyCodeLine{722     IndexType n\_col,      \textcolor{comment}{/* number of columns of A */}}
+\DoxyCodeLine{723     RowStructure<IndexType> Row [],    \textcolor{comment}{/* of size n\_row+1 */}}
+\DoxyCodeLine{724     ColStructure<IndexType> Col [],    \textcolor{comment}{/* of size n\_col+1 */}}
+\DoxyCodeLine{725     IndexType A [],     \textcolor{comment}{/* column form and row form of A */}}
+\DoxyCodeLine{726     IndexType head [],    \textcolor{comment}{/* of size n\_col+1 */}}
+\DoxyCodeLine{727     \textcolor{keywordtype}{double} knobs [NKnobs],\textcolor{comment}{/* parameters */}}
+\DoxyCodeLine{728     IndexType *p\_n\_row2,    \textcolor{comment}{/* number of non-\/dense, non-\/empty rows */}}
+\DoxyCodeLine{729     IndexType *p\_n\_col2,    \textcolor{comment}{/* number of non-\/dense, non-\/empty columns */}}
+\DoxyCodeLine{730     IndexType *p\_max\_deg    \textcolor{comment}{/* maximum row degree */}}
+\DoxyCodeLine{731     )}
+\DoxyCodeLine{732 \{}
+\DoxyCodeLine{733   \textcolor{comment}{/* === Local variables ================================================== */}}
+\DoxyCodeLine{734 }
+\DoxyCodeLine{735   IndexType c ;     \textcolor{comment}{/* a column index */}}
+\DoxyCodeLine{736   IndexType r, row ;    \textcolor{comment}{/* a row index */}}
+\DoxyCodeLine{737   IndexType *cp ;     \textcolor{comment}{/* a column pointer */}}
+\DoxyCodeLine{738   IndexType deg ;     \textcolor{comment}{/* degree of a row or column */}}
+\DoxyCodeLine{739   IndexType *cp\_end ;   \textcolor{comment}{/* a pointer to the end of a column */}}
+\DoxyCodeLine{740   IndexType *new\_cp ;   \textcolor{comment}{/* new column pointer */}}
+\DoxyCodeLine{741   IndexType col\_length ;    \textcolor{comment}{/* length of pruned column */}}
+\DoxyCodeLine{742   IndexType score ;     \textcolor{comment}{/* current column score */}}
+\DoxyCodeLine{743   IndexType n\_col2 ;    \textcolor{comment}{/* number of non-\/dense, non-\/empty columns */}}
+\DoxyCodeLine{744   IndexType n\_row2 ;    \textcolor{comment}{/* number of non-\/dense, non-\/empty rows */}}
+\DoxyCodeLine{745   IndexType dense\_row\_count ; \textcolor{comment}{/* remove rows with more entries than this */}}
+\DoxyCodeLine{746   IndexType dense\_col\_count ; \textcolor{comment}{/* remove cols with more entries than this */}}
+\DoxyCodeLine{747   IndexType min\_score ;   \textcolor{comment}{/* smallest column score */}}
+\DoxyCodeLine{748   IndexType max\_deg ;   \textcolor{comment}{/* maximum row degree */}}
+\DoxyCodeLine{749   IndexType next\_col ;    \textcolor{comment}{/* Used to add to degree list.*/}}
+\DoxyCodeLine{750 }
+\DoxyCodeLine{751 }
+\DoxyCodeLine{752   \textcolor{comment}{/* === Extract knobs ==================================================== */}}
+\DoxyCodeLine{753 }
+\DoxyCodeLine{754   dense\_row\_count = numext::maxi(IndexType(0), numext::mini(IndexType(knobs [Colamd::DenseRow] * n\_col), n\_col)) ;}
+\DoxyCodeLine{755   dense\_col\_count = numext::maxi(IndexType(0), numext::mini(IndexType(knobs [Colamd::DenseCol] * n\_row), n\_row)) ;}
+\DoxyCodeLine{756   COLAMD\_DEBUG1 ((\textcolor{stringliteral}{"{}colamd: densecount: \%d \%d\(\backslash\)n"{}}, dense\_row\_count, dense\_col\_count)) ;}
+\DoxyCodeLine{757   max\_deg = 0 ;}
+\DoxyCodeLine{758   n\_col2 = n\_col ;}
+\DoxyCodeLine{759   n\_row2 = n\_row ;}
+\DoxyCodeLine{760 }
+\DoxyCodeLine{761   \textcolor{comment}{/* === Kill empty columns =============================================== */}}
+\DoxyCodeLine{762 }
+\DoxyCodeLine{763   \textcolor{comment}{/* Put the empty columns at the end in their natural order, so that LU */}}
+\DoxyCodeLine{764   \textcolor{comment}{/* factorization can proceed as far as possible. */}}
+\DoxyCodeLine{765   \textcolor{keywordflow}{for} (c = n\_col-\/1 ; c >= 0 ; c-\/-\/)}
+\DoxyCodeLine{766   \{}
+\DoxyCodeLine{767     deg = Col [c].length ;}
+\DoxyCodeLine{768     \textcolor{keywordflow}{if} (deg == 0)}
+\DoxyCodeLine{769     \{}
+\DoxyCodeLine{770       \textcolor{comment}{/* this is a empty column, kill and order it last */}}
+\DoxyCodeLine{771       Col [c].shared2.order = -\/-\/n\_col2 ;}
+\DoxyCodeLine{772       Col[c].kill\_principal() ;}
+\DoxyCodeLine{773     \}}
+\DoxyCodeLine{774   \}}
+\DoxyCodeLine{775   COLAMD\_DEBUG1 ((\textcolor{stringliteral}{"{}colamd: null columns killed: \%d\(\backslash\)n"{}}, n\_col -\/ n\_col2)) ;}
+\DoxyCodeLine{776 }
+\DoxyCodeLine{777   \textcolor{comment}{/* === Kill dense columns =============================================== */}}
+\DoxyCodeLine{778 }
+\DoxyCodeLine{779   \textcolor{comment}{/* Put the dense columns at the end, in their natural order */}}
+\DoxyCodeLine{780   \textcolor{keywordflow}{for} (c = n\_col-\/1 ; c >= 0 ; c-\/-\/)}
+\DoxyCodeLine{781   \{}
+\DoxyCodeLine{782     \textcolor{comment}{/* skip any dead columns */}}
+\DoxyCodeLine{783     \textcolor{keywordflow}{if} (Col[c].is\_dead())}
+\DoxyCodeLine{784     \{}
+\DoxyCodeLine{785       continue ;}
+\DoxyCodeLine{786     \}}
+\DoxyCodeLine{787     deg = Col [c].length ;}
+\DoxyCodeLine{788     \textcolor{keywordflow}{if} (deg > dense\_col\_count)}
+\DoxyCodeLine{789     \{}
+\DoxyCodeLine{790       \textcolor{comment}{/* this is a dense column, kill and order it last */}}
+\DoxyCodeLine{791       Col [c].shared2.order = -\/-\/n\_col2 ;}
+\DoxyCodeLine{792       \textcolor{comment}{/* decrement the row degrees */}}
+\DoxyCodeLine{793       cp = \&A [Col [c].start] ;}
+\DoxyCodeLine{794       cp\_end = cp + Col [c].length ;}
+\DoxyCodeLine{795       \textcolor{keywordflow}{while} (cp < cp\_end)}
+\DoxyCodeLine{796       \{}
+\DoxyCodeLine{797     Row [*cp++].shared1.degree-\/-\/ ;}
+\DoxyCodeLine{798       \}}
+\DoxyCodeLine{799       Col[c].kill\_principal() ;}
+\DoxyCodeLine{800     \}}
+\DoxyCodeLine{801   \}}
+\DoxyCodeLine{802   COLAMD\_DEBUG1 ((\textcolor{stringliteral}{"{}colamd: Dense and null columns killed: \%d\(\backslash\)n"{}}, n\_col -\/ n\_col2)) ;}
+\DoxyCodeLine{803 }
+\DoxyCodeLine{804   \textcolor{comment}{/* === Kill dense and empty rows ======================================== */}}
+\DoxyCodeLine{805 }
+\DoxyCodeLine{806   \textcolor{keywordflow}{for} (r = 0 ; r < n\_row ; r++)}
+\DoxyCodeLine{807   \{}
+\DoxyCodeLine{808     deg = Row [r].shared1.degree ;}
+\DoxyCodeLine{809     COLAMD\_ASSERT (deg >= 0 \&\& deg <= n\_col) ;}
+\DoxyCodeLine{810     \textcolor{keywordflow}{if} (deg > dense\_row\_count || deg == 0)}
+\DoxyCodeLine{811     \{}
+\DoxyCodeLine{812       \textcolor{comment}{/* kill a dense or empty row */}}
+\DoxyCodeLine{813       Row[r].kill() ;}
+\DoxyCodeLine{814       -\/-\/n\_row2 ;}
+\DoxyCodeLine{815     \}}
+\DoxyCodeLine{816     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{817     \{}
+\DoxyCodeLine{818       \textcolor{comment}{/* keep track of max degree of remaining rows */}}
+\DoxyCodeLine{819       max\_deg = numext::maxi(max\_deg, deg) ;}
+\DoxyCodeLine{820     \}}
+\DoxyCodeLine{821   \}}
+\DoxyCodeLine{822   COLAMD\_DEBUG1 ((\textcolor{stringliteral}{"{}colamd: Dense and null rows killed: \%d\(\backslash\)n"{}}, n\_row -\/ n\_row2)) ;}
+\DoxyCodeLine{823 }
+\DoxyCodeLine{824   \textcolor{comment}{/* === Compute initial column scores ==================================== */}}
+\DoxyCodeLine{825 }
+\DoxyCodeLine{826   \textcolor{comment}{/* At this point the row degrees are accurate.  They reflect the number */}}
+\DoxyCodeLine{827   \textcolor{comment}{/* of "{}live"{} (non-\/dense) columns in each row.  No empty rows exist. */}}
+\DoxyCodeLine{828   \textcolor{comment}{/* Some "{}live"{} columns may contain only dead rows, however.  These are */}}
+\DoxyCodeLine{829   \textcolor{comment}{/* pruned in the code below. */}}
+\DoxyCodeLine{830 }
+\DoxyCodeLine{831   \textcolor{comment}{/* now find the initial matlab score for each column */}}
+\DoxyCodeLine{832   \textcolor{keywordflow}{for} (c = n\_col-\/1 ; c >= 0 ; c-\/-\/)}
+\DoxyCodeLine{833   \{}
+\DoxyCodeLine{834     \textcolor{comment}{/* skip dead column */}}
+\DoxyCodeLine{835     \textcolor{keywordflow}{if} (Col[c].is\_dead())}
+\DoxyCodeLine{836     \{}
+\DoxyCodeLine{837       continue ;}
+\DoxyCodeLine{838     \}}
+\DoxyCodeLine{839     score = 0 ;}
+\DoxyCodeLine{840     cp = \&A [Col [c].start] ;}
+\DoxyCodeLine{841     new\_cp = cp ;}
+\DoxyCodeLine{842     cp\_end = cp + Col [c].length ;}
+\DoxyCodeLine{843     \textcolor{keywordflow}{while} (cp < cp\_end)}
+\DoxyCodeLine{844     \{}
+\DoxyCodeLine{845       \textcolor{comment}{/* get a row */}}
+\DoxyCodeLine{846       row = *cp++ ;}
+\DoxyCodeLine{847       \textcolor{comment}{/* skip if dead */}}
+\DoxyCodeLine{848       \textcolor{keywordflow}{if} (Row[row].is\_dead())}
+\DoxyCodeLine{849       \{}
+\DoxyCodeLine{850     continue ;}
+\DoxyCodeLine{851       \}}
+\DoxyCodeLine{852       \textcolor{comment}{/* compact the column */}}
+\DoxyCodeLine{853       *new\_cp++ = row ;}
+\DoxyCodeLine{854       \textcolor{comment}{/* add row's external degree */}}
+\DoxyCodeLine{855       score += Row [row].shared1.degree -\/ 1 ;}
+\DoxyCodeLine{856       \textcolor{comment}{/* guard against integer overflow */}}
+\DoxyCodeLine{857       score = numext::mini(score, n\_col) ;}
+\DoxyCodeLine{858     \}}
+\DoxyCodeLine{859     \textcolor{comment}{/* determine pruned column length */}}
+\DoxyCodeLine{860     col\_length = (IndexType) (new\_cp -\/ \&A [Col [c].start]) ;}
+\DoxyCodeLine{861     \textcolor{keywordflow}{if} (col\_length == 0)}
+\DoxyCodeLine{862     \{}
+\DoxyCodeLine{863       \textcolor{comment}{/* a newly-\/made null column (all rows in this col are "{}dense"{} */}}
+\DoxyCodeLine{864       \textcolor{comment}{/* and have already been killed) */}}
+\DoxyCodeLine{865       COLAMD\_DEBUG2 ((\textcolor{stringliteral}{"{}Newly null killed: \%d\(\backslash\)n"{}}, c)) ;}
+\DoxyCodeLine{866       Col [c].shared2.order = -\/-\/n\_col2 ;}
+\DoxyCodeLine{867       Col[c].kill\_principal() ;}
+\DoxyCodeLine{868     \}}
+\DoxyCodeLine{869     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{870     \{}
+\DoxyCodeLine{871       \textcolor{comment}{/* set column length and set score */}}
+\DoxyCodeLine{872       COLAMD\_ASSERT (score >= 0) ;}
+\DoxyCodeLine{873       COLAMD\_ASSERT (score <= n\_col) ;}
+\DoxyCodeLine{874       Col [c].length = col\_length ;}
+\DoxyCodeLine{875       Col [c].shared2.score = score ;}
+\DoxyCodeLine{876     \}}
+\DoxyCodeLine{877   \}}
+\DoxyCodeLine{878   COLAMD\_DEBUG1 ((\textcolor{stringliteral}{"{}colamd: Dense, null, and newly-\/null columns killed: \%d\(\backslash\)n"{}},}
+\DoxyCodeLine{879           n\_col-\/n\_col2)) ;}
+\DoxyCodeLine{880 }
+\DoxyCodeLine{881   \textcolor{comment}{/* At this point, all empty rows and columns are dead.  All live columns */}}
+\DoxyCodeLine{882   \textcolor{comment}{/* are "{}clean"{} (containing no dead rows) and simplicial (no supercolumns */}}
+\DoxyCodeLine{883   \textcolor{comment}{/* yet).  Rows may contain dead columns, but all live rows contain at */}}
+\DoxyCodeLine{884   \textcolor{comment}{/* least one live column. */}}
+\DoxyCodeLine{885 }
+\DoxyCodeLine{886   \textcolor{comment}{/* === Initialize degree lists ========================================== */}}
+\DoxyCodeLine{887 }
+\DoxyCodeLine{888 }
+\DoxyCodeLine{889   \textcolor{comment}{/* clear the hash buckets */}}
+\DoxyCodeLine{890   \textcolor{keywordflow}{for} (c = 0 ; c <= n\_col ; c++)}
+\DoxyCodeLine{891   \{}
+\DoxyCodeLine{892     head [c] = Empty ;}
+\DoxyCodeLine{893   \}}
+\DoxyCodeLine{894   min\_score = n\_col ;}
+\DoxyCodeLine{895   \textcolor{comment}{/* place in reverse order, so low column indices are at the front */}}
+\DoxyCodeLine{896   \textcolor{comment}{/* of the lists.  This is to encourage natural tie-\/breaking */}}
+\DoxyCodeLine{897   \textcolor{keywordflow}{for} (c = n\_col-\/1 ; c >= 0 ; c-\/-\/)}
+\DoxyCodeLine{898   \{}
+\DoxyCodeLine{899     \textcolor{comment}{/* only add principal columns to degree lists */}}
+\DoxyCodeLine{900     \textcolor{keywordflow}{if} (Col[c].is\_alive())}
+\DoxyCodeLine{901     \{}
+\DoxyCodeLine{902       COLAMD\_DEBUG4 ((\textcolor{stringliteral}{"{}place \%d score \%d minscore \%d ncol \%d\(\backslash\)n"{}},}
+\DoxyCodeLine{903               c, Col [c].shared2.score, min\_score, n\_col)) ;}
+\DoxyCodeLine{904 }
+\DoxyCodeLine{905       \textcolor{comment}{/* === Add columns score to DList =============================== */}}
+\DoxyCodeLine{906 }
+\DoxyCodeLine{907       score = Col [c].shared2.score ;}
+\DoxyCodeLine{908 }
+\DoxyCodeLine{909       COLAMD\_ASSERT (min\_score >= 0) ;}
+\DoxyCodeLine{910       COLAMD\_ASSERT (min\_score <= n\_col) ;}
+\DoxyCodeLine{911       COLAMD\_ASSERT (score >= 0) ;}
+\DoxyCodeLine{912       COLAMD\_ASSERT (score <= n\_col) ;}
+\DoxyCodeLine{913       COLAMD\_ASSERT (head [score] >= Empty) ;}
+\DoxyCodeLine{914 }
+\DoxyCodeLine{915       \textcolor{comment}{/* now add this column to dList at proper score location */}}
+\DoxyCodeLine{916       next\_col = head [score] ;}
+\DoxyCodeLine{917       Col [c].shared3.prev = Empty ;}
+\DoxyCodeLine{918       Col [c].shared4.degree\_next = next\_col ;}
+\DoxyCodeLine{919 }
+\DoxyCodeLine{920       \textcolor{comment}{/* if there already was a column with the same score, set its */}}
+\DoxyCodeLine{921       \textcolor{comment}{/* previous pointer to this new column */}}
+\DoxyCodeLine{922       \textcolor{keywordflow}{if} (next\_col != Empty)}
+\DoxyCodeLine{923       \{}
+\DoxyCodeLine{924     Col [next\_col].shared3.prev = c ;}
+\DoxyCodeLine{925       \}}
+\DoxyCodeLine{926       head [score] = c ;}
+\DoxyCodeLine{927 }
+\DoxyCodeLine{928       \textcolor{comment}{/* see if this score is less than current min */}}
+\DoxyCodeLine{929       min\_score = numext::mini(min\_score, score) ;}
+\DoxyCodeLine{930 }
+\DoxyCodeLine{931 }
+\DoxyCodeLine{932     \}}
+\DoxyCodeLine{933   \}}
+\DoxyCodeLine{934 }
+\DoxyCodeLine{935 }
+\DoxyCodeLine{936   \textcolor{comment}{/* === Return number of remaining columns, and max row degree =========== */}}
+\DoxyCodeLine{937 }
+\DoxyCodeLine{938   *p\_n\_col2 = n\_col2 ;}
+\DoxyCodeLine{939   *p\_n\_row2 = n\_row2 ;}
+\DoxyCodeLine{940   *p\_max\_deg = max\_deg ;}
+\DoxyCodeLine{941 \}}
+\DoxyCodeLine{942 }
+\DoxyCodeLine{943 }
+\DoxyCodeLine{944 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{945 \textcolor{comment}{/* === find\_ordering ======================================================== */}}
+\DoxyCodeLine{946 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{947 }
+\DoxyCodeLine{948 \textcolor{comment}{/*}}
+\DoxyCodeLine{949 \textcolor{comment}{  Order the principal columns of the supercolumn form of the matrix}}
+\DoxyCodeLine{950 \textcolor{comment}{  (no supercolumns on input).  Uses a minimum approximate column minimum}}
+\DoxyCodeLine{951 \textcolor{comment}{  degree ordering method.  Not user-\/callable.}}
+\DoxyCodeLine{952 \textcolor{comment}{*/}}
+\DoxyCodeLine{953 \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{954 \textcolor{keyword}{static} IndexType find\_ordering \textcolor{comment}{/* return the number of garbage collections */}}
+\DoxyCodeLine{955   (}
+\DoxyCodeLine{956     \textcolor{comment}{/* === Parameters ======================================================= */}}
+\DoxyCodeLine{957 }
+\DoxyCodeLine{958     IndexType n\_row,      \textcolor{comment}{/* number of rows of A */}}
+\DoxyCodeLine{959     IndexType n\_col,      \textcolor{comment}{/* number of columns of A */}}
+\DoxyCodeLine{960     IndexType Alen,     \textcolor{comment}{/* size of A, 2*nnz + n\_col or larger */}}
+\DoxyCodeLine{961     RowStructure<IndexType> Row [],    \textcolor{comment}{/* of size n\_row+1 */}}
+\DoxyCodeLine{962     ColStructure<IndexType> Col [],    \textcolor{comment}{/* of size n\_col+1 */}}
+\DoxyCodeLine{963     IndexType A [],     \textcolor{comment}{/* column form and row form of A */}}
+\DoxyCodeLine{964     IndexType head [],    \textcolor{comment}{/* of size n\_col+1 */}}
+\DoxyCodeLine{965     IndexType n\_col2,     \textcolor{comment}{/* Remaining columns to order */}}
+\DoxyCodeLine{966     IndexType max\_deg,    \textcolor{comment}{/* Maximum row degree */}}
+\DoxyCodeLine{967     IndexType pfree     \textcolor{comment}{/* index of first free slot (2*nnz on entry) */}}
+\DoxyCodeLine{968     )}
+\DoxyCodeLine{969 \{}
+\DoxyCodeLine{970   \textcolor{comment}{/* === Local variables ================================================== */}}
+\DoxyCodeLine{971 }
+\DoxyCodeLine{972   IndexType k ;     \textcolor{comment}{/* current pivot ordering step */}}
+\DoxyCodeLine{973   IndexType pivot\_col ;   \textcolor{comment}{/* current pivot column */}}
+\DoxyCodeLine{974   IndexType *cp ;     \textcolor{comment}{/* a column pointer */}}
+\DoxyCodeLine{975   IndexType *rp ;     \textcolor{comment}{/* a row pointer */}}
+\DoxyCodeLine{976   IndexType pivot\_row ;   \textcolor{comment}{/* current pivot row */}}
+\DoxyCodeLine{977   IndexType *new\_cp ;   \textcolor{comment}{/* modified column pointer */}}
+\DoxyCodeLine{978   IndexType *new\_rp ;   \textcolor{comment}{/* modified row pointer */}}
+\DoxyCodeLine{979   IndexType pivot\_row\_start ; \textcolor{comment}{/* pointer to start of pivot row */}}
+\DoxyCodeLine{980   IndexType pivot\_row\_degree ;  \textcolor{comment}{/* number of columns in pivot row */}}
+\DoxyCodeLine{981   IndexType pivot\_row\_length ;  \textcolor{comment}{/* number of supercolumns in pivot row */}}
+\DoxyCodeLine{982   IndexType pivot\_col\_score ; \textcolor{comment}{/* score of pivot column */}}
+\DoxyCodeLine{983   IndexType needed\_memory ;   \textcolor{comment}{/* free space needed for pivot row */}}
+\DoxyCodeLine{984   IndexType *cp\_end ;   \textcolor{comment}{/* pointer to the end of a column */}}
+\DoxyCodeLine{985   IndexType *rp\_end ;   \textcolor{comment}{/* pointer to the end of a row */}}
+\DoxyCodeLine{986   IndexType row ;     \textcolor{comment}{/* a row index */}}
+\DoxyCodeLine{987   IndexType col ;     \textcolor{comment}{/* a column index */}}
+\DoxyCodeLine{988   IndexType max\_score ;   \textcolor{comment}{/* maximum possible score */}}
+\DoxyCodeLine{989   IndexType cur\_score ;   \textcolor{comment}{/* score of current column */}}
+\DoxyCodeLine{990   \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} hash ;   \textcolor{comment}{/* hash value for supernode detection */}}
+\DoxyCodeLine{991   IndexType head\_column ;   \textcolor{comment}{/* head of hash bucket */}}
+\DoxyCodeLine{992   IndexType first\_col ;   \textcolor{comment}{/* first column in hash bucket */}}
+\DoxyCodeLine{993   IndexType tag\_mark ;    \textcolor{comment}{/* marker value for mark array */}}
+\DoxyCodeLine{994   IndexType row\_mark ;    \textcolor{comment}{/* Row [row].shared2.mark */}}
+\DoxyCodeLine{995   IndexType set\_difference ;  \textcolor{comment}{/* set difference size of row with pivot row */}}
+\DoxyCodeLine{996   IndexType min\_score ;   \textcolor{comment}{/* smallest column score */}}
+\DoxyCodeLine{997   IndexType col\_thickness ;   \textcolor{comment}{/* "{}thickness"{} (no. of columns in a supercol) */}}
+\DoxyCodeLine{998   IndexType max\_mark ;    \textcolor{comment}{/* maximum value of tag\_mark */}}
+\DoxyCodeLine{999   IndexType pivot\_col\_thickness ; \textcolor{comment}{/* number of columns represented by pivot col */}}
+\DoxyCodeLine{1000   IndexType prev\_col ;    \textcolor{comment}{/* Used by Dlist operations. */}}
+\DoxyCodeLine{1001   IndexType next\_col ;    \textcolor{comment}{/* Used by Dlist operations. */}}
+\DoxyCodeLine{1002   IndexType ngarbage ;    \textcolor{comment}{/* number of garbage collections performed */}}
+\DoxyCodeLine{1003 }
+\DoxyCodeLine{1004 }
+\DoxyCodeLine{1005   \textcolor{comment}{/* === Initialization and clear mark ==================================== */}}
+\DoxyCodeLine{1006 }
+\DoxyCodeLine{1007   max\_mark = INT\_MAX -\/ n\_col ;  \textcolor{comment}{/* INT\_MAX defined in <limits.h> */}}
+\DoxyCodeLine{1008   tag\_mark = Colamd::clear\_mark (n\_row, Row) ;}
+\DoxyCodeLine{1009   min\_score = 0 ;}
+\DoxyCodeLine{1010   ngarbage = 0 ;}
+\DoxyCodeLine{1011   COLAMD\_DEBUG1 ((\textcolor{stringliteral}{"{}colamd: Ordering, n\_col2=\%d\(\backslash\)n"{}}, n\_col2)) ;}
+\DoxyCodeLine{1012 }
+\DoxyCodeLine{1013   \textcolor{comment}{/* === Order the columns ================================================ */}}
+\DoxyCodeLine{1014 }
+\DoxyCodeLine{1015   \textcolor{keywordflow}{for} (k = 0 ; k < n\_col2 ; \textcolor{comment}{/* 'k' is incremented below */})}
+\DoxyCodeLine{1016   \{}
+\DoxyCodeLine{1017 }
+\DoxyCodeLine{1018     \textcolor{comment}{/* === Select pivot column, and order it ============================ */}}
+\DoxyCodeLine{1019 }
+\DoxyCodeLine{1020     \textcolor{comment}{/* make sure degree list isn't empty */}}
+\DoxyCodeLine{1021     COLAMD\_ASSERT (min\_score >= 0) ;}
+\DoxyCodeLine{1022     COLAMD\_ASSERT (min\_score <= n\_col) ;}
+\DoxyCodeLine{1023     COLAMD\_ASSERT (head [min\_score] >= Empty) ;}
+\DoxyCodeLine{1024 }
+\DoxyCodeLine{1025     \textcolor{comment}{/* get pivot column from head of minimum degree list */}}
+\DoxyCodeLine{1026     \textcolor{keywordflow}{while} (min\_score < n\_col \&\& head [min\_score] == Empty)}
+\DoxyCodeLine{1027     \{}
+\DoxyCodeLine{1028       min\_score++ ;}
+\DoxyCodeLine{1029     \}}
+\DoxyCodeLine{1030     pivot\_col = head [min\_score] ;}
+\DoxyCodeLine{1031     COLAMD\_ASSERT (pivot\_col >= 0 \&\& pivot\_col <= n\_col) ;}
+\DoxyCodeLine{1032     next\_col = Col [pivot\_col].shared4.degree\_next ;}
+\DoxyCodeLine{1033     head [min\_score] = next\_col ;}
+\DoxyCodeLine{1034     \textcolor{keywordflow}{if} (next\_col != Empty)}
+\DoxyCodeLine{1035     \{}
+\DoxyCodeLine{1036       Col [next\_col].shared3.prev = Empty ;}
+\DoxyCodeLine{1037     \}}
+\DoxyCodeLine{1038 }
+\DoxyCodeLine{1039     COLAMD\_ASSERT (Col[pivot\_col].is\_alive()) ;}
+\DoxyCodeLine{1040     COLAMD\_DEBUG3 ((\textcolor{stringliteral}{"{}Pivot col: \%d\(\backslash\)n"{}}, pivot\_col)) ;}
+\DoxyCodeLine{1041 }
+\DoxyCodeLine{1042     \textcolor{comment}{/* remember score for defrag check */}}
+\DoxyCodeLine{1043     pivot\_col\_score = Col [pivot\_col].shared2.score ;}
+\DoxyCodeLine{1044 }
+\DoxyCodeLine{1045     \textcolor{comment}{/* the pivot column is the kth column in the pivot order */}}
+\DoxyCodeLine{1046     Col [pivot\_col].shared2.order = k ;}
+\DoxyCodeLine{1047 }
+\DoxyCodeLine{1048     \textcolor{comment}{/* increment order count by column thickness */}}
+\DoxyCodeLine{1049     pivot\_col\_thickness = Col [pivot\_col].shared1.thickness ;}
+\DoxyCodeLine{1050     k += pivot\_col\_thickness ;}
+\DoxyCodeLine{1051     COLAMD\_ASSERT (pivot\_col\_thickness > 0) ;}
+\DoxyCodeLine{1052 }
+\DoxyCodeLine{1053     \textcolor{comment}{/* === Garbage\_collection, if necessary ============================= */}}
+\DoxyCodeLine{1054 }
+\DoxyCodeLine{1055     needed\_memory = numext::mini(pivot\_col\_score, n\_col -\/ k) ;}
+\DoxyCodeLine{1056     \textcolor{keywordflow}{if} (pfree + needed\_memory >= Alen)}
+\DoxyCodeLine{1057     \{}
+\DoxyCodeLine{1058       pfree = Colamd::garbage\_collection (n\_row, n\_col, Row, Col, A, \&A [pfree]) ;}
+\DoxyCodeLine{1059       ngarbage++ ;}
+\DoxyCodeLine{1060       \textcolor{comment}{/* after garbage collection we will have enough */}}
+\DoxyCodeLine{1061       COLAMD\_ASSERT (pfree + needed\_memory < Alen) ;}
+\DoxyCodeLine{1062       \textcolor{comment}{/* garbage collection has wiped out the Row[].shared2.mark array */}}
+\DoxyCodeLine{1063       tag\_mark = Colamd::clear\_mark (n\_row, Row) ;}
+\DoxyCodeLine{1064 }
+\DoxyCodeLine{1065     \}}
+\DoxyCodeLine{1066 }
+\DoxyCodeLine{1067     \textcolor{comment}{/* === Compute pivot row pattern ==================================== */}}
+\DoxyCodeLine{1068 }
+\DoxyCodeLine{1069     \textcolor{comment}{/* get starting location for this new merged row */}}
+\DoxyCodeLine{1070     pivot\_row\_start = pfree ;}
+\DoxyCodeLine{1071 }
+\DoxyCodeLine{1072     \textcolor{comment}{/* initialize new row counts to zero */}}
+\DoxyCodeLine{1073     pivot\_row\_degree = 0 ;}
+\DoxyCodeLine{1074 }
+\DoxyCodeLine{1075     \textcolor{comment}{/* tag pivot column as having been visited so it isn't included */}}
+\DoxyCodeLine{1076     \textcolor{comment}{/* in merged pivot row */}}
+\DoxyCodeLine{1077     Col [pivot\_col].shared1.thickness = -\/pivot\_col\_thickness ;}
+\DoxyCodeLine{1078 }
+\DoxyCodeLine{1079     \textcolor{comment}{/* pivot row is the union of all rows in the pivot column pattern */}}
+\DoxyCodeLine{1080     cp = \&A [Col [pivot\_col].start] ;}
+\DoxyCodeLine{1081     cp\_end = cp + Col [pivot\_col].length ;}
+\DoxyCodeLine{1082     \textcolor{keywordflow}{while} (cp < cp\_end)}
+\DoxyCodeLine{1083     \{}
+\DoxyCodeLine{1084       \textcolor{comment}{/* get a row */}}
+\DoxyCodeLine{1085       row = *cp++ ;}
+\DoxyCodeLine{1086       COLAMD\_DEBUG4 ((\textcolor{stringliteral}{"{}Pivot col pattern \%d \%d\(\backslash\)n"{}}, Row[row].is\_alive(), row)) ;}
+\DoxyCodeLine{1087       \textcolor{comment}{/* skip if row is dead */}}
+\DoxyCodeLine{1088       \textcolor{keywordflow}{if} (Row[row].is\_dead())}
+\DoxyCodeLine{1089       \{}
+\DoxyCodeLine{1090     continue ;}
+\DoxyCodeLine{1091       \}}
+\DoxyCodeLine{1092       rp = \&A [Row [row].start] ;}
+\DoxyCodeLine{1093       rp\_end = rp + Row [row].length ;}
+\DoxyCodeLine{1094       \textcolor{keywordflow}{while} (rp < rp\_end)}
+\DoxyCodeLine{1095       \{}
+\DoxyCodeLine{1096     \textcolor{comment}{/* get a column */}}
+\DoxyCodeLine{1097     col = *rp++ ;}
+\DoxyCodeLine{1098     \textcolor{comment}{/* add the column, if alive and untagged */}}
+\DoxyCodeLine{1099     col\_thickness = Col [col].shared1.thickness ;}
+\DoxyCodeLine{1100     \textcolor{keywordflow}{if} (col\_thickness > 0 \&\& Col[col].is\_alive())}
+\DoxyCodeLine{1101     \{}
+\DoxyCodeLine{1102       \textcolor{comment}{/* tag column in pivot row */}}
+\DoxyCodeLine{1103       Col [col].shared1.thickness = -\/col\_thickness ;}
+\DoxyCodeLine{1104       COLAMD\_ASSERT (pfree < Alen) ;}
+\DoxyCodeLine{1105       \textcolor{comment}{/* place column in pivot row */}}
+\DoxyCodeLine{1106       A [pfree++] = col ;}
+\DoxyCodeLine{1107       pivot\_row\_degree += col\_thickness ;}
+\DoxyCodeLine{1108     \}}
+\DoxyCodeLine{1109       \}}
+\DoxyCodeLine{1110     \}}
+\DoxyCodeLine{1111 }
+\DoxyCodeLine{1112     \textcolor{comment}{/* clear tag on pivot column */}}
+\DoxyCodeLine{1113     Col [pivot\_col].shared1.thickness = pivot\_col\_thickness ;}
+\DoxyCodeLine{1114     max\_deg = numext::maxi(max\_deg, pivot\_row\_degree) ;}
+\DoxyCodeLine{1115 }
+\DoxyCodeLine{1116 }
+\DoxyCodeLine{1117     \textcolor{comment}{/* === Kill all rows used to construct pivot row ==================== */}}
+\DoxyCodeLine{1118 }
+\DoxyCodeLine{1119     \textcolor{comment}{/* also kill pivot row, temporarily */}}
+\DoxyCodeLine{1120     cp = \&A [Col [pivot\_col].start] ;}
+\DoxyCodeLine{1121     cp\_end = cp + Col [pivot\_col].length ;}
+\DoxyCodeLine{1122     \textcolor{keywordflow}{while} (cp < cp\_end)}
+\DoxyCodeLine{1123     \{}
+\DoxyCodeLine{1124       \textcolor{comment}{/* may be killing an already dead row */}}
+\DoxyCodeLine{1125       row = *cp++ ;}
+\DoxyCodeLine{1126       COLAMD\_DEBUG3 ((\textcolor{stringliteral}{"{}Kill row in pivot col: \%d\(\backslash\)n"{}}, row)) ;}
+\DoxyCodeLine{1127       Row[row].kill() ;}
+\DoxyCodeLine{1128     \}}
+\DoxyCodeLine{1129 }
+\DoxyCodeLine{1130     \textcolor{comment}{/* === Select a row index to use as the new pivot row =============== */}}
+\DoxyCodeLine{1131 }
+\DoxyCodeLine{1132     pivot\_row\_length = pfree -\/ pivot\_row\_start ;}
+\DoxyCodeLine{1133     \textcolor{keywordflow}{if} (pivot\_row\_length > 0)}
+\DoxyCodeLine{1134     \{}
+\DoxyCodeLine{1135       \textcolor{comment}{/* pick the "{}pivot"{} row arbitrarily (first row in col) */}}
+\DoxyCodeLine{1136       pivot\_row = A [Col [pivot\_col].start] ;}
+\DoxyCodeLine{1137       COLAMD\_DEBUG3 ((\textcolor{stringliteral}{"{}Pivotal row is \%d\(\backslash\)n"{}}, pivot\_row)) ;}
+\DoxyCodeLine{1138     \}}
+\DoxyCodeLine{1139     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{1140     \{}
+\DoxyCodeLine{1141       \textcolor{comment}{/* there is no pivot row, since it is of zero length */}}
+\DoxyCodeLine{1142       pivot\_row = Empty ;}
+\DoxyCodeLine{1143       COLAMD\_ASSERT (pivot\_row\_length == 0) ;}
+\DoxyCodeLine{1144     \}}
+\DoxyCodeLine{1145     COLAMD\_ASSERT (Col [pivot\_col].length > 0 || pivot\_row\_length == 0) ;}
+\DoxyCodeLine{1146 }
+\DoxyCodeLine{1147     \textcolor{comment}{/* === Approximate degree computation =============================== */}}
+\DoxyCodeLine{1148 }
+\DoxyCodeLine{1149     \textcolor{comment}{/* Here begins the computation of the approximate degree.  The column */}}
+\DoxyCodeLine{1150     \textcolor{comment}{/* score is the sum of the pivot row "{}length"{}, plus the size of the */}}
+\DoxyCodeLine{1151     \textcolor{comment}{/* set differences of each row in the column minus the pattern of the */}}
+\DoxyCodeLine{1152     \textcolor{comment}{/* pivot row itself.  The column ("{}thickness"{}) itself is also */}}
+\DoxyCodeLine{1153     \textcolor{comment}{/* excluded from the column score (we thus use an approximate */}}
+\DoxyCodeLine{1154     \textcolor{comment}{/* external degree). */}}
+\DoxyCodeLine{1155 }
+\DoxyCodeLine{1156     \textcolor{comment}{/* The time taken by the following code (compute set differences, and */}}
+\DoxyCodeLine{1157     \textcolor{comment}{/* add them up) is proportional to the size of the data structure */}}
+\DoxyCodeLine{1158     \textcolor{comment}{/* being scanned -\/ that is, the sum of the sizes of each column in */}}
+\DoxyCodeLine{1159     \textcolor{comment}{/* the pivot row.  Thus, the amortized time to compute a column score */}}
+\DoxyCodeLine{1160     \textcolor{comment}{/* is proportional to the size of that column (where size, in this */}}
+\DoxyCodeLine{1161     \textcolor{comment}{/* context, is the column "{}length"{}, or the number of row indices */}}
+\DoxyCodeLine{1162     \textcolor{comment}{/* in that column).  The number of row indices in a column is */}}
+\DoxyCodeLine{1163     \textcolor{comment}{/* monotonically non-\/decreasing, from the length of the original */}}
+\DoxyCodeLine{1164     \textcolor{comment}{/* column on input to colamd. */}}
+\DoxyCodeLine{1165 }
+\DoxyCodeLine{1166     \textcolor{comment}{/* === Compute set differences ====================================== */}}
+\DoxyCodeLine{1167 }
+\DoxyCodeLine{1168     COLAMD\_DEBUG3 ((\textcolor{stringliteral}{"{}** Computing set differences phase. **\(\backslash\)n"{}})) ;}
+\DoxyCodeLine{1169 }
+\DoxyCodeLine{1170     \textcolor{comment}{/* pivot row is currently dead -\/ it will be revived later. */}}
+\DoxyCodeLine{1171 }
+\DoxyCodeLine{1172     COLAMD\_DEBUG3 ((\textcolor{stringliteral}{"{}Pivot row: "{}})) ;}
+\DoxyCodeLine{1173     \textcolor{comment}{/* for each column in pivot row */}}
+\DoxyCodeLine{1174     rp = \&A [pivot\_row\_start] ;}
+\DoxyCodeLine{1175     rp\_end = rp + pivot\_row\_length ;}
+\DoxyCodeLine{1176     \textcolor{keywordflow}{while} (rp < rp\_end)}
+\DoxyCodeLine{1177     \{}
+\DoxyCodeLine{1178       col = *rp++ ;}
+\DoxyCodeLine{1179       COLAMD\_ASSERT (Col[col].is\_alive() \&\& col != pivot\_col) ;}
+\DoxyCodeLine{1180       COLAMD\_DEBUG3 ((\textcolor{stringliteral}{"{}Col: \%d\(\backslash\)n"{}}, col)) ;}
+\DoxyCodeLine{1181 }
+\DoxyCodeLine{1182       \textcolor{comment}{/* clear tags used to construct pivot row pattern */}}
+\DoxyCodeLine{1183       col\_thickness = -\/Col [col].shared1.thickness ;}
+\DoxyCodeLine{1184       COLAMD\_ASSERT (col\_thickness > 0) ;}
+\DoxyCodeLine{1185       Col [col].shared1.thickness = col\_thickness ;}
+\DoxyCodeLine{1186 }
+\DoxyCodeLine{1187       \textcolor{comment}{/* === Remove column from degree list =========================== */}}
+\DoxyCodeLine{1188 }
+\DoxyCodeLine{1189       cur\_score = Col [col].shared2.score ;}
+\DoxyCodeLine{1190       prev\_col = Col [col].shared3.prev ;}
+\DoxyCodeLine{1191       next\_col = Col [col].shared4.degree\_next ;}
+\DoxyCodeLine{1192       COLAMD\_ASSERT (cur\_score >= 0) ;}
+\DoxyCodeLine{1193       COLAMD\_ASSERT (cur\_score <= n\_col) ;}
+\DoxyCodeLine{1194       COLAMD\_ASSERT (cur\_score >= Empty) ;}
+\DoxyCodeLine{1195       \textcolor{keywordflow}{if} (prev\_col == Empty)}
+\DoxyCodeLine{1196       \{}
+\DoxyCodeLine{1197     head [cur\_score] = next\_col ;}
+\DoxyCodeLine{1198       \}}
+\DoxyCodeLine{1199       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{1200       \{}
+\DoxyCodeLine{1201     Col [prev\_col].shared4.degree\_next = next\_col ;}
+\DoxyCodeLine{1202       \}}
+\DoxyCodeLine{1203       \textcolor{keywordflow}{if} (next\_col != Empty)}
+\DoxyCodeLine{1204       \{}
+\DoxyCodeLine{1205     Col [next\_col].shared3.prev = prev\_col ;}
+\DoxyCodeLine{1206       \}}
+\DoxyCodeLine{1207 }
+\DoxyCodeLine{1208       \textcolor{comment}{/* === Scan the column ========================================== */}}
+\DoxyCodeLine{1209 }
+\DoxyCodeLine{1210       cp = \&A [Col [col].start] ;}
+\DoxyCodeLine{1211       cp\_end = cp + Col [col].length ;}
+\DoxyCodeLine{1212       \textcolor{keywordflow}{while} (cp < cp\_end)}
+\DoxyCodeLine{1213       \{}
+\DoxyCodeLine{1214     \textcolor{comment}{/* get a row */}}
+\DoxyCodeLine{1215     row = *cp++ ;}
+\DoxyCodeLine{1216     \textcolor{comment}{/* skip if dead */}}
+\DoxyCodeLine{1217     \textcolor{keywordflow}{if} (Row[row].is\_dead())}
+\DoxyCodeLine{1218     \{}
+\DoxyCodeLine{1219       continue ;}
+\DoxyCodeLine{1220     \}}
+\DoxyCodeLine{1221   row\_mark = Row [row].shared2.mark ;}
+\DoxyCodeLine{1222     COLAMD\_ASSERT (row != pivot\_row) ;}
+\DoxyCodeLine{1223     set\_difference = row\_mark -\/ tag\_mark ;}
+\DoxyCodeLine{1224     \textcolor{comment}{/* check if the row has been seen yet */}}
+\DoxyCodeLine{1225     \textcolor{keywordflow}{if} (set\_difference < 0)}
+\DoxyCodeLine{1226     \{}
+\DoxyCodeLine{1227       COLAMD\_ASSERT (Row [row].shared1.degree <= max\_deg) ;}
+\DoxyCodeLine{1228       set\_difference = Row [row].shared1.degree ;}
+\DoxyCodeLine{1229     \}}
+\DoxyCodeLine{1230     \textcolor{comment}{/* subtract column thickness from this row's set difference */}}
+\DoxyCodeLine{1231     set\_difference -\/= col\_thickness ;}
+\DoxyCodeLine{1232     COLAMD\_ASSERT (set\_difference >= 0) ;}
+\DoxyCodeLine{1233     \textcolor{comment}{/* absorb this row if the set difference becomes zero */}}
+\DoxyCodeLine{1234     \textcolor{keywordflow}{if} (set\_difference == 0)}
+\DoxyCodeLine{1235     \{}
+\DoxyCodeLine{1236       COLAMD\_DEBUG3 ((\textcolor{stringliteral}{"{}aggressive absorption. Row: \%d\(\backslash\)n"{}}, row)) ;}
+\DoxyCodeLine{1237       Row[row].kill() ;}
+\DoxyCodeLine{1238     \}}
+\DoxyCodeLine{1239     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{1240     \{}
+\DoxyCodeLine{1241       \textcolor{comment}{/* save the new mark */}}
+\DoxyCodeLine{1242       Row [row].shared2.mark = set\_difference + tag\_mark ;}
+\DoxyCodeLine{1243     \}}
+\DoxyCodeLine{1244       \}}
+\DoxyCodeLine{1245     \}}
+\DoxyCodeLine{1246 }
+\DoxyCodeLine{1247 }
+\DoxyCodeLine{1248     \textcolor{comment}{/* === Add up set differences for each column ======================= */}}
+\DoxyCodeLine{1249 }
+\DoxyCodeLine{1250     COLAMD\_DEBUG3 ((\textcolor{stringliteral}{"{}** Adding set differences phase. **\(\backslash\)n"{}})) ;}
+\DoxyCodeLine{1251 }
+\DoxyCodeLine{1252     \textcolor{comment}{/* for each column in pivot row */}}
+\DoxyCodeLine{1253     rp = \&A [pivot\_row\_start] ;}
+\DoxyCodeLine{1254     rp\_end = rp + pivot\_row\_length ;}
+\DoxyCodeLine{1255     \textcolor{keywordflow}{while} (rp < rp\_end)}
+\DoxyCodeLine{1256     \{}
+\DoxyCodeLine{1257       \textcolor{comment}{/* get a column */}}
+\DoxyCodeLine{1258       col = *rp++ ;}
+\DoxyCodeLine{1259       COLAMD\_ASSERT (Col[col].is\_alive() \&\& col != pivot\_col) ;}
+\DoxyCodeLine{1260       hash = 0 ;}
+\DoxyCodeLine{1261       cur\_score = 0 ;}
+\DoxyCodeLine{1262       cp = \&A [Col [col].start] ;}
+\DoxyCodeLine{1263       \textcolor{comment}{/* compact the column */}}
+\DoxyCodeLine{1264       new\_cp = cp ;}
+\DoxyCodeLine{1265       cp\_end = cp + Col [col].length ;}
+\DoxyCodeLine{1266 }
+\DoxyCodeLine{1267       COLAMD\_DEBUG4 ((\textcolor{stringliteral}{"{}Adding set diffs for Col: \%d.\(\backslash\)n"{}}, col)) ;}
+\DoxyCodeLine{1268 }
+\DoxyCodeLine{1269       \textcolor{keywordflow}{while} (cp < cp\_end)}
+\DoxyCodeLine{1270       \{}
+\DoxyCodeLine{1271     \textcolor{comment}{/* get a row */}}
+\DoxyCodeLine{1272     row = *cp++ ;}
+\DoxyCodeLine{1273     COLAMD\_ASSERT(row >= 0 \&\& row < n\_row) ;}
+\DoxyCodeLine{1274     \textcolor{comment}{/* skip if dead */}}
+\DoxyCodeLine{1275     \textcolor{keywordflow}{if} (Row [row].is\_dead())}
+\DoxyCodeLine{1276     \{}
+\DoxyCodeLine{1277       continue ;}
+\DoxyCodeLine{1278     \}}
+\DoxyCodeLine{1279   row\_mark = Row [row].shared2.mark ;}
+\DoxyCodeLine{1280     COLAMD\_ASSERT (row\_mark > tag\_mark) ;}
+\DoxyCodeLine{1281     \textcolor{comment}{/* compact the column */}}
+\DoxyCodeLine{1282     *new\_cp++ = row ;}
+\DoxyCodeLine{1283     \textcolor{comment}{/* compute hash function */}}
+\DoxyCodeLine{1284     hash += row ;}
+\DoxyCodeLine{1285     \textcolor{comment}{/* add set difference */}}
+\DoxyCodeLine{1286     cur\_score += row\_mark -\/ tag\_mark ;}
+\DoxyCodeLine{1287     \textcolor{comment}{/* integer overflow... */}}
+\DoxyCodeLine{1288     cur\_score = numext::mini(cur\_score, n\_col) ;}
+\DoxyCodeLine{1289       \}}
+\DoxyCodeLine{1290 }
+\DoxyCodeLine{1291       \textcolor{comment}{/* recompute the column's length */}}
+\DoxyCodeLine{1292       Col [col].length = (IndexType) (new\_cp -\/ \&A [Col [col].start]) ;}
+\DoxyCodeLine{1293 }
+\DoxyCodeLine{1294       \textcolor{comment}{/* === Further mass elimination ================================= */}}
+\DoxyCodeLine{1295 }
+\DoxyCodeLine{1296       \textcolor{keywordflow}{if} (Col [col].length == 0)}
+\DoxyCodeLine{1297       \{}
+\DoxyCodeLine{1298     COLAMD\_DEBUG4 ((\textcolor{stringliteral}{"{}further mass elimination. Col: \%d\(\backslash\)n"{}}, col)) ;}
+\DoxyCodeLine{1299     \textcolor{comment}{/* nothing left but the pivot row in this column */}}
+\DoxyCodeLine{1300     Col[col].kill\_principal() ;}
+\DoxyCodeLine{1301     pivot\_row\_degree -\/= Col [col].shared1.thickness ;}
+\DoxyCodeLine{1302     COLAMD\_ASSERT (pivot\_row\_degree >= 0) ;}
+\DoxyCodeLine{1303     \textcolor{comment}{/* order it */}}
+\DoxyCodeLine{1304     Col [col].shared2.order = k ;}
+\DoxyCodeLine{1305     \textcolor{comment}{/* increment order count by column thickness */}}
+\DoxyCodeLine{1306     k += Col [col].shared1.thickness ;}
+\DoxyCodeLine{1307       \}}
+\DoxyCodeLine{1308       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{1309       \{}
+\DoxyCodeLine{1310     \textcolor{comment}{/* === Prepare for supercolumn detection ==================== */}}
+\DoxyCodeLine{1311 }
+\DoxyCodeLine{1312     COLAMD\_DEBUG4 ((\textcolor{stringliteral}{"{}Preparing supercol detection for Col: \%d.\(\backslash\)n"{}}, col)) ;}
+\DoxyCodeLine{1313 }
+\DoxyCodeLine{1314     \textcolor{comment}{/* save score so far */}}
+\DoxyCodeLine{1315     Col [col].shared2.score = cur\_score ;}
+\DoxyCodeLine{1316 }
+\DoxyCodeLine{1317     \textcolor{comment}{/* add column to hash table, for supercolumn detection */}}
+\DoxyCodeLine{1318     hash \%= n\_col + 1 ;}
+\DoxyCodeLine{1319 }
+\DoxyCodeLine{1320     COLAMD\_DEBUG4 ((\textcolor{stringliteral}{"{} Hash = \%d, n\_col = \%d.\(\backslash\)n"{}}, hash, n\_col)) ;}
+\DoxyCodeLine{1321     COLAMD\_ASSERT (hash <= n\_col) ;}
+\DoxyCodeLine{1322 }
+\DoxyCodeLine{1323     head\_column = head [hash] ;}
+\DoxyCodeLine{1324     \textcolor{keywordflow}{if} (head\_column > Empty)}
+\DoxyCodeLine{1325     \{}
+\DoxyCodeLine{1326       \textcolor{comment}{/* degree list "{}hash"{} is non-\/empty, use prev (shared3) of */}}
+\DoxyCodeLine{1327       \textcolor{comment}{/* first column in degree list as head of hash bucket */}}
+\DoxyCodeLine{1328       first\_col = Col [head\_column].shared3.headhash ;}
+\DoxyCodeLine{1329       Col [head\_column].shared3.headhash = col ;}
+\DoxyCodeLine{1330     \}}
+\DoxyCodeLine{1331     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{1332     \{}
+\DoxyCodeLine{1333       \textcolor{comment}{/* degree list "{}hash"{} is empty, use head as hash bucket */}}
+\DoxyCodeLine{1334       first\_col = -\/ (head\_column + 2) ;}
+\DoxyCodeLine{1335       head [hash] = -\/ (col + 2) ;}
+\DoxyCodeLine{1336     \}}
+\DoxyCodeLine{1337     Col [col].shared4.hash\_next = first\_col ;}
+\DoxyCodeLine{1338 }
+\DoxyCodeLine{1339     \textcolor{comment}{/* save hash function in Col [col].shared3.hash */}}
+\DoxyCodeLine{1340     Col [col].shared3.hash = (IndexType) hash ;}
+\DoxyCodeLine{1341     COLAMD\_ASSERT (Col[col].is\_alive()) ;}
+\DoxyCodeLine{1342       \}}
+\DoxyCodeLine{1343     \}}
+\DoxyCodeLine{1344 }
+\DoxyCodeLine{1345     \textcolor{comment}{/* The approximate external column degree is now computed.  */}}
+\DoxyCodeLine{1346 }
+\DoxyCodeLine{1347     \textcolor{comment}{/* === Supercolumn detection ======================================== */}}
+\DoxyCodeLine{1348 }
+\DoxyCodeLine{1349     COLAMD\_DEBUG3 ((\textcolor{stringliteral}{"{}** Supercolumn detection phase. **\(\backslash\)n"{}})) ;}
+\DoxyCodeLine{1350 }
+\DoxyCodeLine{1351     Colamd::detect\_super\_cols (Col, A, head, pivot\_row\_start, pivot\_row\_length) ;}
+\DoxyCodeLine{1352 }
+\DoxyCodeLine{1353     \textcolor{comment}{/* === Kill the pivotal column ====================================== */}}
+\DoxyCodeLine{1354 }
+\DoxyCodeLine{1355     Col[pivot\_col].kill\_principal() ;}
+\DoxyCodeLine{1356 }
+\DoxyCodeLine{1357     \textcolor{comment}{/* === Clear mark =================================================== */}}
+\DoxyCodeLine{1358 }
+\DoxyCodeLine{1359     tag\_mark += (max\_deg + 1) ;}
+\DoxyCodeLine{1360     \textcolor{keywordflow}{if} (tag\_mark >= max\_mark)}
+\DoxyCodeLine{1361     \{}
+\DoxyCodeLine{1362       COLAMD\_DEBUG2 ((\textcolor{stringliteral}{"{}clearing tag\_mark\(\backslash\)n"{}})) ;}
+\DoxyCodeLine{1363       tag\_mark = Colamd::clear\_mark (n\_row, Row) ;}
+\DoxyCodeLine{1364     \}}
+\DoxyCodeLine{1365 }
+\DoxyCodeLine{1366     \textcolor{comment}{/* === Finalize the new pivot row, and column scores ================ */}}
+\DoxyCodeLine{1367 }
+\DoxyCodeLine{1368     COLAMD\_DEBUG3 ((\textcolor{stringliteral}{"{}** Finalize scores phase. **\(\backslash\)n"{}})) ;}
+\DoxyCodeLine{1369 }
+\DoxyCodeLine{1370     \textcolor{comment}{/* for each column in pivot row */}}
+\DoxyCodeLine{1371     rp = \&A [pivot\_row\_start] ;}
+\DoxyCodeLine{1372     \textcolor{comment}{/* compact the pivot row */}}
+\DoxyCodeLine{1373     new\_rp = rp ;}
+\DoxyCodeLine{1374     rp\_end = rp + pivot\_row\_length ;}
+\DoxyCodeLine{1375     \textcolor{keywordflow}{while} (rp < rp\_end)}
+\DoxyCodeLine{1376     \{}
+\DoxyCodeLine{1377       col = *rp++ ;}
+\DoxyCodeLine{1378       \textcolor{comment}{/* skip dead columns */}}
+\DoxyCodeLine{1379       \textcolor{keywordflow}{if} (Col[col].is\_dead())}
+\DoxyCodeLine{1380       \{}
+\DoxyCodeLine{1381     continue ;}
+\DoxyCodeLine{1382       \}}
+\DoxyCodeLine{1383       *new\_rp++ = col ;}
+\DoxyCodeLine{1384       \textcolor{comment}{/* add new pivot row to column */}}
+\DoxyCodeLine{1385       A [Col [col].start + (Col [col].length++)] = pivot\_row ;}
+\DoxyCodeLine{1386 }
+\DoxyCodeLine{1387       \textcolor{comment}{/* retrieve score so far and add on pivot row's degree. */}}
+\DoxyCodeLine{1388       \textcolor{comment}{/* (we wait until here for this in case the pivot */}}
+\DoxyCodeLine{1389       \textcolor{comment}{/* row's degree was reduced due to mass elimination). */}}
+\DoxyCodeLine{1390       cur\_score = Col [col].shared2.score + pivot\_row\_degree ;}
+\DoxyCodeLine{1391 }
+\DoxyCodeLine{1392       \textcolor{comment}{/* calculate the max possible score as the number of */}}
+\DoxyCodeLine{1393       \textcolor{comment}{/* external columns minus the 'k' value minus the */}}
+\DoxyCodeLine{1394       \textcolor{comment}{/* columns thickness */}}
+\DoxyCodeLine{1395       max\_score = n\_col -\/ k -\/ Col [col].shared1.thickness ;}
+\DoxyCodeLine{1396 }
+\DoxyCodeLine{1397       \textcolor{comment}{/* make the score the external degree of the union-\/of-\/rows */}}
+\DoxyCodeLine{1398       cur\_score -\/= Col [col].shared1.thickness ;}
+\DoxyCodeLine{1399 }
+\DoxyCodeLine{1400       \textcolor{comment}{/* make sure score is less or equal than the max score */}}
+\DoxyCodeLine{1401       cur\_score = numext::mini(cur\_score, max\_score) ;}
+\DoxyCodeLine{1402       COLAMD\_ASSERT (cur\_score >= 0) ;}
+\DoxyCodeLine{1403 }
+\DoxyCodeLine{1404       \textcolor{comment}{/* store updated score */}}
+\DoxyCodeLine{1405       Col [col].shared2.score = cur\_score ;}
+\DoxyCodeLine{1406 }
+\DoxyCodeLine{1407       \textcolor{comment}{/* === Place column back in degree list ========================= */}}
+\DoxyCodeLine{1408 }
+\DoxyCodeLine{1409       COLAMD\_ASSERT (min\_score >= 0) ;}
+\DoxyCodeLine{1410       COLAMD\_ASSERT (min\_score <= n\_col) ;}
+\DoxyCodeLine{1411       COLAMD\_ASSERT (cur\_score >= 0) ;}
+\DoxyCodeLine{1412       COLAMD\_ASSERT (cur\_score <= n\_col) ;}
+\DoxyCodeLine{1413       COLAMD\_ASSERT (head [cur\_score] >= Empty) ;}
+\DoxyCodeLine{1414       next\_col = head [cur\_score] ;}
+\DoxyCodeLine{1415       Col [col].shared4.degree\_next = next\_col ;}
+\DoxyCodeLine{1416       Col [col].shared3.prev = Empty ;}
+\DoxyCodeLine{1417       \textcolor{keywordflow}{if} (next\_col != Empty)}
+\DoxyCodeLine{1418       \{}
+\DoxyCodeLine{1419     Col [next\_col].shared3.prev = col ;}
+\DoxyCodeLine{1420       \}}
+\DoxyCodeLine{1421       head [cur\_score] = col ;}
+\DoxyCodeLine{1422 }
+\DoxyCodeLine{1423       \textcolor{comment}{/* see if this score is less than current min */}}
+\DoxyCodeLine{1424       min\_score = numext::mini(min\_score, cur\_score) ;}
+\DoxyCodeLine{1425 }
+\DoxyCodeLine{1426     \}}
+\DoxyCodeLine{1427 }
+\DoxyCodeLine{1428     \textcolor{comment}{/* === Resurrect the new pivot row ================================== */}}
+\DoxyCodeLine{1429 }
+\DoxyCodeLine{1430     \textcolor{keywordflow}{if} (pivot\_row\_degree > 0)}
+\DoxyCodeLine{1431     \{}
+\DoxyCodeLine{1432       \textcolor{comment}{/* update pivot row length to reflect any cols that were killed */}}
+\DoxyCodeLine{1433       \textcolor{comment}{/* during super-\/col detection and mass elimination */}}
+\DoxyCodeLine{1434       Row [pivot\_row].start  = pivot\_row\_start ;}
+\DoxyCodeLine{1435       Row [pivot\_row].length = (IndexType) (new\_rp -\/ \&A[pivot\_row\_start]) ;}
+\DoxyCodeLine{1436       Row [pivot\_row].shared1.degree = pivot\_row\_degree ;}
+\DoxyCodeLine{1437       Row [pivot\_row].shared2.mark = 0 ;}
+\DoxyCodeLine{1438       \textcolor{comment}{/* pivot row is no longer dead */}}
+\DoxyCodeLine{1439     \}}
+\DoxyCodeLine{1440   \}}
+\DoxyCodeLine{1441 }
+\DoxyCodeLine{1442   \textcolor{comment}{/* === All principal columns have now been ordered ====================== */}}
+\DoxyCodeLine{1443 }
+\DoxyCodeLine{1444   \textcolor{keywordflow}{return} (ngarbage) ;}
+\DoxyCodeLine{1445 \}}
+\DoxyCodeLine{1446 }
+\DoxyCodeLine{1447 }
+\DoxyCodeLine{1448 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{1449 \textcolor{comment}{/* === order\_children ======================================================= */}}
+\DoxyCodeLine{1450 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{1451 }
+\DoxyCodeLine{1452 \textcolor{comment}{/*}}
+\DoxyCodeLine{1453 \textcolor{comment}{  The find\_ordering routine has ordered all of the principal columns (the}}
+\DoxyCodeLine{1454 \textcolor{comment}{  representatives of the supercolumns).  The non-\/principal columns have not}}
+\DoxyCodeLine{1455 \textcolor{comment}{  yet been ordered.  This routine orders those columns by walking up the}}
+\DoxyCodeLine{1456 \textcolor{comment}{  parent tree (a column is a child of the column which absorbed it).  The}}
+\DoxyCodeLine{1457 \textcolor{comment}{  final permutation vector is then placed in p [0 ... n\_col-\/1], with p [0]}}
+\DoxyCodeLine{1458 \textcolor{comment}{  being the first column, and p [n\_col-\/1] being the last.  It doesn't look}}
+\DoxyCodeLine{1459 \textcolor{comment}{  like it at first glance, but be assured that this routine takes time linear}}
+\DoxyCodeLine{1460 \textcolor{comment}{  in the number of columns.  Although not immediately obvious, the time}}
+\DoxyCodeLine{1461 \textcolor{comment}{  taken by this routine is O (n\_col), that is, linear in the number of}}
+\DoxyCodeLine{1462 \textcolor{comment}{  columns.  Not user-\/callable.}}
+\DoxyCodeLine{1463 \textcolor{comment}{*/}}
+\DoxyCodeLine{1464 \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{1465 \textcolor{keyword}{static} \textcolor{keyword}{inline}  \textcolor{keywordtype}{void} order\_children}
+\DoxyCodeLine{1466 (}
+\DoxyCodeLine{1467   \textcolor{comment}{/* === Parameters ======================================================= */}}
+\DoxyCodeLine{1468 }
+\DoxyCodeLine{1469   IndexType n\_col,      \textcolor{comment}{/* number of columns of A */}}
+\DoxyCodeLine{1470   ColStructure<IndexType> Col [],    \textcolor{comment}{/* of size n\_col+1 */}}
+\DoxyCodeLine{1471   IndexType p []      \textcolor{comment}{/* p [0 ... n\_col-\/1] is the column permutation*/}}
+\DoxyCodeLine{1472   )}
+\DoxyCodeLine{1473 \{}
+\DoxyCodeLine{1474   \textcolor{comment}{/* === Local variables ================================================== */}}
+\DoxyCodeLine{1475 }
+\DoxyCodeLine{1476   IndexType i ;     \textcolor{comment}{/* loop counter for all columns */}}
+\DoxyCodeLine{1477   IndexType c ;     \textcolor{comment}{/* column index */}}
+\DoxyCodeLine{1478   IndexType parent ;    \textcolor{comment}{/* index of column's parent */}}
+\DoxyCodeLine{1479   IndexType order ;     \textcolor{comment}{/* column's order */}}
+\DoxyCodeLine{1480 }
+\DoxyCodeLine{1481   \textcolor{comment}{/* === Order each non-\/principal column ================================== */}}
+\DoxyCodeLine{1482 }
+\DoxyCodeLine{1483   \textcolor{keywordflow}{for} (i = 0 ; i < n\_col ; i++)}
+\DoxyCodeLine{1484   \{}
+\DoxyCodeLine{1485     \textcolor{comment}{/* find an un-\/ordered non-\/principal column */}}
+\DoxyCodeLine{1486     COLAMD\_ASSERT (col\_is\_dead(Col, i)) ;}
+\DoxyCodeLine{1487     \textcolor{keywordflow}{if} (!Col[i].is\_dead\_principal() \&\& Col [i].shared2.order == Empty)}
+\DoxyCodeLine{1488     \{}
+\DoxyCodeLine{1489       parent = i ;}
+\DoxyCodeLine{1490       \textcolor{comment}{/* once found, find its principal parent */}}
+\DoxyCodeLine{1491       \textcolor{keywordflow}{do}}
+\DoxyCodeLine{1492       \{}
+\DoxyCodeLine{1493     parent = Col [parent].shared1.parent ;}
+\DoxyCodeLine{1494       \} \textcolor{keywordflow}{while} (!Col[parent].is\_dead\_principal()) ;}
+\DoxyCodeLine{1495 }
+\DoxyCodeLine{1496       \textcolor{comment}{/* now, order all un-\/ordered non-\/principal columns along path */}}
+\DoxyCodeLine{1497       \textcolor{comment}{/* to this parent.  collapse tree at the same time */}}
+\DoxyCodeLine{1498       c = i ;}
+\DoxyCodeLine{1499       \textcolor{comment}{/* get order of parent */}}
+\DoxyCodeLine{1500       order = Col [parent].shared2.order ;}
+\DoxyCodeLine{1501 }
+\DoxyCodeLine{1502       \textcolor{keywordflow}{do}}
+\DoxyCodeLine{1503       \{}
+\DoxyCodeLine{1504     COLAMD\_ASSERT (Col [c].shared2.order == Empty) ;}
+\DoxyCodeLine{1505 }
+\DoxyCodeLine{1506     \textcolor{comment}{/* order this column */}}
+\DoxyCodeLine{1507     Col [c].shared2.order = order++ ;}
+\DoxyCodeLine{1508     \textcolor{comment}{/* collaps tree */}}
+\DoxyCodeLine{1509     Col [c].shared1.parent = parent ;}
+\DoxyCodeLine{1510 }
+\DoxyCodeLine{1511     \textcolor{comment}{/* get immediate parent of this column */}}
+\DoxyCodeLine{1512     c = Col [c].shared1.parent ;}
+\DoxyCodeLine{1513 }
+\DoxyCodeLine{1514     \textcolor{comment}{/* continue until we hit an ordered column.  There are */}}
+\DoxyCodeLine{1515     \textcolor{comment}{/* guaranteed not to be anymore unordered columns */}}
+\DoxyCodeLine{1516     \textcolor{comment}{/* above an ordered column */}}
+\DoxyCodeLine{1517       \} \textcolor{keywordflow}{while} (Col [c].shared2.order == Empty) ;}
+\DoxyCodeLine{1518 }
+\DoxyCodeLine{1519       \textcolor{comment}{/* re-\/order the super\_col parent to largest order for this group */}}
+\DoxyCodeLine{1520       Col [parent].shared2.order = order ;}
+\DoxyCodeLine{1521     \}}
+\DoxyCodeLine{1522   \}}
+\DoxyCodeLine{1523 }
+\DoxyCodeLine{1524   \textcolor{comment}{/* === Generate the permutation ========================================= */}}
+\DoxyCodeLine{1525 }
+\DoxyCodeLine{1526   \textcolor{keywordflow}{for} (c = 0 ; c < n\_col ; c++)}
+\DoxyCodeLine{1527   \{}
+\DoxyCodeLine{1528     p [Col [c].shared2.order] = c ;}
+\DoxyCodeLine{1529   \}}
+\DoxyCodeLine{1530 \}}
+\DoxyCodeLine{1531 }
+\DoxyCodeLine{1532 }
+\DoxyCodeLine{1533 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{1534 \textcolor{comment}{/* === detect\_super\_cols ==================================================== */}}
+\DoxyCodeLine{1535 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{1536 }
+\DoxyCodeLine{1537 \textcolor{comment}{/*}}
+\DoxyCodeLine{1538 \textcolor{comment}{  Detects supercolumns by finding matches between columns in the hash buckets.}}
+\DoxyCodeLine{1539 \textcolor{comment}{  Check amongst columns in the set A [row\_start ... row\_start + row\_length-\/1].}}
+\DoxyCodeLine{1540 \textcolor{comment}{  The columns under consideration are currently *not* in the degree lists,}}
+\DoxyCodeLine{1541 \textcolor{comment}{  and have already been placed in the hash buckets.}}
+\DoxyCodeLine{1542 \textcolor{comment}{}}
+\DoxyCodeLine{1543 \textcolor{comment}{  The hash bucket for columns whose hash function is equal to h is stored}}
+\DoxyCodeLine{1544 \textcolor{comment}{  as follows:}}
+\DoxyCodeLine{1545 \textcolor{comment}{}}
+\DoxyCodeLine{1546 \textcolor{comment}{  if head [h] is >= 0, then head [h] contains a degree list, so:}}
+\DoxyCodeLine{1547 \textcolor{comment}{}}
+\DoxyCodeLine{1548 \textcolor{comment}{  head [h] is the first column in degree bucket h.}}
+\DoxyCodeLine{1549 \textcolor{comment}{  Col [head [h]].headhash gives the first column in hash bucket h.}}
+\DoxyCodeLine{1550 \textcolor{comment}{}}
+\DoxyCodeLine{1551 \textcolor{comment}{  otherwise, the degree list is empty, and:}}
+\DoxyCodeLine{1552 \textcolor{comment}{}}
+\DoxyCodeLine{1553 \textcolor{comment}{  -\/(head [h] + 2) is the first column in hash bucket h.}}
+\DoxyCodeLine{1554 \textcolor{comment}{}}
+\DoxyCodeLine{1555 \textcolor{comment}{  For a column c in a hash bucket, Col [c].shared3.prev is NOT a "{}previous}}
+\DoxyCodeLine{1556 \textcolor{comment}{  column"{} pointer.  Col [c].shared3.hash is used instead as the hash number}}
+\DoxyCodeLine{1557 \textcolor{comment}{  for that column.  The value of Col [c].shared4.hash\_next is the next column}}
+\DoxyCodeLine{1558 \textcolor{comment}{  in the same hash bucket.}}
+\DoxyCodeLine{1559 \textcolor{comment}{}}
+\DoxyCodeLine{1560 \textcolor{comment}{  Assuming no, or "{}few"{} hash collisions, the time taken by this routine is}}
+\DoxyCodeLine{1561 \textcolor{comment}{  linear in the sum of the sizes (lengths) of each column whose score has}}
+\DoxyCodeLine{1562 \textcolor{comment}{  just been computed in the approximate degree computation.}}
+\DoxyCodeLine{1563 \textcolor{comment}{  Not user-\/callable.}}
+\DoxyCodeLine{1564 \textcolor{comment}{*/}}
+\DoxyCodeLine{1565 \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{1566 \textcolor{keyword}{static} \textcolor{keywordtype}{void} detect\_super\_cols}
+\DoxyCodeLine{1567 (}
+\DoxyCodeLine{1568   \textcolor{comment}{/* === Parameters ======================================================= */}}
+\DoxyCodeLine{1569 }
+\DoxyCodeLine{1570   ColStructure<IndexType> Col [],    \textcolor{comment}{/* of size n\_col+1 */}}
+\DoxyCodeLine{1571   IndexType A [],     \textcolor{comment}{/* row indices of A */}}
+\DoxyCodeLine{1572   IndexType head [],    \textcolor{comment}{/* head of degree lists and hash buckets */}}
+\DoxyCodeLine{1573   IndexType row\_start,    \textcolor{comment}{/* pointer to set of columns to check */}}
+\DoxyCodeLine{1574   IndexType row\_length    \textcolor{comment}{/* number of columns to check */}}
+\DoxyCodeLine{1575 )}
+\DoxyCodeLine{1576 \{}
+\DoxyCodeLine{1577   \textcolor{comment}{/* === Local variables ================================================== */}}
+\DoxyCodeLine{1578 }
+\DoxyCodeLine{1579   IndexType hash ;      \textcolor{comment}{/* hash value for a column */}}
+\DoxyCodeLine{1580   IndexType *rp ;     \textcolor{comment}{/* pointer to a row */}}
+\DoxyCodeLine{1581   IndexType c ;     \textcolor{comment}{/* a column index */}}
+\DoxyCodeLine{1582   IndexType super\_c ;   \textcolor{comment}{/* column index of the column to absorb into */}}
+\DoxyCodeLine{1583   IndexType *cp1 ;      \textcolor{comment}{/* column pointer for column super\_c */}}
+\DoxyCodeLine{1584   IndexType *cp2 ;      \textcolor{comment}{/* column pointer for column c */}}
+\DoxyCodeLine{1585   IndexType length ;    \textcolor{comment}{/* length of column super\_c */}}
+\DoxyCodeLine{1586   IndexType prev\_c ;    \textcolor{comment}{/* column preceding c in hash bucket */}}
+\DoxyCodeLine{1587   IndexType i ;     \textcolor{comment}{/* loop counter */}}
+\DoxyCodeLine{1588   IndexType *rp\_end ;   \textcolor{comment}{/* pointer to the end of the row */}}
+\DoxyCodeLine{1589   IndexType col ;     \textcolor{comment}{/* a column index in the row to check */}}
+\DoxyCodeLine{1590   IndexType head\_column ;   \textcolor{comment}{/* first column in hash bucket or degree list */}}
+\DoxyCodeLine{1591   IndexType first\_col ;   \textcolor{comment}{/* first column in hash bucket */}}
+\DoxyCodeLine{1592 }
+\DoxyCodeLine{1593   \textcolor{comment}{/* === Consider each column in the row ================================== */}}
+\DoxyCodeLine{1594 }
+\DoxyCodeLine{1595   rp = \&A [row\_start] ;}
+\DoxyCodeLine{1596   rp\_end = rp + row\_length ;}
+\DoxyCodeLine{1597   \textcolor{keywordflow}{while} (rp < rp\_end)}
+\DoxyCodeLine{1598   \{}
+\DoxyCodeLine{1599     col = *rp++ ;}
+\DoxyCodeLine{1600     \textcolor{keywordflow}{if} (Col[col].is\_dead())}
+\DoxyCodeLine{1601     \{}
+\DoxyCodeLine{1602       continue ;}
+\DoxyCodeLine{1603     \}}
+\DoxyCodeLine{1604 }
+\DoxyCodeLine{1605     \textcolor{comment}{/* get hash number for this column */}}
+\DoxyCodeLine{1606     hash = Col [col].shared3.hash ;}
+\DoxyCodeLine{1607     COLAMD\_ASSERT (hash <= n\_col) ;}
+\DoxyCodeLine{1608 }
+\DoxyCodeLine{1609     \textcolor{comment}{/* === Get the first column in this hash bucket ===================== */}}
+\DoxyCodeLine{1610 }
+\DoxyCodeLine{1611     head\_column = head [hash] ;}
+\DoxyCodeLine{1612     \textcolor{keywordflow}{if} (head\_column > Empty)}
+\DoxyCodeLine{1613     \{}
+\DoxyCodeLine{1614       first\_col = Col [head\_column].shared3.headhash ;}
+\DoxyCodeLine{1615     \}}
+\DoxyCodeLine{1616     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{1617     \{}
+\DoxyCodeLine{1618       first\_col = -\/ (head\_column + 2) ;}
+\DoxyCodeLine{1619     \}}
+\DoxyCodeLine{1620 }
+\DoxyCodeLine{1621     \textcolor{comment}{/* === Consider each column in the hash bucket ====================== */}}
+\DoxyCodeLine{1622 }
+\DoxyCodeLine{1623     \textcolor{keywordflow}{for} (super\_c = first\_col ; super\_c != Empty ;}
+\DoxyCodeLine{1624      super\_c = Col [super\_c].shared4.hash\_next)}
+\DoxyCodeLine{1625     \{}
+\DoxyCodeLine{1626       COLAMD\_ASSERT (Col [super\_c].is\_alive()) ;}
+\DoxyCodeLine{1627       COLAMD\_ASSERT (Col [super\_c].shared3.hash == hash) ;}
+\DoxyCodeLine{1628       length = Col [super\_c].length ;}
+\DoxyCodeLine{1629 }
+\DoxyCodeLine{1630       \textcolor{comment}{/* prev\_c is the column preceding column c in the hash bucket */}}
+\DoxyCodeLine{1631       prev\_c = super\_c ;}
+\DoxyCodeLine{1632 }
+\DoxyCodeLine{1633       \textcolor{comment}{/* === Compare super\_c with all columns after it ================ */}}
+\DoxyCodeLine{1634 }
+\DoxyCodeLine{1635       \textcolor{keywordflow}{for} (c = Col [super\_c].shared4.hash\_next ;}
+\DoxyCodeLine{1636        c != Empty ; c = Col [c].shared4.hash\_next)}
+\DoxyCodeLine{1637       \{}
+\DoxyCodeLine{1638     COLAMD\_ASSERT (c != super\_c) ;}
+\DoxyCodeLine{1639     COLAMD\_ASSERT (Col[c].is\_alive()) ;}
+\DoxyCodeLine{1640     COLAMD\_ASSERT (Col [c].shared3.hash == hash) ;}
+\DoxyCodeLine{1641 }
+\DoxyCodeLine{1642     \textcolor{comment}{/* not identical if lengths or scores are different */}}
+\DoxyCodeLine{1643     \textcolor{keywordflow}{if} (Col [c].length != length ||}
+\DoxyCodeLine{1644         Col [c].shared2.score != Col [super\_c].shared2.score)}
+\DoxyCodeLine{1645     \{}
+\DoxyCodeLine{1646       prev\_c = c ;}
+\DoxyCodeLine{1647       continue ;}
+\DoxyCodeLine{1648     \}}
+\DoxyCodeLine{1649 }
+\DoxyCodeLine{1650     \textcolor{comment}{/* compare the two columns */}}
+\DoxyCodeLine{1651     cp1 = \&A [Col [super\_c].start] ;}
+\DoxyCodeLine{1652     cp2 = \&A [Col [c].start] ;}
+\DoxyCodeLine{1653 }
+\DoxyCodeLine{1654     \textcolor{keywordflow}{for} (i = 0 ; i < length ; i++)}
+\DoxyCodeLine{1655     \{}
+\DoxyCodeLine{1656       \textcolor{comment}{/* the columns are "{}clean"{} (no dead rows) */}}
+\DoxyCodeLine{1657       COLAMD\_ASSERT ( cp1-\/>is\_alive() );}
+\DoxyCodeLine{1658       COLAMD\_ASSERT ( cp2-\/>is\_alive() );}
+\DoxyCodeLine{1659       \textcolor{comment}{/* row indices will same order for both supercols, */}}
+\DoxyCodeLine{1660       \textcolor{comment}{/* no gather scatter necessary */}}
+\DoxyCodeLine{1661       \textcolor{keywordflow}{if} (*cp1++ != *cp2++)}
+\DoxyCodeLine{1662       \{}
+\DoxyCodeLine{1663         break ;}
+\DoxyCodeLine{1664       \}}
+\DoxyCodeLine{1665     \}}
+\DoxyCodeLine{1666 }
+\DoxyCodeLine{1667     \textcolor{comment}{/* the two columns are different if the for-\/loop "{}broke"{} */}}
+\DoxyCodeLine{1668     \textcolor{keywordflow}{if} (i != length)}
+\DoxyCodeLine{1669     \{}
+\DoxyCodeLine{1670       prev\_c = c ;}
+\DoxyCodeLine{1671       continue ;}
+\DoxyCodeLine{1672     \}}
+\DoxyCodeLine{1673 }
+\DoxyCodeLine{1674     \textcolor{comment}{/* === Got it!  two columns are identical =================== */}}
+\DoxyCodeLine{1675 }
+\DoxyCodeLine{1676     COLAMD\_ASSERT (Col [c].shared2.score == Col [super\_c].shared2.score) ;}
+\DoxyCodeLine{1677 }
+\DoxyCodeLine{1678     Col [super\_c].shared1.thickness += Col [c].shared1.thickness ;}
+\DoxyCodeLine{1679     Col [c].shared1.parent = super\_c ;}
+\DoxyCodeLine{1680     Col[c].kill\_non\_principal() ;}
+\DoxyCodeLine{1681     \textcolor{comment}{/* order c later, in order\_children() */}}
+\DoxyCodeLine{1682     Col [c].shared2.order = Empty ;}
+\DoxyCodeLine{1683     \textcolor{comment}{/* remove c from hash bucket */}}
+\DoxyCodeLine{1684     Col [prev\_c].shared4.hash\_next = Col [c].shared4.hash\_next ;}
+\DoxyCodeLine{1685       \}}
+\DoxyCodeLine{1686     \}}
+\DoxyCodeLine{1687 }
+\DoxyCodeLine{1688     \textcolor{comment}{/* === Empty this hash bucket ======================================= */}}
+\DoxyCodeLine{1689 }
+\DoxyCodeLine{1690     \textcolor{keywordflow}{if} (head\_column > Empty)}
+\DoxyCodeLine{1691     \{}
+\DoxyCodeLine{1692       \textcolor{comment}{/* corresponding degree list "{}hash"{} is not empty */}}
+\DoxyCodeLine{1693       Col [head\_column].shared3.headhash = Empty ;}
+\DoxyCodeLine{1694     \}}
+\DoxyCodeLine{1695     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{1696     \{}
+\DoxyCodeLine{1697       \textcolor{comment}{/* corresponding degree list "{}hash"{} is empty */}}
+\DoxyCodeLine{1698       head [hash] = Empty ;}
+\DoxyCodeLine{1699     \}}
+\DoxyCodeLine{1700   \}}
+\DoxyCodeLine{1701 \}}
+\DoxyCodeLine{1702 }
+\DoxyCodeLine{1703 }
+\DoxyCodeLine{1704 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{1705 \textcolor{comment}{/* === garbage\_collection =================================================== */}}
+\DoxyCodeLine{1706 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{1707 }
+\DoxyCodeLine{1708 \textcolor{comment}{/*}}
+\DoxyCodeLine{1709 \textcolor{comment}{  Defragments and compacts columns and rows in the workspace A.  Used when}}
+\DoxyCodeLine{1710 \textcolor{comment}{  all available memory has been used while performing row merging.  Returns}}
+\DoxyCodeLine{1711 \textcolor{comment}{  the index of the first free position in A, after garbage collection.  The}}
+\DoxyCodeLine{1712 \textcolor{comment}{  time taken by this routine is linear is the size of the array A, which is}}
+\DoxyCodeLine{1713 \textcolor{comment}{  itself linear in the number of nonzeros in the input matrix.}}
+\DoxyCodeLine{1714 \textcolor{comment}{  Not user-\/callable.}}
+\DoxyCodeLine{1715 \textcolor{comment}{*/}}
+\DoxyCodeLine{1716 \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{1717 \textcolor{keyword}{static} IndexType garbage\_collection  \textcolor{comment}{/* returns the new value of pfree */}}
+\DoxyCodeLine{1718   (}
+\DoxyCodeLine{1719     \textcolor{comment}{/* === Parameters ======================================================= */}}
+\DoxyCodeLine{1720 }
+\DoxyCodeLine{1721     IndexType n\_row,      \textcolor{comment}{/* number of rows */}}
+\DoxyCodeLine{1722     IndexType n\_col,      \textcolor{comment}{/* number of columns */}}
+\DoxyCodeLine{1723     RowStructure<IndexType> Row [],    \textcolor{comment}{/* row info */}}
+\DoxyCodeLine{1724     ColStructure<IndexType> Col [],    \textcolor{comment}{/* column info */}}
+\DoxyCodeLine{1725     IndexType A [],     \textcolor{comment}{/* A [0 ... Alen-\/1] holds the matrix */}}
+\DoxyCodeLine{1726     IndexType *pfree      \textcolor{comment}{/* \&A [0] ... pfree is in use */}}
+\DoxyCodeLine{1727     )}
+\DoxyCodeLine{1728 \{}
+\DoxyCodeLine{1729   \textcolor{comment}{/* === Local variables ================================================== */}}
+\DoxyCodeLine{1730 }
+\DoxyCodeLine{1731   IndexType *psrc ;     \textcolor{comment}{/* source pointer */}}
+\DoxyCodeLine{1732   IndexType *pdest ;    \textcolor{comment}{/* destination pointer */}}
+\DoxyCodeLine{1733   IndexType j ;     \textcolor{comment}{/* counter */}}
+\DoxyCodeLine{1734   IndexType r ;     \textcolor{comment}{/* a row index */}}
+\DoxyCodeLine{1735   IndexType c ;     \textcolor{comment}{/* a column index */}}
+\DoxyCodeLine{1736   IndexType length ;    \textcolor{comment}{/* length of a row or column */}}
+\DoxyCodeLine{1737 }
+\DoxyCodeLine{1738   \textcolor{comment}{/* === Defragment the columns =========================================== */}}
+\DoxyCodeLine{1739 }
+\DoxyCodeLine{1740   pdest = \&A[0] ;}
+\DoxyCodeLine{1741   \textcolor{keywordflow}{for} (c = 0 ; c < n\_col ; c++)}
+\DoxyCodeLine{1742   \{}
+\DoxyCodeLine{1743     \textcolor{keywordflow}{if} (Col[c].is\_alive())}
+\DoxyCodeLine{1744     \{}
+\DoxyCodeLine{1745       psrc = \&A [Col [c].start] ;}
+\DoxyCodeLine{1746 }
+\DoxyCodeLine{1747       \textcolor{comment}{/* move and compact the column */}}
+\DoxyCodeLine{1748       COLAMD\_ASSERT (pdest <= psrc) ;}
+\DoxyCodeLine{1749       Col [c].start = (IndexType) (pdest -\/ \&A [0]) ;}
+\DoxyCodeLine{1750       length = Col [c].length ;}
+\DoxyCodeLine{1751       \textcolor{keywordflow}{for} (j = 0 ; j < length ; j++)}
+\DoxyCodeLine{1752       \{}
+\DoxyCodeLine{1753     r = *psrc++ ;}
+\DoxyCodeLine{1754     \textcolor{keywordflow}{if} (Row[r].is\_alive())}
+\DoxyCodeLine{1755     \{}
+\DoxyCodeLine{1756       *pdest++ = r ;}
+\DoxyCodeLine{1757     \}}
+\DoxyCodeLine{1758       \}}
+\DoxyCodeLine{1759       Col [c].length = (IndexType) (pdest -\/ \&A [Col [c].start]) ;}
+\DoxyCodeLine{1760     \}}
+\DoxyCodeLine{1761   \}}
+\DoxyCodeLine{1762 }
+\DoxyCodeLine{1763   \textcolor{comment}{/* === Prepare to defragment the rows =================================== */}}
+\DoxyCodeLine{1764 }
+\DoxyCodeLine{1765   \textcolor{keywordflow}{for} (r = 0 ; r < n\_row ; r++)}
+\DoxyCodeLine{1766   \{}
+\DoxyCodeLine{1767     \textcolor{keywordflow}{if} (Row[r].is\_alive())}
+\DoxyCodeLine{1768     \{}
+\DoxyCodeLine{1769       \textcolor{keywordflow}{if} (Row [r].length == 0)}
+\DoxyCodeLine{1770       \{}
+\DoxyCodeLine{1771         \textcolor{comment}{/* this row is of zero length.  cannot compact it, so kill it */}}
+\DoxyCodeLine{1772         COLAMD\_DEBUG3 ((\textcolor{stringliteral}{"{}Defrag row kill\(\backslash\)n"{}})) ;}
+\DoxyCodeLine{1773         Row[r].kill() ;}
+\DoxyCodeLine{1774       \}}
+\DoxyCodeLine{1775       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{1776       \{}
+\DoxyCodeLine{1777         \textcolor{comment}{/* save first column index in Row [r].shared2.first\_column */}}
+\DoxyCodeLine{1778         psrc = \&A [Row [r].start] ;}
+\DoxyCodeLine{1779         Row [r].shared2.first\_column = *psrc ;}
+\DoxyCodeLine{1780         COLAMD\_ASSERT (Row[r].is\_alive()) ;}
+\DoxyCodeLine{1781         \textcolor{comment}{/* flag the start of the row with the one's complement of row */}}
+\DoxyCodeLine{1782         *psrc = ones\_complement(r) ;}
+\DoxyCodeLine{1783 }
+\DoxyCodeLine{1784       \}}
+\DoxyCodeLine{1785     \}}
+\DoxyCodeLine{1786   \}}
+\DoxyCodeLine{1787 }
+\DoxyCodeLine{1788   \textcolor{comment}{/* === Defragment the rows ============================================== */}}
+\DoxyCodeLine{1789 }
+\DoxyCodeLine{1790   psrc = pdest ;}
+\DoxyCodeLine{1791   \textcolor{keywordflow}{while} (psrc < pfree)}
+\DoxyCodeLine{1792   \{}
+\DoxyCodeLine{1793     \textcolor{comment}{/* find a negative number ... the start of a row */}}
+\DoxyCodeLine{1794     \textcolor{keywordflow}{if} (*psrc++ < 0)}
+\DoxyCodeLine{1795     \{}
+\DoxyCodeLine{1796       psrc-\/-\/ ;}
+\DoxyCodeLine{1797       \textcolor{comment}{/* get the row index */}}
+\DoxyCodeLine{1798       r = ones\_complement(*psrc) ;}
+\DoxyCodeLine{1799       COLAMD\_ASSERT (r >= 0 \&\& r < n\_row) ;}
+\DoxyCodeLine{1800       \textcolor{comment}{/* restore first column index */}}
+\DoxyCodeLine{1801       *psrc = Row [r].shared2.first\_column ;}
+\DoxyCodeLine{1802       COLAMD\_ASSERT (Row[r].is\_alive()) ;}
+\DoxyCodeLine{1803 }
+\DoxyCodeLine{1804       \textcolor{comment}{/* move and compact the row */}}
+\DoxyCodeLine{1805       COLAMD\_ASSERT (pdest <= psrc) ;}
+\DoxyCodeLine{1806       Row [r].start = (IndexType) (pdest -\/ \&A [0]) ;}
+\DoxyCodeLine{1807       length = Row [r].length ;}
+\DoxyCodeLine{1808       \textcolor{keywordflow}{for} (j = 0 ; j < length ; j++)}
+\DoxyCodeLine{1809       \{}
+\DoxyCodeLine{1810     c = *psrc++ ;}
+\DoxyCodeLine{1811     \textcolor{keywordflow}{if} (Col[c].is\_alive())}
+\DoxyCodeLine{1812     \{}
+\DoxyCodeLine{1813       *pdest++ = c ;}
+\DoxyCodeLine{1814     \}}
+\DoxyCodeLine{1815       \}}
+\DoxyCodeLine{1816       Row [r].length = (IndexType) (pdest -\/ \&A [Row [r].start]) ;}
+\DoxyCodeLine{1817 }
+\DoxyCodeLine{1818     \}}
+\DoxyCodeLine{1819   \}}
+\DoxyCodeLine{1820   \textcolor{comment}{/* ensure we found all the rows */}}
+\DoxyCodeLine{1821   COLAMD\_ASSERT (debug\_rows == 0) ;}
+\DoxyCodeLine{1822 }
+\DoxyCodeLine{1823   \textcolor{comment}{/* === Return the new value of pfree ==================================== */}}
+\DoxyCodeLine{1824 }
+\DoxyCodeLine{1825   \textcolor{keywordflow}{return} ((IndexType) (pdest -\/ \&A [0])) ;}
+\DoxyCodeLine{1826 \}}
+\DoxyCodeLine{1827 }
+\DoxyCodeLine{1828 }
+\DoxyCodeLine{1829 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{1830 \textcolor{comment}{/* === clear\_mark =========================================================== */}}
+\DoxyCodeLine{1831 \textcolor{comment}{/* ========================================================================== */}}
+\DoxyCodeLine{1832 }
+\DoxyCodeLine{1833 \textcolor{comment}{/*}}
+\DoxyCodeLine{1834 \textcolor{comment}{  Clears the Row [].shared2.mark array, and returns the new tag\_mark.}}
+\DoxyCodeLine{1835 \textcolor{comment}{  Return value is the new tag\_mark.  Not user-\/callable.}}
+\DoxyCodeLine{1836 \textcolor{comment}{*/}}
+\DoxyCodeLine{1837 \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{1838 \textcolor{keyword}{static} \textcolor{keyword}{inline}  IndexType clear\_mark  \textcolor{comment}{/* return the new value for tag\_mark */}}
+\DoxyCodeLine{1839   (}
+\DoxyCodeLine{1840       \textcolor{comment}{/* === Parameters ======================================================= */}}
+\DoxyCodeLine{1841 }
+\DoxyCodeLine{1842     IndexType n\_row,    \textcolor{comment}{/* number of rows in A */}}
+\DoxyCodeLine{1843     RowStructure<IndexType> Row [] \textcolor{comment}{/* Row [0 ... n\_row-\/1].shared2.mark is set to zero */}}
+\DoxyCodeLine{1844     )}
+\DoxyCodeLine{1845 \{}
+\DoxyCodeLine{1846   \textcolor{comment}{/* === Local variables ================================================== */}}
+\DoxyCodeLine{1847 }
+\DoxyCodeLine{1848   IndexType r ;}
+\DoxyCodeLine{1849 }
+\DoxyCodeLine{1850   \textcolor{keywordflow}{for} (r = 0 ; r < n\_row ; r++)}
+\DoxyCodeLine{1851   \{}
+\DoxyCodeLine{1852     \textcolor{keywordflow}{if} (Row[r].is\_alive())}
+\DoxyCodeLine{1853     \{}
+\DoxyCodeLine{1854       Row [r].shared2.mark = 0 ;}
+\DoxyCodeLine{1855     \}}
+\DoxyCodeLine{1856   \}}
+\DoxyCodeLine{1857   \textcolor{keywordflow}{return} (1) ;}
+\DoxyCodeLine{1858 \}}
+\DoxyCodeLine{1859 }
+\DoxyCodeLine{1860 \} \textcolor{comment}{// namespace Colamd}}
+\DoxyCodeLine{1861 }
+\DoxyCodeLine{1862 \} \textcolor{comment}{// namespace internal}}
+\DoxyCodeLine{1863 \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

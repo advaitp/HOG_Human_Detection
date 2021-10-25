@@ -1,0 +1,274 @@
+\hypertarget{SVDBase_8h_source}{}\doxysection{SVDBase.\+h}
+\label{SVDBase_8h_source}\index{include/Eigen/src/SVD/SVDBase.h@{include/Eigen/src/SVD/SVDBase.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2009-\/2010 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2014 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// Copyright (C) 2013 Gauthier Brun <brun.gauthier@gmail.com>}}
+\DoxyCodeLine{8 \textcolor{comment}{// Copyright (C) 2013 Nicolas Carre <nicolas.carre@ensimag.fr>}}
+\DoxyCodeLine{9 \textcolor{comment}{// Copyright (C) 2013 Jean Ceccato <jean.ceccato@ensimag.fr>}}
+\DoxyCodeLine{10 \textcolor{comment}{// Copyright (C) 2013 Pierre Zoppitelli <pierre.zoppitelli@ensimag.fr>}}
+\DoxyCodeLine{11 \textcolor{comment}{//}}
+\DoxyCodeLine{12 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{13 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{14 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{preprocessor}{\#ifndef EIGEN\_SVDBASE\_H}}
+\DoxyCodeLine{17 \textcolor{preprocessor}{\#define EIGEN\_SVDBASE\_H}}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{20 }
+\DoxyCodeLine{21 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{22 }
+\DoxyCodeLine{23 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{24 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{classEigen_1_1SVDBase}{SVDBase}}<Derived> >}
+\DoxyCodeLine{25  : \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<Derived>}
+\DoxyCodeLine{26 \{}
+\DoxyCodeLine{27   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1MatrixXpr}{MatrixXpr}} \mbox{\hyperlink{structEigen_1_1MatrixXpr}{XprKind}};}
+\DoxyCodeLine{28   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1SolverStorage}{SolverStorage}} \mbox{\hyperlink{structEigen_1_1SolverStorage}{StorageKind}};}
+\DoxyCodeLine{29   \textcolor{keyword}{typedef} \textcolor{keywordtype}{int} StorageIndex;}
+\DoxyCodeLine{30   \textcolor{keyword}{enum} \{ Flags = 0 \};}
+\DoxyCodeLine{31 \};}
+\DoxyCodeLine{32 \}}
+\DoxyCodeLine{33 }
+\DoxyCodeLine{64 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1SVDBase}{SVDBase}}}
+\DoxyCodeLine{65  : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1SolverBase}{SolverBase}}<SVDBase<Derived> >}
+\DoxyCodeLine{66 \{}
+\DoxyCodeLine{67 \textcolor{keyword}{public}: }
+\DoxyCodeLine{68    }
+\DoxyCodeLine{69   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived\_>}
+\DoxyCodeLine{70   \textcolor{keyword}{friend} \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1solve__assertion}{internal::solve\_assertion}};}
+\DoxyCodeLine{71 }
+\DoxyCodeLine{72   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::MatrixType}} MatrixType;}
+\DoxyCodeLine{73   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar Scalar;}
+\DoxyCodeLine{74   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} NumTraits<typename MatrixType::Scalar>::Real RealScalar;}
+\DoxyCodeLine{75   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{Eigen::internal::traits<SVDBase>::StorageIndex}} StorageIndex;}
+\DoxyCodeLine{76   \textcolor{keyword}{typedef} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Eigen::Index}} \mbox{\hyperlink{classEigen_1_1SVDBase_a6229a37997eca1072b52cca5ee7a2bec}{Index}}; }
+\DoxyCodeLine{77   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{78     RowsAtCompileTime = MatrixType::RowsAtCompileTime,}
+\DoxyCodeLine{79     ColsAtCompileTime = MatrixType::ColsAtCompileTime,}
+\DoxyCodeLine{80     DiagSizeAtCompileTime = EIGEN\_SIZE\_MIN\_PREFER\_DYNAMIC(RowsAtCompileTime,ColsAtCompileTime),}
+\DoxyCodeLine{81     MaxRowsAtCompileTime = MatrixType::MaxRowsAtCompileTime,}
+\DoxyCodeLine{82     MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime,}
+\DoxyCodeLine{83     MaxDiagSizeAtCompileTime = EIGEN\_SIZE\_MIN\_PREFER\_FIXED(MaxRowsAtCompileTime,MaxColsAtCompileTime),}
+\DoxyCodeLine{84     MatrixOptions = MatrixType::Options}
+\DoxyCodeLine{85   \};}
+\DoxyCodeLine{86 }
+\DoxyCodeLine{87   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar, RowsAtCompileTime, RowsAtCompileTime, MatrixOptions, MaxRowsAtCompileTime, MaxRowsAtCompileTime>}} MatrixUType;}
+\DoxyCodeLine{88   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar, ColsAtCompileTime, ColsAtCompileTime, MatrixOptions, MaxColsAtCompileTime, MaxColsAtCompileTime>}} MatrixVType;}
+\DoxyCodeLine{89   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::plain\_diag\_type<MatrixType, RealScalar>::type}} SingularValuesType;}
+\DoxyCodeLine{90   }
+\DoxyCodeLine{91   Derived\& derived() \{ \textcolor{keywordflow}{return} *\textcolor{keyword}{static\_cast<}Derived*\textcolor{keyword}{>}(\textcolor{keyword}{this}); \}}
+\DoxyCodeLine{92   \textcolor{keyword}{const} Derived\& derived()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} *\textcolor{keyword}{static\_cast<}\textcolor{keyword}{const }Derived*\textcolor{keyword}{>}(\textcolor{keyword}{this}); \}}
+\DoxyCodeLine{93 }
+\DoxyCodeLine{103   \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Matrix}{MatrixUType}}\& \mbox{\hyperlink{classEigen_1_1SVDBase_accbc8e3f9baab3a57a6eba8e4cc3ea27}{matrixU}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{104 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{105     \_check\_compute\_assertions();}
+\DoxyCodeLine{106     eigen\_assert(\mbox{\hyperlink{classEigen_1_1SVDBase_a705a7c2709e1624ccc19aa748a78d473}{computeU}}() \&\& \textcolor{stringliteral}{"{}This SVD decomposition didn't compute U. Did you ask for it?"{}});}
+\DoxyCodeLine{107     \textcolor{keywordflow}{return} m\_matrixU;}
+\DoxyCodeLine{108   \}}
+\DoxyCodeLine{109 }
+\DoxyCodeLine{119   \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Matrix}{MatrixVType}}\& \mbox{\hyperlink{classEigen_1_1SVDBase_af09f06357d7d7442f7ca7343713756fe}{matrixV}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{120 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{121     \_check\_compute\_assertions();}
+\DoxyCodeLine{122     eigen\_assert(\mbox{\hyperlink{classEigen_1_1SVDBase_a5f12efcb791eb007d4a4890ac5255ac4}{computeV}}() \&\& \textcolor{stringliteral}{"{}This SVD decomposition didn't compute V. Did you ask for it?"{}});}
+\DoxyCodeLine{123     \textcolor{keywordflow}{return} m\_matrixV;}
+\DoxyCodeLine{124   \}}
+\DoxyCodeLine{125 }
+\DoxyCodeLine{131   \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{SingularValuesType}}\& \mbox{\hyperlink{classEigen_1_1SVDBase_ac44c307a70731003003faf3a9bdf14f6}{singularValues}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{132 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{133     \_check\_compute\_assertions();}
+\DoxyCodeLine{134     \textcolor{keywordflow}{return} m\_singularValues;}
+\DoxyCodeLine{135   \}}
+\DoxyCodeLine{136 }
+\DoxyCodeLine{138   \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1SVDBase_afe8a555f38393a319a71ec0f0331c9ef}{nonzeroSingularValues}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{139 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{140     \_check\_compute\_assertions();}
+\DoxyCodeLine{141     \textcolor{keywordflow}{return} m\_nonzeroSingularValues;}
+\DoxyCodeLine{142   \}}
+\DoxyCodeLine{143   }
+\DoxyCodeLine{150   \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1SVDBase_a30b89e24f42f1692079eea31b361d26a}{rank}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{151 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{152     \textcolor{keyword}{using} std::abs;}
+\DoxyCodeLine{153     \_check\_compute\_assertions();}
+\DoxyCodeLine{154     \textcolor{keywordflow}{if}(m\_singularValues.size()==0) \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{155     RealScalar premultiplied\_threshold = numext::maxi<RealScalar>(m\_singularValues.coeff(0) * \mbox{\hyperlink{classEigen_1_1SVDBase_a98b2ee98690358951807353812a05c69}{threshold}}(), (std::numeric\_limits<RealScalar>::min)());}
+\DoxyCodeLine{156     \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} i = m\_nonzeroSingularValues-\/1;}
+\DoxyCodeLine{157     \textcolor{keywordflow}{while}(i>=0 \&\& m\_singularValues.coeff(i) < premultiplied\_threshold) -\/-\/i;}
+\DoxyCodeLine{158     \textcolor{keywordflow}{return} i+1;}
+\DoxyCodeLine{159   \}}
+\DoxyCodeLine{160   }
+\DoxyCodeLine{175   Derived\& \mbox{\hyperlink{classEigen_1_1SVDBase_a0ef8fe7049bebc721437034d8d236888}{setThreshold}}(\textcolor{keyword}{const} RealScalar\& \mbox{\hyperlink{classEigen_1_1SVDBase_a98b2ee98690358951807353812a05c69}{threshold}})}
+\DoxyCodeLine{176   \{}
+\DoxyCodeLine{177     m\_usePrescribedThreshold = \textcolor{keyword}{true};}
+\DoxyCodeLine{178     m\_prescribedThreshold = \mbox{\hyperlink{classEigen_1_1SVDBase_a98b2ee98690358951807353812a05c69}{threshold}};}
+\DoxyCodeLine{179     \textcolor{keywordflow}{return} derived();}
+\DoxyCodeLine{180   \}}
+\DoxyCodeLine{181 }
+\DoxyCodeLine{190   Derived\& \mbox{\hyperlink{classEigen_1_1SVDBase_a8ec5520e8a3c7fc3134ada3822877334}{setThreshold}}(Default\_t)}
+\DoxyCodeLine{191   \{}
+\DoxyCodeLine{192     m\_usePrescribedThreshold = \textcolor{keyword}{false};}
+\DoxyCodeLine{193     \textcolor{keywordflow}{return} derived();}
+\DoxyCodeLine{194   \}}
+\DoxyCodeLine{195 }
+\DoxyCodeLine{200   RealScalar \mbox{\hyperlink{classEigen_1_1SVDBase_a98b2ee98690358951807353812a05c69}{threshold}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{201 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{202     eigen\_assert(m\_isInitialized || m\_usePrescribedThreshold);}
+\DoxyCodeLine{203     \textcolor{comment}{// this temporary is needed to workaround a MSVC issue}}
+\DoxyCodeLine{204     \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} diagSize = (std::max<Index>)(1,m\_diagSize);}
+\DoxyCodeLine{205     \textcolor{keywordflow}{return} m\_usePrescribedThreshold ? m\_prescribedThreshold}
+\DoxyCodeLine{206                                     : RealScalar(diagSize)*\mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::epsilon}}();}
+\DoxyCodeLine{207   \}}
+\DoxyCodeLine{208 }
+\DoxyCodeLine{210   \textcolor{keyword}{inline} \textcolor{keywordtype}{bool} \mbox{\hyperlink{classEigen_1_1SVDBase_a705a7c2709e1624ccc19aa748a78d473}{computeU}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_computeFullU || m\_computeThinU; \}}
+\DoxyCodeLine{212   \textcolor{keyword}{inline} \textcolor{keywordtype}{bool} \mbox{\hyperlink{classEigen_1_1SVDBase_a5f12efcb791eb007d4a4890ac5255ac4}{computeV}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_computeFullV || m\_computeThinV; \}}
+\DoxyCodeLine{213 }
+\DoxyCodeLine{214   \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_rows; \}}
+\DoxyCodeLine{215   \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1SVDBase_a6229a37997eca1072b52cca5ee7a2bec}{Index}} cols()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_cols; \}}
+\DoxyCodeLine{216   }
+\DoxyCodeLine{217 \textcolor{preprocessor}{  \#ifdef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{227   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{228   \textcolor{keyword}{inline} \textcolor{keyword}{const} Solve<Derived, Rhs>}
+\DoxyCodeLine{229   \mbox{\hyperlink{classEigen_1_1SolverBase_a943c352b597e3cd4744d5c11bfd77520}{solve}}(\textcolor{keyword}{const} MatrixBase<Rhs>\& b) \textcolor{keyword}{const};}
+\DoxyCodeLine{230 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{231 }
+\DoxyCodeLine{232 }
+\DoxyCodeLine{237   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{238   \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} \mbox{\hyperlink{classEigen_1_1SVDBase_a569913a15fa2f327121f155682368602}{info}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{239 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{240     eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}SVD is not initialized."{}});}
+\DoxyCodeLine{241     \textcolor{keywordflow}{return} m\_info;}
+\DoxyCodeLine{242   \}}
+\DoxyCodeLine{243 }
+\DoxyCodeLine{244 \textcolor{preprocessor}{  \#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{245   \textcolor{keyword}{template}<\textcolor{keyword}{typename} RhsType, \textcolor{keyword}{typename} DstType>}
+\DoxyCodeLine{246   \textcolor{keywordtype}{void} \_solve\_impl(\textcolor{keyword}{const} RhsType \&rhs, DstType \&dst) \textcolor{keyword}{const};}
+\DoxyCodeLine{247 }
+\DoxyCodeLine{248   \textcolor{keyword}{template}<\textcolor{keywordtype}{bool} Conjugate, \textcolor{keyword}{typename} RhsType, \textcolor{keyword}{typename} DstType>}
+\DoxyCodeLine{249   \textcolor{keywordtype}{void} \_solve\_impl\_transposed(\textcolor{keyword}{const} RhsType \&rhs, DstType \&dst) \textcolor{keyword}{const};}
+\DoxyCodeLine{250 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{251 }
+\DoxyCodeLine{252 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{253 }
+\DoxyCodeLine{254   EIGEN\_STATIC\_ASSERT\_NON\_INTEGER(Scalar)}
+\DoxyCodeLine{255 }
+\DoxyCodeLine{256   \textcolor{keywordtype}{void} \_check\_compute\_assertions()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{257     eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}SVD is not initialized."{}});}
+\DoxyCodeLine{258   \}}
+\DoxyCodeLine{259 }
+\DoxyCodeLine{260   \textcolor{keyword}{template}<\textcolor{keywordtype}{bool} Transpose\_, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{261   \textcolor{keywordtype}{void} \_check\_solve\_assertion(\textcolor{keyword}{const} Rhs\& b)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{262       EIGEN\_ONLY\_USED\_FOR\_DEBUG(b);}
+\DoxyCodeLine{263       \_check\_compute\_assertions();}
+\DoxyCodeLine{264       eigen\_assert(\mbox{\hyperlink{classEigen_1_1SVDBase_a705a7c2709e1624ccc19aa748a78d473}{computeU}}() \&\& \mbox{\hyperlink{classEigen_1_1SVDBase_a5f12efcb791eb007d4a4890ac5255ac4}{computeV}}() \&\& \textcolor{stringliteral}{"{}SVDBase::solve(): Both unitaries U and V are required to be computed (thin unitaries suffice)."{}});}
+\DoxyCodeLine{265       eigen\_assert((Transpose\_?cols():rows())==b.rows() \&\& \textcolor{stringliteral}{"{}SVDBase::solve(): invalid number of rows of the right hand side matrix b"{}});}
+\DoxyCodeLine{266   \}}
+\DoxyCodeLine{267 }
+\DoxyCodeLine{268   \textcolor{comment}{// return true if already allocated}}
+\DoxyCodeLine{269   \textcolor{keywordtype}{bool} allocate(\mbox{\hyperlink{classEigen_1_1SVDBase_a6229a37997eca1072b52cca5ee7a2bec}{Index}} rows, \mbox{\hyperlink{classEigen_1_1SVDBase_a6229a37997eca1072b52cca5ee7a2bec}{Index}} cols, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} computationOptions) ;}
+\DoxyCodeLine{270 }
+\DoxyCodeLine{271   MatrixUType m\_matrixU;}
+\DoxyCodeLine{272   MatrixVType m\_matrixV;}
+\DoxyCodeLine{273   SingularValuesType m\_singularValues;}
+\DoxyCodeLine{274   \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} m\_info;}
+\DoxyCodeLine{275   \textcolor{keywordtype}{bool} m\_isInitialized, m\_isAllocated, m\_usePrescribedThreshold;}
+\DoxyCodeLine{276   \textcolor{keywordtype}{bool} m\_computeFullU, m\_computeThinU;}
+\DoxyCodeLine{277   \textcolor{keywordtype}{bool} m\_computeFullV, m\_computeThinV;}
+\DoxyCodeLine{278   \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} m\_computationOptions;}
+\DoxyCodeLine{279   \mbox{\hyperlink{classEigen_1_1SVDBase_a6229a37997eca1072b52cca5ee7a2bec}{Index}} m\_nonzeroSingularValues, m\_rows, m\_cols, m\_diagSize;}
+\DoxyCodeLine{280   RealScalar m\_prescribedThreshold;}
+\DoxyCodeLine{281 }
+\DoxyCodeLine{286   \mbox{\hyperlink{classEigen_1_1SVDBase_abed06fc6f4b743e1f76a7b317539da87}{SVDBase}}()}
+\DoxyCodeLine{287     : m\_info(\mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}}),}
+\DoxyCodeLine{288       m\_isInitialized(false),}
+\DoxyCodeLine{289       m\_isAllocated(false),}
+\DoxyCodeLine{290       m\_usePrescribedThreshold(false),}
+\DoxyCodeLine{291       m\_computeFullU(false),}
+\DoxyCodeLine{292       m\_computeThinU(false),}
+\DoxyCodeLine{293       m\_computeFullV(false),}
+\DoxyCodeLine{294       m\_computeThinV(false),}
+\DoxyCodeLine{295       m\_computationOptions(0),}
+\DoxyCodeLine{296       m\_rows(-\/1), m\_cols(-\/1), m\_diagSize(0)}
+\DoxyCodeLine{297   \{ \}}
+\DoxyCodeLine{298 }
+\DoxyCodeLine{299 }
+\DoxyCodeLine{300 \};}
+\DoxyCodeLine{301 }
+\DoxyCodeLine{302 \textcolor{preprocessor}{\#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{303 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{304 \textcolor{keyword}{template}<\textcolor{keyword}{typename} RhsType, \textcolor{keyword}{typename} DstType>}
+\DoxyCodeLine{305 \textcolor{keywordtype}{void} SVDBase<Derived>::\_solve\_impl(\textcolor{keyword}{const} RhsType \&rhs, DstType \&dst)\textcolor{keyword}{ const}}
+\DoxyCodeLine{306 \textcolor{keyword}{}\{}
+\DoxyCodeLine{307   \textcolor{comment}{// A = U S V\string^*}}
+\DoxyCodeLine{308   \textcolor{comment}{// So A\string^\{-\/1\} = V S\string^\{-\/1\} U\string^*}}
+\DoxyCodeLine{309 }
+\DoxyCodeLine{310   Matrix<typename RhsType::Scalar, Dynamic, RhsType::ColsAtCompileTime, 0, MatrixType::MaxRowsAtCompileTime, RhsType::MaxColsAtCompileTime> tmp;}
+\DoxyCodeLine{311   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} l\_rank = rank();}
+\DoxyCodeLine{312   tmp.noalias() =  m\_matrixU.leftCols(l\_rank).adjoint() * rhs;}
+\DoxyCodeLine{313   tmp = m\_singularValues.head(l\_rank).asDiagonal().inverse() * tmp;}
+\DoxyCodeLine{314   dst = m\_matrixV.leftCols(l\_rank) * tmp;}
+\DoxyCodeLine{315 \}}
+\DoxyCodeLine{316 }
+\DoxyCodeLine{317 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{318 \textcolor{keyword}{template}<\textcolor{keywordtype}{bool} Conjugate, \textcolor{keyword}{typename} RhsType, \textcolor{keyword}{typename} DstType>}
+\DoxyCodeLine{319 \textcolor{keywordtype}{void} SVDBase<Derived>::\_solve\_impl\_transposed(\textcolor{keyword}{const} RhsType \&rhs, DstType \&dst)\textcolor{keyword}{ const}}
+\DoxyCodeLine{320 \textcolor{keyword}{}\{}
+\DoxyCodeLine{321   \textcolor{comment}{// A = U S V\string^*}}
+\DoxyCodeLine{322   \textcolor{comment}{// So  A\string^\{-\/*\} = U S\string^\{-\/1\} V\string^*}}
+\DoxyCodeLine{323   \textcolor{comment}{// And A\string^\{-\/T\} = U\_conj S\string^\{-\/1\} V\string^T}}
+\DoxyCodeLine{324   Matrix<typename RhsType::Scalar, Dynamic, RhsType::ColsAtCompileTime, 0, MatrixType::MaxRowsAtCompileTime, RhsType::MaxColsAtCompileTime> tmp;}
+\DoxyCodeLine{325   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} l\_rank = rank();}
+\DoxyCodeLine{326 }
+\DoxyCodeLine{327   tmp.noalias() =  m\_matrixV.leftCols(l\_rank).transpose().template conjugateIf<Conjugate>() * rhs;}
+\DoxyCodeLine{328   tmp = m\_singularValues.head(l\_rank).asDiagonal().inverse() * tmp;}
+\DoxyCodeLine{329   dst = m\_matrixU.template conjugateIf<!Conjugate>().leftCols(l\_rank) * tmp;}
+\DoxyCodeLine{330 \}}
+\DoxyCodeLine{331 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{332 }
+\DoxyCodeLine{333 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{334 \textcolor{keywordtype}{bool} SVDBase<MatrixType>::allocate(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} computationOptions)}
+\DoxyCodeLine{335 \{}
+\DoxyCodeLine{336   eigen\_assert(rows >= 0 \&\& cols >= 0);}
+\DoxyCodeLine{337 }
+\DoxyCodeLine{338   \textcolor{keywordflow}{if} (m\_isAllocated \&\&}
+\DoxyCodeLine{339       rows == m\_rows \&\&}
+\DoxyCodeLine{340       cols == m\_cols \&\&}
+\DoxyCodeLine{341       computationOptions == m\_computationOptions)}
+\DoxyCodeLine{342   \{}
+\DoxyCodeLine{343     \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
+\DoxyCodeLine{344   \}}
+\DoxyCodeLine{345 }
+\DoxyCodeLine{346   m\_rows = rows;}
+\DoxyCodeLine{347   m\_cols = cols;}
+\DoxyCodeLine{348   m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}};}
+\DoxyCodeLine{349   m\_isInitialized = \textcolor{keyword}{false};}
+\DoxyCodeLine{350   m\_isAllocated = \textcolor{keyword}{true};}
+\DoxyCodeLine{351   m\_computationOptions = computationOptions;}
+\DoxyCodeLine{352   m\_computeFullU = (computationOptions \& \mbox{\hyperlink{group__enums_ggae3e239fb70022eb8747994cf5d68b4a9a9fa9302d510cee20c26311154937e23f}{ComputeFullU}}) != 0;}
+\DoxyCodeLine{353   m\_computeThinU = (computationOptions \& \mbox{\hyperlink{group__enums_ggae3e239fb70022eb8747994cf5d68b4a9aa7fb4e98834788d0b1b0f2b8467d2527}{ComputeThinU}}) != 0;}
+\DoxyCodeLine{354   m\_computeFullV = (computationOptions \& \mbox{\hyperlink{group__enums_ggae3e239fb70022eb8747994cf5d68b4a9a36581f7c662f7def31efd500c284f930}{ComputeFullV}}) != 0;}
+\DoxyCodeLine{355   m\_computeThinV = (computationOptions \& \mbox{\hyperlink{group__enums_ggae3e239fb70022eb8747994cf5d68b4a9a540036417bfecf2e791a70948c227f47}{ComputeThinV}}) != 0;}
+\DoxyCodeLine{356   eigen\_assert(!(m\_computeFullU \&\& m\_computeThinU) \&\& \textcolor{stringliteral}{"{}SVDBase: you can't ask for both full and thin U"{}});}
+\DoxyCodeLine{357   eigen\_assert(!(m\_computeFullV \&\& m\_computeThinV) \&\& \textcolor{stringliteral}{"{}SVDBase: you can't ask for both full and thin V"{}});}
+\DoxyCodeLine{358   eigen\_assert(EIGEN\_IMPLIES(m\_computeThinU || m\_computeThinV, MatrixType::ColsAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}) \&\&}
+\DoxyCodeLine{359            \textcolor{stringliteral}{"{}SVDBase: thin U and V are only available when your matrix has a dynamic number of columns."{}});}
+\DoxyCodeLine{360 }
+\DoxyCodeLine{361   m\_diagSize = (std::min)(m\_rows, m\_cols);}
+\DoxyCodeLine{362   m\_singularValues.resize(m\_diagSize);}
+\DoxyCodeLine{363   \textcolor{keywordflow}{if}(RowsAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}})}
+\DoxyCodeLine{364     m\_matrixU.resize(m\_rows, m\_computeFullU ? m\_rows : m\_computeThinU ? m\_diagSize : 0);}
+\DoxyCodeLine{365   \textcolor{keywordflow}{if}(ColsAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}})}
+\DoxyCodeLine{366     m\_matrixV.resize(m\_cols, m\_computeFullV ? m\_cols : m\_computeThinV ? m\_diagSize : 0);}
+\DoxyCodeLine{367 }
+\DoxyCodeLine{368   \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{369 \}}
+\DoxyCodeLine{370 }
+\DoxyCodeLine{371 \}\textcolor{comment}{// end namespace}}
+\DoxyCodeLine{372 }
+\DoxyCodeLine{373 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_SVDBASE\_H}}
+
+\end{DoxyCode}

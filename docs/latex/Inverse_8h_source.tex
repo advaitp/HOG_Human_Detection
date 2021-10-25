@@ -1,0 +1,105 @@
+\hypertarget{Inverse_8h_source}{}\doxysection{Inverse.\+h}
+\label{Inverse_8h_source}\index{include/Eigen/src/Core/Inverse.h@{include/Eigen/src/Core/Inverse.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2014-\/2019 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_INVERSE\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_INVERSE\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{template}<\textcolor{keyword}{typename} XprType,\textcolor{keyword}{typename} StorageKind> \textcolor{keyword}{class }InverseImpl;}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{20 }
+\DoxyCodeLine{21 \textcolor{keyword}{template}<\textcolor{keyword}{typename} XprType>}
+\DoxyCodeLine{22 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{classEigen_1_1Inverse}{Inverse}}<XprType> >}
+\DoxyCodeLine{23   : \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<typename XprType::PlainObject>}
+\DoxyCodeLine{24 \{}
+\DoxyCodeLine{25   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::PlainObject PlainObject;}
+\DoxyCodeLine{26   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<PlainObject>}} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{BaseTraits}};}
+\DoxyCodeLine{27   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{28     Flags = BaseTraits::Flags \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}}
+\DoxyCodeLine{29   \};}
+\DoxyCodeLine{30 \};}
+\DoxyCodeLine{31 }
+\DoxyCodeLine{32 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{33 }
+\DoxyCodeLine{44 \textcolor{keyword}{template}<\textcolor{keyword}{typename} XprType>}
+\DoxyCodeLine{45 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1Inverse}{Inverse}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1InverseImpl}{InverseImpl}}<XprType,typename internal::traits<XprType>::StorageKind>}
+\DoxyCodeLine{46 \{}
+\DoxyCodeLine{47 \textcolor{keyword}{public}:}
+\DoxyCodeLine{48   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::StorageIndex StorageIndex;}
+\DoxyCodeLine{49   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Scalar                            Scalar;}
+\DoxyCodeLine{50   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::ref\_selector<XprType>::type}}      \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{XprTypeNested}};}
+\DoxyCodeLine{51   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<XprTypeNested>::type  XprTypeNestedCleaned;}
+\DoxyCodeLine{52   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::ref\_selector<Inverse>::type}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{Nested}};}
+\DoxyCodeLine{53   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<XprType>::type NestedExpression;}
+\DoxyCodeLine{54 }
+\DoxyCodeLine{55   \textcolor{keyword}{explicit} EIGEN\_DEVICE\_FUNC \mbox{\hyperlink{classEigen_1_1Inverse}{Inverse}}(\textcolor{keyword}{const} XprType \&xpr)}
+\DoxyCodeLine{56     : m\_xpr(xpr)}
+\DoxyCodeLine{57   \{\}}
+\DoxyCodeLine{58 }
+\DoxyCodeLine{59   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR  \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_xpr.cols(); \}}
+\DoxyCodeLine{60   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR  \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_xpr.rows(); \}}
+\DoxyCodeLine{61 }
+\DoxyCodeLine{62   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{const} XprTypeNestedCleaned\& nestedExpression()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_xpr; \}}
+\DoxyCodeLine{63 }
+\DoxyCodeLine{64 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{65   \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{XprTypeNested}} m\_xpr;}
+\DoxyCodeLine{66 \};}
+\DoxyCodeLine{67 }
+\DoxyCodeLine{68 \textcolor{comment}{// Generic API dispatcher}}
+\DoxyCodeLine{69 \textcolor{keyword}{template}<\textcolor{keyword}{typename} XprType, \textcolor{keyword}{typename} StorageKind>}
+\DoxyCodeLine{70 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1InverseImpl}{InverseImpl}}}
+\DoxyCodeLine{71   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1generic__xpr__base}{internal::generic\_xpr\_base}}<Inverse<XprType> >::type}
+\DoxyCodeLine{72 \{}
+\DoxyCodeLine{73 \textcolor{keyword}{public}:}
+\DoxyCodeLine{74   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1generic__xpr__base}{internal::generic\_xpr\_base<Inverse<XprType>}} >::type \mbox{\hyperlink{classBase}{Base}};}
+\DoxyCodeLine{75   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Scalar Scalar;}
+\DoxyCodeLine{76 \textcolor{keyword}{private}:}
+\DoxyCodeLine{77 }
+\DoxyCodeLine{78   Scalar coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col) \textcolor{keyword}{const};}
+\DoxyCodeLine{79   Scalar coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i) \textcolor{keyword}{const};}
+\DoxyCodeLine{80 \};}
+\DoxyCodeLine{81 }
+\DoxyCodeLine{82 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{83 }
+\DoxyCodeLine{94 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ArgType>}
+\DoxyCodeLine{95 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1Inverse}{Inverse}}<ArgType> >}
+\DoxyCodeLine{96   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<typename Inverse<ArgType>::PlainObject>}
+\DoxyCodeLine{97 \{}
+\DoxyCodeLine{98   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Inverse}{Inverse<ArgType>}} \mbox{\hyperlink{classEigen_1_1Inverse}{InverseType}};}
+\DoxyCodeLine{99   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} InverseType::PlainObject PlainObject;}
+\DoxyCodeLine{100   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<PlainObject>}} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}};}
+\DoxyCodeLine{101 }
+\DoxyCodeLine{102   \textcolor{keyword}{enum} \{ Flags = Base::Flags | \mbox{\hyperlink{group__flags_gaa34e83bae46a8eeae4e69ebe3aaecbed}{EvalBeforeNestingBit}} \};}
+\DoxyCodeLine{103 }
+\DoxyCodeLine{104   \mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Inverse}{InverseType}}\& inv\_xpr)}
+\DoxyCodeLine{105     : m\_result(inv\_xpr.rows(), inv\_xpr.cols())}
+\DoxyCodeLine{106   \{}
+\DoxyCodeLine{107     ::new (\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})) \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}(m\_result);}
+\DoxyCodeLine{108     internal::call\_assignment\_no\_alias(m\_result, inv\_xpr);}
+\DoxyCodeLine{109   \}}
+\DoxyCodeLine{110 }
+\DoxyCodeLine{111 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{112   PlainObject m\_result;}
+\DoxyCodeLine{113 \};}
+\DoxyCodeLine{114 }
+\DoxyCodeLine{115 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{116 }
+\DoxyCodeLine{117 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{118 }
+\DoxyCodeLine{119 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_INVERSE\_H}}
+
+\end{DoxyCode}

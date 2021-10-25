@@ -1,0 +1,121 @@
+\hypertarget{StdDeque_8h_source}{}\doxysection{Std\+Deque.\+h}
+\label{StdDeque_8h_source}\index{include/Eigen/src/StlSupport/StdDeque.h@{include/Eigen/src/StlSupport/StdDeque.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2009 Hauke Heibel <hauke.heibel@googlemail.com>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_STDDEQUE\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_STDDEQUE\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#ifndef EIGEN\_STDDEQUE\_MODULE\_H}}
+\DoxyCodeLine{15 \textcolor{preprocessor}{\#error "{}Please include Eigen/StdDeque instead of including this file directly."{}}}
+\DoxyCodeLine{16 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{preprocessor}{\#include "{}details.h"{}}}
+\DoxyCodeLine{19 }
+\DoxyCodeLine{25 \textcolor{preprocessor}{\#define EIGEN\_DEFINE\_STL\_DEQUE\_SPECIALIZATION(...) \(\backslash\)}}
+\DoxyCodeLine{26 \textcolor{preprocessor}{namespace std \(\backslash\)}}
+\DoxyCodeLine{27 \textcolor{preprocessor}{\{ \(\backslash\)}}
+\DoxyCodeLine{28 \textcolor{preprocessor}{  template<> \(\backslash\)}}
+\DoxyCodeLine{29 \textcolor{preprocessor}{  class deque<\_\_VA\_ARGS\_\_, std::allocator<\_\_VA\_ARGS\_\_> >           \(\backslash\)}}
+\DoxyCodeLine{30 \textcolor{preprocessor}{    : public deque<\_\_VA\_ARGS\_\_, EIGEN\_ALIGNED\_ALLOCATOR<\_\_VA\_ARGS\_\_> > \(\backslash\)}}
+\DoxyCodeLine{31 \textcolor{preprocessor}{  \{ \(\backslash\)}}
+\DoxyCodeLine{32 \textcolor{preprocessor}{    typedef deque<\_\_VA\_ARGS\_\_, EIGEN\_ALIGNED\_ALLOCATOR<\_\_VA\_ARGS\_\_> > deque\_base; \(\backslash\)}}
+\DoxyCodeLine{33 \textcolor{preprocessor}{  public: \(\backslash\)}}
+\DoxyCodeLine{34 \textcolor{preprocessor}{    typedef \_\_VA\_ARGS\_\_ value\_type; \(\backslash\)}}
+\DoxyCodeLine{35 \textcolor{preprocessor}{    typedef deque\_base::allocator\_type allocator\_type; \(\backslash\)}}
+\DoxyCodeLine{36 \textcolor{preprocessor}{    typedef deque\_base::size\_type size\_type;  \(\backslash\)}}
+\DoxyCodeLine{37 \textcolor{preprocessor}{    typedef deque\_base::iterator iterator;  \(\backslash\)}}
+\DoxyCodeLine{38 \textcolor{preprocessor}{    explicit deque(const allocator\_type\& a = allocator\_type()) : deque\_base(a) \{\}  \(\backslash\)}}
+\DoxyCodeLine{39 \textcolor{preprocessor}{    template<typename InputIterator> \(\backslash\)}}
+\DoxyCodeLine{40 \textcolor{preprocessor}{    deque(InputIterator first, InputIterator last, const allocator\_type\& a = allocator\_type()) : deque\_base(first, last, a) \{\} \(\backslash\)}}
+\DoxyCodeLine{41 \textcolor{preprocessor}{    deque(const deque\& c) : deque\_base(c) \{\}  \(\backslash\)}}
+\DoxyCodeLine{42 \textcolor{preprocessor}{    explicit deque(size\_type num, const value\_type\& val = value\_type()) : deque\_base(num, val) \{\} \(\backslash\)}}
+\DoxyCodeLine{43 \textcolor{preprocessor}{    deque(iterator start\_, iterator end\_) : deque\_base(start\_, end\_) \{\}  \(\backslash\)}}
+\DoxyCodeLine{44 \textcolor{preprocessor}{    deque\& operator=(const deque\& x) \{  \(\backslash\)}}
+\DoxyCodeLine{45 \textcolor{preprocessor}{      deque\_base::operator=(x);  \(\backslash\)}}
+\DoxyCodeLine{46 \textcolor{preprocessor}{      return *this;  \(\backslash\)}}
+\DoxyCodeLine{47 \textcolor{preprocessor}{    \} \(\backslash\)}}
+\DoxyCodeLine{48 \textcolor{preprocessor}{  \}; \(\backslash\)}}
+\DoxyCodeLine{49 \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{50 }
+\DoxyCodeLine{51 \textcolor{comment}{// check whether we really need the std::deque specialization}}
+\DoxyCodeLine{52 \textcolor{preprocessor}{\#if !EIGEN\_HAS\_CXX11\_CONTAINERS \&\& !(defined(\_GLIBCXX\_DEQUE) \&\& (!EIGEN\_GNUC\_AT\_LEAST(4,1))) }\textcolor{comment}{/* Note that before gcc-\/4.1 we already have: std::deque::resize(size\_type,const T\&). */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{53 }
+\DoxyCodeLine{54 \textcolor{keyword}{namespace }std \{}
+\DoxyCodeLine{55 }
+\DoxyCodeLine{56 \textcolor{preprocessor}{\#define EIGEN\_STD\_DEQUE\_SPECIALIZATION\_BODY \(\backslash\)}}
+\DoxyCodeLine{57 \textcolor{preprocessor}{  public:  \(\backslash\)}}
+\DoxyCodeLine{58 \textcolor{preprocessor}{    typedef T value\_type; \(\backslash\)}}
+\DoxyCodeLine{59 \textcolor{preprocessor}{    typedef typename deque\_base::allocator\_type allocator\_type; \(\backslash\)}}
+\DoxyCodeLine{60 \textcolor{preprocessor}{    typedef typename deque\_base::size\_type size\_type;  \(\backslash\)}}
+\DoxyCodeLine{61 \textcolor{preprocessor}{    typedef typename deque\_base::iterator iterator;  \(\backslash\)}}
+\DoxyCodeLine{62 \textcolor{preprocessor}{    typedef typename deque\_base::const\_iterator const\_iterator;  \(\backslash\)}}
+\DoxyCodeLine{63 \textcolor{preprocessor}{    explicit deque(const allocator\_type\& a = allocator\_type()) : deque\_base(a) \{\}  \(\backslash\)}}
+\DoxyCodeLine{64 \textcolor{preprocessor}{    template<typename InputIterator> \(\backslash\)}}
+\DoxyCodeLine{65 \textcolor{preprocessor}{    deque(InputIterator first, InputIterator last, const allocator\_type\& a = allocator\_type()) \(\backslash\)}}
+\DoxyCodeLine{66 \textcolor{preprocessor}{    : deque\_base(first, last, a) \{\} \(\backslash\)}}
+\DoxyCodeLine{67 \textcolor{preprocessor}{    deque(const deque\& c) : deque\_base(c) \{\}  \(\backslash\)}}
+\DoxyCodeLine{68 \textcolor{preprocessor}{    explicit deque(size\_type num, const value\_type\& val = value\_type()) : deque\_base(num, val) \{\} \(\backslash\)}}
+\DoxyCodeLine{69 \textcolor{preprocessor}{    deque(iterator start\_, iterator end\_) : deque\_base(start\_, end\_) \{\}  \(\backslash\)}}
+\DoxyCodeLine{70 \textcolor{preprocessor}{    deque\& operator=(const deque\& x) \{  \(\backslash\)}}
+\DoxyCodeLine{71 \textcolor{preprocessor}{      deque\_base::operator=(x);  \(\backslash\)}}
+\DoxyCodeLine{72 \textcolor{preprocessor}{      return *this;  \(\backslash\)}}
+\DoxyCodeLine{73 \textcolor{preprocessor}{    \}}}
+\DoxyCodeLine{74 }
+\DoxyCodeLine{75   \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{76   \textcolor{keyword}{class }deque<T,EIGEN\_ALIGNED\_ALLOCATOR<T> >}
+\DoxyCodeLine{77     : \textcolor{keyword}{public} deque<EIGEN\_WORKAROUND\_MSVC\_STL\_SUPPORT(T),}
+\DoxyCodeLine{78                    Eigen::aligned\_allocator\_indirection<EIGEN\_WORKAROUND\_MSVC\_STL\_SUPPORT(T)> >}
+\DoxyCodeLine{79 \{}
+\DoxyCodeLine{80   \textcolor{keyword}{typedef} deque<EIGEN\_WORKAROUND\_MSVC\_STL\_SUPPORT(T),}
+\DoxyCodeLine{81                 \mbox{\hyperlink{classEigen_1_1aligned__allocator__indirection}{Eigen::aligned\_allocator\_indirection}}<EIGEN\_WORKAROUND\_MSVC\_STL\_SUPPORT(T)> > deque\_base;}
+\DoxyCodeLine{82   EIGEN\_STD\_DEQUE\_SPECIALIZATION\_BODY}
+\DoxyCodeLine{83 }
+\DoxyCodeLine{84   \textcolor{keywordtype}{void} resize(size\_type new\_size)}
+\DoxyCodeLine{85   \{ resize(new\_size, T()); \}}
+\DoxyCodeLine{86 }
+\DoxyCodeLine{87 \textcolor{preprocessor}{\#if defined(\_DEQUE\_)}}
+\DoxyCodeLine{88   \textcolor{comment}{// workaround MSVC std::deque implementation}}
+\DoxyCodeLine{89   \textcolor{keywordtype}{void} resize(size\_type new\_size, \textcolor{keyword}{const} value\_type\& x)}
+\DoxyCodeLine{90   \{}
+\DoxyCodeLine{91     \textcolor{keywordflow}{if} (deque\_base::size() < new\_size)}
+\DoxyCodeLine{92       deque\_base::\_Insert\_n(deque\_base::end(), new\_size -\/ deque\_base::size(), x);}
+\DoxyCodeLine{93     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (new\_size < deque\_base::size())}
+\DoxyCodeLine{94       deque\_base::erase(deque\_base::begin() + new\_size, deque\_base::end());}
+\DoxyCodeLine{95   \}}
+\DoxyCodeLine{96   \textcolor{keywordtype}{void} push\_back(\textcolor{keyword}{const} value\_type\& x)}
+\DoxyCodeLine{97   \{ deque\_base::push\_back(x); \} }
+\DoxyCodeLine{98   \textcolor{keywordtype}{void} push\_front(\textcolor{keyword}{const} value\_type\& x)}
+\DoxyCodeLine{99   \{ deque\_base::push\_front(x); \}}
+\DoxyCodeLine{100   \textcolor{keyword}{using} deque\_base::insert;  }
+\DoxyCodeLine{101   iterator insert(const\_iterator position, \textcolor{keyword}{const} value\_type\& x)}
+\DoxyCodeLine{102   \{ \textcolor{keywordflow}{return} deque\_base::insert(position,x); \}}
+\DoxyCodeLine{103   \textcolor{keywordtype}{void} insert(const\_iterator position, size\_type new\_size, \textcolor{keyword}{const} value\_type\& x)}
+\DoxyCodeLine{104   \{ deque\_base::insert(position, new\_size, x); \}}
+\DoxyCodeLine{105 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{106   \textcolor{comment}{// default implementation which should always work.}}
+\DoxyCodeLine{107   \textcolor{keywordtype}{void} resize(size\_type new\_size, \textcolor{keyword}{const} value\_type\& x)}
+\DoxyCodeLine{108   \{}
+\DoxyCodeLine{109     \textcolor{keywordflow}{if} (new\_size < deque\_base::size())}
+\DoxyCodeLine{110       deque\_base::erase(deque\_base::begin() + new\_size, deque\_base::end());}
+\DoxyCodeLine{111     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (new\_size > deque\_base::size())}
+\DoxyCodeLine{112       deque\_base::insert(deque\_base::end(), new\_size -\/ deque\_base::size(), x);}
+\DoxyCodeLine{113   \}}
+\DoxyCodeLine{114 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{115   \};}
+\DoxyCodeLine{116 \}}
+\DoxyCodeLine{117 }
+\DoxyCodeLine{118 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// check whether specialization is actually required}}
+\DoxyCodeLine{119 }
+\DoxyCodeLine{120 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_STDDEQUE\_H}}
+
+\end{DoxyCode}

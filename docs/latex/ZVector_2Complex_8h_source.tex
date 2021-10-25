@@ -1,0 +1,424 @@
+\hypertarget{ZVector_2Complex_8h_source}{}\doxysection{Complex.\+h}
+\label{ZVector_2Complex_8h_source}\index{include/Eigen/src/Core/arch/ZVector/Complex.h@{include/Eigen/src/Core/arch/ZVector/Complex.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2010 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2016 Konstantinos Margaritis <markos@freevec.org>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_COMPLEX32\_ALTIVEC\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_COMPLEX32\_ALTIVEC\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}../../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{19 }
+\DoxyCodeLine{20 \textcolor{preprocessor}{\#if !defined(\_\_ARCH\_\_) || (defined(\_\_ARCH\_\_) \&\& \_\_ARCH\_\_ >= 12)}}
+\DoxyCodeLine{21 \textcolor{keyword}{static} Packet4ui  p4ui\_CONJ\_XOR = \{ 0x00000000, 0x80000000, 0x00000000, 0x80000000 \}; \textcolor{comment}{//vec\_mergeh((Packet4ui)p4i\_ZERO, (Packet4ui)p4f\_MZERO);}}
+\DoxyCodeLine{22 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{23 }
+\DoxyCodeLine{24 \textcolor{keyword}{static} Packet2ul  p2ul\_CONJ\_XOR1 = (Packet2ul) vec\_sld((Packet4ui) p2d\_ZERO\_, (Packet4ui) p2l\_ZERO, 8);\textcolor{comment}{//\{ 0x8000000000000000, 0x0000000000000000 \};}}
+\DoxyCodeLine{25 \textcolor{keyword}{static} Packet2ul  p2ul\_CONJ\_XOR2 = (Packet2ul) vec\_sld((Packet4ui) p2l\_ZERO,  (Packet4ui) p2d\_ZERO\_, 8);\textcolor{comment}{//\{ 0x8000000000000000, 0x0000000000000000 \};}}
+\DoxyCodeLine{26 }
+\DoxyCodeLine{27 \textcolor{keyword}{struct }Packet1cd}
+\DoxyCodeLine{28 \{}
+\DoxyCodeLine{29   EIGEN\_STRONG\_INLINE Packet1cd() \{\}}
+\DoxyCodeLine{30   EIGEN\_STRONG\_INLINE \textcolor{keyword}{explicit} Packet1cd(\textcolor{keyword}{const} Packet2d\& a) : v(a) \{\}}
+\DoxyCodeLine{31   Packet2d v;}
+\DoxyCodeLine{32 \};}
+\DoxyCodeLine{33 }
+\DoxyCodeLine{34 \textcolor{keyword}{struct }Packet2cf}
+\DoxyCodeLine{35 \{}
+\DoxyCodeLine{36   EIGEN\_STRONG\_INLINE Packet2cf() \{\}}
+\DoxyCodeLine{37   EIGEN\_STRONG\_INLINE \textcolor{keyword}{explicit} Packet2cf(\textcolor{keyword}{const} Packet4f\& a) : v(a) \{\}}
+\DoxyCodeLine{38 \textcolor{preprocessor}{\#if !defined(\_\_ARCH\_\_) || (defined(\_\_ARCH\_\_) \&\& \_\_ARCH\_\_ < 12)}}
+\DoxyCodeLine{39   \textcolor{keyword}{union }\{}
+\DoxyCodeLine{40     Packet4f v;}
+\DoxyCodeLine{41     Packet1cd cd[2];}
+\DoxyCodeLine{42   \};}
+\DoxyCodeLine{43 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{44   Packet4f v;}
+\DoxyCodeLine{45 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{46 \};}
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }packet\_traits<std::complex<float> >  : default\_packet\_traits}
+\DoxyCodeLine{49 \{}
+\DoxyCodeLine{50   \textcolor{keyword}{typedef} Packet2cf type;}
+\DoxyCodeLine{51   \textcolor{keyword}{typedef} Packet2cf half;}
+\DoxyCodeLine{52   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{53     Vectorizable = 1,}
+\DoxyCodeLine{54     AlignedOnScalar = 1,}
+\DoxyCodeLine{55     size = 2,}
+\DoxyCodeLine{56     HasHalfPacket = 0,}
+\DoxyCodeLine{57 }
+\DoxyCodeLine{58     HasAdd    = 1,}
+\DoxyCodeLine{59     HasSub    = 1,}
+\DoxyCodeLine{60     HasMul    = 1,}
+\DoxyCodeLine{61     HasDiv    = 1,}
+\DoxyCodeLine{62     HasNegate = 1,}
+\DoxyCodeLine{63     HasAbs    = 0,}
+\DoxyCodeLine{64     HasAbs2   = 0,}
+\DoxyCodeLine{65     HasMin    = 0,}
+\DoxyCodeLine{66     HasMax    = 0,}
+\DoxyCodeLine{67     HasBlend  = 1,}
+\DoxyCodeLine{68     HasSetLinear = 0}
+\DoxyCodeLine{69   \};}
+\DoxyCodeLine{70 \};}
+\DoxyCodeLine{71 }
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }packet\_traits<std::complex<double> >  : default\_packet\_traits}
+\DoxyCodeLine{74 \{}
+\DoxyCodeLine{75   \textcolor{keyword}{typedef} Packet1cd type;}
+\DoxyCodeLine{76   \textcolor{keyword}{typedef} Packet1cd half;}
+\DoxyCodeLine{77   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{78     Vectorizable = 1,}
+\DoxyCodeLine{79     AlignedOnScalar = 1,}
+\DoxyCodeLine{80     size = 1,}
+\DoxyCodeLine{81     HasHalfPacket = 0,}
+\DoxyCodeLine{82 }
+\DoxyCodeLine{83     HasAdd    = 1,}
+\DoxyCodeLine{84     HasSub    = 1,}
+\DoxyCodeLine{85     HasMul    = 1,}
+\DoxyCodeLine{86     HasDiv    = 1,}
+\DoxyCodeLine{87     HasNegate = 1,}
+\DoxyCodeLine{88     HasAbs    = 0,}
+\DoxyCodeLine{89     HasAbs2   = 0,}
+\DoxyCodeLine{90     HasMin    = 0,}
+\DoxyCodeLine{91     HasMax    = 0,}
+\DoxyCodeLine{92     HasSetLinear = 0}
+\DoxyCodeLine{93   \};}
+\DoxyCodeLine{94 \};}
+\DoxyCodeLine{95 }
+\DoxyCodeLine{96 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }unpacket\_traits<Packet2cf> \{ \textcolor{keyword}{typedef} std::complex<float>  type; \textcolor{keyword}{enum} \{size=2, alignment=\mbox{\hyperlink{group__enums_gga45fe06e29902b7a2773de05ba27b47a1ad0b140cd97bc74365b51843d28379655}{Aligned16}}, vectorizable=\textcolor{keyword}{true}, masked\_load\_available=\textcolor{keyword}{false}, masked\_store\_available=\textcolor{keyword}{false}\}; \textcolor{keyword}{typedef} Packet2cf half; \};}
+\DoxyCodeLine{97 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }unpacket\_traits<Packet1cd> \{ \textcolor{keyword}{typedef} std::complex<double> type; \textcolor{keyword}{enum} \{size=1, alignment=\mbox{\hyperlink{group__enums_gga45fe06e29902b7a2773de05ba27b47a1ad0b140cd97bc74365b51843d28379655}{Aligned16}}, vectorizable=\textcolor{keyword}{true}, masked\_load\_available=\textcolor{keyword}{false}, masked\_store\_available=\textcolor{keyword}{false}\}; \textcolor{keyword}{typedef} Packet1cd half; \};}
+\DoxyCodeLine{98 }
+\DoxyCodeLine{99 \textcolor{comment}{/* Forward declaration */}}
+\DoxyCodeLine{100 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} ptranspose(PacketBlock<Packet2cf,2>\& kernel);}
+\DoxyCodeLine{101 }
+\DoxyCodeLine{102 \textcolor{comment}{/* complex<double> first */}}
+\DoxyCodeLine{103 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet1cd pload <Packet1cd>(\textcolor{keyword}{const} std::complex<double>* from) \{ EIGEN\_DEBUG\_ALIGNED\_LOAD \textcolor{keywordflow}{return} Packet1cd(pload<Packet2d>((\textcolor{keyword}{const} \textcolor{keywordtype}{double}*)from)); \}}
+\DoxyCodeLine{104 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet1cd ploadu<Packet1cd>(\textcolor{keyword}{const} std::complex<double>* from) \{ EIGEN\_DEBUG\_UNALIGNED\_LOAD \textcolor{keywordflow}{return} Packet1cd(ploadu<Packet2d>((\textcolor{keyword}{const} \textcolor{keywordtype}{double}*)from)); \}}
+\DoxyCodeLine{105 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pstore <std::complex<double> >(std::complex<double> *   to, \textcolor{keyword}{const} Packet1cd\& from) \{ EIGEN\_DEBUG\_ALIGNED\_STORE pstore((\textcolor{keywordtype}{double}*)to, from.v); \}}
+\DoxyCodeLine{106 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pstoreu<std::complex<double> >(std::complex<double> *   to, \textcolor{keyword}{const} Packet1cd\& from) \{ EIGEN\_DEBUG\_UNALIGNED\_STORE pstoreu((\textcolor{keywordtype}{double}*)to, from.v); \}}
+\DoxyCodeLine{107 }
+\DoxyCodeLine{108 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet1cd pset1<Packet1cd>(\textcolor{keyword}{const} std::complex<double>\&  from)}
+\DoxyCodeLine{109 \{ \textcolor{comment}{/* here we really have to use unaligned loads :( */} \textcolor{keywordflow}{return} ploadu<Packet1cd>(\&from); \}}
+\DoxyCodeLine{110 }
+\DoxyCodeLine{111 \textcolor{keyword}{template}<> EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} Packet1cd pgather<std::complex<double>, Packet1cd>(\textcolor{keyword}{const} std::complex<double>* from, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride EIGEN\_UNUSED)}
+\DoxyCodeLine{112 \{}
+\DoxyCodeLine{113   \textcolor{keywordflow}{return} pload<Packet1cd>(from);}
+\DoxyCodeLine{114 \}}
+\DoxyCodeLine{115 \textcolor{keyword}{template}<> EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keywordtype}{void} pscatter<std::complex<double>, Packet1cd>(std::complex<double>* to, \textcolor{keyword}{const} Packet1cd\& from, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride EIGEN\_UNUSED)}
+\DoxyCodeLine{116 \{}
+\DoxyCodeLine{117   pstore<std::complex<double> >(to, from);}
+\DoxyCodeLine{118 \}}
+\DoxyCodeLine{119 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet1cd padd<Packet1cd>(\textcolor{keyword}{const} Packet1cd\& a, \textcolor{keyword}{const} Packet1cd\& b) \{ \textcolor{keywordflow}{return} Packet1cd(a.v + b.v); \}}
+\DoxyCodeLine{120 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet1cd psub<Packet1cd>(\textcolor{keyword}{const} Packet1cd\& a, \textcolor{keyword}{const} Packet1cd\& b) \{ \textcolor{keywordflow}{return} Packet1cd(a.v -\/ b.v); \}}
+\DoxyCodeLine{121 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet1cd pnegate(\textcolor{keyword}{const} Packet1cd\& a) \{ \textcolor{keywordflow}{return} Packet1cd(pnegate(Packet2d(a.v))); \}}
+\DoxyCodeLine{122 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet1cd pconj(\textcolor{keyword}{const} Packet1cd\& a) \{ \textcolor{keywordflow}{return} Packet1cd((Packet2d)vec\_xor((Packet2d)a.v, (Packet2d)p2ul\_CONJ\_XOR2)); \}}
+\DoxyCodeLine{123 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet1cd pmul<Packet1cd>(\textcolor{keyword}{const} Packet1cd\& a, \textcolor{keyword}{const} Packet1cd\& b)}
+\DoxyCodeLine{124 \{}
+\DoxyCodeLine{125   Packet2d a\_re, a\_im, v1, v2;}
+\DoxyCodeLine{126 }
+\DoxyCodeLine{127   \textcolor{comment}{// Permute and multiply the real parts of a and b}}
+\DoxyCodeLine{128   a\_re = vec\_perm(a.v, a.v, p16uc\_PSET64\_HI);}
+\DoxyCodeLine{129   \textcolor{comment}{// Get the imaginary parts of a}}
+\DoxyCodeLine{130   a\_im = vec\_perm(a.v, a.v, p16uc\_PSET64\_LO);}
+\DoxyCodeLine{131   \textcolor{comment}{// multiply a\_re * b}}
+\DoxyCodeLine{132   v1 = vec\_madd(a\_re, b.v, p2d\_ZERO);}
+\DoxyCodeLine{133   \textcolor{comment}{// multiply a\_im * b and get the conjugate result}}
+\DoxyCodeLine{134   v2 = vec\_madd(a\_im, b.v, p2d\_ZERO);}
+\DoxyCodeLine{135   v2 = (Packet2d) vec\_sld((Packet4ui)v2, (Packet4ui)v2, 8);}
+\DoxyCodeLine{136   v2 = (Packet2d) vec\_xor((Packet2d)v2, (Packet2d) p2ul\_CONJ\_XOR1);}
+\DoxyCodeLine{137 }
+\DoxyCodeLine{138   \textcolor{keywordflow}{return} Packet1cd(v1 + v2);}
+\DoxyCodeLine{139 \}}
+\DoxyCodeLine{140 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet1cd pand    <Packet1cd>(\textcolor{keyword}{const} Packet1cd\& a, \textcolor{keyword}{const} Packet1cd\& b) \{ \textcolor{keywordflow}{return} Packet1cd(vec\_and(a.v,b.v)); \}}
+\DoxyCodeLine{141 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet1cd por     <Packet1cd>(\textcolor{keyword}{const} Packet1cd\& a, \textcolor{keyword}{const} Packet1cd\& b) \{ \textcolor{keywordflow}{return} Packet1cd(vec\_or(a.v,b.v)); \}}
+\DoxyCodeLine{142 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet1cd pxor    <Packet1cd>(\textcolor{keyword}{const} Packet1cd\& a, \textcolor{keyword}{const} Packet1cd\& b) \{ \textcolor{keywordflow}{return} Packet1cd(vec\_xor(a.v,b.v)); \}}
+\DoxyCodeLine{143 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet1cd pandnot <Packet1cd>(\textcolor{keyword}{const} Packet1cd\& a, \textcolor{keyword}{const} Packet1cd\& b) \{ \textcolor{keywordflow}{return} Packet1cd(vec\_and(a.v, vec\_nor(b.v,b.v))); \}}
+\DoxyCodeLine{144 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet1cd ploaddup<Packet1cd>(\textcolor{keyword}{const} std::complex<double>*     from) \{  \textcolor{keywordflow}{return} pset1<Packet1cd>(*from); \}}
+\DoxyCodeLine{145 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet1cd pcmp\_eq(\textcolor{keyword}{const} Packet1cd\& a, \textcolor{keyword}{const} Packet1cd\& b) \{}
+\DoxyCodeLine{146   Packet2d eq = vec\_cmpeq (a.v, b.v);}
+\DoxyCodeLine{147   Packet2d tmp = \{ eq[1], eq[0] \};}
+\DoxyCodeLine{148   \textcolor{keywordflow}{return} (Packet1cd)pand<Packet2d>(eq, tmp);}
+\DoxyCodeLine{149 \}}
+\DoxyCodeLine{150 }
+\DoxyCodeLine{151 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} prefetch<std::complex<double> >(\textcolor{keyword}{const} std::complex<double> *   addr) \{ EIGEN\_ZVECTOR\_PREFETCH(addr); \}}
+\DoxyCodeLine{152 }
+\DoxyCodeLine{153 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE std::complex<double>  pfirst<Packet1cd>(\textcolor{keyword}{const} Packet1cd\& a)}
+\DoxyCodeLine{154 \{}
+\DoxyCodeLine{155   std::complex<double> EIGEN\_ALIGN16 res;}
+\DoxyCodeLine{156   pstore<std::complex<double> >(\&res, a);}
+\DoxyCodeLine{157 }
+\DoxyCodeLine{158   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{159 \}}
+\DoxyCodeLine{160 }
+\DoxyCodeLine{161 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet1cd preverse(\textcolor{keyword}{const} Packet1cd\& a) \{ \textcolor{keywordflow}{return} a; \}}
+\DoxyCodeLine{162 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE std::complex<double> predux<Packet1cd>(\textcolor{keyword}{const} Packet1cd\& a)}
+\DoxyCodeLine{163 \{}
+\DoxyCodeLine{164   \textcolor{keywordflow}{return} pfirst(a);}
+\DoxyCodeLine{165 \}}
+\DoxyCodeLine{166 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE std::complex<double> predux\_mul<Packet1cd>(\textcolor{keyword}{const} Packet1cd\& a)}
+\DoxyCodeLine{167 \{}
+\DoxyCodeLine{168   \textcolor{keywordflow}{return} pfirst(a);}
+\DoxyCodeLine{169 \}}
+\DoxyCodeLine{170 EIGEN\_MAKE\_CONJ\_HELPER\_CPLX\_REAL(Packet1cd,Packet2d)}
+\DoxyCodeLine{171 }
+\DoxyCodeLine{172 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet1cd pdiv<Packet1cd>(\textcolor{keyword}{const} Packet1cd\& a, \textcolor{keyword}{const} Packet1cd\& b)}
+\DoxyCodeLine{173 \{}
+\DoxyCodeLine{174   \textcolor{keywordflow}{return} pdiv\_complex(a, b);}
+\DoxyCodeLine{175 \}}
+\DoxyCodeLine{176 }
+\DoxyCodeLine{177 EIGEN\_STRONG\_INLINE Packet1cd pcplxflip\textcolor{comment}{/*<Packet1cd>*/}(\textcolor{keyword}{const} Packet1cd\& x)}
+\DoxyCodeLine{178 \{}
+\DoxyCodeLine{179   \textcolor{keywordflow}{return} Packet1cd(preverse(Packet2d(x.v)));}
+\DoxyCodeLine{180 \}}
+\DoxyCodeLine{181 }
+\DoxyCodeLine{182 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} ptranspose(PacketBlock<Packet1cd,2>\& kernel)}
+\DoxyCodeLine{183 \{}
+\DoxyCodeLine{184   Packet2d tmp = vec\_perm(kernel.packet[0].v, kernel.packet[1].v, p16uc\_TRANSPOSE64\_HI);}
+\DoxyCodeLine{185   kernel.packet[1].v = vec\_perm(kernel.packet[0].v, kernel.packet[1].v, p16uc\_TRANSPOSE64\_LO);}
+\DoxyCodeLine{186   kernel.packet[0].v = tmp;}
+\DoxyCodeLine{187 \}}
+\DoxyCodeLine{188 }
+\DoxyCodeLine{189 \textcolor{comment}{/* complex<float> follows */}}
+\DoxyCodeLine{190 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf pload <Packet2cf>(\textcolor{keyword}{const} std::complex<float>* from)  \{ EIGEN\_DEBUG\_ALIGNED\_LOAD \textcolor{keywordflow}{return} Packet2cf(pload<Packet4f>((\textcolor{keyword}{const} \textcolor{keywordtype}{float}*)from)); \}}
+\DoxyCodeLine{191 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf ploadu<Packet2cf>(\textcolor{keyword}{const} std::complex<float>* from)  \{ EIGEN\_DEBUG\_UNALIGNED\_LOAD \textcolor{keywordflow}{return} Packet2cf(ploadu<Packet4f>((\textcolor{keyword}{const} \textcolor{keywordtype}{float}*)from)); \}}
+\DoxyCodeLine{192 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pstore <std::complex<float> >(std::complex<float> *     to, \textcolor{keyword}{const} Packet2cf\& from) \{ EIGEN\_DEBUG\_ALIGNED\_STORE pstore((\textcolor{keywordtype}{float}*)to, from.v); \}}
+\DoxyCodeLine{193 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pstoreu<std::complex<float> >(std::complex<float> *     to, \textcolor{keyword}{const} Packet2cf\& from) \{ EIGEN\_DEBUG\_UNALIGNED\_STORE pstoreu((\textcolor{keywordtype}{float}*)to, from.v); \}}
+\DoxyCodeLine{194 }
+\DoxyCodeLine{195 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE std::complex<float>  pfirst<Packet2cf>(\textcolor{keyword}{const} Packet2cf\& a)}
+\DoxyCodeLine{196 \{}
+\DoxyCodeLine{197   std::complex<float> EIGEN\_ALIGN16 res[2];}
+\DoxyCodeLine{198   pstore<std::complex<float> >(res, a);}
+\DoxyCodeLine{199 }
+\DoxyCodeLine{200   \textcolor{keywordflow}{return} res[0];}
+\DoxyCodeLine{201 \}}
+\DoxyCodeLine{202 }
+\DoxyCodeLine{203 }
+\DoxyCodeLine{204 \textcolor{preprocessor}{\#if !defined(\_\_ARCH\_\_) || (defined(\_\_ARCH\_\_) \&\& \_\_ARCH\_\_ < 12)}}
+\DoxyCodeLine{205 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf pset1<Packet2cf>(\textcolor{keyword}{const} std::complex<float>\&  from)}
+\DoxyCodeLine{206 \{}
+\DoxyCodeLine{207   Packet2cf res;}
+\DoxyCodeLine{208   res.cd[0] = Packet1cd(vec\_ld2f((\textcolor{keyword}{const} \textcolor{keywordtype}{float} *)\&from));}
+\DoxyCodeLine{209   res.cd[1] = res.cd[0];}
+\DoxyCodeLine{210   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{211 \}}
+\DoxyCodeLine{212 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{213 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf pset1<Packet2cf>(\textcolor{keyword}{const} std::complex<float>\&  from)}
+\DoxyCodeLine{214 \{}
+\DoxyCodeLine{215   Packet2cf res;}
+\DoxyCodeLine{216   \textcolor{keywordflow}{if}((std::ptrdiff\_t(\&from) \% 16) == 0)}
+\DoxyCodeLine{217     res.v = pload<Packet4f>((\textcolor{keyword}{const} \textcolor{keywordtype}{float} *)\&from);}
+\DoxyCodeLine{218   \textcolor{keywordflow}{else}}
+\DoxyCodeLine{219     res.v = ploadu<Packet4f>((\textcolor{keyword}{const} \textcolor{keywordtype}{float} *)\&from);}
+\DoxyCodeLine{220   res.v = vec\_perm(res.v, res.v, p16uc\_PSET64\_HI);}
+\DoxyCodeLine{221   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{222 \}}
+\DoxyCodeLine{223 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{224 }
+\DoxyCodeLine{225 \textcolor{keyword}{template}<> EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} Packet2cf pgather<std::complex<float>, Packet2cf>(\textcolor{keyword}{const} std::complex<float>* from, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride)}
+\DoxyCodeLine{226 \{}
+\DoxyCodeLine{227   std::complex<float> EIGEN\_ALIGN16 af[2];}
+\DoxyCodeLine{228   af[0] = from[0*stride];}
+\DoxyCodeLine{229   af[1] = from[1*stride];}
+\DoxyCodeLine{230   \textcolor{keywordflow}{return} pload<Packet2cf>(af);}
+\DoxyCodeLine{231 \}}
+\DoxyCodeLine{232 \textcolor{keyword}{template}<> EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keywordtype}{void} pscatter<std::complex<float>, Packet2cf>(std::complex<float>* to, \textcolor{keyword}{const} Packet2cf\& from, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride)}
+\DoxyCodeLine{233 \{}
+\DoxyCodeLine{234   std::complex<float> EIGEN\_ALIGN16 af[2];}
+\DoxyCodeLine{235   pstore<std::complex<float> >((std::complex<float> *) af, from);}
+\DoxyCodeLine{236   to[0*stride] = af[0];}
+\DoxyCodeLine{237   to[1*stride] = af[1];}
+\DoxyCodeLine{238 \}}
+\DoxyCodeLine{239 }
+\DoxyCodeLine{240 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf padd<Packet2cf>(\textcolor{keyword}{const} Packet2cf\& a, \textcolor{keyword}{const} Packet2cf\& b) \{ \textcolor{keywordflow}{return} Packet2cf(padd<Packet4f>(a.v, b.v)); \}}
+\DoxyCodeLine{241 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf psub<Packet2cf>(\textcolor{keyword}{const} Packet2cf\& a, \textcolor{keyword}{const} Packet2cf\& b) \{ \textcolor{keywordflow}{return} Packet2cf(psub<Packet4f>(a.v, b.v)); \}}
+\DoxyCodeLine{242 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf pnegate(\textcolor{keyword}{const} Packet2cf\& a) \{ \textcolor{keywordflow}{return} Packet2cf(pnegate(Packet4f(a.v))); \}}
+\DoxyCodeLine{243 }
+\DoxyCodeLine{244 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf pand   <Packet2cf>(\textcolor{keyword}{const} Packet2cf\& a, \textcolor{keyword}{const} Packet2cf\& b) \{ \textcolor{keywordflow}{return} Packet2cf(pand<Packet4f>(a.v,b.v)); \}}
+\DoxyCodeLine{245 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf por    <Packet2cf>(\textcolor{keyword}{const} Packet2cf\& a, \textcolor{keyword}{const} Packet2cf\& b) \{ \textcolor{keywordflow}{return} Packet2cf(por<Packet4f>(a.v,b.v)); \}}
+\DoxyCodeLine{246 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf pxor   <Packet2cf>(\textcolor{keyword}{const} Packet2cf\& a, \textcolor{keyword}{const} Packet2cf\& b) \{ \textcolor{keywordflow}{return} Packet2cf(pxor<Packet4f>(a.v,b.v)); \}}
+\DoxyCodeLine{247 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf pandnot<Packet2cf>(\textcolor{keyword}{const} Packet2cf\& a, \textcolor{keyword}{const} Packet2cf\& b) \{ \textcolor{keywordflow}{return} Packet2cf(pandnot<Packet4f>(a.v,b.v)); \}}
+\DoxyCodeLine{248 }
+\DoxyCodeLine{249 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf ploaddup<Packet2cf>(\textcolor{keyword}{const} std::complex<float>*      from) \{  \textcolor{keywordflow}{return} pset1<Packet2cf>(*from); \}}
+\DoxyCodeLine{250 }
+\DoxyCodeLine{251 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} prefetch<std::complex<float> >(\textcolor{keyword}{const} std::complex<float> *     addr) \{ EIGEN\_ZVECTOR\_PREFETCH(addr); \}}
+\DoxyCodeLine{252 }
+\DoxyCodeLine{253 }
+\DoxyCodeLine{254 \textcolor{preprocessor}{\#if !defined(\_\_ARCH\_\_) || (defined(\_\_ARCH\_\_) \&\& \_\_ARCH\_\_ < 12)}}
+\DoxyCodeLine{255 }
+\DoxyCodeLine{256 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf pcmp\_eq(\textcolor{keyword}{const} Packet2cf\& a, \textcolor{keyword}{const} Packet2cf\& b) \{}
+\DoxyCodeLine{257   Packet4f eq = pcmp\_eq<Packet4f> (a.v, b.v);}
+\DoxyCodeLine{258   Packet2cf res;}
+\DoxyCodeLine{259   Packet2d tmp1 = \{ eq.v4f[0][1], eq.v4f[0][0] \};}
+\DoxyCodeLine{260   Packet2d tmp2 = \{ eq.v4f[1][1], eq.v4f[1][0] \};}
+\DoxyCodeLine{261   res.v.v4f[0] = pand<Packet2d>(eq.v4f[0], tmp1);}
+\DoxyCodeLine{262   res.v.v4f[1] = pand<Packet2d>(eq.v4f[1], tmp2);}
+\DoxyCodeLine{263   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{264 \}}
+\DoxyCodeLine{265 }
+\DoxyCodeLine{266 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf pconj(\textcolor{keyword}{const} Packet2cf\& a)}
+\DoxyCodeLine{267 \{}
+\DoxyCodeLine{268   Packet2cf res;}
+\DoxyCodeLine{269   res.v.v4f[0] = pconj(Packet1cd(\textcolor{keyword}{reinterpret\_cast<}Packet2d\textcolor{keyword}{>}(a.v.v4f[0]))).v;}
+\DoxyCodeLine{270   res.v.v4f[1] = pconj(Packet1cd(\textcolor{keyword}{reinterpret\_cast<}Packet2d\textcolor{keyword}{>}(a.v.v4f[1]))).v;}
+\DoxyCodeLine{271   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{272 \}}
+\DoxyCodeLine{273 }
+\DoxyCodeLine{274 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf pmul<Packet2cf>(\textcolor{keyword}{const} Packet2cf\& a, \textcolor{keyword}{const} Packet2cf\& b)}
+\DoxyCodeLine{275 \{}
+\DoxyCodeLine{276   Packet2cf res;}
+\DoxyCodeLine{277   res.v.v4f[0] = pmul(Packet1cd(\textcolor{keyword}{reinterpret\_cast<}Packet2d\textcolor{keyword}{>}(a.v.v4f[0])), Packet1cd(\textcolor{keyword}{reinterpret\_cast<}Packet2d\textcolor{keyword}{>}(b.v.v4f[0]))).v;}
+\DoxyCodeLine{278   res.v.v4f[1] = pmul(Packet1cd(\textcolor{keyword}{reinterpret\_cast<}Packet2d\textcolor{keyword}{>}(a.v.v4f[1])), Packet1cd(\textcolor{keyword}{reinterpret\_cast<}Packet2d\textcolor{keyword}{>}(b.v.v4f[1]))).v;}
+\DoxyCodeLine{279   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{280 \}}
+\DoxyCodeLine{281 }
+\DoxyCodeLine{282 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf preverse(\textcolor{keyword}{const} Packet2cf\& a)}
+\DoxyCodeLine{283 \{}
+\DoxyCodeLine{284   Packet2cf res;}
+\DoxyCodeLine{285   res.cd[0] = a.cd[1];}
+\DoxyCodeLine{286   res.cd[1] = a.cd[0];}
+\DoxyCodeLine{287   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{288 \}}
+\DoxyCodeLine{289 }
+\DoxyCodeLine{290 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE std::complex<float> predux<Packet2cf>(\textcolor{keyword}{const} Packet2cf\& a)}
+\DoxyCodeLine{291 \{}
+\DoxyCodeLine{292   std::complex<float> res;}
+\DoxyCodeLine{293   Packet1cd b = padd<Packet1cd>(a.cd[0], a.cd[1]);}
+\DoxyCodeLine{294   vec\_st2f(b.v, (\textcolor{keywordtype}{float}*)\&res);}
+\DoxyCodeLine{295   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{296 \}}
+\DoxyCodeLine{297 }
+\DoxyCodeLine{298 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE std::complex<float> predux\_mul<Packet2cf>(\textcolor{keyword}{const} Packet2cf\& a)}
+\DoxyCodeLine{299 \{}
+\DoxyCodeLine{300   std::complex<float> res;}
+\DoxyCodeLine{301   Packet1cd b = pmul<Packet1cd>(a.cd[0], a.cd[1]);}
+\DoxyCodeLine{302   vec\_st2f(b.v, (\textcolor{keywordtype}{float}*)\&res);}
+\DoxyCodeLine{303   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{304 \}}
+\DoxyCodeLine{305 }
+\DoxyCodeLine{306 EIGEN\_MAKE\_CONJ\_HELPER\_CPLX\_REAL(Packet2cf,Packet4f)}
+\DoxyCodeLine{307 }
+\DoxyCodeLine{308 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf pdiv<Packet2cf>(\textcolor{keyword}{const} Packet2cf\& a, \textcolor{keyword}{const} Packet2cf\& b)}
+\DoxyCodeLine{309 \{}
+\DoxyCodeLine{310   \textcolor{keywordflow}{return} pdiv\_complex(a, b);}
+\DoxyCodeLine{311 \}}
+\DoxyCodeLine{312 }
+\DoxyCodeLine{313 EIGEN\_STRONG\_INLINE Packet2cf pcplxflip\textcolor{comment}{/*<Packet2cf>*/}(\textcolor{keyword}{const} Packet2cf\& x)}
+\DoxyCodeLine{314 \{}
+\DoxyCodeLine{315   Packet2cf res;}
+\DoxyCodeLine{316   res.cd[0] = pcplxflip(x.cd[0]);}
+\DoxyCodeLine{317   res.cd[1] = pcplxflip(x.cd[1]);}
+\DoxyCodeLine{318   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{319 \}}
+\DoxyCodeLine{320 }
+\DoxyCodeLine{321 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} ptranspose(PacketBlock<Packet2cf,2>\& kernel)}
+\DoxyCodeLine{322 \{}
+\DoxyCodeLine{323   Packet1cd tmp = kernel.packet[0].cd[1];}
+\DoxyCodeLine{324   kernel.packet[0].cd[1] = kernel.packet[1].cd[0];}
+\DoxyCodeLine{325   kernel.packet[1].cd[0] = tmp;}
+\DoxyCodeLine{326 \}}
+\DoxyCodeLine{327 }
+\DoxyCodeLine{328 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf pblend(\textcolor{keyword}{const} Selector<2>\& ifPacket, \textcolor{keyword}{const} Packet2cf\& thenPacket, \textcolor{keyword}{const} Packet2cf\& elsePacket) \{}
+\DoxyCodeLine{329   Packet2cf result;}
+\DoxyCodeLine{330   \textcolor{keyword}{const} Selector<4> ifPacket4 = \{ ifPacket.select[0], ifPacket.select[0], ifPacket.select[1], ifPacket.select[1] \};}
+\DoxyCodeLine{331   result.v = pblend<Packet4f>(ifPacket4, thenPacket.v, elsePacket.v);}
+\DoxyCodeLine{332   \textcolor{keywordflow}{return} result;}
+\DoxyCodeLine{333 \}}
+\DoxyCodeLine{334 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{335 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf pcmp\_eq(\textcolor{keyword}{const} Packet2cf\& a, \textcolor{keyword}{const} Packet2cf\& b) \{}
+\DoxyCodeLine{336   Packet4f eq = vec\_cmpeq (a.v, b.v);}
+\DoxyCodeLine{337   Packet4f tmp = \{ eq[1], eq[0], eq[3], eq[2] \};}
+\DoxyCodeLine{338   \textcolor{keywordflow}{return} (Packet2cf)pand<Packet4f>(eq, tmp);}
+\DoxyCodeLine{339 \}}
+\DoxyCodeLine{340 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf pconj(\textcolor{keyword}{const} Packet2cf\& a) \{ \textcolor{keywordflow}{return} Packet2cf(pxor<Packet4f>(a.v, \textcolor{keyword}{reinterpret\_cast<}Packet4f\textcolor{keyword}{>}(p4ui\_CONJ\_XOR))); \}}
+\DoxyCodeLine{341 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf pmul<Packet2cf>(\textcolor{keyword}{const} Packet2cf\& a, \textcolor{keyword}{const} Packet2cf\& b)}
+\DoxyCodeLine{342 \{}
+\DoxyCodeLine{343   Packet4f a\_re, a\_im, prod, prod\_im;}
+\DoxyCodeLine{344 }
+\DoxyCodeLine{345   \textcolor{comment}{// Permute and multiply the real parts of a and b}}
+\DoxyCodeLine{346   a\_re = vec\_perm(a.v, a.v, p16uc\_PSET32\_WODD);}
+\DoxyCodeLine{347   }
+\DoxyCodeLine{348   \textcolor{comment}{// Get the imaginary parts of a}}
+\DoxyCodeLine{349   a\_im = vec\_perm(a.v, a.v, p16uc\_PSET32\_WEVEN);}
+\DoxyCodeLine{350 }
+\DoxyCodeLine{351   \textcolor{comment}{// multiply a\_im * b and get the conjugate result}}
+\DoxyCodeLine{352   prod\_im = a\_im * b.v;}
+\DoxyCodeLine{353   prod\_im = pxor<Packet4f>(prod\_im, \textcolor{keyword}{reinterpret\_cast<}Packet4f\textcolor{keyword}{>}(p4ui\_CONJ\_XOR));}
+\DoxyCodeLine{354   \textcolor{comment}{// permute back to a proper order}}
+\DoxyCodeLine{355   prod\_im = vec\_perm(prod\_im, prod\_im, p16uc\_COMPLEX32\_REV);}
+\DoxyCodeLine{356 }
+\DoxyCodeLine{357   \textcolor{comment}{// multiply a\_re * b, add prod\_im}}
+\DoxyCodeLine{358   prod = pmadd<Packet4f>(a\_re, b.v, prod\_im);}
+\DoxyCodeLine{359  }
+\DoxyCodeLine{360   \textcolor{keywordflow}{return} Packet2cf(prod);}
+\DoxyCodeLine{361 \}}
+\DoxyCodeLine{362 }
+\DoxyCodeLine{363 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf preverse(\textcolor{keyword}{const} Packet2cf\& a)}
+\DoxyCodeLine{364 \{}
+\DoxyCodeLine{365   Packet4f rev\_a;}
+\DoxyCodeLine{366   rev\_a = vec\_perm(a.v, a.v, p16uc\_COMPLEX32\_REV2);}
+\DoxyCodeLine{367   \textcolor{keywordflow}{return} Packet2cf(rev\_a);}
+\DoxyCodeLine{368 \}}
+\DoxyCodeLine{369 }
+\DoxyCodeLine{370 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE std::complex<float> predux<Packet2cf>(\textcolor{keyword}{const} Packet2cf\& a)}
+\DoxyCodeLine{371 \{}
+\DoxyCodeLine{372   Packet4f b;}
+\DoxyCodeLine{373   b = vec\_sld(a.v, a.v, 8);}
+\DoxyCodeLine{374   b = padd<Packet4f>(a.v, b);}
+\DoxyCodeLine{375   \textcolor{keywordflow}{return} pfirst<Packet2cf>(Packet2cf(b));}
+\DoxyCodeLine{376 \}}
+\DoxyCodeLine{377 }
+\DoxyCodeLine{378 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE std::complex<float> predux\_mul<Packet2cf>(\textcolor{keyword}{const} Packet2cf\& a)}
+\DoxyCodeLine{379 \{}
+\DoxyCodeLine{380   Packet4f b;}
+\DoxyCodeLine{381   Packet2cf prod;}
+\DoxyCodeLine{382   b = vec\_sld(a.v, a.v, 8);}
+\DoxyCodeLine{383   prod = pmul<Packet2cf>(a, Packet2cf(b));}
+\DoxyCodeLine{384 }
+\DoxyCodeLine{385   \textcolor{keywordflow}{return} pfirst<Packet2cf>(prod);}
+\DoxyCodeLine{386 \}}
+\DoxyCodeLine{387 }
+\DoxyCodeLine{388 EIGEN\_MAKE\_CONJ\_HELPER\_CPLX\_REAL(Packet2cf,Packet4f)}
+\DoxyCodeLine{389 }
+\DoxyCodeLine{390 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf pdiv<Packet2cf>(\textcolor{keyword}{const} Packet2cf\& a, \textcolor{keyword}{const} Packet2cf\& b)}
+\DoxyCodeLine{391 \{}
+\DoxyCodeLine{392   \textcolor{keywordflow}{return} pdiv\_complex(a, b);}
+\DoxyCodeLine{393 \}}
+\DoxyCodeLine{394 }
+\DoxyCodeLine{395 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf pcplxflip<Packet2cf>(\textcolor{keyword}{const} Packet2cf\& x)}
+\DoxyCodeLine{396 \{}
+\DoxyCodeLine{397   \textcolor{keywordflow}{return} Packet2cf(vec\_perm(x.v, x.v, p16uc\_COMPLEX32\_REV));}
+\DoxyCodeLine{398 \}}
+\DoxyCodeLine{399 }
+\DoxyCodeLine{400 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} ptranspose(PacketBlock<Packet2cf,2>\& kernel)}
+\DoxyCodeLine{401 \{}
+\DoxyCodeLine{402   Packet4f tmp = vec\_perm(kernel.packet[0].v, kernel.packet[1].v, p16uc\_TRANSPOSE64\_HI);}
+\DoxyCodeLine{403   kernel.packet[1].v = vec\_perm(kernel.packet[0].v, kernel.packet[1].v, p16uc\_TRANSPOSE64\_LO);}
+\DoxyCodeLine{404   kernel.packet[0].v = tmp;}
+\DoxyCodeLine{405 \}}
+\DoxyCodeLine{406 }
+\DoxyCodeLine{407 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2cf pblend(\textcolor{keyword}{const} Selector<2>\& ifPacket, \textcolor{keyword}{const} Packet2cf\& thenPacket, \textcolor{keyword}{const} Packet2cf\& elsePacket) \{}
+\DoxyCodeLine{408   Packet2cf result;}
+\DoxyCodeLine{409   result.v = \textcolor{keyword}{reinterpret\_cast<}Packet4f\textcolor{keyword}{>}(pblend<Packet2d>(ifPacket, \textcolor{keyword}{reinterpret\_cast<}Packet2d\textcolor{keyword}{>}(thenPacket.v), \textcolor{keyword}{reinterpret\_cast<}Packet2d\textcolor{keyword}{>}(elsePacket.v)));}
+\DoxyCodeLine{410   \textcolor{keywordflow}{return} result;}
+\DoxyCodeLine{411 \}}
+\DoxyCodeLine{412 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{413 }
+\DoxyCodeLine{414 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{415 }
+\DoxyCodeLine{416 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{417 }
+\DoxyCodeLine{418 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_COMPLEX32\_ALTIVEC\_H}}
+
+\end{DoxyCode}

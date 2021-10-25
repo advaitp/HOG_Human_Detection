@@ -1,0 +1,57 @@
+\hypertarget{SVE_2TypeCasting_8h_source}{}\doxysection{Type\+Casting.\+h}
+\label{SVE_2TypeCasting_8h_source}\index{include/Eigen/src/Core/arch/SVE/TypeCasting.h@{include/Eigen/src/Core/arch/SVE/TypeCasting.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2020, Arm Limited and Contributors}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_TYPE\_CASTING\_SVE\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_TYPE\_CASTING\_SVE\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}../../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{16 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{19 \textcolor{keyword}{struct }type\_casting\_traits<float, numext::int32\_t> \{}
+\DoxyCodeLine{20   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{21 \};}
+\DoxyCodeLine{22 }
+\DoxyCodeLine{23 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{24 \textcolor{keyword}{struct }type\_casting\_traits<numext::int32\_t, float> \{}
+\DoxyCodeLine{25   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{26 \};}
+\DoxyCodeLine{27 }
+\DoxyCodeLine{28 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{29 EIGEN\_STRONG\_INLINE PacketXf pcast<PacketXi, PacketXf>(\textcolor{keyword}{const} PacketXi\& a) \{}
+\DoxyCodeLine{30   \textcolor{keywordflow}{return} svcvt\_f32\_s32\_z(svptrue\_b32(), a);}
+\DoxyCodeLine{31 \}}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{34 EIGEN\_STRONG\_INLINE PacketXi pcast<PacketXf, PacketXi>(\textcolor{keyword}{const} PacketXf\& a) \{}
+\DoxyCodeLine{35   \textcolor{keywordflow}{return} svcvt\_s32\_f32\_z(svptrue\_b32(), a);}
+\DoxyCodeLine{36 \}}
+\DoxyCodeLine{37 }
+\DoxyCodeLine{38 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{39 EIGEN\_STRONG\_INLINE PacketXf preinterpret<PacketXf, PacketXi>(\textcolor{keyword}{const} PacketXi\& a) \{}
+\DoxyCodeLine{40   \textcolor{keywordflow}{return} svreinterpret\_f32\_s32(a);}
+\DoxyCodeLine{41 \}}
+\DoxyCodeLine{42 }
+\DoxyCodeLine{43 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{44 EIGEN\_STRONG\_INLINE PacketXi preinterpret<PacketXi, PacketXf>(\textcolor{keyword}{const} PacketXf\& a) \{}
+\DoxyCodeLine{45   \textcolor{keywordflow}{return} svreinterpret\_s32\_f32(a);}
+\DoxyCodeLine{46 \}}
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48 \}  \textcolor{comment}{// namespace internal}}
+\DoxyCodeLine{49 \}  \textcolor{comment}{// namespace Eigen}}
+\DoxyCodeLine{50 }
+\DoxyCodeLine{51 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_TYPE\_CASTING\_SVE\_H}}
+
+\end{DoxyCode}

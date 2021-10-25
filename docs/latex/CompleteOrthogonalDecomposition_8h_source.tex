@@ -1,0 +1,412 @@
+\hypertarget{CompleteOrthogonalDecomposition_8h_source}{}\doxysection{Complete\+Orthogonal\+Decomposition.\+h}
+\label{CompleteOrthogonalDecomposition_8h_source}\index{include/Eigen/src/QR/CompleteOrthogonalDecomposition.h@{include/Eigen/src/QR/CompleteOrthogonalDecomposition.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2016 Rasmus Munk Larsen <rmlarsen@google.com>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_COMPLETEORTHOGONALDECOMPOSITION\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_COMPLETEORTHOGONALDECOMPOSITION\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{18 \textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixType\_>}
+\DoxyCodeLine{19 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition}{CompleteOrthogonalDecomposition}}<MatrixType\_> >}
+\DoxyCodeLine{20     : \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<MatrixType\_> \{}
+\DoxyCodeLine{21   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1MatrixXpr}{MatrixXpr}} \mbox{\hyperlink{structEigen_1_1MatrixXpr}{XprKind}};}
+\DoxyCodeLine{22   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1SolverStorage}{SolverStorage}} \mbox{\hyperlink{structEigen_1_1SolverStorage}{StorageKind}};}
+\DoxyCodeLine{23   \textcolor{keyword}{typedef} \textcolor{keywordtype}{int} StorageIndex;}
+\DoxyCodeLine{24   \textcolor{keyword}{enum} \{ Flags = 0 \};}
+\DoxyCodeLine{25 \};}
+\DoxyCodeLine{26 }
+\DoxyCodeLine{27 \}  \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{28 }
+\DoxyCodeLine{52 \textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixType\_> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition}{CompleteOrthogonalDecomposition}}}
+\DoxyCodeLine{53           : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1SolverBase}{SolverBase}}<CompleteOrthogonalDecomposition<MatrixType\_> >}
+\DoxyCodeLine{54 \{}
+\DoxyCodeLine{55  \textcolor{keyword}{public}:}
+\DoxyCodeLine{56   \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{57   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SolverBase}{SolverBase<CompleteOrthogonalDecomposition>}} \mbox{\hyperlink{classEigen_1_1SolverBase}{Base}};}
+\DoxyCodeLine{58 }
+\DoxyCodeLine{59   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{60   \textcolor{keyword}{friend} \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1solve__assertion}{internal::solve\_assertion}};}
+\DoxyCodeLine{61 }
+\DoxyCodeLine{62   EIGEN\_GENERIC\_PUBLIC\_INTERFACE(\mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition}{CompleteOrthogonalDecomposition}})}
+\DoxyCodeLine{63   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{64     MaxRowsAtCompileTime = MatrixType::MaxRowsAtCompileTime,}
+\DoxyCodeLine{65     MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime}
+\DoxyCodeLine{66   \};}
+\DoxyCodeLine{67   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::plain\_diag\_type<MatrixType>::type}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{HCoeffsType}};}
+\DoxyCodeLine{68   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationMatrix<ColsAtCompileTime, MaxColsAtCompileTime>}}}
+\DoxyCodeLine{69       \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationType}};}
+\DoxyCodeLine{70   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::plain\_row\_type<MatrixType, Index>::type}}}
+\DoxyCodeLine{71       \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{IntRowVectorType}};}
+\DoxyCodeLine{72   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::plain\_row\_type<MatrixType>::type}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{RowVectorType}};}
+\DoxyCodeLine{73   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::plain\_row\_type<MatrixType, RealScalar>::type}}}
+\DoxyCodeLine{74       \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{RealRowVectorType}};}
+\DoxyCodeLine{75   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1HouseholderSequence}{HouseholderSequence}}<}
+\DoxyCodeLine{76       MatrixType, \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1remove__all}{internal::remove\_all}}<}
+\DoxyCodeLine{77                       \textcolor{keyword}{typename} HCoeffsType::ConjugateReturnType>::type>}
+\DoxyCodeLine{78       \mbox{\hyperlink{classEigen_1_1HouseholderSequence}{HouseholderSequenceType}};}
+\DoxyCodeLine{79   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::PlainObject PlainObject;}
+\DoxyCodeLine{80 }
+\DoxyCodeLine{81  \textcolor{keyword}{private}:}
+\DoxyCodeLine{82   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{PermutationType::Index}} PermIndexType;}
+\DoxyCodeLine{83 }
+\DoxyCodeLine{84  \textcolor{keyword}{public}:}
+\DoxyCodeLine{92   \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_a8a94c3d01d207ef16aa2177a2b0c5953}{CompleteOrthogonalDecomposition}}() : m\_cpqr(), m\_zCoeffs(), m\_temp() \{\}}
+\DoxyCodeLine{93 }
+\DoxyCodeLine{100   \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_ad8910c5d4d52bc29ecda801bd9acf10e}{CompleteOrthogonalDecomposition}}(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} rows, \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} cols)}
+\DoxyCodeLine{101       : m\_cpqr(rows, cols), m\_zCoeffs((std::min)(rows, cols)), m\_temp(cols) \{\}}
+\DoxyCodeLine{102 }
+\DoxyCodeLine{119   \textcolor{keyword}{template} <\textcolor{keyword}{typename} InputType>}
+\DoxyCodeLine{120   \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_a94e1eb8a57d1e604b61a73a510ded439}{CompleteOrthogonalDecomposition}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<InputType>}}\& matrix)}
+\DoxyCodeLine{121       : m\_cpqr(matrix.rows(), matrix.cols()),}
+\DoxyCodeLine{122         m\_zCoeffs((std::min)(matrix.rows(), matrix.cols())),}
+\DoxyCodeLine{123         m\_temp(matrix.cols())}
+\DoxyCodeLine{124   \{}
+\DoxyCodeLine{125     compute(matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}());}
+\DoxyCodeLine{126   \}}
+\DoxyCodeLine{127 }
+\DoxyCodeLine{134   \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputType>}
+\DoxyCodeLine{135   \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_ae7ff6ebc9b83cbe7617b29940c4a3744}{CompleteOrthogonalDecomposition}}(\mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<InputType>}}\& matrix)}
+\DoxyCodeLine{136     : m\_cpqr(matrix.\mbox{\hyperlink{classEigen_1_1SolverBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}()),}
+\DoxyCodeLine{137       m\_zCoeffs((std::min)(matrix.rows(), matrix.cols())),}
+\DoxyCodeLine{138       m\_temp(matrix.cols())}
+\DoxyCodeLine{139   \{}
+\DoxyCodeLine{140     \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_adb0b963d7d8f96492904e8eda03efbf5}{computeInPlace}}();}
+\DoxyCodeLine{141   \} }
+\DoxyCodeLine{142 }
+\DoxyCodeLine{143 \textcolor{preprocessor}{  \#ifdef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{153   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{154   \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Solve}{Solve<CompleteOrthogonalDecomposition, Rhs>}} \mbox{\hyperlink{classEigen_1_1SolverBase_a943c352b597e3cd4744d5c11bfd77520}{solve}}(}
+\DoxyCodeLine{155       \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Rhs>}}\& b) \textcolor{keyword}{const};}
+\DoxyCodeLine{156 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{157 }
+\DoxyCodeLine{158   HouseholderSequenceType \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_ac95b93ddad59c6e57d06fcd4737b27e1}{householderQ}}(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};}
+\DoxyCodeLine{159   HouseholderSequenceType matrixQ(\textcolor{keywordtype}{void})\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_cpqr.\mbox{\hyperlink{classEigen_1_1ColPivHouseholderQR_a28ab9d8916ca609c5469c4c192fbfa28}{householderQ}}(); \}}
+\DoxyCodeLine{160 }
+\DoxyCodeLine{163   MatrixType \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_a4206a90976d04c4275301b308108f60b}{matrixZ}}()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{164     MatrixType Z = MatrixType::Identity(m\_cpqr.cols(), m\_cpqr.cols());}
+\DoxyCodeLine{165     applyZOnTheLeftInPlace<false>(Z);}
+\DoxyCodeLine{166     \textcolor{keywordflow}{return} Z;}
+\DoxyCodeLine{167   \}}
+\DoxyCodeLine{168 }
+\DoxyCodeLine{172   \textcolor{keyword}{const} MatrixType\& \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_a97a7ce8d3a3f18002c00df8cf694c14f}{matrixQTZ}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_cpqr.\mbox{\hyperlink{classEigen_1_1ColPivHouseholderQR_a097246c35983ea864e4d694fc5eb0338}{matrixQR}}(); \}}
+\DoxyCodeLine{173 }
+\DoxyCodeLine{185   \textcolor{keyword}{const} MatrixType\& \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_a29ccc6fdbf39bf4300da6d30d9e0e211}{matrixT}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_cpqr.\mbox{\hyperlink{classEigen_1_1ColPivHouseholderQR_a097246c35983ea864e4d694fc5eb0338}{matrixQR}}(); \}}
+\DoxyCodeLine{186 }
+\DoxyCodeLine{187   \textcolor{keyword}{template} <\textcolor{keyword}{typename} InputType>}
+\DoxyCodeLine{188   \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition}{CompleteOrthogonalDecomposition}}\& compute(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<InputType>}}\& matrix) \{}
+\DoxyCodeLine{189     \textcolor{comment}{// Compute the column pivoted QR factorization A P = Q R.}}
+\DoxyCodeLine{190     m\_cpqr.compute(matrix);}
+\DoxyCodeLine{191     \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_adb0b963d7d8f96492904e8eda03efbf5}{computeInPlace}}();}
+\DoxyCodeLine{192     \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{193   \}}
+\DoxyCodeLine{194 }
+\DoxyCodeLine{196   \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationType}}\& \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_a451ce7222506a75f145dbc6f3338652a}{colsPermutation}}()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{197     \textcolor{keywordflow}{return} m\_cpqr.\mbox{\hyperlink{classEigen_1_1ColPivHouseholderQR_a00493003ea0f3e14760460e3c697add7}{colsPermutation}}();}
+\DoxyCodeLine{198   \}}
+\DoxyCodeLine{199 }
+\DoxyCodeLine{213   \textcolor{keyword}{typename} MatrixType::RealScalar \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_ac040c34ce3fb2b68d3f57adc0c29d526}{absDeterminant}}() \textcolor{keyword}{const};}
+\DoxyCodeLine{214 }
+\DoxyCodeLine{228   \textcolor{keyword}{typename} MatrixType::RealScalar \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_ad59d6dc78dab52a0038ac372b4a72c0d}{logAbsDeterminant}}() \textcolor{keyword}{const};}
+\DoxyCodeLine{229 }
+\DoxyCodeLine{237   \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_a0ea6a40374c16331f8d323d1f64bf57e}{rank}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_cpqr.\mbox{\hyperlink{classEigen_1_1ColPivHouseholderQR_a4990f19995bb873e6e33f1ec26d42c1b}{rank}}(); \}}
+\DoxyCodeLine{238 }
+\DoxyCodeLine{246   \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_aa86b911cf8754fb172804966b04e6013}{dimensionOfKernel}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_cpqr.\mbox{\hyperlink{classEigen_1_1ColPivHouseholderQR_aece2257cbd8258b54759d6ed6ea9ac45}{dimensionOfKernel}}(); \}}
+\DoxyCodeLine{247 }
+\DoxyCodeLine{255   \textcolor{keyword}{inline} \textcolor{keywordtype}{bool} \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_a381e9c1cbb5660821554fedb3d347f5d}{isInjective}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_cpqr.\mbox{\hyperlink{classEigen_1_1ColPivHouseholderQR_afbffcdcd2b149678ee2897bf77443ab5}{isInjective}}(); \}}
+\DoxyCodeLine{256 }
+\DoxyCodeLine{264   \textcolor{keyword}{inline} \textcolor{keywordtype}{bool} \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_a52030f2aeb90d4eba8203635bf7fbec4}{isSurjective}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_cpqr.\mbox{\hyperlink{classEigen_1_1ColPivHouseholderQR_ac0bafd24ce9da5b1c453ec567cac36e9}{isSurjective}}(); \}}
+\DoxyCodeLine{265 }
+\DoxyCodeLine{273   \textcolor{keyword}{inline} \textcolor{keywordtype}{bool} \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_a2e1e4c484ee28a89fa821313d18691fb}{isInvertible}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_cpqr.\mbox{\hyperlink{classEigen_1_1ColPivHouseholderQR_a1920097880203a64fb8493f25d8901e7}{isInvertible}}(); \}}
+\DoxyCodeLine{274 }
+\DoxyCodeLine{280   \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Inverse}{Inverse<CompleteOrthogonalDecomposition>}} \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_aa65232e80489414d67bcd267805f0141}{pseudoInverse}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{281 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{282     eigen\_assert(m\_cpqr.m\_isInitialized \&\& \textcolor{stringliteral}{"{}CompleteOrthogonalDecomposition is not initialized."{}});}
+\DoxyCodeLine{283     \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Inverse}{Inverse<CompleteOrthogonalDecomposition>}}(*\textcolor{keyword}{this});}
+\DoxyCodeLine{284   \}}
+\DoxyCodeLine{285 }
+\DoxyCodeLine{286   \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_cpqr.rows(); \}}
+\DoxyCodeLine{287   \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} cols()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_cpqr.cols(); \}}
+\DoxyCodeLine{288 }
+\DoxyCodeLine{294   \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{HCoeffsType}}\& \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_a76209ebfb08e744f9620fd5505ec8df0}{hCoeffs}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_cpqr.\mbox{\hyperlink{classEigen_1_1ColPivHouseholderQR_a9cd36201d2a3defc30143d60d5054d1e}{hCoeffs}}(); \}}
+\DoxyCodeLine{295 }
+\DoxyCodeLine{301   \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{HCoeffsType}}\& \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_aceb544c4867ce94bce14a1d8472800bd}{zCoeffs}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_zCoeffs; \}}
+\DoxyCodeLine{302 }
+\DoxyCodeLine{322   \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition}{CompleteOrthogonalDecomposition}}\& \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_a7c06c84f4f218629163ce0268ec3e842}{setThreshold}}(\textcolor{keyword}{const} RealScalar\& \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_a16c1fd97a7ef99d1cf64f8cf1ee81cbf}{threshold}}) \{}
+\DoxyCodeLine{323     m\_cpqr.\mbox{\hyperlink{classEigen_1_1ColPivHouseholderQR_a0da97103887fd3dd2947303478ea36b4}{setThreshold}}(\mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_a16c1fd97a7ef99d1cf64f8cf1ee81cbf}{threshold}});}
+\DoxyCodeLine{324     \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{325   \}}
+\DoxyCodeLine{326 }
+\DoxyCodeLine{335   \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition}{CompleteOrthogonalDecomposition}}\& \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_afd261ba946c07cd76364a69e5f3b15e7}{setThreshold}}(Default\_t) \{}
+\DoxyCodeLine{336     m\_cpqr.\mbox{\hyperlink{classEigen_1_1ColPivHouseholderQR_a0da97103887fd3dd2947303478ea36b4}{setThreshold}}(Default);}
+\DoxyCodeLine{337     \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{338   \}}
+\DoxyCodeLine{339 }
+\DoxyCodeLine{344   RealScalar \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_a16c1fd97a7ef99d1cf64f8cf1ee81cbf}{threshold}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_cpqr.\mbox{\hyperlink{classEigen_1_1ColPivHouseholderQR_a70061ce2f56d787777b9b74384ba3bc0}{threshold}}(); \}}
+\DoxyCodeLine{345 }
+\DoxyCodeLine{353   \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_a1897953269e238eacea58afc3307958b}{nonzeroPivots}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_cpqr.\mbox{\hyperlink{classEigen_1_1ColPivHouseholderQR_a161398359338bbc7daacd7e9ad4c4969}{nonzeroPivots}}(); \}}
+\DoxyCodeLine{354 }
+\DoxyCodeLine{358   \textcolor{keyword}{inline} RealScalar \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_ac0e5f2123e375c181e28db748ce2b1c8}{maxPivot}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_cpqr.\mbox{\hyperlink{classEigen_1_1ColPivHouseholderQR_a97247d121ab174fbffcf86e6394bc2c7}{maxPivot}}(); \}}
+\DoxyCodeLine{359 }
+\DoxyCodeLine{368   \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_a3521b66f1b597a2e18b13ab542cd48f4}{info}}()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{369     eigen\_assert(m\_cpqr.m\_isInitialized \&\& \textcolor{stringliteral}{"{}Decomposition is not initialized."{}});}
+\DoxyCodeLine{370     \textcolor{keywordflow}{return} \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}};}
+\DoxyCodeLine{371   \}}
+\DoxyCodeLine{372 }
+\DoxyCodeLine{373 \textcolor{preprocessor}{\#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{374   \textcolor{keyword}{template} <\textcolor{keyword}{typename} RhsType, \textcolor{keyword}{typename} DstType>}
+\DoxyCodeLine{375   \textcolor{keywordtype}{void} \_solve\_impl(\textcolor{keyword}{const} RhsType\& rhs, DstType\& dst) \textcolor{keyword}{const};}
+\DoxyCodeLine{376 }
+\DoxyCodeLine{377   \textcolor{keyword}{template}<\textcolor{keywordtype}{bool} Conjugate, \textcolor{keyword}{typename} RhsType, \textcolor{keyword}{typename} DstType>}
+\DoxyCodeLine{378   \textcolor{keywordtype}{void} \_solve\_impl\_transposed(\textcolor{keyword}{const} RhsType \&rhs, DstType \&dst) \textcolor{keyword}{const};}
+\DoxyCodeLine{379 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{380 }
+\DoxyCodeLine{381  \textcolor{keyword}{protected}:}
+\DoxyCodeLine{382   EIGEN\_STATIC\_ASSERT\_NON\_INTEGER(Scalar)}
+\DoxyCodeLine{383 }
+\DoxyCodeLine{384   \textcolor{keyword}{template}<\textcolor{keywordtype}{bool} Transpose\_, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{385   \textcolor{keywordtype}{void} \_check\_solve\_assertion(\textcolor{keyword}{const} Rhs\& b)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{386       EIGEN\_ONLY\_USED\_FOR\_DEBUG(b);}
+\DoxyCodeLine{387       eigen\_assert(m\_cpqr.m\_isInitialized \&\& \textcolor{stringliteral}{"{}CompleteOrthogonalDecomposition is not initialized."{}});}
+\DoxyCodeLine{388       eigen\_assert((Transpose\_?\mbox{\hyperlink{classEigen_1_1SolverBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}().cols():\mbox{\hyperlink{classEigen_1_1SolverBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}().rows())==b.rows() \&\& \textcolor{stringliteral}{"{}CompleteOrthogonalDecomposition::solve(): invalid number of rows of the right hand side matrix b"{}});}
+\DoxyCodeLine{389   \}}
+\DoxyCodeLine{390 }
+\DoxyCodeLine{391   \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_adb0b963d7d8f96492904e8eda03efbf5}{computeInPlace}}();}
+\DoxyCodeLine{392 }
+\DoxyCodeLine{397   \textcolor{keyword}{template} <\textcolor{keywordtype}{bool} Conjugate, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{398   \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_afedd1ee41b8490b70fd1fefdd21f8c80}{applyZOnTheLeftInPlace}}(Rhs\& rhs) \textcolor{keyword}{const};}
+\DoxyCodeLine{399 }
+\DoxyCodeLine{402   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{403   \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_a0a89641e0b4ea92c515405f2a31e6abe}{applyZAdjointOnTheLeftInPlace}}(Rhs\& rhs) \textcolor{keyword}{const};}
+\DoxyCodeLine{404 }
+\DoxyCodeLine{405   ColPivHouseholderQR<MatrixType> m\_cpqr;}
+\DoxyCodeLine{406   HCoeffsType m\_zCoeffs;}
+\DoxyCodeLine{407   RowVectorType m\_temp;}
+\DoxyCodeLine{408 \};}
+\DoxyCodeLine{409 }
+\DoxyCodeLine{410 \textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{411 \textcolor{keyword}{typename} MatrixType::RealScalar}
+\DoxyCodeLine{412 \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_ac040c34ce3fb2b68d3f57adc0c29d526}{CompleteOrthogonalDecomposition<MatrixType>::absDeterminant}}()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{413   \textcolor{keywordflow}{return} m\_cpqr.absDeterminant();}
+\DoxyCodeLine{414 \}}
+\DoxyCodeLine{415 }
+\DoxyCodeLine{416 \textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{417 \textcolor{keyword}{typename} MatrixType::RealScalar}
+\DoxyCodeLine{418 \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_ad59d6dc78dab52a0038ac372b4a72c0d}{CompleteOrthogonalDecomposition<MatrixType>::logAbsDeterminant}}()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{419   \textcolor{keywordflow}{return} m\_cpqr.logAbsDeterminant();}
+\DoxyCodeLine{420 \}}
+\DoxyCodeLine{421 }
+\DoxyCodeLine{429 \textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{430 \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_adb0b963d7d8f96492904e8eda03efbf5}{CompleteOrthogonalDecomposition<MatrixType>::computeInPlace}}()}
+\DoxyCodeLine{431 \{}
+\DoxyCodeLine{432   \textcolor{comment}{// the column permutation is stored as int indices, so just to be sure:}}
+\DoxyCodeLine{433   eigen\_assert(m\_cpqr.cols() <= \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<int>::highest}}());}
+\DoxyCodeLine{434 }
+\DoxyCodeLine{435   \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} rank = m\_cpqr.rank();}
+\DoxyCodeLine{436   \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} cols = m\_cpqr.cols();}
+\DoxyCodeLine{437   \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} rows = m\_cpqr.rows();}
+\DoxyCodeLine{438   m\_zCoeffs.resize((std::min)(rows, cols));}
+\DoxyCodeLine{439   m\_temp.resize(cols);}
+\DoxyCodeLine{440 }
+\DoxyCodeLine{441   \textcolor{keywordflow}{if} (rank < cols) \{}
+\DoxyCodeLine{442     \textcolor{comment}{// We have reduced the (permuted) matrix to the form}}
+\DoxyCodeLine{443     \textcolor{comment}{//   [R11 R12]}}
+\DoxyCodeLine{444     \textcolor{comment}{//   [ 0  R22]}}
+\DoxyCodeLine{445     \textcolor{comment}{// where R11 is r-\/by-\/r (r = rank) upper triangular, R12 is}}
+\DoxyCodeLine{446     \textcolor{comment}{// r-\/by-\/(n-\/r), and R22 is empty or the norm of R22 is negligible.}}
+\DoxyCodeLine{447     \textcolor{comment}{// We now compute the complete orthogonal decomposition by applying}}
+\DoxyCodeLine{448     \textcolor{comment}{// Householder transformations from the right to the upper trapezoidal}}
+\DoxyCodeLine{449     \textcolor{comment}{// matrix X = [R11 R12] to zero out R12 and obtain the factorization}}
+\DoxyCodeLine{450     \textcolor{comment}{// [R11 R12] = [T11 0] * Z, where T11 is r-\/by-\/r upper triangular and}}
+\DoxyCodeLine{451     \textcolor{comment}{// Z = Z(0) * Z(1) ... Z(r-\/1) is an n-\/by-\/n orthogonal matrix.}}
+\DoxyCodeLine{452     \textcolor{comment}{// We store the data representing Z in R12 and m\_zCoeffs.}}
+\DoxyCodeLine{453     \textcolor{keywordflow}{for} (\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} k = rank -\/ 1; k >= 0; -\/-\/k) \{}
+\DoxyCodeLine{454       \textcolor{keywordflow}{if} (k != rank -\/ 1) \{}
+\DoxyCodeLine{455         \textcolor{comment}{// Given the API for Householder reflectors, it is more convenient if}}
+\DoxyCodeLine{456         \textcolor{comment}{// we swap the leading parts of columns k and r-\/1 (zero-\/based) to form}}
+\DoxyCodeLine{457         \textcolor{comment}{// the matrix X\_k = [X(0:k, k), X(0:k, r:n)]}}
+\DoxyCodeLine{458         m\_cpqr.m\_qr.col(k).head(k + 1).swap(}
+\DoxyCodeLine{459             m\_cpqr.m\_qr.col(rank -\/ 1).head(k + 1));}
+\DoxyCodeLine{460       \}}
+\DoxyCodeLine{461       \textcolor{comment}{// Construct Householder reflector Z(k) to zero out the last row of X\_k,}}
+\DoxyCodeLine{462       \textcolor{comment}{// i.e. choose Z(k) such that}}
+\DoxyCodeLine{463       \textcolor{comment}{// [X(k, k), X(k, r:n)] * Z(k) = [beta, 0, .., 0].}}
+\DoxyCodeLine{464       RealScalar beta;}
+\DoxyCodeLine{465       m\_cpqr.m\_qr.row(k)}
+\DoxyCodeLine{466           .tail(cols -\/ rank + 1)}
+\DoxyCodeLine{467           .makeHouseholderInPlace(m\_zCoeffs(k), beta);}
+\DoxyCodeLine{468       m\_cpqr.m\_qr(k, rank -\/ 1) = beta;}
+\DoxyCodeLine{469       \textcolor{keywordflow}{if} (k > 0) \{}
+\DoxyCodeLine{470         \textcolor{comment}{// Apply Z(k) to the first k rows of X\_k}}
+\DoxyCodeLine{471         m\_cpqr.m\_qr.topRightCorner(k, cols -\/ rank + 1)}
+\DoxyCodeLine{472             .applyHouseholderOnTheRight(}
+\DoxyCodeLine{473                 m\_cpqr.m\_qr.row(k).tail(cols -\/ rank).adjoint(), m\_zCoeffs(k),}
+\DoxyCodeLine{474                 \&m\_temp(0));}
+\DoxyCodeLine{475       \}}
+\DoxyCodeLine{476       \textcolor{keywordflow}{if} (k != rank -\/ 1) \{}
+\DoxyCodeLine{477         \textcolor{comment}{// Swap X(0:k,k) back to its proper location.}}
+\DoxyCodeLine{478         m\_cpqr.m\_qr.col(k).head(k + 1).swap(}
+\DoxyCodeLine{479             m\_cpqr.m\_qr.col(rank -\/ 1).head(k + 1));}
+\DoxyCodeLine{480       \}}
+\DoxyCodeLine{481     \}}
+\DoxyCodeLine{482   \}}
+\DoxyCodeLine{483 \}}
+\DoxyCodeLine{484 }
+\DoxyCodeLine{485 \textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{486 \textcolor{keyword}{template} <\textcolor{keywordtype}{bool} Conjugate, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{487 \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_afedd1ee41b8490b70fd1fefdd21f8c80}{CompleteOrthogonalDecomposition<MatrixType>::applyZOnTheLeftInPlace}}(}
+\DoxyCodeLine{488     Rhs\& rhs)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{489   \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} cols = this-\/>cols();}
+\DoxyCodeLine{490   \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} nrhs = rhs.cols();}
+\DoxyCodeLine{491   \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} rank = this-\/>rank();}
+\DoxyCodeLine{492   \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<typename Rhs::Scalar, Dynamic, 1>}} temp((std::max)(cols, nrhs));}
+\DoxyCodeLine{493   \textcolor{keywordflow}{for} (\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} k = rank-\/1; k >= 0; -\/-\/k) \{}
+\DoxyCodeLine{494     \textcolor{keywordflow}{if} (k != rank -\/ 1) \{}
+\DoxyCodeLine{495       rhs.row(k).swap(rhs.row(rank -\/ 1));}
+\DoxyCodeLine{496     \}}
+\DoxyCodeLine{497     rhs.middleRows(rank -\/ 1, cols -\/ rank + 1)}
+\DoxyCodeLine{498         .applyHouseholderOnTheLeft(}
+\DoxyCodeLine{499             matrixQTZ().row(k).tail(cols -\/ rank).transpose().\textcolor{keyword}{template} conjugateIf<!Conjugate>(), zCoeffs().\textcolor{keyword}{template} conjugateIf<Conjugate>()(k),}
+\DoxyCodeLine{500             \&temp(0));}
+\DoxyCodeLine{501     \textcolor{keywordflow}{if} (k != rank -\/ 1) \{}
+\DoxyCodeLine{502       rhs.row(k).swap(rhs.row(rank -\/ 1));}
+\DoxyCodeLine{503     \}}
+\DoxyCodeLine{504   \}}
+\DoxyCodeLine{505 \}}
+\DoxyCodeLine{506 }
+\DoxyCodeLine{507 \textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{508 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{509 \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_a0a89641e0b4ea92c515405f2a31e6abe}{CompleteOrthogonalDecomposition<MatrixType>::applyZAdjointOnTheLeftInPlace}}(}
+\DoxyCodeLine{510     Rhs\& rhs)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{511   \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} cols = this-\/>cols();}
+\DoxyCodeLine{512   \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} nrhs = rhs.cols();}
+\DoxyCodeLine{513   \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} rank = this-\/>rank();}
+\DoxyCodeLine{514   \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<typename Rhs::Scalar, Dynamic, 1>}} temp((std::max)(cols, nrhs));}
+\DoxyCodeLine{515   \textcolor{keywordflow}{for} (\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} k = 0; k < rank; ++k) \{}
+\DoxyCodeLine{516     \textcolor{keywordflow}{if} (k != rank -\/ 1) \{}
+\DoxyCodeLine{517       rhs.row(k).swap(rhs.row(rank -\/ 1));}
+\DoxyCodeLine{518     \}}
+\DoxyCodeLine{519     rhs.middleRows(rank -\/ 1, cols -\/ rank + 1)}
+\DoxyCodeLine{520         .applyHouseholderOnTheLeft(}
+\DoxyCodeLine{521             matrixQTZ().row(k).tail(cols -\/ rank).adjoint(), zCoeffs()(k),}
+\DoxyCodeLine{522             \&temp(0));}
+\DoxyCodeLine{523     \textcolor{keywordflow}{if} (k != rank -\/ 1) \{}
+\DoxyCodeLine{524       rhs.row(k).swap(rhs.row(rank -\/ 1));}
+\DoxyCodeLine{525     \}}
+\DoxyCodeLine{526   \}}
+\DoxyCodeLine{527 \}}
+\DoxyCodeLine{528 }
+\DoxyCodeLine{529 \textcolor{preprocessor}{\#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{530 \textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixType\_>}
+\DoxyCodeLine{531 \textcolor{keyword}{template} <\textcolor{keyword}{typename} RhsType, \textcolor{keyword}{typename} DstType>}
+\DoxyCodeLine{532 \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition}{CompleteOrthogonalDecomposition<MatrixType\_>::\_solve\_impl}}(}
+\DoxyCodeLine{533     \textcolor{keyword}{const} RhsType\& rhs, DstType\& dst)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{534   \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rank = this-\/>rank();}
+\DoxyCodeLine{535   \textcolor{keywordflow}{if} (rank == 0) \{}
+\DoxyCodeLine{536     dst.setZero();}
+\DoxyCodeLine{537     \textcolor{keywordflow}{return};}
+\DoxyCodeLine{538   \}}
+\DoxyCodeLine{539 }
+\DoxyCodeLine{540   \textcolor{comment}{// Compute c = Q\string^* * rhs}}
+\DoxyCodeLine{541   \textcolor{keyword}{typename} RhsType::PlainObject c(rhs);}
+\DoxyCodeLine{542   c.applyOnTheLeft(matrixQ().setLength(rank).adjoint());}
+\DoxyCodeLine{543 }
+\DoxyCodeLine{544   \textcolor{comment}{// Solve T z = c(1:rank, :)}}
+\DoxyCodeLine{545   dst.topRows(rank) = matrixT()}
+\DoxyCodeLine{546                           .topLeftCorner(rank, rank)}
+\DoxyCodeLine{547                           .template triangularView<Upper>()}
+\DoxyCodeLine{548                           .solve(c.topRows(rank));}
+\DoxyCodeLine{549 }
+\DoxyCodeLine{550   \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols = this-\/>cols();}
+\DoxyCodeLine{551   \textcolor{keywordflow}{if} (rank < cols) \{}
+\DoxyCodeLine{552     \textcolor{comment}{// Compute y = Z\string^* * [ z ]}}
+\DoxyCodeLine{553     \textcolor{comment}{//                   [ 0 ]}}
+\DoxyCodeLine{554     dst.bottomRows(cols -\/ rank).setZero();}
+\DoxyCodeLine{555     applyZAdjointOnTheLeftInPlace(dst);}
+\DoxyCodeLine{556   \}}
+\DoxyCodeLine{557 }
+\DoxyCodeLine{558   \textcolor{comment}{// Undo permutation to get x = P\string^\{-\/1\} * y.}}
+\DoxyCodeLine{559   dst = colsPermutation() * dst;}
+\DoxyCodeLine{560 \}}
+\DoxyCodeLine{561 }
+\DoxyCodeLine{562 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_>}
+\DoxyCodeLine{563 \textcolor{keyword}{template}<\textcolor{keywordtype}{bool} Conjugate, \textcolor{keyword}{typename} RhsType, \textcolor{keyword}{typename} DstType>}
+\DoxyCodeLine{564 \textcolor{keywordtype}{void} CompleteOrthogonalDecomposition<MatrixType\_>::\_solve\_impl\_transposed(\textcolor{keyword}{const} RhsType \&rhs, DstType \&dst)\textcolor{keyword}{ const}}
+\DoxyCodeLine{565 \textcolor{keyword}{}\{}
+\DoxyCodeLine{566   \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rank = this-\/>rank();}
+\DoxyCodeLine{567 }
+\DoxyCodeLine{568   \textcolor{keywordflow}{if} (rank == 0) \{}
+\DoxyCodeLine{569     dst.setZero();}
+\DoxyCodeLine{570     \textcolor{keywordflow}{return};}
+\DoxyCodeLine{571   \}}
+\DoxyCodeLine{572 }
+\DoxyCodeLine{573   \textcolor{keyword}{typename} RhsType::PlainObject c(colsPermutation().transpose()*rhs);}
+\DoxyCodeLine{574 }
+\DoxyCodeLine{575   \textcolor{keywordflow}{if} (rank < cols()) \{}
+\DoxyCodeLine{576     applyZOnTheLeftInPlace<!Conjugate>(c);}
+\DoxyCodeLine{577   \}}
+\DoxyCodeLine{578 }
+\DoxyCodeLine{579   matrixT().topLeftCorner(rank, rank)}
+\DoxyCodeLine{580            .template triangularView<Upper>()}
+\DoxyCodeLine{581            .transpose().template conjugateIf<Conjugate>()}
+\DoxyCodeLine{582            .solveInPlace(c.topRows(rank));}
+\DoxyCodeLine{583 }
+\DoxyCodeLine{584   dst.topRows(rank) = c.topRows(rank);}
+\DoxyCodeLine{585   dst.bottomRows(rows()-\/rank).setZero();}
+\DoxyCodeLine{586 }
+\DoxyCodeLine{587   dst.applyOnTheLeft(householderQ().setLength(rank).\textcolor{keyword}{template} conjugateIf<!Conjugate>() );}
+\DoxyCodeLine{588 \}}
+\DoxyCodeLine{589 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{590 }
+\DoxyCodeLine{591 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{592 }
+\DoxyCodeLine{593 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{594 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{classEigen_1_1Inverse}{Inverse}}<\mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition}{CompleteOrthogonalDecomposition}}<MatrixType> > >}
+\DoxyCodeLine{595   : \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<typename Transpose<typename MatrixType::PlainObject>::PlainObject>}
+\DoxyCodeLine{596 \{}
+\DoxyCodeLine{597   \textcolor{keyword}{enum} \{ Flags = 0 \};}
+\DoxyCodeLine{598 \};}
+\DoxyCodeLine{599 }
+\DoxyCodeLine{600 \textcolor{keyword}{template}<\textcolor{keyword}{typename} DstXprType, \textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{601 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1Assignment}{Assignment}}<DstXprType, \mbox{\hyperlink{classEigen_1_1Inverse}{Inverse}}<\mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition}{CompleteOrthogonalDecomposition}}<MatrixType> >, internal::\mbox{\hyperlink{structEigen_1_1internal_1_1assign__op}{assign\_op}}<typename DstXprType::Scalar,typename CompleteOrthogonalDecomposition<MatrixType>::Scalar>, \mbox{\hyperlink{structEigen_1_1internal_1_1Dense2Dense}{Dense2Dense}}>}
+\DoxyCodeLine{602 \{}
+\DoxyCodeLine{603   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition}{CompleteOrthogonalDecomposition<MatrixType>}} \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition}{CodType}};}
+\DoxyCodeLine{604   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Inverse}{Inverse<CodType>}} \mbox{\hyperlink{classEigen_1_1Inverse}{SrcXprType}};}
+\DoxyCodeLine{605   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(DstXprType \&dst, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Inverse}{SrcXprType}} \&src, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1assign__op}{internal::assign\_op<typename DstXprType::Scalar,typename CodType::Scalar>}} \&)}
+\DoxyCodeLine{606   \{}
+\DoxyCodeLine{607     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<typename CodType::Scalar, CodType::RowsAtCompileTime, CodType::RowsAtCompileTime, 0, CodType::MaxRowsAtCompileTime, CodType::MaxRowsAtCompileTime>}} IdentityMatrixType;}
+\DoxyCodeLine{608     dst = src.nestedExpression().solve(IdentityMatrixType::Identity(src.cols(), src.cols()));}
+\DoxyCodeLine{609   \}}
+\DoxyCodeLine{610 \};}
+\DoxyCodeLine{611 }
+\DoxyCodeLine{612 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{613 }
+\DoxyCodeLine{615 \textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{616 \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1HouseholderSequence}{CompleteOrthogonalDecomposition<MatrixType>::HouseholderSequenceType}}}
+\DoxyCodeLine{617 \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition_ac95b93ddad59c6e57d06fcd4737b27e1}{CompleteOrthogonalDecomposition<MatrixType>::householderQ}}()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{618   \textcolor{keywordflow}{return} m\_cpqr.householderQ();}
+\DoxyCodeLine{619 \}}
+\DoxyCodeLine{620 }
+\DoxyCodeLine{625 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{626 \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition}{CompleteOrthogonalDecomposition<typename MatrixBase<Derived>::PlainObject}}>}
+\DoxyCodeLine{627 \mbox{\hyperlink{classEigen_1_1MatrixBase_ae90b6846f05bd30b8d52b66e427e3e09}{MatrixBase<Derived>::completeOrthogonalDecomposition}}()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{628   \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1CompleteOrthogonalDecomposition}{CompleteOrthogonalDecomposition<PlainObject>}}(eval());}
+\DoxyCodeLine{629 \}}
+\DoxyCodeLine{630 }
+\DoxyCodeLine{631 \}  \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{632 }
+\DoxyCodeLine{633 \textcolor{preprocessor}{\#endif  }\textcolor{comment}{// EIGEN\_COMPLETEORTHOGONALDECOMPOSITION\_H}}
+
+\end{DoxyCode}

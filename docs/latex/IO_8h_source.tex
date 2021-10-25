@@ -1,0 +1,211 @@
+\hypertarget{IO_8h_source}{}\doxysection{IO.\+h}
+\label{IO_8h_source}\index{include/Eigen/src/Core/IO.h@{include/Eigen/src/Core/IO.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2006-\/2008 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_IO\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_IO\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{enum} \{ DontAlignCols = 1 \};}
+\DoxyCodeLine{19 \textcolor{keyword}{enum} \{ StreamPrecision = -\/1,}
+\DoxyCodeLine{20        FullPrecision = -\/2 \};}
+\DoxyCodeLine{21 }
+\DoxyCodeLine{22 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{23 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{24 std::ostream \& print\_matrix(std::ostream \& s, \textcolor{keyword}{const} Derived\& \_m, \textcolor{keyword}{const} IOFormat\& fmt);}
+\DoxyCodeLine{25 \}}
+\DoxyCodeLine{26 }
+\DoxyCodeLine{53 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1IOFormat}{IOFormat}}}
+\DoxyCodeLine{54 \{}
+\DoxyCodeLine{56   \mbox{\hyperlink{structEigen_1_1IOFormat_acdcc91702d45c714b11ba42db5beddb5}{IOFormat}}(\textcolor{keywordtype}{int} \_precision = StreamPrecision, \textcolor{keywordtype}{int} \_flags = 0,}
+\DoxyCodeLine{57     \textcolor{keyword}{const} std::string\& \_coeffSeparator = \textcolor{stringliteral}{"{} "{}},}
+\DoxyCodeLine{58     \textcolor{keyword}{const} std::string\& \_rowSeparator = \textcolor{stringliteral}{"{}\(\backslash\)n"{}}, \textcolor{keyword}{const} std::string\& \_rowPrefix=\textcolor{stringliteral}{"{}"{}}, \textcolor{keyword}{const} std::string\& \_rowSuffix=\textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{59     \textcolor{keyword}{const} std::string\& \_matPrefix=\textcolor{stringliteral}{"{}"{}}, \textcolor{keyword}{const} std::string\& \_matSuffix=\textcolor{stringliteral}{"{}"{}}, \textcolor{keyword}{const} \textcolor{keywordtype}{char} \_fill=\textcolor{charliteral}{' '})}
+\DoxyCodeLine{60   : matPrefix(\_matPrefix), matSuffix(\_matSuffix), rowPrefix(\_rowPrefix), rowSuffix(\_rowSuffix), rowSeparator(\_rowSeparator),}
+\DoxyCodeLine{61     rowSpacer(\textcolor{stringliteral}{"{}"{}}), coeffSeparator(\_coeffSeparator), fill(\_fill), precision(\_precision), flags(\_flags)}
+\DoxyCodeLine{62   \{}
+\DoxyCodeLine{63     \textcolor{comment}{// TODO check if rowPrefix, rowSuffix or rowSeparator contains a newline}}
+\DoxyCodeLine{64     \textcolor{comment}{// don't add rowSpacer if columns are not to be aligned}}
+\DoxyCodeLine{65     \textcolor{keywordflow}{if}((flags \& DontAlignCols))}
+\DoxyCodeLine{66       \textcolor{keywordflow}{return};}
+\DoxyCodeLine{67     \textcolor{keywordtype}{int} i = int(matSuffix.length())-\/1;}
+\DoxyCodeLine{68     \textcolor{keywordflow}{while} (i>=0 \&\& matSuffix[i]!=\textcolor{charliteral}{'\(\backslash\)n'})}
+\DoxyCodeLine{69     \{}
+\DoxyCodeLine{70       rowSpacer += \textcolor{charliteral}{' '};}
+\DoxyCodeLine{71       i-\/-\/;}
+\DoxyCodeLine{72     \}}
+\DoxyCodeLine{73   \}}
+\DoxyCodeLine{74   std::string matPrefix, matSuffix;}
+\DoxyCodeLine{75   std::string rowPrefix, rowSuffix, rowSeparator, rowSpacer;}
+\DoxyCodeLine{76   std::string coeffSeparator;}
+\DoxyCodeLine{77   \textcolor{keywordtype}{char} fill;}
+\DoxyCodeLine{78   \textcolor{keywordtype}{int} precision;}
+\DoxyCodeLine{79   \textcolor{keywordtype}{int} flags;}
+\DoxyCodeLine{80 \};}
+\DoxyCodeLine{81 }
+\DoxyCodeLine{97 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ExpressionType>}
+\DoxyCodeLine{98 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1WithFormat}{WithFormat}}}
+\DoxyCodeLine{99 \{}
+\DoxyCodeLine{100   \textcolor{keyword}{public}:}
+\DoxyCodeLine{101 }
+\DoxyCodeLine{102     \mbox{\hyperlink{classEigen_1_1WithFormat}{WithFormat}}(\textcolor{keyword}{const} ExpressionType\& matrix, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1IOFormat}{IOFormat}}\& format)}
+\DoxyCodeLine{103       : m\_matrix(matrix), m\_format(format)}
+\DoxyCodeLine{104     \{\}}
+\DoxyCodeLine{105 }
+\DoxyCodeLine{106     \textcolor{keyword}{friend} std::ostream \& operator << (std::ostream \& s, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1WithFormat}{WithFormat}}\& wf)}
+\DoxyCodeLine{107     \{}
+\DoxyCodeLine{108       \textcolor{keywordflow}{return} internal::print\_matrix(s, wf.m\_matrix.eval(), wf.m\_format);}
+\DoxyCodeLine{109     \}}
+\DoxyCodeLine{110 }
+\DoxyCodeLine{111   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{112     \textcolor{keyword}{typename} ExpressionType::Nested m\_matrix;}
+\DoxyCodeLine{113     \mbox{\hyperlink{structEigen_1_1IOFormat}{IOFormat}} m\_format;}
+\DoxyCodeLine{114 \};}
+\DoxyCodeLine{115 }
+\DoxyCodeLine{116 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{117 }
+\DoxyCodeLine{118 \textcolor{comment}{// NOTE: This helper is kept for backward compatibility with previous code specializing}}
+\DoxyCodeLine{119 \textcolor{comment}{//       this internal::significant\_decimals\_impl structure. In the future we should directly}}
+\DoxyCodeLine{120 \textcolor{comment}{//       call digits10() which has been introduced in July 2016 in 3.3.}}
+\DoxyCodeLine{121 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{122 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1significant__decimals__impl}{significant\_decimals\_impl}}}
+\DoxyCodeLine{123 \{}
+\DoxyCodeLine{124   \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{int} run()}
+\DoxyCodeLine{125   \{}
+\DoxyCodeLine{126     \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::digits10}}();}
+\DoxyCodeLine{127   \}}
+\DoxyCodeLine{128 \};}
+\DoxyCodeLine{129 }
+\DoxyCodeLine{132 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{133 std::ostream \& print\_matrix(std::ostream \& s, \textcolor{keyword}{const} Derived\& \_m, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1IOFormat}{IOFormat}}\& fmt)}
+\DoxyCodeLine{134 \{}
+\DoxyCodeLine{135   \textcolor{keyword}{using} \mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{internal::is\_same}};}
+\DoxyCodeLine{136   \textcolor{keyword}{using} \mbox{\hyperlink{structEigen_1_1internal_1_1conditional}{internal::conditional}};}
+\DoxyCodeLine{137 }
+\DoxyCodeLine{138   \textcolor{keywordflow}{if}(\_m.size() == 0)}
+\DoxyCodeLine{139   \{}
+\DoxyCodeLine{140     s << fmt.matPrefix << fmt.matSuffix;}
+\DoxyCodeLine{141     \textcolor{keywordflow}{return} s;}
+\DoxyCodeLine{142   \}}
+\DoxyCodeLine{143   }
+\DoxyCodeLine{144   \textcolor{keyword}{typename} Derived::Nested m = \_m;}
+\DoxyCodeLine{145   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Derived::Scalar Scalar;}
+\DoxyCodeLine{146   \textcolor{keyword}{typedef} \textcolor{keyword}{typename}}
+\DoxyCodeLine{147       conditional<}
+\DoxyCodeLine{148           is\_same<Scalar, char>::value ||}
+\DoxyCodeLine{149             is\_same<Scalar, unsigned char>::value ||}
+\DoxyCodeLine{150             is\_same<Scalar, numext::int8\_t>::value ||}
+\DoxyCodeLine{151             is\_same<Scalar, numext::uint8\_t>::value,}
+\DoxyCodeLine{152           int,}
+\DoxyCodeLine{153           \textcolor{keyword}{typename} conditional<}
+\DoxyCodeLine{154               is\_same<Scalar, std::complex<char> >::value ||}
+\DoxyCodeLine{155                 is\_same<Scalar, std::complex<unsigned char> >::value ||}
+\DoxyCodeLine{156                 is\_same<Scalar, std::complex<numext::int8\_t> >::value ||}
+\DoxyCodeLine{157                 is\_same<Scalar, std::complex<numext::uint8\_t> >::value,}
+\DoxyCodeLine{158               std::complex<int>,}
+\DoxyCodeLine{159               \textcolor{keyword}{const} Scalar\&}
+\DoxyCodeLine{160             >::type}
+\DoxyCodeLine{161         >::type PrintType;}
+\DoxyCodeLine{162 }
+\DoxyCodeLine{163   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} width = 0;}
+\DoxyCodeLine{164 }
+\DoxyCodeLine{165   std::streamsize explicit\_precision;}
+\DoxyCodeLine{166   \textcolor{keywordflow}{if}(fmt.precision == StreamPrecision)}
+\DoxyCodeLine{167   \{}
+\DoxyCodeLine{168     explicit\_precision = 0;}
+\DoxyCodeLine{169   \}}
+\DoxyCodeLine{170   \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(fmt.precision == FullPrecision)}
+\DoxyCodeLine{171   \{}
+\DoxyCodeLine{172     \textcolor{keywordflow}{if} (NumTraits<Scalar>::IsInteger)}
+\DoxyCodeLine{173     \{}
+\DoxyCodeLine{174       explicit\_precision = 0;}
+\DoxyCodeLine{175     \}}
+\DoxyCodeLine{176     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{177     \{}
+\DoxyCodeLine{178       explicit\_precision = significant\_decimals\_impl<Scalar>::run();}
+\DoxyCodeLine{179     \}}
+\DoxyCodeLine{180   \}}
+\DoxyCodeLine{181   \textcolor{keywordflow}{else}}
+\DoxyCodeLine{182   \{}
+\DoxyCodeLine{183     explicit\_precision = fmt.precision;}
+\DoxyCodeLine{184   \}}
+\DoxyCodeLine{185 }
+\DoxyCodeLine{186   std::streamsize old\_precision = 0;}
+\DoxyCodeLine{187   \textcolor{keywordflow}{if}(explicit\_precision) old\_precision = s.precision(explicit\_precision);}
+\DoxyCodeLine{188 }
+\DoxyCodeLine{189   \textcolor{keywordtype}{bool} align\_cols = !(fmt.flags \& DontAlignCols);}
+\DoxyCodeLine{190   \textcolor{keywordflow}{if}(align\_cols)}
+\DoxyCodeLine{191   \{}
+\DoxyCodeLine{192     \textcolor{comment}{// compute the largest width}}
+\DoxyCodeLine{193     \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < m.cols(); ++j)}
+\DoxyCodeLine{194       \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = 0; i < m.rows(); ++i)}
+\DoxyCodeLine{195       \{}
+\DoxyCodeLine{196         std::stringstream sstr;}
+\DoxyCodeLine{197         sstr.copyfmt(s);}
+\DoxyCodeLine{198         sstr << static\_cast<PrintType>(m.coeff(i,j));}
+\DoxyCodeLine{199         width = std::max<Index>(width, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}(sstr.str().length()));}
+\DoxyCodeLine{200       \}}
+\DoxyCodeLine{201   \}}
+\DoxyCodeLine{202   std::streamsize old\_width = s.width();}
+\DoxyCodeLine{203   \textcolor{keywordtype}{char} old\_fill\_character = s.fill();}
+\DoxyCodeLine{204   s << fmt.matPrefix;}
+\DoxyCodeLine{205   \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = 0; i < m.rows(); ++i)}
+\DoxyCodeLine{206   \{}
+\DoxyCodeLine{207     \textcolor{keywordflow}{if} (i)}
+\DoxyCodeLine{208       s << fmt.rowSpacer;}
+\DoxyCodeLine{209     s << fmt.rowPrefix;}
+\DoxyCodeLine{210     \textcolor{keywordflow}{if}(width) \{}
+\DoxyCodeLine{211       s.fill(fmt.fill);}
+\DoxyCodeLine{212       s.width(width);}
+\DoxyCodeLine{213     \}}
+\DoxyCodeLine{214     s << static\_cast<PrintType>(m.coeff(i, 0));}
+\DoxyCodeLine{215     \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 1; j < m.cols(); ++j)}
+\DoxyCodeLine{216     \{}
+\DoxyCodeLine{217       s << fmt.coeffSeparator;}
+\DoxyCodeLine{218       \textcolor{keywordflow}{if}(width) \{}
+\DoxyCodeLine{219         s.fill(fmt.fill);}
+\DoxyCodeLine{220         s.width(width);}
+\DoxyCodeLine{221       \}}
+\DoxyCodeLine{222       s << static\_cast<PrintType>(m.coeff(i, j));}
+\DoxyCodeLine{223     \}}
+\DoxyCodeLine{224     s << fmt.rowSuffix;}
+\DoxyCodeLine{225     \textcolor{keywordflow}{if}( i < m.rows() -\/ 1)}
+\DoxyCodeLine{226       s << fmt.rowSeparator;}
+\DoxyCodeLine{227   \}}
+\DoxyCodeLine{228   s << fmt.matSuffix;}
+\DoxyCodeLine{229   \textcolor{keywordflow}{if}(explicit\_precision) s.precision(old\_precision);}
+\DoxyCodeLine{230   \textcolor{keywordflow}{if}(width) \{}
+\DoxyCodeLine{231     s.fill(old\_fill\_character);}
+\DoxyCodeLine{232     s.width(old\_width);}
+\DoxyCodeLine{233   \}}
+\DoxyCodeLine{234   \textcolor{keywordflow}{return} s;}
+\DoxyCodeLine{235 \}}
+\DoxyCodeLine{236 }
+\DoxyCodeLine{237 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{238 }
+\DoxyCodeLine{250 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{251 std::ostream \& \textcolor{keyword}{operator} <<}
+\DoxyCodeLine{252 (std::ostream \& s,}
+\DoxyCodeLine{253  \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1DenseBase}{DenseBase<Derived>}} \& m)}
+\DoxyCodeLine{254 \{}
+\DoxyCodeLine{255   \textcolor{keywordflow}{return} internal::print\_matrix(s, m.eval(), EIGEN\_DEFAULT\_IO\_FORMAT);}
+\DoxyCodeLine{256 \}}
+\DoxyCodeLine{257 }
+\DoxyCodeLine{258 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{259 }
+\DoxyCodeLine{260 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_IO\_H}}
+
+\end{DoxyCode}

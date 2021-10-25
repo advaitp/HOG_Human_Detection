@@ -1,0 +1,562 @@
+\hypertarget{PaStiXSupport_8h_source}{}\doxysection{Pa\+Sti\+XSupport.\+h}
+\label{PaStiXSupport_8h_source}\index{include/Eigen/src/PaStiXSupport/PaStiXSupport.h@{include/Eigen/src/PaStiXSupport/PaStiXSupport.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2012 Désiré Nuentsa-\/Wakam <desire.nuentsa\_wakam@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_PASTIXSUPPORT\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_PASTIXSUPPORT\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{preprocessor}{\#if defined(DCOMPLEX)}}
+\DoxyCodeLine{18 \textcolor{preprocessor}{  \#define PASTIX\_COMPLEX  COMPLEX}}
+\DoxyCodeLine{19 \textcolor{preprocessor}{  \#define PASTIX\_DCOMPLEX DCOMPLEX}}
+\DoxyCodeLine{20 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{21 \textcolor{preprocessor}{  \#define PASTIX\_COMPLEX  std::complex<float>}}
+\DoxyCodeLine{22 \textcolor{preprocessor}{  \#define PASTIX\_DCOMPLEX std::complex<double>}}
+\DoxyCodeLine{23 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{24 }
+\DoxyCodeLine{33 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_, \textcolor{keywordtype}{bool} IsStrSym = false> \textcolor{keyword}{class }PastixLU;}
+\DoxyCodeLine{34 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_, \textcolor{keywordtype}{int} Options> \textcolor{keyword}{class }PastixLLT;}
+\DoxyCodeLine{35 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_, \textcolor{keywordtype}{int} Options> \textcolor{keyword}{class }PastixLDLT;}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{37 \textcolor{keyword}{namespace }internal}
+\DoxyCodeLine{38 \{}
+\DoxyCodeLine{39     }
+\DoxyCodeLine{40   \textcolor{keyword}{template}<\textcolor{keyword}{class} Pastix> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1pastix__traits}{pastix\_traits}};}
+\DoxyCodeLine{41 }
+\DoxyCodeLine{42   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_>}
+\DoxyCodeLine{43   \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1pastix__traits}{pastix\_traits}}< \mbox{\hyperlink{classEigen_1_1PastixLU}{PastixLU}}<MatrixType\_> >}
+\DoxyCodeLine{44   \{}
+\DoxyCodeLine{45     \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{46     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType\_::Scalar Scalar;}
+\DoxyCodeLine{47     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType\_::RealScalar RealScalar;}
+\DoxyCodeLine{48     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType\_::StorageIndex StorageIndex;}
+\DoxyCodeLine{49   \};}
+\DoxyCodeLine{50 }
+\DoxyCodeLine{51   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_, \textcolor{keywordtype}{int} Options>}
+\DoxyCodeLine{52   \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1pastix__traits}{pastix\_traits}}< \mbox{\hyperlink{classEigen_1_1PastixLLT}{PastixLLT}}<MatrixType\_,Options> >}
+\DoxyCodeLine{53   \{}
+\DoxyCodeLine{54     \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{55     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType\_::Scalar Scalar;}
+\DoxyCodeLine{56     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType\_::RealScalar RealScalar;}
+\DoxyCodeLine{57     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType\_::StorageIndex StorageIndex;}
+\DoxyCodeLine{58   \};}
+\DoxyCodeLine{59 }
+\DoxyCodeLine{60   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_, \textcolor{keywordtype}{int} Options>}
+\DoxyCodeLine{61   \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1pastix__traits}{pastix\_traits}}< \mbox{\hyperlink{classEigen_1_1PastixLDLT}{PastixLDLT}}<MatrixType\_,Options> >}
+\DoxyCodeLine{62   \{}
+\DoxyCodeLine{63     \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{64     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType\_::Scalar Scalar;}
+\DoxyCodeLine{65     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType\_::RealScalar RealScalar;}
+\DoxyCodeLine{66     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType\_::StorageIndex StorageIndex;}
+\DoxyCodeLine{67   \};}
+\DoxyCodeLine{68   }
+\DoxyCodeLine{69   \textcolor{keyword}{inline} \textcolor{keywordtype}{void} eigen\_pastix(pastix\_data\_t **pastix\_data, \textcolor{keywordtype}{int} pastix\_comm, \textcolor{keywordtype}{int} n, \textcolor{keywordtype}{int} *ptr, \textcolor{keywordtype}{int} *idx, \textcolor{keywordtype}{float} *vals, \textcolor{keywordtype}{int} *perm, \textcolor{keywordtype}{int} * invp, \textcolor{keywordtype}{float} *x, \textcolor{keywordtype}{int} nbrhs, \textcolor{keywordtype}{int} *iparm, \textcolor{keywordtype}{double} *dparm)}
+\DoxyCodeLine{70   \{}
+\DoxyCodeLine{71     \textcolor{keywordflow}{if} (n == 0) \{ ptr = NULL; idx = NULL; vals = NULL; \}}
+\DoxyCodeLine{72     \textcolor{keywordflow}{if} (nbrhs == 0) \{x = NULL; nbrhs=1;\}}
+\DoxyCodeLine{73     s\_pastix(pastix\_data, pastix\_comm, n, ptr, idx, vals, perm, invp, x, nbrhs, iparm, dparm); }
+\DoxyCodeLine{74   \}}
+\DoxyCodeLine{75   }
+\DoxyCodeLine{76   \textcolor{keyword}{inline} \textcolor{keywordtype}{void} eigen\_pastix(pastix\_data\_t **pastix\_data, \textcolor{keywordtype}{int} pastix\_comm, \textcolor{keywordtype}{int} n, \textcolor{keywordtype}{int} *ptr, \textcolor{keywordtype}{int} *idx, \textcolor{keywordtype}{double} *vals, \textcolor{keywordtype}{int} *perm, \textcolor{keywordtype}{int} * invp, \textcolor{keywordtype}{double} *x, \textcolor{keywordtype}{int} nbrhs, \textcolor{keywordtype}{int} *iparm, \textcolor{keywordtype}{double} *dparm)}
+\DoxyCodeLine{77   \{}
+\DoxyCodeLine{78     \textcolor{keywordflow}{if} (n == 0) \{ ptr = NULL; idx = NULL; vals = NULL; \}}
+\DoxyCodeLine{79     \textcolor{keywordflow}{if} (nbrhs == 0) \{x = NULL; nbrhs=1;\}}
+\DoxyCodeLine{80     d\_pastix(pastix\_data, pastix\_comm, n, ptr, idx, vals, perm, invp, x, nbrhs, iparm, dparm); }
+\DoxyCodeLine{81   \}}
+\DoxyCodeLine{82   }
+\DoxyCodeLine{83   \textcolor{keyword}{inline} \textcolor{keywordtype}{void} eigen\_pastix(pastix\_data\_t **pastix\_data, \textcolor{keywordtype}{int} pastix\_comm, \textcolor{keywordtype}{int} n, \textcolor{keywordtype}{int} *ptr, \textcolor{keywordtype}{int} *idx, std::complex<float> *vals, \textcolor{keywordtype}{int} *perm, \textcolor{keywordtype}{int} * invp, std::complex<float> *x, \textcolor{keywordtype}{int} nbrhs, \textcolor{keywordtype}{int} *iparm, \textcolor{keywordtype}{double} *dparm)}
+\DoxyCodeLine{84   \{}
+\DoxyCodeLine{85     \textcolor{keywordflow}{if} (n == 0) \{ ptr = NULL; idx = NULL; vals = NULL; \}}
+\DoxyCodeLine{86     \textcolor{keywordflow}{if} (nbrhs == 0) \{x = NULL; nbrhs=1;\}}
+\DoxyCodeLine{87     c\_pastix(pastix\_data, pastix\_comm, n, ptr, idx, \textcolor{keyword}{reinterpret\_cast<}PASTIX\_COMPLEX*\textcolor{keyword}{>}(vals), perm, invp, \textcolor{keyword}{reinterpret\_cast<}PASTIX\_COMPLEX*\textcolor{keyword}{>}(x), nbrhs, iparm, dparm); }
+\DoxyCodeLine{88   \}}
+\DoxyCodeLine{89   }
+\DoxyCodeLine{90   \textcolor{keyword}{inline} \textcolor{keywordtype}{void} eigen\_pastix(pastix\_data\_t **pastix\_data, \textcolor{keywordtype}{int} pastix\_comm, \textcolor{keywordtype}{int} n, \textcolor{keywordtype}{int} *ptr, \textcolor{keywordtype}{int} *idx, std::complex<double> *vals, \textcolor{keywordtype}{int} *perm, \textcolor{keywordtype}{int} * invp, std::complex<double> *x, \textcolor{keywordtype}{int} nbrhs, \textcolor{keywordtype}{int} *iparm, \textcolor{keywordtype}{double} *dparm)}
+\DoxyCodeLine{91   \{}
+\DoxyCodeLine{92     \textcolor{keywordflow}{if} (n == 0) \{ ptr = NULL; idx = NULL; vals = NULL; \}}
+\DoxyCodeLine{93     \textcolor{keywordflow}{if} (nbrhs == 0) \{x = NULL; nbrhs=1;\}}
+\DoxyCodeLine{94     z\_pastix(pastix\_data, pastix\_comm, n, ptr, idx, \textcolor{keyword}{reinterpret\_cast<}PASTIX\_DCOMPLEX*\textcolor{keyword}{>}(vals), perm, invp, \textcolor{keyword}{reinterpret\_cast<}PASTIX\_DCOMPLEX*\textcolor{keyword}{>}(x), nbrhs, iparm, dparm); }
+\DoxyCodeLine{95   \}}
+\DoxyCodeLine{96 }
+\DoxyCodeLine{97   \textcolor{comment}{// Convert the matrix  to Fortran-\/style Numbering}}
+\DoxyCodeLine{98   \textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{99   \textcolor{keywordtype}{void} c\_to\_fortran\_numbering (MatrixType\& mat)}
+\DoxyCodeLine{100   \{}
+\DoxyCodeLine{101     \textcolor{keywordflow}{if} ( !(mat.outerIndexPtr()[0]) ) }
+\DoxyCodeLine{102     \{ }
+\DoxyCodeLine{103       \textcolor{keywordtype}{int} i;}
+\DoxyCodeLine{104       \textcolor{keywordflow}{for}(i = 0; i <= mat.rows(); ++i)}
+\DoxyCodeLine{105         ++mat.outerIndexPtr()[i];}
+\DoxyCodeLine{106       \textcolor{keywordflow}{for}(i = 0; i < mat.nonZeros(); ++i)}
+\DoxyCodeLine{107         ++mat.innerIndexPtr()[i];}
+\DoxyCodeLine{108     \}}
+\DoxyCodeLine{109   \}}
+\DoxyCodeLine{110   }
+\DoxyCodeLine{111   \textcolor{comment}{// Convert to C-\/style Numbering}}
+\DoxyCodeLine{112   \textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{113   \textcolor{keywordtype}{void} fortran\_to\_c\_numbering (MatrixType\& mat)}
+\DoxyCodeLine{114   \{}
+\DoxyCodeLine{115     \textcolor{comment}{// Check the Numbering}}
+\DoxyCodeLine{116     \textcolor{keywordflow}{if} ( mat.outerIndexPtr()[0] == 1 ) }
+\DoxyCodeLine{117     \{ \textcolor{comment}{// Convert to C-\/style numbering}}
+\DoxyCodeLine{118       \textcolor{keywordtype}{int} i;}
+\DoxyCodeLine{119       \textcolor{keywordflow}{for}(i = 0; i <= mat.rows(); ++i)}
+\DoxyCodeLine{120         -\/-\/mat.outerIndexPtr()[i];}
+\DoxyCodeLine{121       \textcolor{keywordflow}{for}(i = 0; i < mat.nonZeros(); ++i)}
+\DoxyCodeLine{122         -\/-\/mat.innerIndexPtr()[i];}
+\DoxyCodeLine{123     \}}
+\DoxyCodeLine{124   \}}
+\DoxyCodeLine{125 \}}
+\DoxyCodeLine{126 }
+\DoxyCodeLine{127 \textcolor{comment}{// This is the base class to interface with PaStiX functions. }}
+\DoxyCodeLine{128 \textcolor{comment}{// Users should not used this class directly. }}
+\DoxyCodeLine{129 \textcolor{keyword}{template} <\textcolor{keyword}{class} Derived>}
+\DoxyCodeLine{130 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1PastixBase}{PastixBase}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{SparseSolverBase}}<Derived>}
+\DoxyCodeLine{131 \{}
+\DoxyCodeLine{132   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{133     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{SparseSolverBase<Derived>}} \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{Base}};}
+\DoxyCodeLine{134     \textcolor{keyword}{using} Base::derived;}
+\DoxyCodeLine{135     \textcolor{keyword}{using} Base::m\_isInitialized;}
+\DoxyCodeLine{136   \textcolor{keyword}{public}:}
+\DoxyCodeLine{137     \textcolor{keyword}{using} Base::\_solve\_impl;}
+\DoxyCodeLine{138     }
+\DoxyCodeLine{139     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1pastix__traits}{internal::pastix\_traits<Derived>::MatrixType}} MatrixType\_;}
+\DoxyCodeLine{140     \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{141     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar Scalar;}
+\DoxyCodeLine{142     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::RealScalar RealScalar;}
+\DoxyCodeLine{143     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::StorageIndex StorageIndex;}
+\DoxyCodeLine{144     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar,Dynamic,1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{Vector}};}
+\DoxyCodeLine{145     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<Scalar, ColMajor>}} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{ColSpMatrix}};}
+\DoxyCodeLine{146     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{147       ColsAtCompileTime = MatrixType::ColsAtCompileTime,}
+\DoxyCodeLine{148       MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime}
+\DoxyCodeLine{149     \};}
+\DoxyCodeLine{150     }
+\DoxyCodeLine{151   \textcolor{keyword}{public}:}
+\DoxyCodeLine{152     }
+\DoxyCodeLine{153     \mbox{\hyperlink{classEigen_1_1PastixBase}{PastixBase}}() : m\_initisOk(\textcolor{keyword}{false}), m\_analysisIsOk(\textcolor{keyword}{false}), m\_factorizationIsOk(\textcolor{keyword}{false}), m\_pastixdata(0), m\_size(0)}
+\DoxyCodeLine{154     \{}
+\DoxyCodeLine{155       \mbox{\hyperlink{classEigen_1_1PastixBase_ac6202714edd1943646e34f16ad384336}{init}}();}
+\DoxyCodeLine{156     \}}
+\DoxyCodeLine{157     }
+\DoxyCodeLine{158     \mbox{\hyperlink{classEigen_1_1PastixBase}{\string~PastixBase}}() }
+\DoxyCodeLine{159     \{}
+\DoxyCodeLine{160       clean();}
+\DoxyCodeLine{161     \}}
+\DoxyCodeLine{162     }
+\DoxyCodeLine{163     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs,\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{164     \textcolor{keywordtype}{bool} \_solve\_impl(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Rhs>}} \&b, \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Dest>}} \&x) \textcolor{keyword}{const};}
+\DoxyCodeLine{165     }
+\DoxyCodeLine{171     \mbox{\hyperlink{classEigen_1_1Array}{Array<StorageIndex,IPARM\_SIZE,1>}}\& \mbox{\hyperlink{classEigen_1_1PastixBase_a94ffc14a89791a4b5f5a6974d69e67f7}{iparm}}()}
+\DoxyCodeLine{172     \{}
+\DoxyCodeLine{173       \textcolor{keywordflow}{return} m\_iparm; }
+\DoxyCodeLine{174     \}}
+\DoxyCodeLine{175     }
+\DoxyCodeLine{180     \textcolor{keywordtype}{int}\& \mbox{\hyperlink{classEigen_1_1PastixBase_af2f8c79dab3b42332fd40e9a0434534c}{iparm}}(\textcolor{keywordtype}{int} idxparam)}
+\DoxyCodeLine{181     \{}
+\DoxyCodeLine{182       \textcolor{keywordflow}{return} m\_iparm(idxparam);}
+\DoxyCodeLine{183     \}}
+\DoxyCodeLine{184     }
+\DoxyCodeLine{189     \mbox{\hyperlink{classEigen_1_1Array}{Array<double,DPARM\_SIZE,1>}}\& \mbox{\hyperlink{classEigen_1_1PastixBase_aad62b642c759fcdec92f2fc193142e07}{dparm}}()}
+\DoxyCodeLine{190     \{}
+\DoxyCodeLine{191       \textcolor{keywordflow}{return} m\_dparm; }
+\DoxyCodeLine{192     \}}
+\DoxyCodeLine{193     }
+\DoxyCodeLine{194     }
+\DoxyCodeLine{198     \textcolor{keywordtype}{double}\& \mbox{\hyperlink{classEigen_1_1PastixBase_a319074206cf99fb1f964c185e9a16a2b}{dparm}}(\textcolor{keywordtype}{int} idxparam)}
+\DoxyCodeLine{199     \{}
+\DoxyCodeLine{200       \textcolor{keywordflow}{return} m\_dparm(idxparam);}
+\DoxyCodeLine{201     \}}
+\DoxyCodeLine{202     }
+\DoxyCodeLine{203     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_size; \}}
+\DoxyCodeLine{204     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_size; \}}
+\DoxyCodeLine{205     }
+\DoxyCodeLine{214     \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} \mbox{\hyperlink{classEigen_1_1PastixBase_a436e99a385c9c019be9627cc1fa884cf}{info}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{215 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{216       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}Decomposition is not initialized."{}});}
+\DoxyCodeLine{217       \textcolor{keywordflow}{return} m\_info;}
+\DoxyCodeLine{218     \}}
+\DoxyCodeLine{219     }
+\DoxyCodeLine{220   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{221 }
+\DoxyCodeLine{222     \textcolor{comment}{// Initialize the Pastix data structure, check the matrix}}
+\DoxyCodeLine{223     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1PastixBase_ac6202714edd1943646e34f16ad384336}{init}}(); }
+\DoxyCodeLine{224     }
+\DoxyCodeLine{225     \textcolor{comment}{// Compute the ordering and the symbolic factorization}}
+\DoxyCodeLine{226     \textcolor{keywordtype}{void} analyzePattern(\mbox{\hyperlink{classEigen_1_1SparseMatrix}{ColSpMatrix}}\& mat);}
+\DoxyCodeLine{227     }
+\DoxyCodeLine{228     \textcolor{comment}{// Compute the numerical factorization}}
+\DoxyCodeLine{229     \textcolor{keywordtype}{void} factorize(\mbox{\hyperlink{classEigen_1_1SparseMatrix}{ColSpMatrix}}\& mat);}
+\DoxyCodeLine{230     }
+\DoxyCodeLine{231     \textcolor{comment}{// Free all the data allocated by Pastix}}
+\DoxyCodeLine{232     \textcolor{keywordtype}{void} clean()}
+\DoxyCodeLine{233     \{}
+\DoxyCodeLine{234       eigen\_assert(m\_initisOk \&\& \textcolor{stringliteral}{"{}The Pastix structure should be allocated first"{}}); }
+\DoxyCodeLine{235       m\_iparm(IPARM\_START\_TASK) = API\_TASK\_CLEAN;}
+\DoxyCodeLine{236       m\_iparm(IPARM\_END\_TASK) = API\_TASK\_CLEAN;}
+\DoxyCodeLine{237       internal::eigen\_pastix(\&m\_pastixdata, MPI\_COMM\_WORLD, 0, 0, 0, (Scalar*)0,}
+\DoxyCodeLine{238                              m\_perm.data(), m\_invp.data(), 0, 0, m\_iparm.data(), m\_dparm.data());}
+\DoxyCodeLine{239     \}}
+\DoxyCodeLine{240     }
+\DoxyCodeLine{241     \textcolor{keywordtype}{void} compute(ColSpMatrix\& mat);}
+\DoxyCodeLine{242     }
+\DoxyCodeLine{243     \textcolor{keywordtype}{int} m\_initisOk; }
+\DoxyCodeLine{244     \textcolor{keywordtype}{int} m\_analysisIsOk;}
+\DoxyCodeLine{245     \textcolor{keywordtype}{int} m\_factorizationIsOk;}
+\DoxyCodeLine{246     \textcolor{keyword}{mutable} \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} m\_info; }
+\DoxyCodeLine{247     \textcolor{keyword}{mutable} pastix\_data\_t *m\_pastixdata; \textcolor{comment}{// Data structure for pastix}}
+\DoxyCodeLine{248     \textcolor{keyword}{mutable} \textcolor{keywordtype}{int} m\_comm; \textcolor{comment}{// The MPI communicator identifier}}
+\DoxyCodeLine{249     \textcolor{keyword}{mutable} \mbox{\hyperlink{classEigen_1_1Array}{Array<int,IPARM\_SIZE,1>}} m\_iparm; \textcolor{comment}{// integer vector for the input parameters}}
+\DoxyCodeLine{250     \textcolor{keyword}{mutable} \mbox{\hyperlink{classEigen_1_1Array}{Array<double,DPARM\_SIZE,1>}} m\_dparm; \textcolor{comment}{// Scalar vector for the input parameters}}
+\DoxyCodeLine{251     \textcolor{keyword}{mutable} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<StorageIndex,Dynamic,1>}} m\_perm;  \textcolor{comment}{// Permutation vector}}
+\DoxyCodeLine{252     \textcolor{keyword}{mutable} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<StorageIndex,Dynamic,1>}} m\_invp;  \textcolor{comment}{// Inverse permutation vector}}
+\DoxyCodeLine{253     \textcolor{keyword}{mutable} \textcolor{keywordtype}{int} m\_size; \textcolor{comment}{// Size of the matrix }}
+\DoxyCodeLine{254 \}; }
+\DoxyCodeLine{255 }
+\DoxyCodeLine{260 \textcolor{keyword}{template} <\textcolor{keyword}{class} Derived>}
+\DoxyCodeLine{261 \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1PastixBase_ac6202714edd1943646e34f16ad384336}{PastixBase<Derived>::init}}()}
+\DoxyCodeLine{262 \{}
+\DoxyCodeLine{263   m\_size = 0; }
+\DoxyCodeLine{264   m\_iparm.setZero(IPARM\_SIZE);}
+\DoxyCodeLine{265   m\_dparm.setZero(DPARM\_SIZE);}
+\DoxyCodeLine{266   }
+\DoxyCodeLine{267   m\_iparm(IPARM\_MODIFY\_PARAMETER) = API\_NO;}
+\DoxyCodeLine{268   pastix(\&m\_pastixdata, MPI\_COMM\_WORLD,}
+\DoxyCodeLine{269          0, 0, 0, 0,}
+\DoxyCodeLine{270          0, 0, 0, 1, m\_iparm.data(), m\_dparm.data());}
+\DoxyCodeLine{271   }
+\DoxyCodeLine{272   m\_iparm[IPARM\_MATRIX\_VERIFICATION] = API\_NO;}
+\DoxyCodeLine{273   m\_iparm[IPARM\_VERBOSE]             = API\_VERBOSE\_NOT;}
+\DoxyCodeLine{274   m\_iparm[IPARM\_ORDERING]            = API\_ORDER\_SCOTCH;}
+\DoxyCodeLine{275   m\_iparm[IPARM\_INCOMPLETE]          = API\_NO;}
+\DoxyCodeLine{276   m\_iparm[IPARM\_OOC\_LIMIT]           = 2000;}
+\DoxyCodeLine{277   m\_iparm[IPARM\_RHS\_MAKING]          = API\_RHS\_B;}
+\DoxyCodeLine{278   m\_iparm(IPARM\_MATRIX\_VERIFICATION) = API\_NO;}
+\DoxyCodeLine{279   }
+\DoxyCodeLine{280   m\_iparm(IPARM\_START\_TASK) = API\_TASK\_INIT;}
+\DoxyCodeLine{281   m\_iparm(IPARM\_END\_TASK) = API\_TASK\_INIT;}
+\DoxyCodeLine{282   internal::eigen\_pastix(\&m\_pastixdata, MPI\_COMM\_WORLD, 0, 0, 0, (Scalar*)0,}
+\DoxyCodeLine{283                          0, 0, 0, 0, m\_iparm.data(), m\_dparm.data());}
+\DoxyCodeLine{284   }
+\DoxyCodeLine{285   \textcolor{comment}{// Check the returned error}}
+\DoxyCodeLine{286   \textcolor{keywordflow}{if}(m\_iparm(IPARM\_ERROR\_NUMBER)) \{}
+\DoxyCodeLine{287     m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea580b2a3cafe585691e789f768fb729bf}{InvalidInput}};}
+\DoxyCodeLine{288     m\_initisOk = \textcolor{keyword}{false};}
+\DoxyCodeLine{289   \}}
+\DoxyCodeLine{290   \textcolor{keywordflow}{else} \{ }
+\DoxyCodeLine{291     m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}};}
+\DoxyCodeLine{292     m\_initisOk = \textcolor{keyword}{true};}
+\DoxyCodeLine{293   \}}
+\DoxyCodeLine{294 \}}
+\DoxyCodeLine{295 }
+\DoxyCodeLine{296 \textcolor{keyword}{template} <\textcolor{keyword}{class} Derived>}
+\DoxyCodeLine{297 \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1PastixBase}{PastixBase<Derived>::compute}}(ColSpMatrix\& mat)}
+\DoxyCodeLine{298 \{}
+\DoxyCodeLine{299   eigen\_assert(mat.rows() == mat.cols() \&\& \textcolor{stringliteral}{"{}The input matrix should be squared"{}});}
+\DoxyCodeLine{300   }
+\DoxyCodeLine{301   analyzePattern(mat);  }
+\DoxyCodeLine{302   factorize(mat);}
+\DoxyCodeLine{303   }
+\DoxyCodeLine{304   m\_iparm(IPARM\_MATRIX\_VERIFICATION) = API\_NO;}
+\DoxyCodeLine{305 \}}
+\DoxyCodeLine{306 }
+\DoxyCodeLine{307 }
+\DoxyCodeLine{308 \textcolor{keyword}{template} <\textcolor{keyword}{class} Derived>}
+\DoxyCodeLine{309 \textcolor{keywordtype}{void} PastixBase<Derived>::analyzePattern(ColSpMatrix\& mat)}
+\DoxyCodeLine{310 \{                         }
+\DoxyCodeLine{311   eigen\_assert(m\_initisOk \&\& \textcolor{stringliteral}{"{}The initialization of PaSTiX failed"{}});}
+\DoxyCodeLine{312   }
+\DoxyCodeLine{313   \textcolor{comment}{// clean previous calls}}
+\DoxyCodeLine{314   \textcolor{keywordflow}{if}(m\_size>0)}
+\DoxyCodeLine{315     clean();}
+\DoxyCodeLine{316   }
+\DoxyCodeLine{317   m\_size = internal::convert\_index<int>(mat.rows());}
+\DoxyCodeLine{318   m\_perm.resize(m\_size);}
+\DoxyCodeLine{319   m\_invp.resize(m\_size);}
+\DoxyCodeLine{320   }
+\DoxyCodeLine{321   m\_iparm(IPARM\_START\_TASK) = API\_TASK\_ORDERING;}
+\DoxyCodeLine{322   m\_iparm(IPARM\_END\_TASK) = API\_TASK\_ANALYSE;}
+\DoxyCodeLine{323   internal::eigen\_pastix(\&m\_pastixdata, MPI\_COMM\_WORLD, m\_size, mat.outerIndexPtr(), mat.innerIndexPtr(),}
+\DoxyCodeLine{324                mat.valuePtr(), m\_perm.data(), m\_invp.data(), 0, 0, m\_iparm.data(), m\_dparm.data());}
+\DoxyCodeLine{325   }
+\DoxyCodeLine{326   \textcolor{comment}{// Check the returned error}}
+\DoxyCodeLine{327   \textcolor{keywordflow}{if}(m\_iparm(IPARM\_ERROR\_NUMBER))}
+\DoxyCodeLine{328   \{}
+\DoxyCodeLine{329     m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea1c6e20706575a629b27a105f07f1883b}{NumericalIssue}};}
+\DoxyCodeLine{330     m\_analysisIsOk = \textcolor{keyword}{false};}
+\DoxyCodeLine{331   \}}
+\DoxyCodeLine{332   \textcolor{keywordflow}{else}}
+\DoxyCodeLine{333   \{ }
+\DoxyCodeLine{334     m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}};}
+\DoxyCodeLine{335     m\_analysisIsOk = \textcolor{keyword}{true};}
+\DoxyCodeLine{336   \}}
+\DoxyCodeLine{337 \}}
+\DoxyCodeLine{338 }
+\DoxyCodeLine{339 \textcolor{keyword}{template} <\textcolor{keyword}{class} Derived>}
+\DoxyCodeLine{340 \textcolor{keywordtype}{void} PastixBase<Derived>::factorize(ColSpMatrix\& mat)}
+\DoxyCodeLine{341 \{}
+\DoxyCodeLine{342 \textcolor{comment}{//   if(\&m\_cpyMat != \&mat) m\_cpyMat = mat;}}
+\DoxyCodeLine{343   eigen\_assert(m\_analysisIsOk \&\& \textcolor{stringliteral}{"{}The analysis phase should be called before the factorization phase"{}});}
+\DoxyCodeLine{344   m\_iparm(IPARM\_START\_TASK) = API\_TASK\_NUMFACT;}
+\DoxyCodeLine{345   m\_iparm(IPARM\_END\_TASK) = API\_TASK\_NUMFACT;}
+\DoxyCodeLine{346   m\_size = internal::convert\_index<int>(mat.rows());}
+\DoxyCodeLine{347   }
+\DoxyCodeLine{348   internal::eigen\_pastix(\&m\_pastixdata, MPI\_COMM\_WORLD, m\_size, mat.outerIndexPtr(), mat.innerIndexPtr(),}
+\DoxyCodeLine{349                mat.valuePtr(), m\_perm.data(), m\_invp.data(), 0, 0, m\_iparm.data(), m\_dparm.data());}
+\DoxyCodeLine{350   }
+\DoxyCodeLine{351   \textcolor{comment}{// Check the returned error}}
+\DoxyCodeLine{352   \textcolor{keywordflow}{if}(m\_iparm(IPARM\_ERROR\_NUMBER))}
+\DoxyCodeLine{353   \{}
+\DoxyCodeLine{354     m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea1c6e20706575a629b27a105f07f1883b}{NumericalIssue}};}
+\DoxyCodeLine{355     m\_factorizationIsOk = \textcolor{keyword}{false};}
+\DoxyCodeLine{356     m\_isInitialized = \textcolor{keyword}{false};}
+\DoxyCodeLine{357   \}}
+\DoxyCodeLine{358   \textcolor{keywordflow}{else}}
+\DoxyCodeLine{359   \{}
+\DoxyCodeLine{360     m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}};}
+\DoxyCodeLine{361     m\_factorizationIsOk = \textcolor{keyword}{true};}
+\DoxyCodeLine{362     m\_isInitialized = \textcolor{keyword}{true};}
+\DoxyCodeLine{363   \}}
+\DoxyCodeLine{364 \}}
+\DoxyCodeLine{365 }
+\DoxyCodeLine{366 \textcolor{comment}{/* Solve the system */}}
+\DoxyCodeLine{367 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Base>}
+\DoxyCodeLine{368 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs,\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{369 \textcolor{keywordtype}{bool} PastixBase<Base>::\_solve\_impl(\textcolor{keyword}{const} MatrixBase<Rhs> \&b, MatrixBase<Dest> \&x)\textcolor{keyword}{ const}}
+\DoxyCodeLine{370 \textcolor{keyword}{}\{}
+\DoxyCodeLine{371   eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}The matrix should be factorized first"{}});}
+\DoxyCodeLine{372   EIGEN\_STATIC\_ASSERT((Dest::Flags\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})==0,}
+\DoxyCodeLine{373                      THIS\_METHOD\_IS\_ONLY\_FOR\_COLUMN\_MAJOR\_MATRICES);}
+\DoxyCodeLine{374   \textcolor{keywordtype}{int} rhs = 1;}
+\DoxyCodeLine{375   }
+\DoxyCodeLine{376   x = b; \textcolor{comment}{/* on return, x is overwritten by the computed solution */}}
+\DoxyCodeLine{377   }
+\DoxyCodeLine{378   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < b.cols(); i++)\{}
+\DoxyCodeLine{379     m\_iparm[IPARM\_START\_TASK]          = API\_TASK\_SOLVE;}
+\DoxyCodeLine{380     m\_iparm[IPARM\_END\_TASK]            = API\_TASK\_REFINE;}
+\DoxyCodeLine{381   }
+\DoxyCodeLine{382     internal::eigen\_pastix(\&m\_pastixdata, MPI\_COMM\_WORLD, internal::convert\_index<int>(x.rows()), 0, 0, 0,}
+\DoxyCodeLine{383                            m\_perm.data(), m\_invp.data(), \&x(0, i), rhs, m\_iparm.data(), m\_dparm.data());}
+\DoxyCodeLine{384   \}}
+\DoxyCodeLine{385   }
+\DoxyCodeLine{386   \textcolor{comment}{// Check the returned error}}
+\DoxyCodeLine{387   m\_info = m\_iparm(IPARM\_ERROR\_NUMBER)==0 ? \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}} : \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea1c6e20706575a629b27a105f07f1883b}{NumericalIssue}};}
+\DoxyCodeLine{388   }
+\DoxyCodeLine{389   \textcolor{keywordflow}{return} m\_iparm(IPARM\_ERROR\_NUMBER)==0;}
+\DoxyCodeLine{390 \}}
+\DoxyCodeLine{391 }
+\DoxyCodeLine{413 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_, \textcolor{keywordtype}{bool} IsStrSym>}
+\DoxyCodeLine{414 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1PastixLU}{PastixLU}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1PastixBase}{PastixBase}}< PastixLU<MatrixType\_> >}
+\DoxyCodeLine{415 \{}
+\DoxyCodeLine{416   \textcolor{keyword}{public}:}
+\DoxyCodeLine{417     \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{418     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1PastixBase}{PastixBase<PastixLU<MatrixType>}} > \mbox{\hyperlink{classEigen_1_1PastixBase}{Base}};}
+\DoxyCodeLine{419     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{Base::ColSpMatrix}} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{ColSpMatrix}};}
+\DoxyCodeLine{420     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::StorageIndex StorageIndex;}
+\DoxyCodeLine{421     }
+\DoxyCodeLine{422   \textcolor{keyword}{public}:}
+\DoxyCodeLine{423     \mbox{\hyperlink{classEigen_1_1PastixLU}{PastixLU}}() : \mbox{\hyperlink{classEigen_1_1PastixBase}{Base}}()}
+\DoxyCodeLine{424     \{}
+\DoxyCodeLine{425       init();}
+\DoxyCodeLine{426     \}}
+\DoxyCodeLine{427     }
+\DoxyCodeLine{428     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1PastixLU}{PastixLU}}(\textcolor{keyword}{const} MatrixType\& matrix):\mbox{\hyperlink{classEigen_1_1PastixBase}{Base}}()}
+\DoxyCodeLine{429     \{}
+\DoxyCodeLine{430       init();}
+\DoxyCodeLine{431       \mbox{\hyperlink{classEigen_1_1PastixLU_a6b3142fc7eb7d45df22e36dd35468259}{compute}}(matrix);}
+\DoxyCodeLine{432     \}}
+\DoxyCodeLine{438     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1PastixLU_a6b3142fc7eb7d45df22e36dd35468259}{compute}} (\textcolor{keyword}{const} MatrixType\& matrix)}
+\DoxyCodeLine{439     \{}
+\DoxyCodeLine{440       m\_structureIsUptodate = \textcolor{keyword}{false};}
+\DoxyCodeLine{441       \mbox{\hyperlink{classEigen_1_1SparseMatrix}{ColSpMatrix}} temp;}
+\DoxyCodeLine{442       grabMatrix(matrix, temp);}
+\DoxyCodeLine{443       Base::compute(temp);}
+\DoxyCodeLine{444     \}}
+\DoxyCodeLine{450     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1PastixLU_a4a9a1dd6668e1757655344e80678e4f5}{analyzePattern}}(\textcolor{keyword}{const} MatrixType\& matrix)}
+\DoxyCodeLine{451     \{}
+\DoxyCodeLine{452       m\_structureIsUptodate = \textcolor{keyword}{false};}
+\DoxyCodeLine{453       \mbox{\hyperlink{classEigen_1_1SparseMatrix}{ColSpMatrix}} temp;}
+\DoxyCodeLine{454       grabMatrix(matrix, temp);}
+\DoxyCodeLine{455       Base::analyzePattern(temp);}
+\DoxyCodeLine{456     \}}
+\DoxyCodeLine{457 }
+\DoxyCodeLine{463     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1PastixLU_a5ac2170d33699b2ff5faf6fc2a669bca}{factorize}}(\textcolor{keyword}{const} MatrixType\& matrix)}
+\DoxyCodeLine{464     \{}
+\DoxyCodeLine{465       \mbox{\hyperlink{classEigen_1_1SparseMatrix}{ColSpMatrix}} temp;}
+\DoxyCodeLine{466       grabMatrix(matrix, temp);}
+\DoxyCodeLine{467       Base::factorize(temp);}
+\DoxyCodeLine{468     \}}
+\DoxyCodeLine{469   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{470     }
+\DoxyCodeLine{471     \textcolor{keywordtype}{void} init()}
+\DoxyCodeLine{472     \{}
+\DoxyCodeLine{473       m\_structureIsUptodate = \textcolor{keyword}{false};}
+\DoxyCodeLine{474       m\_iparm(IPARM\_SYM) = API\_SYM\_NO;}
+\DoxyCodeLine{475       m\_iparm(IPARM\_FACTORIZATION) = API\_FACT\_LU;}
+\DoxyCodeLine{476     \}}
+\DoxyCodeLine{477     }
+\DoxyCodeLine{478     \textcolor{keywordtype}{void} grabMatrix(\textcolor{keyword}{const} MatrixType\& matrix, ColSpMatrix\& out)}
+\DoxyCodeLine{479     \{}
+\DoxyCodeLine{480       \textcolor{keywordflow}{if}(IsStrSym)}
+\DoxyCodeLine{481         out = matrix;}
+\DoxyCodeLine{482       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{483       \{}
+\DoxyCodeLine{484         \textcolor{keywordflow}{if}(!m\_structureIsUptodate)}
+\DoxyCodeLine{485         \{}
+\DoxyCodeLine{486           \textcolor{comment}{// update the transposed structure}}
+\DoxyCodeLine{487           m\_transposedStructure = matrix.transpose();}
+\DoxyCodeLine{488           }
+\DoxyCodeLine{489           \textcolor{comment}{// Set the elements of the matrix to zero }}
+\DoxyCodeLine{490           \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j=0; j<m\_transposedStructure.\mbox{\hyperlink{classEigen_1_1SparseMatrix_a47c7cdf3c713ea69d08387aaf78e0c53}{outerSize}}(); ++j) }
+\DoxyCodeLine{491             \textcolor{keywordflow}{for}(\textcolor{keyword}{typename} ColSpMatrix::InnerIterator it(m\_transposedStructure, j); it; ++it)}
+\DoxyCodeLine{492               it.valueRef() = 0.0;}
+\DoxyCodeLine{493 }
+\DoxyCodeLine{494           m\_structureIsUptodate = \textcolor{keyword}{true};}
+\DoxyCodeLine{495         \}}
+\DoxyCodeLine{496         }
+\DoxyCodeLine{497         out = m\_transposedStructure + matrix;}
+\DoxyCodeLine{498       \}}
+\DoxyCodeLine{499       internal::c\_to\_fortran\_numbering(out);}
+\DoxyCodeLine{500     \}}
+\DoxyCodeLine{501     }
+\DoxyCodeLine{502     \textcolor{keyword}{using} Base::m\_iparm;}
+\DoxyCodeLine{503     \textcolor{keyword}{using} Base::m\_dparm;}
+\DoxyCodeLine{504     }
+\DoxyCodeLine{505     ColSpMatrix m\_transposedStructure;}
+\DoxyCodeLine{506     \textcolor{keywordtype}{bool} m\_structureIsUptodate;}
+\DoxyCodeLine{507 \};}
+\DoxyCodeLine{508 }
+\DoxyCodeLine{525 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_, \textcolor{keywordtype}{int} UpLo\_>}
+\DoxyCodeLine{526 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1PastixLLT}{PastixLLT}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1PastixBase}{PastixBase}}< PastixLLT<MatrixType\_, UpLo\_> >}
+\DoxyCodeLine{527 \{}
+\DoxyCodeLine{528   \textcolor{keyword}{public}:}
+\DoxyCodeLine{529     \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{530     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1PastixBase}{PastixBase<PastixLLT<MatrixType, UpLo\_>}} > \mbox{\hyperlink{classEigen_1_1PastixBase}{Base}};}
+\DoxyCodeLine{531     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{Base::ColSpMatrix}} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{ColSpMatrix}};}
+\DoxyCodeLine{532     }
+\DoxyCodeLine{533   \textcolor{keyword}{public}:}
+\DoxyCodeLine{534     \textcolor{keyword}{enum} \{ UpLo = UpLo\_ \};}
+\DoxyCodeLine{535     \mbox{\hyperlink{classEigen_1_1PastixLLT}{PastixLLT}}() : \mbox{\hyperlink{classEigen_1_1PastixBase}{Base}}()}
+\DoxyCodeLine{536     \{}
+\DoxyCodeLine{537       init();}
+\DoxyCodeLine{538     \}}
+\DoxyCodeLine{539     }
+\DoxyCodeLine{540     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1PastixLLT}{PastixLLT}}(\textcolor{keyword}{const} MatrixType\& matrix):\mbox{\hyperlink{classEigen_1_1PastixBase}{Base}}()}
+\DoxyCodeLine{541     \{}
+\DoxyCodeLine{542       init();}
+\DoxyCodeLine{543       \mbox{\hyperlink{classEigen_1_1PastixLLT_a7827297a4f763397378d818283159fcd}{compute}}(matrix);}
+\DoxyCodeLine{544     \}}
+\DoxyCodeLine{545 }
+\DoxyCodeLine{549     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1PastixLLT_a7827297a4f763397378d818283159fcd}{compute}} (\textcolor{keyword}{const} MatrixType\& matrix)}
+\DoxyCodeLine{550     \{}
+\DoxyCodeLine{551       \mbox{\hyperlink{classEigen_1_1SparseMatrix}{ColSpMatrix}} temp;}
+\DoxyCodeLine{552       grabMatrix(matrix, temp);}
+\DoxyCodeLine{553       Base::compute(temp);}
+\DoxyCodeLine{554     \}}
+\DoxyCodeLine{555 }
+\DoxyCodeLine{560     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1PastixLLT_aaf7870321a25f3953d583b0e7b851d6b}{analyzePattern}}(\textcolor{keyword}{const} MatrixType\& matrix)}
+\DoxyCodeLine{561     \{}
+\DoxyCodeLine{562       \mbox{\hyperlink{classEigen_1_1SparseMatrix}{ColSpMatrix}} temp;}
+\DoxyCodeLine{563       grabMatrix(matrix, temp);}
+\DoxyCodeLine{564       Base::analyzePattern(temp);}
+\DoxyCodeLine{565     \}}
+\DoxyCodeLine{569     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1PastixLLT_a823659cf5e2d07a063c43e2e497ebeda}{factorize}}(\textcolor{keyword}{const} MatrixType\& matrix)}
+\DoxyCodeLine{570     \{}
+\DoxyCodeLine{571       \mbox{\hyperlink{classEigen_1_1SparseMatrix}{ColSpMatrix}} temp;}
+\DoxyCodeLine{572       grabMatrix(matrix, temp);}
+\DoxyCodeLine{573       Base::factorize(temp);}
+\DoxyCodeLine{574     \}}
+\DoxyCodeLine{575   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{576     \textcolor{keyword}{using} Base::m\_iparm;}
+\DoxyCodeLine{577     }
+\DoxyCodeLine{578     \textcolor{keywordtype}{void} init()}
+\DoxyCodeLine{579     \{}
+\DoxyCodeLine{580       m\_iparm(IPARM\_SYM) = API\_SYM\_YES;}
+\DoxyCodeLine{581       m\_iparm(IPARM\_FACTORIZATION) = API\_FACT\_LLT;}
+\DoxyCodeLine{582     \}}
+\DoxyCodeLine{583     }
+\DoxyCodeLine{584     \textcolor{keywordtype}{void} grabMatrix(\textcolor{keyword}{const} MatrixType\& matrix, ColSpMatrix\& out)}
+\DoxyCodeLine{585     \{}
+\DoxyCodeLine{586       out.resize(matrix.rows(), matrix.cols());}
+\DoxyCodeLine{587       \textcolor{comment}{// Pastix supports only lower, column-\/major matrices }}
+\DoxyCodeLine{588       out.template selfadjointView<Lower>() = matrix.template selfadjointView<UpLo>();}
+\DoxyCodeLine{589       internal::c\_to\_fortran\_numbering(out);}
+\DoxyCodeLine{590     \}}
+\DoxyCodeLine{591 \};}
+\DoxyCodeLine{592 }
+\DoxyCodeLine{609 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_, \textcolor{keywordtype}{int} UpLo\_>}
+\DoxyCodeLine{610 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1PastixLDLT}{PastixLDLT}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1PastixBase}{PastixBase}}< PastixLDLT<MatrixType\_, UpLo\_> >}
+\DoxyCodeLine{611 \{}
+\DoxyCodeLine{612   \textcolor{keyword}{public}:}
+\DoxyCodeLine{613     \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{614     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1PastixBase}{PastixBase<PastixLDLT<MatrixType, UpLo\_>}} > \mbox{\hyperlink{classEigen_1_1PastixBase}{Base}};}
+\DoxyCodeLine{615     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{Base::ColSpMatrix}} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{ColSpMatrix}};}
+\DoxyCodeLine{616     }
+\DoxyCodeLine{617   \textcolor{keyword}{public}:}
+\DoxyCodeLine{618     \textcolor{keyword}{enum} \{ UpLo = UpLo\_ \};}
+\DoxyCodeLine{619     \mbox{\hyperlink{classEigen_1_1PastixLDLT}{PastixLDLT}}():\mbox{\hyperlink{classEigen_1_1PastixBase}{Base}}()}
+\DoxyCodeLine{620     \{}
+\DoxyCodeLine{621       init();}
+\DoxyCodeLine{622     \}}
+\DoxyCodeLine{623     }
+\DoxyCodeLine{624     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1PastixLDLT}{PastixLDLT}}(\textcolor{keyword}{const} MatrixType\& matrix):\mbox{\hyperlink{classEigen_1_1PastixBase}{Base}}()}
+\DoxyCodeLine{625     \{}
+\DoxyCodeLine{626       init();}
+\DoxyCodeLine{627       \mbox{\hyperlink{classEigen_1_1PastixLDLT_ab4160e2fb560309bfe120beccc78fea5}{compute}}(matrix);}
+\DoxyCodeLine{628     \}}
+\DoxyCodeLine{629 }
+\DoxyCodeLine{633     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1PastixLDLT_ab4160e2fb560309bfe120beccc78fea5}{compute}} (\textcolor{keyword}{const} MatrixType\& matrix)}
+\DoxyCodeLine{634     \{}
+\DoxyCodeLine{635       \mbox{\hyperlink{classEigen_1_1SparseMatrix}{ColSpMatrix}} temp;}
+\DoxyCodeLine{636       grabMatrix(matrix, temp);}
+\DoxyCodeLine{637       Base::compute(temp);}
+\DoxyCodeLine{638     \}}
+\DoxyCodeLine{639 }
+\DoxyCodeLine{644     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1PastixLDLT_ac2a904bb67bf9540efca23c1f9d21091}{analyzePattern}}(\textcolor{keyword}{const} MatrixType\& matrix)}
+\DoxyCodeLine{645     \{ }
+\DoxyCodeLine{646       \mbox{\hyperlink{classEigen_1_1SparseMatrix}{ColSpMatrix}} temp;}
+\DoxyCodeLine{647       grabMatrix(matrix, temp);}
+\DoxyCodeLine{648       Base::analyzePattern(temp);}
+\DoxyCodeLine{649     \}}
+\DoxyCodeLine{653     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1PastixLDLT_add0325572db95203721c320a1e050ee7}{factorize}}(\textcolor{keyword}{const} MatrixType\& matrix)}
+\DoxyCodeLine{654     \{}
+\DoxyCodeLine{655       \mbox{\hyperlink{classEigen_1_1SparseMatrix}{ColSpMatrix}} temp;}
+\DoxyCodeLine{656       grabMatrix(matrix, temp);}
+\DoxyCodeLine{657       Base::factorize(temp);}
+\DoxyCodeLine{658     \}}
+\DoxyCodeLine{659 }
+\DoxyCodeLine{660   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{661     \textcolor{keyword}{using} Base::m\_iparm;}
+\DoxyCodeLine{662     }
+\DoxyCodeLine{663     \textcolor{keywordtype}{void} init()}
+\DoxyCodeLine{664     \{}
+\DoxyCodeLine{665       m\_iparm(IPARM\_SYM) = API\_SYM\_YES;}
+\DoxyCodeLine{666       m\_iparm(IPARM\_FACTORIZATION) = API\_FACT\_LDLT;}
+\DoxyCodeLine{667     \}}
+\DoxyCodeLine{668     }
+\DoxyCodeLine{669     \textcolor{keywordtype}{void} grabMatrix(\textcolor{keyword}{const} MatrixType\& matrix, ColSpMatrix\& out)}
+\DoxyCodeLine{670     \{}
+\DoxyCodeLine{671       \textcolor{comment}{// Pastix supports only lower, column-\/major matrices }}
+\DoxyCodeLine{672       out.resize(matrix.rows(), matrix.cols());}
+\DoxyCodeLine{673       out.template selfadjointView<Lower>() = matrix.template selfadjointView<UpLo>();}
+\DoxyCodeLine{674       internal::c\_to\_fortran\_numbering(out);}
+\DoxyCodeLine{675     \}}
+\DoxyCodeLine{676 \};}
+\DoxyCodeLine{677 }
+\DoxyCodeLine{678 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{679 }
+\DoxyCodeLine{680 \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

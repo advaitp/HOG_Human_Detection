@@ -1,0 +1,182 @@
+\hypertarget{SimplicialCholesky__impl_8h_source}{}\doxysection{Simplicial\+Cholesky\+\_\+impl.\+h}
+\label{SimplicialCholesky__impl_8h_source}\index{include/Eigen/src/SparseCholesky/SimplicialCholesky\_impl.h@{include/Eigen/src/SparseCholesky/SimplicialCholesky\_impl.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2008-\/2012 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{comment}{/*}}
+\DoxyCodeLine{11 \textcolor{comment}{NOTE: these functions have been adapted from the LDL library:}}
+\DoxyCodeLine{12 \textcolor{comment}{}}
+\DoxyCodeLine{13 \textcolor{comment}{LDL Copyright (c) 2005 by Timothy A. Davis.  All Rights Reserved.}}
+\DoxyCodeLine{14 \textcolor{comment}{}}
+\DoxyCodeLine{15 \textcolor{comment}{The author of LDL, Timothy A. Davis., has executed a license with Google LLC}}
+\DoxyCodeLine{16 \textcolor{comment}{to permit distribution of this code and derivative works as part of Eigen under}}
+\DoxyCodeLine{17 \textcolor{comment}{the Mozilla Public License v. 2.0, as stated at the top of this file.}}
+\DoxyCodeLine{18 \textcolor{comment}{ */}}
+\DoxyCodeLine{19 }
+\DoxyCodeLine{20 \textcolor{preprocessor}{\#ifndef EIGEN\_SIMPLICIAL\_CHOLESKY\_IMPL\_H}}
+\DoxyCodeLine{21 \textcolor{preprocessor}{\#define EIGEN\_SIMPLICIAL\_CHOLESKY\_IMPL\_H}}
+\DoxyCodeLine{22 }
+\DoxyCodeLine{23 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{24 }
+\DoxyCodeLine{25 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{26 }
+\DoxyCodeLine{27 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{28 \textcolor{keywordtype}{void} SimplicialCholeskyBase<Derived>::analyzePattern\_preordered(\textcolor{keyword}{const} CholMatrixType\& ap, \textcolor{keywordtype}{bool} doLDLT)}
+\DoxyCodeLine{29 \{}
+\DoxyCodeLine{30   \textcolor{keyword}{const} StorageIndex size = StorageIndex(ap.rows());}
+\DoxyCodeLine{31   m\_matrix.resize(size, size);}
+\DoxyCodeLine{32   m\_parent.resize(size);}
+\DoxyCodeLine{33   m\_nonZerosPerCol.resize(size);}
+\DoxyCodeLine{34 }
+\DoxyCodeLine{35   ei\_declare\_aligned\_stack\_constructed\_variable(StorageIndex, tags, size, 0);}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{37   \textcolor{keywordflow}{for}(StorageIndex k = 0; k < size; ++k)}
+\DoxyCodeLine{38   \{}
+\DoxyCodeLine{39     \textcolor{comment}{/* L(k,:) pattern: all nodes reachable in etree from nz in A(0:k-\/1,k) */}}
+\DoxyCodeLine{40     m\_parent[k] = -\/1;             \textcolor{comment}{/* parent of k is not yet known */}}
+\DoxyCodeLine{41     tags[k] = k;                  \textcolor{comment}{/* mark node k as visited */}}
+\DoxyCodeLine{42     m\_nonZerosPerCol[k] = 0;      \textcolor{comment}{/* count of nonzeros in column k of L */}}
+\DoxyCodeLine{43     \textcolor{keywordflow}{for}(\textcolor{keyword}{typename} CholMatrixType::InnerIterator it(ap,k); it; ++it)}
+\DoxyCodeLine{44     \{}
+\DoxyCodeLine{45       StorageIndex i = it.index();}
+\DoxyCodeLine{46       \textcolor{keywordflow}{if}(i < k)}
+\DoxyCodeLine{47       \{}
+\DoxyCodeLine{48         \textcolor{comment}{/* follow path from i to root of etree, stop at flagged node */}}
+\DoxyCodeLine{49         \textcolor{keywordflow}{for}(; tags[i] != k; i = m\_parent[i])}
+\DoxyCodeLine{50         \{}
+\DoxyCodeLine{51           \textcolor{comment}{/* find parent of i if not yet determined */}}
+\DoxyCodeLine{52           \textcolor{keywordflow}{if} (m\_parent[i] == -\/1)}
+\DoxyCodeLine{53             m\_parent[i] = k;}
+\DoxyCodeLine{54           m\_nonZerosPerCol[i]++;        \textcolor{comment}{/* L (k,i) is nonzero */}}
+\DoxyCodeLine{55           tags[i] = k;                  \textcolor{comment}{/* mark i as visited */}}
+\DoxyCodeLine{56         \}}
+\DoxyCodeLine{57       \}}
+\DoxyCodeLine{58     \}}
+\DoxyCodeLine{59   \}}
+\DoxyCodeLine{60 }
+\DoxyCodeLine{61   \textcolor{comment}{/* construct Lp index array from m\_nonZerosPerCol column counts */}}
+\DoxyCodeLine{62   StorageIndex* Lp = m\_matrix.outerIndexPtr();}
+\DoxyCodeLine{63   Lp[0] = 0;}
+\DoxyCodeLine{64   \textcolor{keywordflow}{for}(StorageIndex k = 0; k < size; ++k)}
+\DoxyCodeLine{65     Lp[k+1] = Lp[k] + m\_nonZerosPerCol[k] + (doLDLT ? 0 : 1);}
+\DoxyCodeLine{66 }
+\DoxyCodeLine{67   m\_matrix.resizeNonZeros(Lp[size]);}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{69   m\_isInitialized     = \textcolor{keyword}{true};}
+\DoxyCodeLine{70   m\_info              = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}};}
+\DoxyCodeLine{71   m\_analysisIsOk      = \textcolor{keyword}{true};}
+\DoxyCodeLine{72   m\_factorizationIsOk = \textcolor{keyword}{false};}
+\DoxyCodeLine{73 \}}
+\DoxyCodeLine{74 }
+\DoxyCodeLine{75 }
+\DoxyCodeLine{76 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{77 \textcolor{keyword}{template}<\textcolor{keywordtype}{bool} DoLDLT>}
+\DoxyCodeLine{78 \textcolor{keywordtype}{void} SimplicialCholeskyBase<Derived>::factorize\_preordered(\textcolor{keyword}{const} CholMatrixType\& ap)}
+\DoxyCodeLine{79 \{}
+\DoxyCodeLine{80   \textcolor{keyword}{using} std::sqrt;}
+\DoxyCodeLine{81 }
+\DoxyCodeLine{82   eigen\_assert(m\_analysisIsOk \&\& \textcolor{stringliteral}{"{}You must first call analyzePattern()"{}});}
+\DoxyCodeLine{83   eigen\_assert(ap.rows()==ap.cols());}
+\DoxyCodeLine{84   eigen\_assert(m\_parent.size()==ap.rows());}
+\DoxyCodeLine{85   eigen\_assert(m\_nonZerosPerCol.size()==ap.rows());}
+\DoxyCodeLine{86 }
+\DoxyCodeLine{87   \textcolor{keyword}{const} StorageIndex size = StorageIndex(ap.rows());}
+\DoxyCodeLine{88   \textcolor{keyword}{const} StorageIndex* Lp = m\_matrix.outerIndexPtr();}
+\DoxyCodeLine{89   StorageIndex* Li = m\_matrix.innerIndexPtr();}
+\DoxyCodeLine{90   Scalar* Lx = m\_matrix.valuePtr();}
+\DoxyCodeLine{91 }
+\DoxyCodeLine{92   ei\_declare\_aligned\_stack\_constructed\_variable(Scalar, y, size, 0);}
+\DoxyCodeLine{93   ei\_declare\_aligned\_stack\_constructed\_variable(StorageIndex,  pattern, size, 0);}
+\DoxyCodeLine{94   ei\_declare\_aligned\_stack\_constructed\_variable(StorageIndex,  tags, size, 0);}
+\DoxyCodeLine{95 }
+\DoxyCodeLine{96   \textcolor{keywordtype}{bool} ok = \textcolor{keyword}{true};}
+\DoxyCodeLine{97   m\_diag.resize(DoLDLT ? size : 0);}
+\DoxyCodeLine{98 }
+\DoxyCodeLine{99   \textcolor{keywordflow}{for}(StorageIndex k = 0; k < size; ++k)}
+\DoxyCodeLine{100   \{}
+\DoxyCodeLine{101     \textcolor{comment}{// compute nonzero pattern of kth row of L, in topological order}}
+\DoxyCodeLine{102     y[k] = Scalar(0);                     \textcolor{comment}{// Y(0:k) is now all zero}}
+\DoxyCodeLine{103     StorageIndex top = size;               \textcolor{comment}{// stack for pattern is empty}}
+\DoxyCodeLine{104     tags[k] = k;                    \textcolor{comment}{// mark node k as visited}}
+\DoxyCodeLine{105     m\_nonZerosPerCol[k] = 0;        \textcolor{comment}{// count of nonzeros in column k of L}}
+\DoxyCodeLine{106     \textcolor{keywordflow}{for}(\textcolor{keyword}{typename} CholMatrixType::InnerIterator it(ap,k); it; ++it)}
+\DoxyCodeLine{107     \{}
+\DoxyCodeLine{108       StorageIndex i = it.index();}
+\DoxyCodeLine{109       \textcolor{keywordflow}{if}(i <= k)}
+\DoxyCodeLine{110       \{}
+\DoxyCodeLine{111         y[i] += numext::conj(it.value());            \textcolor{comment}{/* scatter A(i,k) into Y (sum duplicates) */}}
+\DoxyCodeLine{112         \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} len;}
+\DoxyCodeLine{113         \textcolor{keywordflow}{for}(len = 0; tags[i] != k; i = m\_parent[i])}
+\DoxyCodeLine{114         \{}
+\DoxyCodeLine{115           pattern[len++] = i;     \textcolor{comment}{/* L(k,i) is nonzero */}}
+\DoxyCodeLine{116           tags[i] = k;            \textcolor{comment}{/* mark i as visited */}}
+\DoxyCodeLine{117         \}}
+\DoxyCodeLine{118         \textcolor{keywordflow}{while}(len > 0)}
+\DoxyCodeLine{119           pattern[-\/-\/top] = pattern[-\/-\/len];}
+\DoxyCodeLine{120       \}}
+\DoxyCodeLine{121     \}}
+\DoxyCodeLine{122 }
+\DoxyCodeLine{123     \textcolor{comment}{/* compute numerical values kth row of L (a sparse triangular solve) */}}
+\DoxyCodeLine{124 }
+\DoxyCodeLine{125     RealScalar d = numext::real(y[k]) * m\_shiftScale + m\_shiftOffset;    \textcolor{comment}{// get D(k,k), apply the shift function, and clear Y(k)}}
+\DoxyCodeLine{126     y[k] = Scalar(0);}
+\DoxyCodeLine{127     \textcolor{keywordflow}{for}(; top < size; ++top)}
+\DoxyCodeLine{128     \{}
+\DoxyCodeLine{129       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = pattern[top];       \textcolor{comment}{/* pattern[top:n-\/1] is pattern of L(:,k) */}}
+\DoxyCodeLine{130       Scalar yi = y[i];             \textcolor{comment}{/* get and clear Y(i) */}}
+\DoxyCodeLine{131       y[i] = Scalar(0);}
+\DoxyCodeLine{132 }
+\DoxyCodeLine{133       \textcolor{comment}{/* the nonzero entry L(k,i) */}}
+\DoxyCodeLine{134       Scalar l\_ki;}
+\DoxyCodeLine{135       \textcolor{keywordflow}{if}(DoLDLT)}
+\DoxyCodeLine{136         l\_ki = yi / numext::real(m\_diag[i]);}
+\DoxyCodeLine{137       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{138         yi = l\_ki = yi / Lx[Lp[i]];}
+\DoxyCodeLine{139 }
+\DoxyCodeLine{140       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} p2 = Lp[i] + m\_nonZerosPerCol[i];}
+\DoxyCodeLine{141       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} p;}
+\DoxyCodeLine{142       \textcolor{keywordflow}{for}(p = Lp[i] + (DoLDLT ? 0 : 1); p < p2; ++p)}
+\DoxyCodeLine{143         y[Li[p]] -\/= numext::conj(Lx[p]) * yi;}
+\DoxyCodeLine{144       d -\/= numext::real(l\_ki * numext::conj(yi));}
+\DoxyCodeLine{145       Li[p] = k;                          \textcolor{comment}{/* store L(k,i) in column form of L */}}
+\DoxyCodeLine{146       Lx[p] = l\_ki;}
+\DoxyCodeLine{147       ++m\_nonZerosPerCol[i];              \textcolor{comment}{/* increment count of nonzeros in col i */}}
+\DoxyCodeLine{148     \}}
+\DoxyCodeLine{149     \textcolor{keywordflow}{if}(DoLDLT)}
+\DoxyCodeLine{150     \{}
+\DoxyCodeLine{151       m\_diag[k] = d;}
+\DoxyCodeLine{152       \textcolor{keywordflow}{if}(d == RealScalar(0))}
+\DoxyCodeLine{153       \{}
+\DoxyCodeLine{154         ok = \textcolor{keyword}{false};                         \textcolor{comment}{/* failure, D(k,k) is zero */}}
+\DoxyCodeLine{155         \textcolor{keywordflow}{break};}
+\DoxyCodeLine{156       \}}
+\DoxyCodeLine{157     \}}
+\DoxyCodeLine{158     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{159     \{}
+\DoxyCodeLine{160       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} p = Lp[k] + m\_nonZerosPerCol[k]++;}
+\DoxyCodeLine{161       Li[p] = k ;                \textcolor{comment}{/* store L(k,k) = sqrt (d) in column k */}}
+\DoxyCodeLine{162       \textcolor{keywordflow}{if}(d <= RealScalar(0)) \{}
+\DoxyCodeLine{163         ok = \textcolor{keyword}{false};              \textcolor{comment}{/* failure, matrix is not positive definite */}}
+\DoxyCodeLine{164         \textcolor{keywordflow}{break};}
+\DoxyCodeLine{165       \}}
+\DoxyCodeLine{166       Lx[p] = sqrt(d) ;}
+\DoxyCodeLine{167     \}}
+\DoxyCodeLine{168   \}}
+\DoxyCodeLine{169 }
+\DoxyCodeLine{170   m\_info = ok ? \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}} : \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea1c6e20706575a629b27a105f07f1883b}{NumericalIssue}};}
+\DoxyCodeLine{171   m\_factorizationIsOk = \textcolor{keyword}{true};}
+\DoxyCodeLine{172 \}}
+\DoxyCodeLine{173 }
+\DoxyCodeLine{174 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{175 }
+\DoxyCodeLine{176 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_SIMPLICIAL\_CHOLESKY\_IMPL\_H}}
+
+\end{DoxyCode}

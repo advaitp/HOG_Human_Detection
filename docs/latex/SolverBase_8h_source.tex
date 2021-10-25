@@ -1,0 +1,136 @@
+\hypertarget{SolverBase_8h_source}{}\doxysection{Solver\+Base.\+h}
+\label{SolverBase_8h_source}\index{include/Eigen/src/Core/SolverBase.h@{include/Eigen/src/Core/SolverBase.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2015 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_SOLVERBASE\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_SOLVERBASE\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{20 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1solve__assertion}{solve\_assertion}} \{}
+\DoxyCodeLine{21     \textcolor{keyword}{template}<\textcolor{keywordtype}{bool} Transpose\_, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{22     \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(\textcolor{keyword}{const} Derived\& solver, \textcolor{keyword}{const} Rhs\& b) \{ solver.template \_check\_solve\_assertion<Transpose\_>(b); \}}
+\DoxyCodeLine{23 \};}
+\DoxyCodeLine{24 }
+\DoxyCodeLine{25 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{26 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1solve__assertion}{solve\_assertion}}<\mbox{\hyperlink{classEigen_1_1Transpose}{Transpose}}<Derived> >}
+\DoxyCodeLine{27 \{}
+\DoxyCodeLine{28     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Transpose}{Transpose<Derived>}} \mbox{\hyperlink{classEigen_1_1Transpose}{type}};}
+\DoxyCodeLine{29 }
+\DoxyCodeLine{30     \textcolor{keyword}{template}<\textcolor{keywordtype}{bool} Transpose\_, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{31     \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Transpose}{type}}\& transpose, \textcolor{keyword}{const} Rhs\& b)}
+\DoxyCodeLine{32     \{}
+\DoxyCodeLine{33         \mbox{\hyperlink{structEigen_1_1internal_1_1solve__assertion}{internal::solve\_assertion<typename internal::remove\_all<Derived>::type}}>::template run<true>(transpose.\mbox{\hyperlink{classEigen_1_1Transpose_ad7a6e63756170ed6bf8512f7ee795a69}{nestedExpression}}(), b);}
+\DoxyCodeLine{34     \}}
+\DoxyCodeLine{35 \};}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{37 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{38 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1solve__assertion}{solve\_assertion}}<\mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{CwiseUnaryOp}}<\mbox{\hyperlink{namespaceEigen}{Eigen}}::\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__conjugate__op}{internal::scalar\_conjugate\_op}}<Scalar>, const \mbox{\hyperlink{classEigen_1_1Transpose}{Transpose}}<Derived> > >}
+\DoxyCodeLine{39 \{}
+\DoxyCodeLine{40     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{CwiseUnaryOp<Eigen::internal::scalar\_conjugate\_op<Scalar>}}, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Transpose}{Transpose<Derived>}} > \mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{type}};}
+\DoxyCodeLine{41 }
+\DoxyCodeLine{42     \textcolor{keyword}{template}<\textcolor{keywordtype}{bool} Transpose\_, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{43     \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{type}}\& adjoint, \textcolor{keyword}{const} Rhs\& b)}
+\DoxyCodeLine{44     \{}
+\DoxyCodeLine{45         \mbox{\hyperlink{structEigen_1_1internal_1_1solve__assertion}{internal::solve\_assertion<typename internal::remove\_all<Transpose<Derived>}} >\mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{::type}}>::template run<true>(adjoint.\mbox{\hyperlink{classEigen_1_1CwiseUnaryOp_a5b22c2e851e86c801e395792708c1f7c}{nestedExpression}}(), b);}
+\DoxyCodeLine{46     \}}
+\DoxyCodeLine{47 \};}
+\DoxyCodeLine{48 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{49 }
+\DoxyCodeLine{69 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{70 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1SolverBase}{SolverBase}} : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase}}<Derived>}
+\DoxyCodeLine{71 \{}
+\DoxyCodeLine{72   \textcolor{keyword}{public}:}
+\DoxyCodeLine{73 }
+\DoxyCodeLine{74     \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<Derived>}} \mbox{\hyperlink{structEigen_1_1EigenBase}{Base}};}
+\DoxyCodeLine{75     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::Scalar}} Scalar;}
+\DoxyCodeLine{76     \textcolor{keyword}{typedef} Scalar CoeffReturnType;}
+\DoxyCodeLine{77 }
+\DoxyCodeLine{78     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived\_>}
+\DoxyCodeLine{79     \textcolor{keyword}{friend} \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1solve__assertion}{internal::solve\_assertion}};}
+\DoxyCodeLine{80 }
+\DoxyCodeLine{81     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{82       RowsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::RowsAtCompileTime}},}
+\DoxyCodeLine{83       ColsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::ColsAtCompileTime}},}
+\DoxyCodeLine{84       SizeAtCompileTime = (\mbox{\hyperlink{structEigen_1_1internal_1_1size__at__compile__time}{internal::size\_at\_compile\_time<internal::traits<Derived>::RowsAtCompileTime}},}
+\DoxyCodeLine{85                                                           \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::ColsAtCompileTime}}>::ret),}
+\DoxyCodeLine{86       MaxRowsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::MaxRowsAtCompileTime}},}
+\DoxyCodeLine{87       MaxColsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::MaxColsAtCompileTime}},}
+\DoxyCodeLine{88       MaxSizeAtCompileTime = (\mbox{\hyperlink{structEigen_1_1internal_1_1size__at__compile__time}{internal::size\_at\_compile\_time}}<\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::MaxRowsAtCompileTime}},}
+\DoxyCodeLine{89                                                              \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::MaxColsAtCompileTime}}>::ret),}
+\DoxyCodeLine{90       IsVectorAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::MaxRowsAtCompileTime}} == 1}
+\DoxyCodeLine{91                            || \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::MaxColsAtCompileTime}} == 1,}
+\DoxyCodeLine{92       NumDimensions = int(MaxSizeAtCompileTime) == 1 ? 0 : bool(IsVectorAtCompileTime) ? 1 : 2}
+\DoxyCodeLine{93     \};}
+\DoxyCodeLine{94 }
+\DoxyCodeLine{96     \mbox{\hyperlink{classEigen_1_1SolverBase_a4d5e5baddfba3790ab1a5f247dcc4dc1}{SolverBase}}()}
+\DoxyCodeLine{97     \{\}}
+\DoxyCodeLine{98 }
+\DoxyCodeLine{99     \mbox{\hyperlink{classEigen_1_1SolverBase}{\string~SolverBase}}()}
+\DoxyCodeLine{100     \{\}}
+\DoxyCodeLine{101 }
+\DoxyCodeLine{102     \textcolor{keyword}{using} \mbox{\hyperlink{structEigen_1_1EigenBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{Base::derived}};}
+\DoxyCodeLine{103 }
+\DoxyCodeLine{106     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{107     \textcolor{keyword}{inline} \textcolor{keyword}{const} Solve<Derived, Rhs>}
+\DoxyCodeLine{108     \mbox{\hyperlink{classEigen_1_1SolverBase_a943c352b597e3cd4744d5c11bfd77520}{solve}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Rhs>}}\& b)\textcolor{keyword}{ const}}
+\DoxyCodeLine{109 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{110       \mbox{\hyperlink{structEigen_1_1internal_1_1solve__assertion}{internal::solve\_assertion<typename internal::remove\_all<Derived>::type}}>::template run<false>(\mbox{\hyperlink{classEigen_1_1SolverBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}(), b);}
+\DoxyCodeLine{111       \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Solve}{Solve<Derived, Rhs>}}(\mbox{\hyperlink{classEigen_1_1SolverBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}(), b.derived());}
+\DoxyCodeLine{112     \}}
+\DoxyCodeLine{113 }
+\DoxyCodeLine{115     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1add__const}{internal::add\_const<Transpose<const Derived>}} >::type ConstTransposeReturnType;}
+\DoxyCodeLine{123     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Diagonal}{ConstTransposeReturnType}} \mbox{\hyperlink{classEigen_1_1SolverBase_a732e75b5132bb4db3775916927b0e86c}{transpose}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{124 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{125       \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Diagonal}{ConstTransposeReturnType}}(\mbox{\hyperlink{classEigen_1_1SolverBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}());}
+\DoxyCodeLine{126     \}}
+\DoxyCodeLine{127 }
+\DoxyCodeLine{129     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1conditional}{internal::conditional<NumTraits<Scalar>::IsComplex}},}
+\DoxyCodeLine{130                         \mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{CwiseUnaryOp<internal::scalar\_conjugate\_op<Scalar>}}, ConstTransposeReturnType>,}
+\DoxyCodeLine{131                         ConstTransposeReturnType}
+\DoxyCodeLine{132                      >::type AdjointReturnType;}
+\DoxyCodeLine{142     \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{AdjointReturnType}} \mbox{\hyperlink{classEigen_1_1SolverBase_a05a3686a89888681c8e0c2bcab6d1ce5}{adjoint}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{143 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{144       \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{AdjointReturnType}}(\mbox{\hyperlink{classEigen_1_1SolverBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}().\mbox{\hyperlink{classEigen_1_1SolverBase_a732e75b5132bb4db3775916927b0e86c}{transpose}}());}
+\DoxyCodeLine{145     \}}
+\DoxyCodeLine{146 }
+\DoxyCodeLine{147   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{148 }
+\DoxyCodeLine{149     \textcolor{keyword}{template}<\textcolor{keywordtype}{bool} Transpose\_, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{150     \textcolor{keywordtype}{void} \_check\_solve\_assertion(\textcolor{keyword}{const} Rhs\& b)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{151         EIGEN\_ONLY\_USED\_FOR\_DEBUG(b);}
+\DoxyCodeLine{152         eigen\_assert(\mbox{\hyperlink{classEigen_1_1SolverBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}().m\_isInitialized \&\& \textcolor{stringliteral}{"{}Solver is not initialized."{}});}
+\DoxyCodeLine{153         eigen\_assert((Transpose\_?\mbox{\hyperlink{classEigen_1_1SolverBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}().\mbox{\hyperlink{structEigen_1_1EigenBase_a50c19c45f15acdfe1cb66ab5e879b8e3}{cols}}():\mbox{\hyperlink{classEigen_1_1SolverBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}().\mbox{\hyperlink{structEigen_1_1EigenBase_af1d12fdb3361e150427e1fd94ebb1f14}{rows}}())==b.rows() \&\& \textcolor{stringliteral}{"{}SolverBase::solve(): invalid number of rows of the right hand side matrix b"{}});}
+\DoxyCodeLine{154     \}}
+\DoxyCodeLine{155 \};}
+\DoxyCodeLine{156 }
+\DoxyCodeLine{157 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{158 }
+\DoxyCodeLine{159 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{160 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generic__xpr__base}{generic\_xpr\_base}}<Derived, \mbox{\hyperlink{structEigen_1_1MatrixXpr}{MatrixXpr}}, \mbox{\hyperlink{structEigen_1_1SolverStorage}{SolverStorage}}>}
+\DoxyCodeLine{161 \{}
+\DoxyCodeLine{162   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SolverBase}{SolverBase<Derived>}} \mbox{\hyperlink{classEigen_1_1SolverBase}{type}};}
+\DoxyCodeLine{163 }
+\DoxyCodeLine{164 \};}
+\DoxyCodeLine{165 }
+\DoxyCodeLine{166 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{167 }
+\DoxyCodeLine{168 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{169 }
+\DoxyCodeLine{170 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_SOLVERBASE\_H}}
+
+\end{DoxyCode}

@@ -1,0 +1,111 @@
+\hypertarget{StdList_8h_source}{}\doxysection{Std\+List.\+h}
+\label{StdList_8h_source}\index{include/Eigen/src/StlSupport/StdList.h@{include/Eigen/src/StlSupport/StdList.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2009 Hauke Heibel <hauke.heibel@googlemail.com>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_STDLIST\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_STDLIST\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#ifndef EIGEN\_STDLIST\_MODULE\_H}}
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#error "{}Please include Eigen/StdList instead of including this file directly."{}}}
+\DoxyCodeLine{15 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{preprocessor}{\#include "{}details.h"{}}}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{24 \textcolor{preprocessor}{\#define EIGEN\_DEFINE\_STL\_LIST\_SPECIALIZATION(...) \(\backslash\)}}
+\DoxyCodeLine{25 \textcolor{preprocessor}{namespace std \(\backslash\)}}
+\DoxyCodeLine{26 \textcolor{preprocessor}{\{ \(\backslash\)}}
+\DoxyCodeLine{27 \textcolor{preprocessor}{  template<> \(\backslash\)}}
+\DoxyCodeLine{28 \textcolor{preprocessor}{  class list<\_\_VA\_ARGS\_\_, std::allocator<\_\_VA\_ARGS\_\_> >           \(\backslash\)}}
+\DoxyCodeLine{29 \textcolor{preprocessor}{    : public list<\_\_VA\_ARGS\_\_, EIGEN\_ALIGNED\_ALLOCATOR<\_\_VA\_ARGS\_\_> > \(\backslash\)}}
+\DoxyCodeLine{30 \textcolor{preprocessor}{  \{ \(\backslash\)}}
+\DoxyCodeLine{31 \textcolor{preprocessor}{    typedef list<\_\_VA\_ARGS\_\_, EIGEN\_ALIGNED\_ALLOCATOR<\_\_VA\_ARGS\_\_> > list\_base; \(\backslash\)}}
+\DoxyCodeLine{32 \textcolor{preprocessor}{  public: \(\backslash\)}}
+\DoxyCodeLine{33 \textcolor{preprocessor}{    typedef \_\_VA\_ARGS\_\_ value\_type; \(\backslash\)}}
+\DoxyCodeLine{34 \textcolor{preprocessor}{    typedef list\_base::allocator\_type allocator\_type; \(\backslash\)}}
+\DoxyCodeLine{35 \textcolor{preprocessor}{    typedef list\_base::size\_type size\_type;  \(\backslash\)}}
+\DoxyCodeLine{36 \textcolor{preprocessor}{    typedef list\_base::iterator iterator;  \(\backslash\)}}
+\DoxyCodeLine{37 \textcolor{preprocessor}{    explicit list(const allocator\_type\& a = allocator\_type()) : list\_base(a) \{\}  \(\backslash\)}}
+\DoxyCodeLine{38 \textcolor{preprocessor}{    template<typename InputIterator> \(\backslash\)}}
+\DoxyCodeLine{39 \textcolor{preprocessor}{    list(InputIterator first, InputIterator last, const allocator\_type\& a = allocator\_type()) : list\_base(first, last, a) \{\} \(\backslash\)}}
+\DoxyCodeLine{40 \textcolor{preprocessor}{    list(const list\& c) : list\_base(c) \{\}  \(\backslash\)}}
+\DoxyCodeLine{41 \textcolor{preprocessor}{    explicit list(size\_type num, const value\_type\& val = value\_type()) : list\_base(num, val) \{\} \(\backslash\)}}
+\DoxyCodeLine{42 \textcolor{preprocessor}{    list(iterator start\_, iterator end\_) : list\_base(start\_, end\_) \{\}  \(\backslash\)}}
+\DoxyCodeLine{43 \textcolor{preprocessor}{    list\& operator=(const list\& x) \{  \(\backslash\)}}
+\DoxyCodeLine{44 \textcolor{preprocessor}{      list\_base::operator=(x);  \(\backslash\)}}
+\DoxyCodeLine{45 \textcolor{preprocessor}{      return *this;  \(\backslash\)}}
+\DoxyCodeLine{46 \textcolor{preprocessor}{    \} \(\backslash\)}}
+\DoxyCodeLine{47 \textcolor{preprocessor}{  \}; \(\backslash\)}}
+\DoxyCodeLine{48 \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{49 }
+\DoxyCodeLine{50 \textcolor{comment}{// check whether we really need the std::list specialization}}
+\DoxyCodeLine{51 \textcolor{preprocessor}{\#if !EIGEN\_HAS\_CXX11\_CONTAINERS \&\& !(defined(\_GLIBCXX\_LIST) \&\& (!EIGEN\_GNUC\_AT\_LEAST(4,1))) }\textcolor{comment}{/* Note that before gcc-\/4.1 we already have: std::list::resize(size\_type,const T\&). */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{52 }
+\DoxyCodeLine{53 \textcolor{keyword}{namespace }std}
+\DoxyCodeLine{54 \{}
+\DoxyCodeLine{55 }
+\DoxyCodeLine{56 \textcolor{preprocessor}{\#define EIGEN\_STD\_LIST\_SPECIALIZATION\_BODY \(\backslash\)}}
+\DoxyCodeLine{57 \textcolor{preprocessor}{  public:  \(\backslash\)}}
+\DoxyCodeLine{58 \textcolor{preprocessor}{    typedef T value\_type; \(\backslash\)}}
+\DoxyCodeLine{59 \textcolor{preprocessor}{    typedef typename list\_base::allocator\_type allocator\_type; \(\backslash\)}}
+\DoxyCodeLine{60 \textcolor{preprocessor}{    typedef typename list\_base::size\_type size\_type;  \(\backslash\)}}
+\DoxyCodeLine{61 \textcolor{preprocessor}{    typedef typename list\_base::iterator iterator;  \(\backslash\)}}
+\DoxyCodeLine{62 \textcolor{preprocessor}{    typedef typename list\_base::const\_iterator const\_iterator;  \(\backslash\)}}
+\DoxyCodeLine{63 \textcolor{preprocessor}{    explicit list(const allocator\_type\& a = allocator\_type()) : list\_base(a) \{\}  \(\backslash\)}}
+\DoxyCodeLine{64 \textcolor{preprocessor}{    template<typename InputIterator> \(\backslash\)}}
+\DoxyCodeLine{65 \textcolor{preprocessor}{    list(InputIterator first, InputIterator last, const allocator\_type\& a = allocator\_type()) \(\backslash\)}}
+\DoxyCodeLine{66 \textcolor{preprocessor}{    : list\_base(first, last, a) \{\} \(\backslash\)}}
+\DoxyCodeLine{67 \textcolor{preprocessor}{    list(const list\& c) : list\_base(c) \{\}  \(\backslash\)}}
+\DoxyCodeLine{68 \textcolor{preprocessor}{    explicit list(size\_type num, const value\_type\& val = value\_type()) : list\_base(num, val) \{\} \(\backslash\)}}
+\DoxyCodeLine{69 \textcolor{preprocessor}{    list(iterator start\_, iterator end\_) : list\_base(start\_, end\_) \{\}  \(\backslash\)}}
+\DoxyCodeLine{70 \textcolor{preprocessor}{    list\& operator=(const list\& x) \{  \(\backslash\)}}
+\DoxyCodeLine{71 \textcolor{preprocessor}{    list\_base::operator=(x);  \(\backslash\)}}
+\DoxyCodeLine{72 \textcolor{preprocessor}{    return *this; \(\backslash\)}}
+\DoxyCodeLine{73 \textcolor{preprocessor}{  \}}}
+\DoxyCodeLine{74 }
+\DoxyCodeLine{75   \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{76   \textcolor{keyword}{class }list<T,EIGEN\_ALIGNED\_ALLOCATOR<T> >}
+\DoxyCodeLine{77     : \textcolor{keyword}{public} list<EIGEN\_WORKAROUND\_MSVC\_STL\_SUPPORT(T),}
+\DoxyCodeLine{78                   Eigen::aligned\_allocator\_indirection<EIGEN\_WORKAROUND\_MSVC\_STL\_SUPPORT(T)> >}
+\DoxyCodeLine{79   \{}
+\DoxyCodeLine{80     \textcolor{keyword}{typedef} list<EIGEN\_WORKAROUND\_MSVC\_STL\_SUPPORT(T),}
+\DoxyCodeLine{81                  \mbox{\hyperlink{classEigen_1_1aligned__allocator__indirection}{Eigen::aligned\_allocator\_indirection}}<EIGEN\_WORKAROUND\_MSVC\_STL\_SUPPORT(T)> > list\_base;}
+\DoxyCodeLine{82     EIGEN\_STD\_LIST\_SPECIALIZATION\_BODY}
+\DoxyCodeLine{83 }
+\DoxyCodeLine{84     \textcolor{keywordtype}{void} resize(size\_type new\_size)}
+\DoxyCodeLine{85     \{ resize(new\_size, T()); \}}
+\DoxyCodeLine{86 }
+\DoxyCodeLine{87     \textcolor{keywordtype}{void} resize(size\_type new\_size, \textcolor{keyword}{const} value\_type\& x)}
+\DoxyCodeLine{88     \{}
+\DoxyCodeLine{89       \textcolor{keywordflow}{if} (list\_base::size() < new\_size)}
+\DoxyCodeLine{90         list\_base::insert(list\_base::end(), new\_size -\/ list\_base::size(), x);}
+\DoxyCodeLine{91       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{92         \textcolor{keywordflow}{while} (new\_size < list\_base::size()) list\_base::pop\_back();}
+\DoxyCodeLine{93     \}}
+\DoxyCodeLine{94 }
+\DoxyCodeLine{95 \textcolor{preprocessor}{\#if defined(\_LIST\_)}}
+\DoxyCodeLine{96     \textcolor{comment}{// workaround MSVC std::list implementation}}
+\DoxyCodeLine{97     \textcolor{keywordtype}{void} push\_back(\textcolor{keyword}{const} value\_type\& x)}
+\DoxyCodeLine{98     \{ list\_base::push\_back(x); \} }
+\DoxyCodeLine{99     \textcolor{keyword}{using} list\_base::insert;  }
+\DoxyCodeLine{100     iterator insert(const\_iterator position, \textcolor{keyword}{const} value\_type\& x)}
+\DoxyCodeLine{101     \{ \textcolor{keywordflow}{return} list\_base::insert(position,x); \}}
+\DoxyCodeLine{102     \textcolor{keywordtype}{void} insert(const\_iterator position, size\_type new\_size, \textcolor{keyword}{const} value\_type\& x)}
+\DoxyCodeLine{103     \{ list\_base::insert(position, new\_size, x); \}}
+\DoxyCodeLine{104 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{105   \};}
+\DoxyCodeLine{106 \}}
+\DoxyCodeLine{107 }
+\DoxyCodeLine{108 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// check whether specialization is actually required}}
+\DoxyCodeLine{109 }
+\DoxyCodeLine{110 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_STDLIST\_H}}
+
+\end{DoxyCode}

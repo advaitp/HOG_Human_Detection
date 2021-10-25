@@ -1,0 +1,63 @@
+\hypertarget{RealSvd2x2_8h_source}{}\doxysection{Real\+Svd2x2.\+h}
+\label{RealSvd2x2_8h_source}\index{include/Eigen/src/misc/RealSvd2x2.h@{include/Eigen/src/misc/RealSvd2x2.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2009-\/2010 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2013-\/2016 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_REALSVD2X2\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_REALSVD2X2\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{19 }
+\DoxyCodeLine{20 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keyword}{typename} RealScalar, \textcolor{keyword}{typename} Index>}
+\DoxyCodeLine{21 \textcolor{keywordtype}{void} real\_2x2\_jacobi\_svd(\textcolor{keyword}{const} MatrixType\& matrix, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} p, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} q,}
+\DoxyCodeLine{22                          JacobiRotation<RealScalar> *j\_left,}
+\DoxyCodeLine{23                          JacobiRotation<RealScalar> *j\_right)}
+\DoxyCodeLine{24 \{}
+\DoxyCodeLine{25   \textcolor{keyword}{using} std::sqrt;}
+\DoxyCodeLine{26   \textcolor{keyword}{using} std::abs;}
+\DoxyCodeLine{27   Matrix<RealScalar,2,2> m;}
+\DoxyCodeLine{28   m << numext::real(matrix.coeff(p,p)), numext::real(matrix.coeff(p,q)),}
+\DoxyCodeLine{29        numext::real(matrix.coeff(q,p)), numext::real(matrix.coeff(q,q));}
+\DoxyCodeLine{30   JacobiRotation<RealScalar> rot1;}
+\DoxyCodeLine{31   RealScalar t = m.coeff(0,0) + m.coeff(1,1);}
+\DoxyCodeLine{32   RealScalar d = m.coeff(1,0) -\/ m.coeff(0,1);}
+\DoxyCodeLine{33 }
+\DoxyCodeLine{34   \textcolor{keywordflow}{if}(abs(d) < (std::numeric\_limits<RealScalar>::min)())}
+\DoxyCodeLine{35   \{}
+\DoxyCodeLine{36     rot1.s() = RealScalar(0);}
+\DoxyCodeLine{37     rot1.c() = RealScalar(1);}
+\DoxyCodeLine{38   \}}
+\DoxyCodeLine{39   \textcolor{keywordflow}{else}}
+\DoxyCodeLine{40   \{}
+\DoxyCodeLine{41     \textcolor{comment}{// If d!=0, then t/d cannot overflow because the magnitude of the}}
+\DoxyCodeLine{42     \textcolor{comment}{// entries forming d are not too small compared to the ones forming t.}}
+\DoxyCodeLine{43     RealScalar u = t / d;}
+\DoxyCodeLine{44     RealScalar tmp = sqrt(RealScalar(1) + numext::abs2(u));}
+\DoxyCodeLine{45     rot1.s() = RealScalar(1) / tmp;}
+\DoxyCodeLine{46     rot1.c() = u / tmp;}
+\DoxyCodeLine{47   \}}
+\DoxyCodeLine{48   m.applyOnTheLeft(0,1,rot1);}
+\DoxyCodeLine{49   j\_right-\/>makeJacobi(m,0,1);}
+\DoxyCodeLine{50   *j\_left = rot1 * j\_right-\/>transpose();}
+\DoxyCodeLine{51 \}}
+\DoxyCodeLine{52 }
+\DoxyCodeLine{53 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{54 }
+\DoxyCodeLine{55 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{56 }
+\DoxyCodeLine{57 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_REALSVD2X2\_H}}
+
+\end{DoxyCode}

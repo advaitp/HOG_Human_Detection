@@ -1,0 +1,163 @@
+\hypertarget{IndexedViewHelper_8h_source}{}\doxysection{Indexed\+View\+Helper.\+h}
+\label{IndexedViewHelper_8h_source}\index{include/Eigen/src/Core/util/IndexedViewHelper.h@{include/Eigen/src/Core/util/IndexedViewHelper.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2017 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_INDEXED\_VIEW\_HELPER\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_INDEXED\_VIEW\_HELPER\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{19 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1symbolic__last__tag}{symbolic\_last\_tag}} \{\};}
+\DoxyCodeLine{20 \}  \textcolor{comment}{// namespace internal}}
+\DoxyCodeLine{21 }
+\DoxyCodeLine{22 \textcolor{keyword}{namespace }placeholders \{}
+\DoxyCodeLine{23 }
+\DoxyCodeLine{24 \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1symbolic_1_1SymbolExpr}{symbolic::SymbolExpr<internal::symbolic\_last\_tag>}} last\_t;}
+\DoxyCodeLine{25 }
+\DoxyCodeLine{44 \textcolor{keyword}{static} \textcolor{keyword}{const} last\_t last;}
+\DoxyCodeLine{45 }
+\DoxyCodeLine{46 \}  \textcolor{comment}{// namespace placeholders}}
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{49 }
+\DoxyCodeLine{50 \textcolor{comment}{// Replace symbolic last/end "{}keywords"{} by their true runtime value}}
+\DoxyCodeLine{51 \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} eval\_expr\_given\_size(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} x, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \textcolor{comment}{/* size */})   \{ \textcolor{keywordflow}{return} x; \}}
+\DoxyCodeLine{52 }
+\DoxyCodeLine{53 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} N>}
+\DoxyCodeLine{54 FixedInt<N> eval\_expr\_given\_size(FixedInt<N> x, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \textcolor{comment}{/*size*/})   \{ \textcolor{keywordflow}{return} x; \}}
+\DoxyCodeLine{55 }
+\DoxyCodeLine{56 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{57 \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} eval\_expr\_given\_size(\textcolor{keyword}{const} symbolic::BaseExpr<Derived> \&x, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size)}
+\DoxyCodeLine{58 \{}
+\DoxyCodeLine{59   \textcolor{keywordflow}{return} x.derived().eval(Eigen::placeholders::last=size-\/1);}
+\DoxyCodeLine{60 \}}
+\DoxyCodeLine{61 }
+\DoxyCodeLine{62 \textcolor{comment}{// Extract increment/step at compile time}}
+\DoxyCodeLine{63 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} EnableIf = \textcolor{keywordtype}{void}> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1get__compile__time__incr}{get\_compile\_time\_incr}} \{}
+\DoxyCodeLine{64   \textcolor{keyword}{enum} \{ value = \mbox{\hyperlink{namespaceEigen_a06808a853a9baa38b23a5368e7491abd}{UndefinedIncr}} \};}
+\DoxyCodeLine{65 \};}
+\DoxyCodeLine{66 }
+\DoxyCodeLine{67 \textcolor{comment}{// Analogue of std::get<0>(x), but tailored for our needs.}}
+\DoxyCodeLine{68 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{69 EIGEN\_CONSTEXPR \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} first(\textcolor{keyword}{const} T\& x) EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} x.first(); \}}
+\DoxyCodeLine{70 }
+\DoxyCodeLine{71 \textcolor{comment}{// IndexedViewCompatibleType/makeIndexedViewCompatible turn an arbitrary object of type T into something usable by MatrixSlice}}
+\DoxyCodeLine{72 \textcolor{comment}{// The generic implementation is a no-\/op}}
+\DoxyCodeLine{73 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T,\textcolor{keywordtype}{int} XprSize,\textcolor{keyword}{typename} EnableIf=\textcolor{keywordtype}{void}>}
+\DoxyCodeLine{74 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1IndexedViewCompatibleType}{IndexedViewCompatibleType}} \{}
+\DoxyCodeLine{75   \textcolor{keyword}{typedef} T type;}
+\DoxyCodeLine{76 \};}
+\DoxyCodeLine{77 }
+\DoxyCodeLine{78 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T,\textcolor{keyword}{typename} Q>}
+\DoxyCodeLine{79 \textcolor{keyword}{const} T\& makeIndexedViewCompatible(\textcolor{keyword}{const} T\& x, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \textcolor{comment}{/*size*/}, Q) \{ \textcolor{keywordflow}{return} x; \}}
+\DoxyCodeLine{80 }
+\DoxyCodeLine{81 \textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{82 \textcolor{comment}{// Handling of a single Index}}
+\DoxyCodeLine{83 \textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{84 }
+\DoxyCodeLine{85 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1SingleRange}{SingleRange}} \{}
+\DoxyCodeLine{86   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{87     SizeAtCompileTime = 1}
+\DoxyCodeLine{88   \};}
+\DoxyCodeLine{89   \mbox{\hyperlink{structEigen_1_1internal_1_1SingleRange}{SingleRange}}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} val) : m\_value(val) \{\}}
+\DoxyCodeLine{90   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} operator[](\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}})\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_value; \}}
+\DoxyCodeLine{91   \textcolor{keyword}{static} EIGEN\_CONSTEXPR \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size() EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} 1; \}}
+\DoxyCodeLine{92   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} first() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_value; \}}
+\DoxyCodeLine{93   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m\_value;}
+\DoxyCodeLine{94 \};}
+\DoxyCodeLine{95 }
+\DoxyCodeLine{96 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1get__compile__time__incr}{get\_compile\_time\_incr}}<\mbox{\hyperlink{structEigen_1_1internal_1_1SingleRange}{SingleRange}}> \{}
+\DoxyCodeLine{97   \textcolor{keyword}{enum} \{ value = 1 \}; \textcolor{comment}{// 1 or 0 ??}}
+\DoxyCodeLine{98 \};}
+\DoxyCodeLine{99 }
+\DoxyCodeLine{100 \textcolor{comment}{// Turn a single index into something that looks like an array (i.e., that exposes a .size(), and operator[](int) methods)}}
+\DoxyCodeLine{101 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, \textcolor{keywordtype}{int} XprSize>}
+\DoxyCodeLine{102 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1IndexedViewCompatibleType}{IndexedViewCompatibleType}}<T,XprSize,typename internal::\mbox{\hyperlink{structEigen_1_1internal_1_1enable__if}{enable\_if}}<internal::is\_integral<T>::value>\mbox{\hyperlink{structEigen_1_1internal_1_1SingleRange}{::type}}> \{}
+\DoxyCodeLine{103   \textcolor{comment}{// Here we could simply use Array, but maybe it's less work for the compiler to use}}
+\DoxyCodeLine{104   \textcolor{comment}{// a simpler wrapper as SingleRange}}
+\DoxyCodeLine{105   \textcolor{comment}{//typedef Eigen::Array<Index,1,1> type;}}
+\DoxyCodeLine{106   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1SingleRange}{SingleRange}} \mbox{\hyperlink{structEigen_1_1internal_1_1SingleRange}{type}};}
+\DoxyCodeLine{107 \};}
+\DoxyCodeLine{108 }
+\DoxyCodeLine{109 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, \textcolor{keywordtype}{int} XprSize>}
+\DoxyCodeLine{110 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1IndexedViewCompatibleType}{IndexedViewCompatibleType}}<T, XprSize, typename \mbox{\hyperlink{structEigen_1_1internal_1_1enable__if}{enable\_if}}<symbolic::is\_symbolic<T>::value>\mbox{\hyperlink{structEigen_1_1internal_1_1SingleRange}{::type}}> \{}
+\DoxyCodeLine{111   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1SingleRange}{SingleRange}} \mbox{\hyperlink{structEigen_1_1internal_1_1SingleRange}{type}};}
+\DoxyCodeLine{112 \};}
+\DoxyCodeLine{113 }
+\DoxyCodeLine{114 }
+\DoxyCodeLine{115 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{116 \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1enable__if}{enable\_if<symbolic::is\_symbolic<T>::value}},\mbox{\hyperlink{structEigen_1_1internal_1_1SingleRange}{SingleRange}}>::type}
+\DoxyCodeLine{117 makeIndexedViewCompatible(\textcolor{keyword}{const} T\& \textcolor{keywordtype}{id}, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size, SpecializedType) \{}
+\DoxyCodeLine{118   \textcolor{keywordflow}{return} eval\_expr\_given\_size(\textcolor{keywordtype}{id},size);}
+\DoxyCodeLine{119 \}}
+\DoxyCodeLine{120 }
+\DoxyCodeLine{121 \textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{122 \textcolor{comment}{// Handling of all}}
+\DoxyCodeLine{123 \textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{124 }
+\DoxyCodeLine{125 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1all__t}{all\_t}} \{ \mbox{\hyperlink{structEigen_1_1internal_1_1all__t}{all\_t}}() \{\} \};}
+\DoxyCodeLine{126 }
+\DoxyCodeLine{127 \textcolor{comment}{// Convert a symbolic 'all' into a usable range type}}
+\DoxyCodeLine{128 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} XprSize>}
+\DoxyCodeLine{129 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1AllRange}{AllRange}} \{}
+\DoxyCodeLine{130   \textcolor{keyword}{enum} \{ SizeAtCompileTime = XprSize \};}
+\DoxyCodeLine{131   \mbox{\hyperlink{structEigen_1_1internal_1_1AllRange}{AllRange}}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size = XprSize) : m\_size(size) \{\}}
+\DoxyCodeLine{132   EIGEN\_CONSTEXPR \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} operator[](\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i) \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} i; \}}
+\DoxyCodeLine{133   EIGEN\_CONSTEXPR \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_size.value(); \}}
+\DoxyCodeLine{134   EIGEN\_CONSTEXPR \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} first() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} 0; \}}
+\DoxyCodeLine{135   \mbox{\hyperlink{classEigen_1_1internal_1_1variable__if__dynamic}{variable\_if\_dynamic<Index,XprSize>}} m\_size;}
+\DoxyCodeLine{136 \};}
+\DoxyCodeLine{137 }
+\DoxyCodeLine{138 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} XprSize>}
+\DoxyCodeLine{139 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1IndexedViewCompatibleType}{IndexedViewCompatibleType}}<\mbox{\hyperlink{structEigen_1_1internal_1_1all__t}{all\_t}},XprSize> \{}
+\DoxyCodeLine{140   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1AllRange}{AllRange<XprSize>}} \mbox{\hyperlink{structEigen_1_1internal_1_1AllRange}{type}};}
+\DoxyCodeLine{141 \};}
+\DoxyCodeLine{142 }
+\DoxyCodeLine{143 \textcolor{keyword}{template}<\textcolor{keyword}{typename} XprSizeType>}
+\DoxyCodeLine{144 \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1internal_1_1AllRange}{AllRange<get\_fixed\_value<XprSizeType>::value}}> makeIndexedViewCompatible(\mbox{\hyperlink{structEigen_1_1internal_1_1all__t}{all\_t}} , XprSizeType size, SpecializedType) \{}
+\DoxyCodeLine{145   \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1AllRange}{AllRange<get\_fixed\_value<XprSizeType>::value}}>(size);}
+\DoxyCodeLine{146 \}}
+\DoxyCodeLine{147 }
+\DoxyCodeLine{148 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Size> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1get__compile__time__incr}{get\_compile\_time\_incr}}<\mbox{\hyperlink{structEigen_1_1internal_1_1AllRange}{AllRange}}<Size> > \{}
+\DoxyCodeLine{149   \textcolor{keyword}{enum} \{ value = 1 \};}
+\DoxyCodeLine{150 \};}
+\DoxyCodeLine{151 }
+\DoxyCodeLine{152 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{153 }
+\DoxyCodeLine{154 \textcolor{keyword}{namespace }placeholders \{}
+\DoxyCodeLine{155 }
+\DoxyCodeLine{156 \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1symbolic_1_1AddExpr}{symbolic::AddExpr<symbolic::SymbolExpr<internal::symbolic\_last\_tag>}},\mbox{\hyperlink{classEigen_1_1symbolic_1_1ValueExpr}{symbolic::ValueExpr<Eigen::internal::FixedInt<1>}} > > lastp1\_t;}
+\DoxyCodeLine{157 \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1all__t}{Eigen::internal::all\_t}} all\_t;}
+\DoxyCodeLine{158 }
+\DoxyCodeLine{171 \textcolor{preprocessor}{\#ifdef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{172 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keyword}{auto} lastp1 = last+fix<1>;}
+\DoxyCodeLine{173 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{174 \textcolor{comment}{// Using a FixedExpr<1> expression is important here to make sure the compiler}}
+\DoxyCodeLine{175 \textcolor{comment}{// can fully optimize the computation starting indices with zero overhead.}}
+\DoxyCodeLine{176 \textcolor{keyword}{static} \textcolor{keyword}{const} lastp1\_t lastp1(last+fix<1>());}
+\DoxyCodeLine{177 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{178 }
+\DoxyCodeLine{183 \textcolor{keyword}{static} \textcolor{keyword}{const} lastp1\_t end = lastp1;}
+\DoxyCodeLine{184 }
+\DoxyCodeLine{189 \textcolor{keyword}{static} \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1all__t}{Eigen::internal::all\_t}} all;}
+\DoxyCodeLine{190 }
+\DoxyCodeLine{191 \} \textcolor{comment}{// namespace placeholders}}
+\DoxyCodeLine{192 }
+\DoxyCodeLine{193 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{194 }
+\DoxyCodeLine{195 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_INDEXED\_VIEW\_HELPER\_H}}
+
+\end{DoxyCode}

@@ -1,0 +1,466 @@
+\hypertarget{DenseCoeffsBase_8h_source}{}\doxysection{Dense\+Coeffs\+Base.\+h}
+\label{DenseCoeffsBase_8h_source}\index{include/Eigen/src/Core/DenseCoeffsBase.h@{include/Eigen/src/Core/DenseCoeffsBase.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2006-\/2010 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_DENSECOEFFSBASE\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_DENSECOEFFSBASE\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{18 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1add__const__on__value__type__if__arithmetic}{add\_const\_on\_value\_type\_if\_arithmetic}}}
+\DoxyCodeLine{19 \{}
+\DoxyCodeLine{20   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1conditional}{conditional<is\_arithmetic<T>::value}}, T, \textcolor{keyword}{typename} add\_const\_on\_value\_type<T>::type>\mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{::type}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{type}};}
+\DoxyCodeLine{21 \};}
+\DoxyCodeLine{22 \}}
+\DoxyCodeLine{23 }
+\DoxyCodeLine{36 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{37 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1DenseCoeffsBase}{DenseCoeffsBase}}<Derived,\mbox{\hyperlink{group__enums_gga9f93eac38eb83deb0e8dbd42ddf11d5daa1f2b0e6a668b11f2958940965d2b572}{ReadOnlyAccessors}}> : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase}}<Derived>}
+\DoxyCodeLine{38 \{}
+\DoxyCodeLine{39   \textcolor{keyword}{public}:}
+\DoxyCodeLine{40     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::StorageKind}} StorageKind;}
+\DoxyCodeLine{41     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::Scalar}} Scalar;}
+\DoxyCodeLine{42     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::packet\_traits<Scalar>::type PacketScalar;}
+\DoxyCodeLine{43 }
+\DoxyCodeLine{44     \textcolor{comment}{// Explanation for this CoeffReturnType typedef.}}
+\DoxyCodeLine{45     \textcolor{comment}{// -\/ This is the return type of the coeff() method.}}
+\DoxyCodeLine{46     \textcolor{comment}{// -\/ The LvalueBit means exactly that we can offer a coeffRef() method, which means exactly that we can get references}}
+\DoxyCodeLine{47     \textcolor{comment}{// to coeffs, which means exactly that we can have coeff() return a const reference (as opposed to returning a value).}}
+\DoxyCodeLine{48     \textcolor{comment}{// -\/ The is\_arithmetic check is required since "{}const int"{}, "{}const double"{}, etc. will cause warnings on some systems}}
+\DoxyCodeLine{49     \textcolor{comment}{// while the declaration of "{}const T"{}, where T is a non arithmetic type does not. Always returning "{}const Scalar\&"{} is}}
+\DoxyCodeLine{50     \textcolor{comment}{// not possible, since the underlying expressions might not offer a valid address the reference could be referring to.}}
+\DoxyCodeLine{51     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1conditional}{internal::conditional}}<bool(\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::Flags}}\&\mbox{\hyperlink{group__flags_gae2c323957f20dfdc6cb8f44428eaec1a}{LvalueBit}}),}
+\DoxyCodeLine{52                          \textcolor{keyword}{const} Scalar\&,}
+\DoxyCodeLine{53                          \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1conditional}{internal::conditional<internal::is\_arithmetic<Scalar>::value}}, Scalar, \textcolor{keyword}{const} Scalar>::type}
+\DoxyCodeLine{54                      >::type \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{CoeffReturnType}};}
+\DoxyCodeLine{55 }
+\DoxyCodeLine{56     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1add__const__on__value__type__if__arithmetic}{internal::add\_const\_on\_value\_type\_if\_arithmetic}}<}
+\DoxyCodeLine{57                          \textcolor{keyword}{typename} internal::packet\_traits<Scalar>::type}
+\DoxyCodeLine{58                      >::type \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{PacketReturnType}};}
+\DoxyCodeLine{59 }
+\DoxyCodeLine{60     \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<Derived>}} \mbox{\hyperlink{structEigen_1_1EigenBase}{Base}};}
+\DoxyCodeLine{61     \textcolor{keyword}{using} Base::rows;}
+\DoxyCodeLine{62     \textcolor{keyword}{using} Base::cols;}
+\DoxyCodeLine{63     \textcolor{keyword}{using} Base::size;}
+\DoxyCodeLine{64     \textcolor{keyword}{using} Base::derived;}
+\DoxyCodeLine{65 }
+\DoxyCodeLine{66     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{67     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} rowIndexByOuterInner(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} outer, \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} inner)\textcolor{keyword}{ const}}
+\DoxyCodeLine{68 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{69       \textcolor{keywordflow}{return} int(Derived::RowsAtCompileTime) == 1 ? 0}
+\DoxyCodeLine{70           : int(Derived::ColsAtCompileTime) == 1 ? inner}
+\DoxyCodeLine{71           : int(Derived::Flags)\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}} ? outer}
+\DoxyCodeLine{72           : inner;}
+\DoxyCodeLine{73     \}}
+\DoxyCodeLine{74 }
+\DoxyCodeLine{75     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{76     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} colIndexByOuterInner(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} outer, \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} inner)\textcolor{keyword}{ const}}
+\DoxyCodeLine{77 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{78       \textcolor{keywordflow}{return} int(Derived::ColsAtCompileTime) == 1 ? 0}
+\DoxyCodeLine{79           : int(Derived::RowsAtCompileTime) == 1 ? inner}
+\DoxyCodeLine{80           : int(Derived::Flags)\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}} ? inner}
+\DoxyCodeLine{81           : outer;}
+\DoxyCodeLine{82     \}}
+\DoxyCodeLine{83 }
+\DoxyCodeLine{98     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{99     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{CoeffReturnType}} \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01ReadOnlyAccessors_01_4_ad41647ef695f9a5a58a9a0f50e2ae064}{coeff}}(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} row, \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{100 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{101       eigen\_internal\_assert(row >= 0 \&\& row < rows()}
+\DoxyCodeLine{102                          \&\& col >= 0 \&\& col < cols());}
+\DoxyCodeLine{103       \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{internal::evaluator<Derived>}}(derived()).coeff(row,col);}
+\DoxyCodeLine{104     \}}
+\DoxyCodeLine{105 }
+\DoxyCodeLine{106     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{107     EIGEN\_STRONG\_INLINE CoeffReturnType coeffByOuterInner(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outer, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} inner)\textcolor{keyword}{ const}}
+\DoxyCodeLine{108 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{109       \textcolor{keywordflow}{return} coeff(rowIndexByOuterInner(outer, inner),}
+\DoxyCodeLine{110                    colIndexByOuterInner(outer, inner));}
+\DoxyCodeLine{111     \}}
+\DoxyCodeLine{112 }
+\DoxyCodeLine{117     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{118     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{CoeffReturnType}} \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01ReadOnlyAccessors_01_4_a29ac34389e098ec963ebb2ebd351335a}{operator()}}(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} row, \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{119 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{120       eigen\_assert(row >= 0 \&\& row < rows()}
+\DoxyCodeLine{121           \&\& col >= 0 \&\& col < cols());}
+\DoxyCodeLine{122       \textcolor{keywordflow}{return} coeff(row, col);}
+\DoxyCodeLine{123     \}}
+\DoxyCodeLine{124 }
+\DoxyCodeLine{140     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{141     EIGEN\_STRONG\_INLINE CoeffReturnType}
+\DoxyCodeLine{142     \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01ReadOnlyAccessors_01_4_ad52344ad1f42852db71996590d2de0de}{coeff}}(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{143 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{144       EIGEN\_STATIC\_ASSERT(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{internal::evaluator<Derived>::Flags}} \& \mbox{\hyperlink{group__flags_ga4b983a15d57cd55806df618ac544d09e}{LinearAccessBit}},}
+\DoxyCodeLine{145                           THIS\_COEFFICIENT\_ACCESSOR\_TAKING\_ONE\_ACCESS\_IS\_ONLY\_FOR\_EXPRESSIONS\_ALLOWING\_LINEAR\_ACCESS)}
+\DoxyCodeLine{146       eigen\_internal\_assert(index >= 0 \&\& index < size());}
+\DoxyCodeLine{147       \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{internal::evaluator<Derived>}}(derived()).coeff(index);}
+\DoxyCodeLine{148     \}}
+\DoxyCodeLine{149 }
+\DoxyCodeLine{150 }
+\DoxyCodeLine{159     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{160     EIGEN\_STRONG\_INLINE CoeffReturnType}
+\DoxyCodeLine{161     \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01ReadOnlyAccessors_01_4_ad26422dfa7b2bf859d4304663c36de10}{operator[]}}(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{162 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{163       EIGEN\_STATIC\_ASSERT(Derived::IsVectorAtCompileTime,}
+\DoxyCodeLine{164                           THE\_BRACKET\_OPERATOR\_IS\_ONLY\_FOR\_VECTORS\_\_USE\_THE\_PARENTHESIS\_OPERATOR\_INSTEAD)}
+\DoxyCodeLine{165       eigen\_assert(index >= 0 \&\& index < size());}
+\DoxyCodeLine{166       \textcolor{keywordflow}{return} coeff(index);}
+\DoxyCodeLine{167     \}}
+\DoxyCodeLine{168 }
+\DoxyCodeLine{179     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{180     EIGEN\_STRONG\_INLINE CoeffReturnType}
+\DoxyCodeLine{181     \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01ReadOnlyAccessors_01_4_a679c7e69917baa1abf2c2f82725ae470}{operator()}}(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{182 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{183       eigen\_assert(index >= 0 \&\& index < size());}
+\DoxyCodeLine{184       \textcolor{keywordflow}{return} coeff(index);}
+\DoxyCodeLine{185     \}}
+\DoxyCodeLine{186 }
+\DoxyCodeLine{189     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{190     EIGEN\_STRONG\_INLINE CoeffReturnType}
+\DoxyCodeLine{191     \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01ReadOnlyAccessors_01_4_a36fb246141b6ea5ab5289d7eb6afdf6e}{x}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} (*\textcolor{keyword}{this})[0]; \}}
+\DoxyCodeLine{192 }
+\DoxyCodeLine{195     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{196     EIGEN\_STRONG\_INLINE CoeffReturnType}
+\DoxyCodeLine{197     \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01ReadOnlyAccessors_01_4_af2cb257225cf4348136a37fa9333ccda}{y}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{198 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{199       EIGEN\_STATIC\_ASSERT(Derived::SizeAtCompileTime==-\/1 || Derived::SizeAtCompileTime>=2, OUT\_OF\_RANGE\_ACCESS);}
+\DoxyCodeLine{200       \textcolor{keywordflow}{return} (*\textcolor{keyword}{this})[1];}
+\DoxyCodeLine{201     \}}
+\DoxyCodeLine{202 }
+\DoxyCodeLine{205     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{206     EIGEN\_STRONG\_INLINE CoeffReturnType}
+\DoxyCodeLine{207     \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01ReadOnlyAccessors_01_4_a9040af2dcad8961168daafe09c1b1dc4}{z}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{208 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{209       EIGEN\_STATIC\_ASSERT(Derived::SizeAtCompileTime==-\/1 || Derived::SizeAtCompileTime>=3, OUT\_OF\_RANGE\_ACCESS);}
+\DoxyCodeLine{210       \textcolor{keywordflow}{return} (*\textcolor{keyword}{this})[2];}
+\DoxyCodeLine{211     \}}
+\DoxyCodeLine{212 }
+\DoxyCodeLine{215     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{216     EIGEN\_STRONG\_INLINE CoeffReturnType}
+\DoxyCodeLine{217     \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01ReadOnlyAccessors_01_4_a422892fbb6b2eecce243776c3b8452ab}{w}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{218 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{219       EIGEN\_STATIC\_ASSERT(Derived::SizeAtCompileTime==-\/1 || Derived::SizeAtCompileTime>=4, OUT\_OF\_RANGE\_ACCESS);}
+\DoxyCodeLine{220       \textcolor{keywordflow}{return} (*\textcolor{keyword}{this})[3];}
+\DoxyCodeLine{221     \}}
+\DoxyCodeLine{222 }
+\DoxyCodeLine{233     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode>}
+\DoxyCodeLine{234     EIGEN\_STRONG\_INLINE PacketReturnType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{235 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{236       \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::packet\_traits<Scalar>::type DefaultPacketType;}
+\DoxyCodeLine{237       eigen\_internal\_assert(row >= 0 \&\& row < rows() \&\& col >= 0 \&\& col < cols());}
+\DoxyCodeLine{238       \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{internal::evaluator<Derived>}}(derived()).template packet<LoadMode,DefaultPacketType>(row,col);}
+\DoxyCodeLine{239     \}}
+\DoxyCodeLine{240 }
+\DoxyCodeLine{241 }
+\DoxyCodeLine{243     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode>}
+\DoxyCodeLine{244     EIGEN\_STRONG\_INLINE PacketReturnType packetByOuterInner(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outer, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} inner)\textcolor{keyword}{ const}}
+\DoxyCodeLine{245 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{246       \textcolor{keywordflow}{return} packet<LoadMode>(rowIndexByOuterInner(outer, inner),}
+\DoxyCodeLine{247                               colIndexByOuterInner(outer, inner));}
+\DoxyCodeLine{248     \}}
+\DoxyCodeLine{249 }
+\DoxyCodeLine{260     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode>}
+\DoxyCodeLine{261     EIGEN\_STRONG\_INLINE PacketReturnType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{262 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{263       EIGEN\_STATIC\_ASSERT(internal::evaluator<Derived>::Flags \& \mbox{\hyperlink{group__flags_ga4b983a15d57cd55806df618ac544d09e}{LinearAccessBit}},}
+\DoxyCodeLine{264                           THIS\_COEFFICIENT\_ACCESSOR\_TAKING\_ONE\_ACCESS\_IS\_ONLY\_FOR\_EXPRESSIONS\_ALLOWING\_LINEAR\_ACCESS)}
+\DoxyCodeLine{265       \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::packet\_traits<Scalar>::type DefaultPacketType;}
+\DoxyCodeLine{266       eigen\_internal\_assert(index >= 0 \&\& index < size());}
+\DoxyCodeLine{267       \textcolor{keywordflow}{return} internal::evaluator<Derived>(derived()).template packet<LoadMode,DefaultPacketType>(index);}
+\DoxyCodeLine{268     \}}
+\DoxyCodeLine{269 }
+\DoxyCodeLine{270   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{271     \textcolor{comment}{// explanation: DenseBase is doing "{}using ..."{} on the methods from DenseCoeffsBase.}}
+\DoxyCodeLine{272     \textcolor{comment}{// But some methods are only available in the DirectAccess case.}}
+\DoxyCodeLine{273     \textcolor{comment}{// So we add dummy methods here with these names, so that "{}using... "{} doesn't fail.}}
+\DoxyCodeLine{274     \textcolor{comment}{// It's not private so that the child class DenseBase can access them, and it's not public}}
+\DoxyCodeLine{275     \textcolor{comment}{// either since it's an implementation detail, so has to be protected.}}
+\DoxyCodeLine{276     \textcolor{keywordtype}{void} coeffRef();}
+\DoxyCodeLine{277     \textcolor{keywordtype}{void} coeffRefByOuterInner();}
+\DoxyCodeLine{278     \textcolor{keywordtype}{void} writePacket();}
+\DoxyCodeLine{279     \textcolor{keywordtype}{void} writePacketByOuterInner();}
+\DoxyCodeLine{280     \textcolor{keywordtype}{void} copyCoeff();}
+\DoxyCodeLine{281     \textcolor{keywordtype}{void} copyCoeffByOuterInner();}
+\DoxyCodeLine{282     \textcolor{keywordtype}{void} copyPacket();}
+\DoxyCodeLine{283     \textcolor{keywordtype}{void} copyPacketByOuterInner();}
+\DoxyCodeLine{284     \textcolor{keywordtype}{void} stride();}
+\DoxyCodeLine{285     \textcolor{keywordtype}{void} innerStride();}
+\DoxyCodeLine{286     \textcolor{keywordtype}{void} outerStride();}
+\DoxyCodeLine{287     \textcolor{keywordtype}{void} rowStride();}
+\DoxyCodeLine{288     \textcolor{keywordtype}{void} colStride();}
+\DoxyCodeLine{289 \};}
+\DoxyCodeLine{290 }
+\DoxyCodeLine{303 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{304 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1DenseCoeffsBase}{DenseCoeffsBase}}<Derived, \mbox{\hyperlink{group__enums_gga9f93eac38eb83deb0e8dbd42ddf11d5dabcadf08230fb1a5ef7b3195745d3a458}{WriteAccessors}}> : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase}{DenseCoeffsBase}}<Derived, ReadOnlyAccessors>}
+\DoxyCodeLine{305 \{}
+\DoxyCodeLine{306   \textcolor{keyword}{public}:}
+\DoxyCodeLine{307 }
+\DoxyCodeLine{308     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01ReadOnlyAccessors_01_4}{DenseCoeffsBase<Derived, ReadOnlyAccessors>}} \mbox{\hyperlink{structEigen_1_1EigenBase}{Base}};}
+\DoxyCodeLine{309 }
+\DoxyCodeLine{310     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::StorageKind}} StorageKind;}
+\DoxyCodeLine{311     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::Scalar}} Scalar;}
+\DoxyCodeLine{312     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::packet\_traits<Scalar>::type PacketScalar;}
+\DoxyCodeLine{313     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}} RealScalar;}
+\DoxyCodeLine{314 }
+\DoxyCodeLine{315     \textcolor{keyword}{using} Base::coeff;}
+\DoxyCodeLine{316     \textcolor{keyword}{using} Base::rows;}
+\DoxyCodeLine{317     \textcolor{keyword}{using} Base::cols;}
+\DoxyCodeLine{318     \textcolor{keyword}{using} Base::size;}
+\DoxyCodeLine{319     \textcolor{keyword}{using} Base::derived;}
+\DoxyCodeLine{320     \textcolor{keyword}{using} Base::rowIndexByOuterInner;}
+\DoxyCodeLine{321     \textcolor{keyword}{using} Base::colIndexByOuterInner;}
+\DoxyCodeLine{322     \textcolor{keyword}{using} Base::operator[];}
+\DoxyCodeLine{323     \textcolor{keyword}{using} Base::operator();}
+\DoxyCodeLine{324     \textcolor{keyword}{using} Base::x;}
+\DoxyCodeLine{325     \textcolor{keyword}{using} Base::y;}
+\DoxyCodeLine{326     \textcolor{keyword}{using} Base::z;}
+\DoxyCodeLine{327     \textcolor{keyword}{using} Base::w;}
+\DoxyCodeLine{328 }
+\DoxyCodeLine{343     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{344     EIGEN\_STRONG\_INLINE Scalar\& \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01WriteAccessors_01_4_a5a2e2a300e243c61591222c6fb0874f3}{coeffRef}}(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} row, \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} col)}
+\DoxyCodeLine{345     \{}
+\DoxyCodeLine{346       eigen\_internal\_assert(row >= 0 \&\& row < rows()}
+\DoxyCodeLine{347                          \&\& col >= 0 \&\& col < cols());}
+\DoxyCodeLine{348       \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{internal::evaluator<Derived>}}(derived()).coeffRef(row,col);}
+\DoxyCodeLine{349     \}}
+\DoxyCodeLine{350 }
+\DoxyCodeLine{351     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{352     EIGEN\_STRONG\_INLINE Scalar\&}
+\DoxyCodeLine{353     coeffRefByOuterInner(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outer, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} inner)}
+\DoxyCodeLine{354     \{}
+\DoxyCodeLine{355       \textcolor{keywordflow}{return} coeffRef(rowIndexByOuterInner(outer, inner),}
+\DoxyCodeLine{356                       colIndexByOuterInner(outer, inner));}
+\DoxyCodeLine{357     \}}
+\DoxyCodeLine{358 }
+\DoxyCodeLine{364     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{365     EIGEN\_STRONG\_INLINE Scalar\&}
+\DoxyCodeLine{366     \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01WriteAccessors_01_4_a74094f5caace4db3698f49a1664331cd}{operator()}}(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} row, \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} col)}
+\DoxyCodeLine{367     \{}
+\DoxyCodeLine{368       eigen\_assert(row >= 0 \&\& row < rows()}
+\DoxyCodeLine{369           \&\& col >= 0 \&\& col < cols());}
+\DoxyCodeLine{370       \textcolor{keywordflow}{return} coeffRef(row, col);}
+\DoxyCodeLine{371     \}}
+\DoxyCodeLine{372 }
+\DoxyCodeLine{373 }
+\DoxyCodeLine{389     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{390     EIGEN\_STRONG\_INLINE Scalar\&}
+\DoxyCodeLine{391     \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01WriteAccessors_01_4_ad653f85668cbd0b53d2e96db0e922396}{coeffRef}}(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} index)}
+\DoxyCodeLine{392     \{}
+\DoxyCodeLine{393       EIGEN\_STATIC\_ASSERT(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{internal::evaluator<Derived>::Flags}} \& \mbox{\hyperlink{group__flags_ga4b983a15d57cd55806df618ac544d09e}{LinearAccessBit}},}
+\DoxyCodeLine{394                           THIS\_COEFFICIENT\_ACCESSOR\_TAKING\_ONE\_ACCESS\_IS\_ONLY\_FOR\_EXPRESSIONS\_ALLOWING\_LINEAR\_ACCESS)}
+\DoxyCodeLine{395       eigen\_internal\_assert(index >= 0 \&\& index < size());}
+\DoxyCodeLine{396       \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{internal::evaluator<Derived>}}(derived()).coeffRef(index);}
+\DoxyCodeLine{397     \}}
+\DoxyCodeLine{398 }
+\DoxyCodeLine{406     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{407     EIGEN\_STRONG\_INLINE Scalar\&}
+\DoxyCodeLine{408     \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01WriteAccessors_01_4_a1f8a1f45390806b31758756910180774}{operator[]}}(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} index)}
+\DoxyCodeLine{409     \{}
+\DoxyCodeLine{410       EIGEN\_STATIC\_ASSERT(Derived::IsVectorAtCompileTime,}
+\DoxyCodeLine{411                           THE\_BRACKET\_OPERATOR\_IS\_ONLY\_FOR\_VECTORS\_\_USE\_THE\_PARENTHESIS\_OPERATOR\_INSTEAD)}
+\DoxyCodeLine{412       eigen\_assert(index >= 0 \&\& index < size());}
+\DoxyCodeLine{413       \textcolor{keywordflow}{return} coeffRef(index);}
+\DoxyCodeLine{414     \}}
+\DoxyCodeLine{415 }
+\DoxyCodeLine{425     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{426     EIGEN\_STRONG\_INLINE Scalar\&}
+\DoxyCodeLine{427     \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01WriteAccessors_01_4_aa6d7e2377bbf48903b42e0f3058bd87f}{operator()}}(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} index)}
+\DoxyCodeLine{428     \{}
+\DoxyCodeLine{429       eigen\_assert(index >= 0 \&\& index < size());}
+\DoxyCodeLine{430       \textcolor{keywordflow}{return} coeffRef(index);}
+\DoxyCodeLine{431     \}}
+\DoxyCodeLine{432 }
+\DoxyCodeLine{435     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{436     EIGEN\_STRONG\_INLINE Scalar\&}
+\DoxyCodeLine{437     \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01WriteAccessors_01_4_a196ee5a48c78c93f54fead2e44e5c8b5}{x}}() \{ \textcolor{keywordflow}{return} (*\textcolor{keyword}{this})[0]; \}}
+\DoxyCodeLine{438 }
+\DoxyCodeLine{441     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{442     EIGEN\_STRONG\_INLINE Scalar\&}
+\DoxyCodeLine{443     \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01WriteAccessors_01_4_a2c1d88c89e1ac9a903d0df96a6270452}{y}}()}
+\DoxyCodeLine{444     \{}
+\DoxyCodeLine{445       EIGEN\_STATIC\_ASSERT(Derived::SizeAtCompileTime==-\/1 || Derived::SizeAtCompileTime>=2, OUT\_OF\_RANGE\_ACCESS);}
+\DoxyCodeLine{446       \textcolor{keywordflow}{return} (*\textcolor{keyword}{this})[1];}
+\DoxyCodeLine{447     \}}
+\DoxyCodeLine{448 }
+\DoxyCodeLine{451     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{452     EIGEN\_STRONG\_INLINE Scalar\&}
+\DoxyCodeLine{453     \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01WriteAccessors_01_4_a834f074e6650815d9bed38fb85bbd757}{z}}()}
+\DoxyCodeLine{454     \{}
+\DoxyCodeLine{455       EIGEN\_STATIC\_ASSERT(Derived::SizeAtCompileTime==-\/1 || Derived::SizeAtCompileTime>=3, OUT\_OF\_RANGE\_ACCESS);}
+\DoxyCodeLine{456       \textcolor{keywordflow}{return} (*\textcolor{keyword}{this})[2];}
+\DoxyCodeLine{457     \}}
+\DoxyCodeLine{458 }
+\DoxyCodeLine{461     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{462     EIGEN\_STRONG\_INLINE Scalar\&}
+\DoxyCodeLine{463     \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01WriteAccessors_01_4_af15673d3ae0e392670d370a386f213d9}{w}}()}
+\DoxyCodeLine{464     \{}
+\DoxyCodeLine{465       EIGEN\_STATIC\_ASSERT(Derived::SizeAtCompileTime==-\/1 || Derived::SizeAtCompileTime>=4, OUT\_OF\_RANGE\_ACCESS);}
+\DoxyCodeLine{466       \textcolor{keywordflow}{return} (*\textcolor{keyword}{this})[3];}
+\DoxyCodeLine{467     \}}
+\DoxyCodeLine{468 \};}
+\DoxyCodeLine{469 }
+\DoxyCodeLine{482 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{483 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1DenseCoeffsBase}{DenseCoeffsBase}}<Derived, \mbox{\hyperlink{group__enums_gga9f93eac38eb83deb0e8dbd42ddf11d5da50108ad00095928de06228470ceab09e}{DirectAccessors}}> : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase}{DenseCoeffsBase}}<Derived, ReadOnlyAccessors>}
+\DoxyCodeLine{484 \{}
+\DoxyCodeLine{485   \textcolor{keyword}{public}:}
+\DoxyCodeLine{486 }
+\DoxyCodeLine{487     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01ReadOnlyAccessors_01_4}{DenseCoeffsBase<Derived, ReadOnlyAccessors>}} \mbox{\hyperlink{structEigen_1_1EigenBase}{Base}};}
+\DoxyCodeLine{488     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::Scalar}} Scalar;}
+\DoxyCodeLine{489     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}} RealScalar;}
+\DoxyCodeLine{490 }
+\DoxyCodeLine{491     \textcolor{keyword}{using} Base::rows;}
+\DoxyCodeLine{492     \textcolor{keyword}{using} Base::cols;}
+\DoxyCodeLine{493     \textcolor{keyword}{using} Base::size;}
+\DoxyCodeLine{494     \textcolor{keyword}{using} Base::derived;}
+\DoxyCodeLine{495 }
+\DoxyCodeLine{500     EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{501     \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01DirectAccessors_01_4_ac2f07ada6a975ad86cace8e064a30932}{innerStride}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{502 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{503       \textcolor{keywordflow}{return} derived().innerStride();}
+\DoxyCodeLine{504     \}}
+\DoxyCodeLine{505 }
+\DoxyCodeLine{511     EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{512     \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01DirectAccessors_01_4_a769681ecddbef726fc3a09a426b6ea30}{outerStride}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{513 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{514       \textcolor{keywordflow}{return} derived().outerStride();}
+\DoxyCodeLine{515     \}}
+\DoxyCodeLine{516 }
+\DoxyCodeLine{517     \textcolor{comment}{// FIXME shall we remove it ?}}
+\DoxyCodeLine{518     EIGEN\_CONSTEXPR \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride()\textcolor{keyword}{ const}}
+\DoxyCodeLine{519 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{520       \textcolor{keywordflow}{return} Derived::IsVectorAtCompileTime ? innerStride() : outerStride();}
+\DoxyCodeLine{521     \}}
+\DoxyCodeLine{522 }
+\DoxyCodeLine{527     EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{528     \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01DirectAccessors_01_4_a86ae87df7937d25954f719569386dda6}{rowStride}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{529 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{530       \textcolor{keywordflow}{return} Derived::IsRowMajor ? outerStride() : innerStride();}
+\DoxyCodeLine{531     \}}
+\DoxyCodeLine{532 }
+\DoxyCodeLine{537     EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{538     \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01DirectAccessors_01_4_a4e28dee9989b046d7719d8fecaeccb94}{colStride}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{539 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{540       \textcolor{keywordflow}{return} Derived::IsRowMajor ? innerStride() : outerStride();}
+\DoxyCodeLine{541     \}}
+\DoxyCodeLine{542 \};}
+\DoxyCodeLine{543 }
+\DoxyCodeLine{556 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{557 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1DenseCoeffsBase}{DenseCoeffsBase}}<Derived, \mbox{\hyperlink{group__enums_gga9f93eac38eb83deb0e8dbd42ddf11d5dacbe59d09ba2fdf8eac127bff1a1f0234}{DirectWriteAccessors}}>}
+\DoxyCodeLine{558   : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase}{DenseCoeffsBase}}<Derived, WriteAccessors>}
+\DoxyCodeLine{559 \{}
+\DoxyCodeLine{560   \textcolor{keyword}{public}:}
+\DoxyCodeLine{561 }
+\DoxyCodeLine{562     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01WriteAccessors_01_4}{DenseCoeffsBase<Derived, WriteAccessors>}} \mbox{\hyperlink{structEigen_1_1EigenBase}{Base}};}
+\DoxyCodeLine{563     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::Scalar}} Scalar;}
+\DoxyCodeLine{564     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}} RealScalar;}
+\DoxyCodeLine{565 }
+\DoxyCodeLine{566     \textcolor{keyword}{using} Base::rows;}
+\DoxyCodeLine{567     \textcolor{keyword}{using} Base::cols;}
+\DoxyCodeLine{568     \textcolor{keyword}{using} Base::size;}
+\DoxyCodeLine{569     \textcolor{keyword}{using} Base::derived;}
+\DoxyCodeLine{570 }
+\DoxyCodeLine{575     EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{576     \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01DirectWriteAccessors_01_4_a1a23f8c9a484a711ee5ea2e35aa446c3}{innerStride}}() const EIGEN\_NOEXCEPT}
+\DoxyCodeLine{577     \{}
+\DoxyCodeLine{578       \textcolor{keywordflow}{return} derived().innerStride();}
+\DoxyCodeLine{579     \}}
+\DoxyCodeLine{580 }
+\DoxyCodeLine{586     EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{587     \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01DirectWriteAccessors_01_4_ac054e54614d84356d0cb0450d31d10e0}{outerStride}}() const EIGEN\_NOEXCEPT}
+\DoxyCodeLine{588     \{}
+\DoxyCodeLine{589       \textcolor{keywordflow}{return} derived().outerStride();}
+\DoxyCodeLine{590     \}}
+\DoxyCodeLine{591 }
+\DoxyCodeLine{592     \textcolor{comment}{// FIXME shall we remove it ?}}
+\DoxyCodeLine{593     EIGEN\_CONSTEXPR \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride() const EIGEN\_NOEXCEPT}
+\DoxyCodeLine{594     \{}
+\DoxyCodeLine{595       \textcolor{keywordflow}{return} Derived::IsVectorAtCompileTime ? innerStride() : outerStride();}
+\DoxyCodeLine{596     \}}
+\DoxyCodeLine{597 }
+\DoxyCodeLine{602     EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{603     \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01DirectWriteAccessors_01_4_a7f75f85e0319cf4e5947b81f92242ee7}{rowStride}}() const EIGEN\_NOEXCEPT}
+\DoxyCodeLine{604     \{}
+\DoxyCodeLine{605       \textcolor{keywordflow}{return} Derived::IsRowMajor ? outerStride() : innerStride();}
+\DoxyCodeLine{606     \}}
+\DoxyCodeLine{607 }
+\DoxyCodeLine{612     EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{613     \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1DenseCoeffsBase_3_01Derived_00_01DirectWriteAccessors_01_4_acbc2156242b3deeb318456f0919c05af}{colStride}}() const EIGEN\_NOEXCEPT}
+\DoxyCodeLine{614     \{}
+\DoxyCodeLine{615       \textcolor{keywordflow}{return} Derived::IsRowMajor ? innerStride() : outerStride();}
+\DoxyCodeLine{616     \}}
+\DoxyCodeLine{617 \};}
+\DoxyCodeLine{618 }
+\DoxyCodeLine{619 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{620 }
+\DoxyCodeLine{621 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Alignment, \textcolor{keyword}{typename} Derived, \textcolor{keywordtype}{bool} JustReturnZero>}
+\DoxyCodeLine{622 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1first__aligned__impl}{first\_aligned\_impl}}}
+\DoxyCodeLine{623 \{}
+\DoxyCodeLine{624   \textcolor{keyword}{static} EIGEN\_CONSTEXPR \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} run(\textcolor{keyword}{const} Derived\&) EIGEN\_NOEXCEPT}
+\DoxyCodeLine{625   \{ \textcolor{keywordflow}{return} 0; \}}
+\DoxyCodeLine{626 \};}
+\DoxyCodeLine{627 }
+\DoxyCodeLine{628 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Alignment, \textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{629 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1first__aligned__impl}{first\_aligned\_impl}}<Alignment, Derived, false>}
+\DoxyCodeLine{630 \{}
+\DoxyCodeLine{631   \textcolor{keyword}{static} \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} run(\textcolor{keyword}{const} Derived\& m)}
+\DoxyCodeLine{632   \{}
+\DoxyCodeLine{633     \textcolor{keywordflow}{return} internal::first\_aligned<Alignment>(m.data(), m.size());}
+\DoxyCodeLine{634   \}}
+\DoxyCodeLine{635 \};}
+\DoxyCodeLine{636 }
+\DoxyCodeLine{644 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Alignment, \textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{645 \textcolor{keyword}{static} \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} first\_aligned(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1DenseBase}{DenseBase<Derived>}}\& m)}
+\DoxyCodeLine{646 \{}
+\DoxyCodeLine{647   \textcolor{keyword}{enum} \{ ReturnZero = (int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Derived>::Alignment}}) >= Alignment) || !(Derived::Flags \& \mbox{\hyperlink{group__flags_gabf1e9d0516a933445a4c307ad8f14915}{DirectAccessBit}}) \};}
+\DoxyCodeLine{648   \textcolor{keywordflow}{return} first\_aligned\_impl<Alignment, Derived, ReturnZero>::run(m.derived());}
+\DoxyCodeLine{649 \}}
+\DoxyCodeLine{650 }
+\DoxyCodeLine{651 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{652 \textcolor{keyword}{static} \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} first\_default\_aligned(\textcolor{keyword}{const} DenseBase<Derived>\& m)}
+\DoxyCodeLine{653 \{}
+\DoxyCodeLine{654   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Derived::Scalar Scalar;}
+\DoxyCodeLine{655   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} packet\_traits<Scalar>::type DefaultPacketType;}
+\DoxyCodeLine{656   \textcolor{keywordflow}{return} internal::first\_aligned<int(unpacket\_traits<DefaultPacketType>::alignment),Derived>(m);}
+\DoxyCodeLine{657 \}}
+\DoxyCodeLine{658 }
+\DoxyCodeLine{659 template<typename Derived, bool HasDirectAccess = has\_direct\_access<Derived>::ret>}
+\DoxyCodeLine{660 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1inner__stride__at__compile__time}{inner\_stride\_at\_compile\_time}}}
+\DoxyCodeLine{661 \{}
+\DoxyCodeLine{662   \textcolor{keyword}{enum} \{ ret = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<Derived>::InnerStrideAtCompileTime}} \};}
+\DoxyCodeLine{663 \};}
+\DoxyCodeLine{664 }
+\DoxyCodeLine{665 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{666 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1inner__stride__at__compile__time}{inner\_stride\_at\_compile\_time}}<Derived, false>}
+\DoxyCodeLine{667 \{}
+\DoxyCodeLine{668   \textcolor{keyword}{enum} \{ ret = 0 \};}
+\DoxyCodeLine{669 \};}
+\DoxyCodeLine{670 }
+\DoxyCodeLine{671 template<typename Derived, bool HasDirectAccess = has\_direct\_access<Derived>::ret>}
+\DoxyCodeLine{672 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1outer__stride__at__compile__time}{outer\_stride\_at\_compile\_time}}}
+\DoxyCodeLine{673 \{}
+\DoxyCodeLine{674   \textcolor{keyword}{enum} \{ ret = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<Derived>::OuterStrideAtCompileTime}} \};}
+\DoxyCodeLine{675 \};}
+\DoxyCodeLine{676 }
+\DoxyCodeLine{677 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{678 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1outer__stride__at__compile__time}{outer\_stride\_at\_compile\_time}}<Derived, false>}
+\DoxyCodeLine{679 \{}
+\DoxyCodeLine{680   \textcolor{keyword}{enum} \{ ret = 0 \};}
+\DoxyCodeLine{681 \};}
+\DoxyCodeLine{682 }
+\DoxyCodeLine{683 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{684 }
+\DoxyCodeLine{685 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{686 }
+\DoxyCodeLine{687 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_DENSECOEFFSBASE\_H}}
+
+\end{DoxyCode}

@@ -1,0 +1,137 @@
+\hypertarget{MetisSupport_8h_source}{}\doxysection{Metis\+Support.\+h}
+\label{MetisSupport_8h_source}\index{include/Eigen/src/MetisSupport/MetisSupport.h@{include/Eigen/src/MetisSupport/MetisSupport.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2012 Désiré Nuentsa-\/Wakam <desire.nuentsa\_wakam@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 \textcolor{preprocessor}{\#ifndef METIS\_SUPPORT\_H}}
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#define METIS\_SUPPORT\_H}}
+\DoxyCodeLine{11 }
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{23 \textcolor{keyword}{template} <\textcolor{keyword}{typename} StorageIndex>}
+\DoxyCodeLine{24 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1MetisOrdering}{MetisOrdering}}}
+\DoxyCodeLine{25 \{}
+\DoxyCodeLine{26 \textcolor{keyword}{public}:}
+\DoxyCodeLine{27   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationMatrix<Dynamic,Dynamic,StorageIndex>}} \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationType}};}
+\DoxyCodeLine{28   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<StorageIndex,Dynamic,1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}}; }
+\DoxyCodeLine{29   }
+\DoxyCodeLine{30   \textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{31   \textcolor{keywordtype}{void} get\_symmetrized\_graph(\textcolor{keyword}{const} MatrixType\& A)}
+\DoxyCodeLine{32   \{}
+\DoxyCodeLine{33     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m = A.cols(); }
+\DoxyCodeLine{34     eigen\_assert((A.rows() == A.cols()) \&\& \textcolor{stringliteral}{"{}ONLY FOR SQUARED MATRICES"{}});}
+\DoxyCodeLine{35     \textcolor{comment}{// Get the transpose of the input matrix }}
+\DoxyCodeLine{36     MatrixType At = A.transpose(); }
+\DoxyCodeLine{37     \textcolor{comment}{// Get the number of nonzeros elements in each row/col of At+A}}
+\DoxyCodeLine{38     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} TotNz = 0; }
+\DoxyCodeLine{39     \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}} visited(m); }
+\DoxyCodeLine{40     visited.\mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac8dea1df3d92b752cc683ff42abf6f9b}{setConstant}}(-\/1); }
+\DoxyCodeLine{41     \textcolor{keywordflow}{for} (StorageIndex j = 0; j < m; j++)}
+\DoxyCodeLine{42     \{}
+\DoxyCodeLine{43       \textcolor{comment}{// Compute the union structure of of A(j,:) and At(j,:)}}
+\DoxyCodeLine{44       visited(j) = j; \textcolor{comment}{// Do not include the diagonal element}}
+\DoxyCodeLine{45       \textcolor{comment}{// Get the nonzeros in row/column j of A}}
+\DoxyCodeLine{46       \textcolor{keywordflow}{for} (\textcolor{keyword}{typename} MatrixType::InnerIterator it(A, j); it; ++it)}
+\DoxyCodeLine{47       \{}
+\DoxyCodeLine{48         \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} idx = it.index(); \textcolor{comment}{// Get the row index (for column major) or column index (for row major)}}
+\DoxyCodeLine{49         \textcolor{keywordflow}{if} (visited(idx) != j ) }
+\DoxyCodeLine{50         \{}
+\DoxyCodeLine{51           visited(idx) = j; }
+\DoxyCodeLine{52           ++TotNz; }
+\DoxyCodeLine{53         \}}
+\DoxyCodeLine{54       \}}
+\DoxyCodeLine{55       \textcolor{comment}{//Get the nonzeros in row/column j of At}}
+\DoxyCodeLine{56       \textcolor{keywordflow}{for} (\textcolor{keyword}{typename} MatrixType::InnerIterator it(At, j); it; ++it)}
+\DoxyCodeLine{57       \{}
+\DoxyCodeLine{58         \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} idx = it.index(); }
+\DoxyCodeLine{59         \textcolor{keywordflow}{if}(visited(idx) != j)}
+\DoxyCodeLine{60         \{}
+\DoxyCodeLine{61           visited(idx) = j; }
+\DoxyCodeLine{62           ++TotNz; }
+\DoxyCodeLine{63         \}}
+\DoxyCodeLine{64       \}}
+\DoxyCodeLine{65     \}}
+\DoxyCodeLine{66     \textcolor{comment}{// Reserve place for A + At}}
+\DoxyCodeLine{67     m\_indexPtr.resize(m+1);}
+\DoxyCodeLine{68     m\_innerIndices.resize(TotNz); }
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70     \textcolor{comment}{// Now compute the real adjacency list of each column/row }}
+\DoxyCodeLine{71     visited.\mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac8dea1df3d92b752cc683ff42abf6f9b}{setConstant}}(-\/1); }
+\DoxyCodeLine{72     StorageIndex CurNz = 0; }
+\DoxyCodeLine{73     \textcolor{keywordflow}{for} (StorageIndex j = 0; j < m; j++)}
+\DoxyCodeLine{74     \{}
+\DoxyCodeLine{75       m\_indexPtr(j) = CurNz; }
+\DoxyCodeLine{76       }
+\DoxyCodeLine{77       visited(j) = j; \textcolor{comment}{// Do not include the diagonal element}}
+\DoxyCodeLine{78       \textcolor{comment}{// Add the pattern of row/column j of A to A+At}}
+\DoxyCodeLine{79       \textcolor{keywordflow}{for} (\textcolor{keyword}{typename} MatrixType::InnerIterator it(A,j); it; ++it)}
+\DoxyCodeLine{80       \{}
+\DoxyCodeLine{81         StorageIndex idx = it.index(); \textcolor{comment}{// Get the row index (for column major) or column index (for row major)}}
+\DoxyCodeLine{82         \textcolor{keywordflow}{if} (visited(idx) != j ) }
+\DoxyCodeLine{83         \{}
+\DoxyCodeLine{84           visited(idx) = j; }
+\DoxyCodeLine{85           m\_innerIndices(CurNz) = idx; }
+\DoxyCodeLine{86           CurNz++; }
+\DoxyCodeLine{87         \}}
+\DoxyCodeLine{88       \}}
+\DoxyCodeLine{89       \textcolor{comment}{//Add the pattern of row/column j of At to A+At}}
+\DoxyCodeLine{90       \textcolor{keywordflow}{for} (\textcolor{keyword}{typename} MatrixType::InnerIterator it(At, j); it; ++it)}
+\DoxyCodeLine{91       \{}
+\DoxyCodeLine{92         StorageIndex idx = it.index(); }
+\DoxyCodeLine{93         \textcolor{keywordflow}{if}(visited(idx) != j)}
+\DoxyCodeLine{94         \{}
+\DoxyCodeLine{95           visited(idx) = j; }
+\DoxyCodeLine{96           m\_innerIndices(CurNz) = idx; }
+\DoxyCodeLine{97           ++CurNz; }
+\DoxyCodeLine{98         \}}
+\DoxyCodeLine{99       \}}
+\DoxyCodeLine{100     \}}
+\DoxyCodeLine{101     m\_indexPtr(m) = CurNz;    }
+\DoxyCodeLine{102   \}}
+\DoxyCodeLine{103   }
+\DoxyCodeLine{104   \textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{105   \textcolor{keywordtype}{void} operator() (\textcolor{keyword}{const} MatrixType\& A, \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationType}}\& matperm)}
+\DoxyCodeLine{106   \{}
+\DoxyCodeLine{107      StorageIndex m = internal::convert\_index<StorageIndex>(A.cols()); \textcolor{comment}{// must be StorageIndex, because it is passed by address to METIS}}
+\DoxyCodeLine{108      \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}} perm(m),iperm(m); }
+\DoxyCodeLine{109     \textcolor{comment}{// First, symmetrize the matrix graph. }}
+\DoxyCodeLine{110      get\_symmetrized\_graph(A); }
+\DoxyCodeLine{111      \textcolor{keywordtype}{int} output\_error;}
+\DoxyCodeLine{112      }
+\DoxyCodeLine{113      \textcolor{comment}{// Call the fill-\/reducing routine from METIS }}
+\DoxyCodeLine{114      output\_error = METIS\_NodeND(\&m, m\_indexPtr.data(), m\_innerIndices.data(), NULL, NULL, perm.data(), iperm.data());}
+\DoxyCodeLine{115      }
+\DoxyCodeLine{116     \textcolor{keywordflow}{if}(output\_error != METIS\_OK) }
+\DoxyCodeLine{117     \{}
+\DoxyCodeLine{118       \textcolor{comment}{//FIXME The ordering interface should define a class of possible errors }}
+\DoxyCodeLine{119      std::cerr << \textcolor{stringliteral}{"{}ERROR WHILE CALLING THE METIS PACKAGE \(\backslash\)n"{}}; }
+\DoxyCodeLine{120      \textcolor{keywordflow}{return}; }
+\DoxyCodeLine{121     \}}
+\DoxyCodeLine{122     }
+\DoxyCodeLine{123     \textcolor{comment}{// Get the fill-\/reducing permutation }}
+\DoxyCodeLine{124     \textcolor{comment}{//NOTE:  If Ap is the permuted matrix then perm and iperm vectors are defined as follows }}
+\DoxyCodeLine{125     \textcolor{comment}{// Row (column) i of Ap is the perm(i) row(column) of A, and row (column) i of A is the iperm(i) row(column) of Ap}}
+\DoxyCodeLine{126     }
+\DoxyCodeLine{127      matperm.\mbox{\hyperlink{classEigen_1_1PermutationBase_a0e0fda6e84d69e02432e4770359bb532}{resize}}(m);}
+\DoxyCodeLine{128      \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} j = 0; j < m; j++)}
+\DoxyCodeLine{129        matperm.\mbox{\hyperlink{classEigen_1_1PermutationMatrix_add5183846b9d0b236291b75d3d1a36d9}{indices}}()(iperm(j)) = j;}
+\DoxyCodeLine{130    }
+\DoxyCodeLine{131   \}}
+\DoxyCodeLine{132   }
+\DoxyCodeLine{133   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{134     \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}} m\_indexPtr; \textcolor{comment}{// Pointer to the adjacenccy list of each row/column}}
+\DoxyCodeLine{135     \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}} m\_innerIndices; \textcolor{comment}{// Adjacency list }}
+\DoxyCodeLine{136 \};}
+\DoxyCodeLine{137 }
+\DoxyCodeLine{138 \}\textcolor{comment}{// end namespace eigen }}
+\DoxyCodeLine{139 \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

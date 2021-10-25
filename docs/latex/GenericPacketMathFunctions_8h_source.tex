@@ -1,0 +1,1671 @@
+\hypertarget{GenericPacketMathFunctions_8h_source}{}\doxysection{Generic\+Packet\+Math\+Functions.\+h}
+\label{GenericPacketMathFunctions_8h_source}\index{include/Eigen/src/Core/arch/Default/GenericPacketMathFunctions.h@{include/Eigen/src/Core/arch/Default/GenericPacketMathFunctions.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2007 Julien Pommier}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2014 Pedro Gonnet (pedro.gonnet@gmail.com)}}
+\DoxyCodeLine{6 \textcolor{comment}{// Copyright (C) 2009-\/2019 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{7 \textcolor{comment}{//}}
+\DoxyCodeLine{8 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{9 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{10 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{11 }
+\DoxyCodeLine{12 \textcolor{comment}{/* The exp and log functions of this file initially come from}}
+\DoxyCodeLine{13 \textcolor{comment}{ * Julien Pommier's sse math library: http://gruntthepeon.free.fr/ssemath/}}
+\DoxyCodeLine{14 \textcolor{comment}{ */}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{preprocessor}{\#ifndef EIGEN\_ARCH\_GENERIC\_PACKET\_MATH\_FUNCTIONS\_H}}
+\DoxyCodeLine{17 \textcolor{preprocessor}{\#define EIGEN\_ARCH\_GENERIC\_PACKET\_MATH\_FUNCTIONS\_H}}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{preprocessor}{\#include "{}../../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{20 }
+\DoxyCodeLine{21 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{22 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{23 }
+\DoxyCodeLine{24 \textcolor{comment}{// Creates a Scalar integer type with same bit-\/width.}}
+\DoxyCodeLine{25 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1make__integer}{make\_integer}};}
+\DoxyCodeLine{26 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1make__integer}{make\_integer}}<float>    \{ \textcolor{keyword}{typedef} numext::int32\_t type; \};}
+\DoxyCodeLine{27 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1make__integer}{make\_integer}}<double>   \{ \textcolor{keyword}{typedef} numext::int64\_t type; \};}
+\DoxyCodeLine{28 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1make__integer}{make\_integer}}<\mbox{\hyperlink{structEigen_1_1half}{half}}>     \{ \textcolor{keyword}{typedef} numext::int16\_t type; \};}
+\DoxyCodeLine{29 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1make__integer}{make\_integer}}<\mbox{\hyperlink{structEigen_1_1bfloat16}{bfloat16}}> \{ \textcolor{keyword}{typedef} numext::int16\_t type; \};}
+\DoxyCodeLine{30 }
+\DoxyCodeLine{31 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet> EIGEN\_STRONG\_INLINE EIGEN\_DEVICE\_FUNC  }
+\DoxyCodeLine{32 \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} pfrexp\_generic\_get\_biased\_exponent(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a) \{}
+\DoxyCodeLine{33   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{unpacket\_traits<Packet>::type}} Scalar;}
+\DoxyCodeLine{34   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1unpacket__traits}{unpacket\_traits<Packet>::integer\_packet}} PacketI;}
+\DoxyCodeLine{35   \textcolor{keyword}{enum} \{ mantissa\_bits = numext::numeric\_limits<Scalar>::digits -\/ 1\};}
+\DoxyCodeLine{36   \textcolor{keywordflow}{return} pcast<PacketI, Packet>(plogical\_shift\_right<mantissa\_bits>(preinterpret<PacketI>(pabs(a))));}
+\DoxyCodeLine{37 \}}
+\DoxyCodeLine{38 }
+\DoxyCodeLine{39 \textcolor{comment}{// Safely applies frexp, correctly handles denormals.}}
+\DoxyCodeLine{40 \textcolor{comment}{// Assumes IEEE floating point format.}}
+\DoxyCodeLine{41 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet> EIGEN\_STRONG\_INLINE EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{42 Packet pfrexp\_generic(\textcolor{keyword}{const} Packet\& a, Packet\& exponent) \{}
+\DoxyCodeLine{43   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} unpacket\_traits<Packet>::type Scalar;}
+\DoxyCodeLine{44   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} make\_unsigned<typename make\_integer<Scalar>::type>::type ScalarUI;}
+\DoxyCodeLine{45   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{46     TotalBits = \textcolor{keyword}{sizeof}(Scalar) * CHAR\_BIT,}
+\DoxyCodeLine{47     MantissaBits = numext::numeric\_limits<Scalar>::digits -\/ 1,}
+\DoxyCodeLine{48     ExponentBits = \textcolor{keywordtype}{int}(TotalBits) -\/ int(MantissaBits) -\/ 1}
+\DoxyCodeLine{49   \};}
+\DoxyCodeLine{50 }
+\DoxyCodeLine{51   EIGEN\_CONSTEXPR ScalarUI scalar\_sign\_mantissa\_mask = }
+\DoxyCodeLine{52       \string~(((ScalarUI(1) << int(ExponentBits)) -\/ ScalarUI(1)) << \textcolor{keywordtype}{int}(MantissaBits)); \textcolor{comment}{// \string~0x7f800000}}
+\DoxyCodeLine{53   \textcolor{keyword}{const} Packet sign\_mantissa\_mask = pset1frombits<Packet>(\textcolor{keyword}{static\_cast<}ScalarUI\textcolor{keyword}{>}(scalar\_sign\_mantissa\_mask)); }
+\DoxyCodeLine{54   \textcolor{keyword}{const} Packet half = pset1<Packet>(Scalar(0.5));}
+\DoxyCodeLine{55   \textcolor{keyword}{const} Packet zero = pzero(a);}
+\DoxyCodeLine{56   \textcolor{keyword}{const} Packet normal\_min = pset1<Packet>((numext::numeric\_limits<Scalar>::min)()); \textcolor{comment}{// Minimum normal value, 2\string^-\/126}}
+\DoxyCodeLine{57   }
+\DoxyCodeLine{58   \textcolor{comment}{// To handle denormals, normalize by multiplying by 2\string^(int(MantissaBits)+1).}}
+\DoxyCodeLine{59   \textcolor{keyword}{const} Packet is\_denormal = pcmp\_lt(pabs(a), normal\_min);}
+\DoxyCodeLine{60   EIGEN\_CONSTEXPR ScalarUI scalar\_normalization\_offset = ScalarUI(\textcolor{keywordtype}{int}(MantissaBits) + 1); \textcolor{comment}{// 24}}
+\DoxyCodeLine{61   \textcolor{comment}{// The following cannot be constexpr because bfloat16(uint16\_t) is not constexpr.}}
+\DoxyCodeLine{62   \textcolor{keyword}{const} Scalar scalar\_normalization\_factor = Scalar(ScalarUI(1) << \textcolor{keywordtype}{int}(scalar\_normalization\_offset)); \textcolor{comment}{// 2\string^24}}
+\DoxyCodeLine{63   \textcolor{keyword}{const} Packet normalization\_factor = pset1<Packet>(scalar\_normalization\_factor);  }
+\DoxyCodeLine{64   \textcolor{keyword}{const} Packet normalized\_a = pselect(is\_denormal, pmul(a, normalization\_factor), a);}
+\DoxyCodeLine{65   }
+\DoxyCodeLine{66   \textcolor{comment}{// Determine exponent offset: -\/126 if normal, -\/126-\/24 if denormal}}
+\DoxyCodeLine{67   \textcolor{keyword}{const} Scalar scalar\_exponent\_offset = -\/Scalar((ScalarUI(1)<<(\textcolor{keywordtype}{int}(ExponentBits)-\/1)) -\/ ScalarUI(2)); \textcolor{comment}{// -\/126}}
+\DoxyCodeLine{68   Packet exponent\_offset = pset1<Packet>(scalar\_exponent\_offset);}
+\DoxyCodeLine{69   \textcolor{keyword}{const} Packet normalization\_offset = pset1<Packet>(-\/Scalar(scalar\_normalization\_offset)); \textcolor{comment}{// -\/24}}
+\DoxyCodeLine{70   exponent\_offset = pselect(is\_denormal, padd(exponent\_offset, normalization\_offset), exponent\_offset);}
+\DoxyCodeLine{71   }
+\DoxyCodeLine{72   \textcolor{comment}{// Determine exponent and mantissa from normalized\_a.}}
+\DoxyCodeLine{73   exponent = pfrexp\_generic\_get\_biased\_exponent(normalized\_a);}
+\DoxyCodeLine{74   \textcolor{comment}{// Zero, Inf and NaN return 'a' unmodified, exponent is zero}}
+\DoxyCodeLine{75   \textcolor{comment}{// (technically the exponent is unspecified for inf/NaN, but GCC/Clang set it to zero)}}
+\DoxyCodeLine{76   \textcolor{keyword}{const} Scalar scalar\_non\_finite\_exponent = Scalar((ScalarUI(1) << \textcolor{keywordtype}{int}(ExponentBits)) -\/ ScalarUI(1));  \textcolor{comment}{// 255}}
+\DoxyCodeLine{77   \textcolor{keyword}{const} Packet non\_finite\_exponent = pset1<Packet>(scalar\_non\_finite\_exponent);}
+\DoxyCodeLine{78   \textcolor{keyword}{const} Packet is\_zero\_or\_not\_finite = por(pcmp\_eq(a, zero), pcmp\_eq(exponent, non\_finite\_exponent));}
+\DoxyCodeLine{79   \textcolor{keyword}{const} Packet m = pselect(is\_zero\_or\_not\_finite, a, por(pand(normalized\_a, sign\_mantissa\_mask), half));}
+\DoxyCodeLine{80   exponent = pselect(is\_zero\_or\_not\_finite, zero, padd(exponent, exponent\_offset));  }
+\DoxyCodeLine{81   \textcolor{keywordflow}{return} m;}
+\DoxyCodeLine{82 \}}
+\DoxyCodeLine{83 }
+\DoxyCodeLine{84 \textcolor{comment}{// Safely applies ldexp, correctly handles overflows, underflows and denormals.}}
+\DoxyCodeLine{85 \textcolor{comment}{// Assumes IEEE floating point format.}}
+\DoxyCodeLine{86 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet> EIGEN\_STRONG\_INLINE EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{87 Packet pldexp\_generic(\textcolor{keyword}{const} Packet\& a, \textcolor{keyword}{const} Packet\& exponent) \{}
+\DoxyCodeLine{88   \textcolor{comment}{// We want to return a * 2\string^exponent, allowing for all possible integer}}
+\DoxyCodeLine{89   \textcolor{comment}{// exponents without overflowing or underflowing in intermediate}}
+\DoxyCodeLine{90   \textcolor{comment}{// computations.}}
+\DoxyCodeLine{91   \textcolor{comment}{//}}
+\DoxyCodeLine{92   \textcolor{comment}{// Since 'a' and the output can be denormal, the maximum range of 'exponent'}}
+\DoxyCodeLine{93   \textcolor{comment}{// to consider for a float is:}}
+\DoxyCodeLine{94   \textcolor{comment}{//   -\/255-\/23 -\/> 255+23}}
+\DoxyCodeLine{95   \textcolor{comment}{// Below -\/278 any finite float 'a' will become zero, and above +278 any}}
+\DoxyCodeLine{96   \textcolor{comment}{// finite float will become inf, including when 'a' is the smallest possible }}
+\DoxyCodeLine{97   \textcolor{comment}{// denormal.}}
+\DoxyCodeLine{98   \textcolor{comment}{//}}
+\DoxyCodeLine{99   \textcolor{comment}{// Unfortunately, 2\string^(278) cannot be represented using either one or two}}
+\DoxyCodeLine{100   \textcolor{comment}{// finite normal floats, so we must split the scale factor into at least}}
+\DoxyCodeLine{101   \textcolor{comment}{// three parts. It turns out to be faster to split 'exponent' into four}}
+\DoxyCodeLine{102   \textcolor{comment}{// factors, since [exponent>>2] is much faster to compute that [exponent/3].}}
+\DoxyCodeLine{103   \textcolor{comment}{//}}
+\DoxyCodeLine{104   \textcolor{comment}{// Set e = min(max(exponent, -\/278), 278);}}
+\DoxyCodeLine{105   \textcolor{comment}{//     b = floor(e/4);}}
+\DoxyCodeLine{106   \textcolor{comment}{//   out = ((((a * 2\string^(b)) * 2\string^(b)) * 2\string^(b)) * 2\string^(e-\/3*b))}}
+\DoxyCodeLine{107   \textcolor{comment}{//}}
+\DoxyCodeLine{108   \textcolor{comment}{// This will avoid any intermediate overflows and correctly handle 0, inf,}}
+\DoxyCodeLine{109   \textcolor{comment}{// NaN cases.}}
+\DoxyCodeLine{110   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} unpacket\_traits<Packet>::integer\_packet PacketI;}
+\DoxyCodeLine{111   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} unpacket\_traits<Packet>::type Scalar;}
+\DoxyCodeLine{112   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} unpacket\_traits<PacketI>::type ScalarI;}
+\DoxyCodeLine{113   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{114     TotalBits = \textcolor{keyword}{sizeof}(Scalar) * CHAR\_BIT,}
+\DoxyCodeLine{115     MantissaBits = numext::numeric\_limits<Scalar>::digits -\/ 1,}
+\DoxyCodeLine{116     ExponentBits = \textcolor{keywordtype}{int}(TotalBits) -\/ int(MantissaBits) -\/ 1}
+\DoxyCodeLine{117   \};}
+\DoxyCodeLine{118 }
+\DoxyCodeLine{119   \textcolor{keyword}{const} Packet max\_exponent = pset1<Packet>(Scalar((ScalarI(1)<<\textcolor{keywordtype}{int}(ExponentBits)) + ScalarI(\textcolor{keywordtype}{int}(MantissaBits) -\/ 1)));  \textcolor{comment}{// 278}}
+\DoxyCodeLine{120   \textcolor{keyword}{const} PacketI bias = pset1<PacketI>((ScalarI(1)<<(\textcolor{keywordtype}{int}(ExponentBits)-\/1)) -\/ ScalarI(1));  \textcolor{comment}{// 127}}
+\DoxyCodeLine{121   \textcolor{keyword}{const} PacketI e = pcast<Packet, PacketI>(pmin(pmax(exponent, pnegate(max\_exponent)), max\_exponent));}
+\DoxyCodeLine{122   PacketI b = parithmetic\_shift\_right<2>(e); \textcolor{comment}{// floor(e/4);}}
+\DoxyCodeLine{123   Packet c = preinterpret<Packet>(plogical\_shift\_left<\textcolor{keywordtype}{int}(MantissaBits)>(padd(b, bias)));  \textcolor{comment}{// 2\string^b}}
+\DoxyCodeLine{124   Packet out = pmul(pmul(pmul(a, c), c), c);  \textcolor{comment}{// a * 2\string^(3b)}}
+\DoxyCodeLine{125   b = psub(psub(psub(e, b), b), b); \textcolor{comment}{// e -\/ 3b}}
+\DoxyCodeLine{126   c = preinterpret<Packet>(plogical\_shift\_left<\textcolor{keywordtype}{int}(MantissaBits)>(padd(b, bias)));  \textcolor{comment}{// 2\string^(e-\/3*b)}}
+\DoxyCodeLine{127   out = pmul(out, c);}
+\DoxyCodeLine{128   \textcolor{keywordflow}{return} out;}
+\DoxyCodeLine{129 \}}
+\DoxyCodeLine{130 }
+\DoxyCodeLine{131 \textcolor{comment}{// Explicitly multiplies }}
+\DoxyCodeLine{132 \textcolor{comment}{//    a * (2\string^e)}}
+\DoxyCodeLine{133 \textcolor{comment}{// clamping e to the range}}
+\DoxyCodeLine{134 \textcolor{comment}{// [NumTraits<Scalar>::min\_exponent()-\/2, NumTraits<Scalar>::max\_exponent()]}}
+\DoxyCodeLine{135 \textcolor{comment}{//}}
+\DoxyCodeLine{136 \textcolor{comment}{// This is approx 7x faster than pldexp\_impl, but will prematurely over/underflow}}
+\DoxyCodeLine{137 \textcolor{comment}{// if 2\string^e doesn't fit into a normal floating-\/point Scalar.}}
+\DoxyCodeLine{138 \textcolor{comment}{//}}
+\DoxyCodeLine{139 \textcolor{comment}{// Assumes IEEE floating point format}}
+\DoxyCodeLine{140 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{141 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1pldexp__fast__impl}{pldexp\_fast\_impl}} \{}
+\DoxyCodeLine{142   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1unpacket__traits}{unpacket\_traits<Packet>::integer\_packet}} PacketI;}
+\DoxyCodeLine{143   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{unpacket\_traits<Packet>::type}} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Scalar}};}
+\DoxyCodeLine{144   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{unpacket\_traits<PacketI>::type}} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{ScalarI}};}
+\DoxyCodeLine{145   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{146     TotalBits = \textcolor{keyword}{sizeof}(\mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Scalar}}) * CHAR\_BIT,}
+\DoxyCodeLine{147     MantissaBits = numext::numeric\_limits<Scalar>::digits -\/ 1,}
+\DoxyCodeLine{148     ExponentBits = \textcolor{keywordtype}{int}(TotalBits) -\/ int(MantissaBits) -\/ 1}
+\DoxyCodeLine{149   \};}
+\DoxyCodeLine{150   }
+\DoxyCodeLine{151   \textcolor{keyword}{static} EIGEN\_STRONG\_INLINE EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{152   \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} run(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a, \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& exponent) \{}
+\DoxyCodeLine{153     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} bias = pset1<Packet>(\mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Scalar}}((\mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{ScalarI}}(1)<<(\textcolor{keywordtype}{int}(ExponentBits)-\/1)) -\/ \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{ScalarI}}(1)));  \textcolor{comment}{// 127}}
+\DoxyCodeLine{154     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} limit = pset1<Packet>(\mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Scalar}}((\mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{ScalarI}}(1)<<\textcolor{keywordtype}{int}(ExponentBits)) -\/ \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{ScalarI}}(1)));     \textcolor{comment}{// 255}}
+\DoxyCodeLine{155     \textcolor{comment}{// restrict biased exponent between 0 and 255 for float.}}
+\DoxyCodeLine{156     \textcolor{keyword}{const} PacketI e = pcast<Packet, PacketI>(pmin(pmax(padd(exponent, bias), pzero(limit)), limit)); \textcolor{comment}{// exponent + 127}}
+\DoxyCodeLine{157     \textcolor{comment}{// return a * (2\string^e)}}
+\DoxyCodeLine{158     \textcolor{keywordflow}{return} pmul(a, preinterpret<Packet>(plogical\_shift\_left<\textcolor{keywordtype}{int}(MantissaBits)>(e)));}
+\DoxyCodeLine{159   \}}
+\DoxyCodeLine{160 \};}
+\DoxyCodeLine{161 }
+\DoxyCodeLine{162 \textcolor{comment}{// Natural or base 2 logarithm.}}
+\DoxyCodeLine{163 \textcolor{comment}{// Computes log(x) as log(2\string^e * m) = C*e + log(m), where the constant C =log(2)}}
+\DoxyCodeLine{164 \textcolor{comment}{// and m is in the range [sqrt(1/2),sqrt(2)). In this range, the logarithm can}}
+\DoxyCodeLine{165 \textcolor{comment}{// be easily approximated by a polynomial centered on m=1 for stability.}}
+\DoxyCodeLine{166 \textcolor{comment}{// TODO(gonnet): Further reduce the interval allowing for lower-\/degree}}
+\DoxyCodeLine{167 \textcolor{comment}{//               polynomial interpolants -\/> ... -\/> profit!}}
+\DoxyCodeLine{168 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet, \textcolor{keywordtype}{bool} base2>}
+\DoxyCodeLine{169 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS}
+\DoxyCodeLine{170 EIGEN\_UNUSED}
+\DoxyCodeLine{171 \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} plog\_impl\_float(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} \_x)}
+\DoxyCodeLine{172 \{}
+\DoxyCodeLine{173   \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} x = \_x;}
+\DoxyCodeLine{174 }
+\DoxyCodeLine{175   \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} cst\_1              = pset1<Packet>(1.0f);}
+\DoxyCodeLine{176   \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} cst\_neg\_half       = pset1<Packet>(-\/0.5f);}
+\DoxyCodeLine{177   \textcolor{comment}{// The smallest non denormalized float number.}}
+\DoxyCodeLine{178   \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} cst\_min\_norm\_pos   = pset1frombits<Packet>( 0x00800000u);}
+\DoxyCodeLine{179   \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} cst\_minus\_inf      = pset1frombits<Packet>( 0xff800000u);}
+\DoxyCodeLine{180   \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} cst\_pos\_inf        = pset1frombits<Packet>( 0x7f800000u);}
+\DoxyCodeLine{181 }
+\DoxyCodeLine{182   \textcolor{comment}{// Polynomial coefficients.}}
+\DoxyCodeLine{183   \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} cst\_cephes\_SQRTHF = pset1<Packet>(0.707106781186547524f);}
+\DoxyCodeLine{184   \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} cst\_cephes\_log\_p0 = pset1<Packet>(7.0376836292E-\/2f);}
+\DoxyCodeLine{185   \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} cst\_cephes\_log\_p1 = pset1<Packet>(-\/1.1514610310E-\/1f);}
+\DoxyCodeLine{186   \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} cst\_cephes\_log\_p2 = pset1<Packet>(1.1676998740E-\/1f);}
+\DoxyCodeLine{187   \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} cst\_cephes\_log\_p3 = pset1<Packet>(-\/1.2420140846E-\/1f);}
+\DoxyCodeLine{188   \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} cst\_cephes\_log\_p4 = pset1<Packet>(+1.4249322787E-\/1f);}
+\DoxyCodeLine{189   \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} cst\_cephes\_log\_p5 = pset1<Packet>(-\/1.6668057665E-\/1f);}
+\DoxyCodeLine{190   \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} cst\_cephes\_log\_p6 = pset1<Packet>(+2.0000714765E-\/1f);}
+\DoxyCodeLine{191   \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} cst\_cephes\_log\_p7 = pset1<Packet>(-\/2.4999993993E-\/1f);}
+\DoxyCodeLine{192   \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} cst\_cephes\_log\_p8 = pset1<Packet>(+3.3333331174E-\/1f);}
+\DoxyCodeLine{193 }
+\DoxyCodeLine{194   \textcolor{comment}{// Truncate input values to the minimum positive normal.}}
+\DoxyCodeLine{195   x = pmax(x, cst\_min\_norm\_pos);}
+\DoxyCodeLine{196 }
+\DoxyCodeLine{197   \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} e;}
+\DoxyCodeLine{198   \textcolor{comment}{// extract significant in the range [0.5,1) and exponent}}
+\DoxyCodeLine{199   x = pfrexp(x,e);}
+\DoxyCodeLine{200 }
+\DoxyCodeLine{201   \textcolor{comment}{// part2: Shift the inputs from the range [0.5,1) to [sqrt(1/2),sqrt(2))}}
+\DoxyCodeLine{202   \textcolor{comment}{// and shift by -\/1. The values are then centered around 0, which improves}}
+\DoxyCodeLine{203   \textcolor{comment}{// the stability of the polynomial evaluation.}}
+\DoxyCodeLine{204   \textcolor{comment}{//   if( x < SQRTHF ) \{}}
+\DoxyCodeLine{205   \textcolor{comment}{//     e -\/= 1;}}
+\DoxyCodeLine{206   \textcolor{comment}{//     x = x + x -\/ 1.0;}}
+\DoxyCodeLine{207   \textcolor{comment}{//   \} else \{ x = x -\/ 1.0; \}}}
+\DoxyCodeLine{208   \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} mask = pcmp\_lt(x, cst\_cephes\_SQRTHF);}
+\DoxyCodeLine{209   \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} tmp = pand(x, mask);}
+\DoxyCodeLine{210   x = psub(x, cst\_1);}
+\DoxyCodeLine{211   e = psub(e, pand(cst\_1, mask));}
+\DoxyCodeLine{212   x = padd(x, tmp);}
+\DoxyCodeLine{213 }
+\DoxyCodeLine{214   \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} x2 = pmul(x, x);}
+\DoxyCodeLine{215   \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} x3 = pmul(x2, x);}
+\DoxyCodeLine{216 }
+\DoxyCodeLine{217   \textcolor{comment}{// Evaluate the polynomial approximant of degree 8 in three parts, probably}}
+\DoxyCodeLine{218   \textcolor{comment}{// to improve instruction-\/level parallelism.}}
+\DoxyCodeLine{219   \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} y, y1, y2;}
+\DoxyCodeLine{220   y  = pmadd(cst\_cephes\_log\_p0, x, cst\_cephes\_log\_p1);}
+\DoxyCodeLine{221   y1 = pmadd(cst\_cephes\_log\_p3, x, cst\_cephes\_log\_p4);}
+\DoxyCodeLine{222   y2 = pmadd(cst\_cephes\_log\_p6, x, cst\_cephes\_log\_p7);}
+\DoxyCodeLine{223   y  = pmadd(y, x, cst\_cephes\_log\_p2);}
+\DoxyCodeLine{224   y1 = pmadd(y1, x, cst\_cephes\_log\_p5);}
+\DoxyCodeLine{225   y2 = pmadd(y2, x, cst\_cephes\_log\_p8);}
+\DoxyCodeLine{226   y  = pmadd(y, x3, y1);}
+\DoxyCodeLine{227   y  = pmadd(y, x3, y2);}
+\DoxyCodeLine{228   y  = pmul(y, x3);}
+\DoxyCodeLine{229 }
+\DoxyCodeLine{230   y = pmadd(cst\_neg\_half, x2, y);}
+\DoxyCodeLine{231   x = padd(x, y);}
+\DoxyCodeLine{232 }
+\DoxyCodeLine{233   \textcolor{comment}{// Add the logarithm of the exponent back to the result of the interpolation.}}
+\DoxyCodeLine{234   \textcolor{keywordflow}{if} (base2) \{}
+\DoxyCodeLine{235     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} cst\_log2e = pset1<Packet>(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(EIGEN\_LOG2E));}
+\DoxyCodeLine{236     x = pmadd(x, cst\_log2e, e);}
+\DoxyCodeLine{237   \} \textcolor{keywordflow}{else} \{}
+\DoxyCodeLine{238     \textcolor{keyword}{const} Packet cst\_ln2 = pset1<Packet>(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(EIGEN\_LN2));}
+\DoxyCodeLine{239     x = pmadd(e, cst\_ln2, x);}
+\DoxyCodeLine{240   \}}
+\DoxyCodeLine{241 }
+\DoxyCodeLine{242   Packet invalid\_mask = pcmp\_lt\_or\_nan(\_x, pzero(\_x));}
+\DoxyCodeLine{243   Packet iszero\_mask  = pcmp\_eq(\_x,pzero(\_x));}
+\DoxyCodeLine{244   Packet pos\_inf\_mask = pcmp\_eq(\_x,cst\_pos\_inf);}
+\DoxyCodeLine{245   \textcolor{comment}{// Filter out invalid inputs, i.e.:}}
+\DoxyCodeLine{246   \textcolor{comment}{//  -\/ negative arg will be NAN}}
+\DoxyCodeLine{247   \textcolor{comment}{//  -\/ 0 will be -\/INF}}
+\DoxyCodeLine{248   \textcolor{comment}{//  -\/ +INF will be +INF}}
+\DoxyCodeLine{249   \textcolor{keywordflow}{return} pselect(iszero\_mask, cst\_minus\_inf,}
+\DoxyCodeLine{250                               por(pselect(pos\_inf\_mask,cst\_pos\_inf,x), invalid\_mask));}
+\DoxyCodeLine{251 \}}
+\DoxyCodeLine{252 }
+\DoxyCodeLine{253 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{254 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS}
+\DoxyCodeLine{255 EIGEN\_UNUSED}
+\DoxyCodeLine{256 Packet plog\_float(\textcolor{keyword}{const} Packet \_x)}
+\DoxyCodeLine{257 \{}
+\DoxyCodeLine{258   \textcolor{keywordflow}{return} plog\_impl\_float<Packet, \textcolor{comment}{/* base2 */} \textcolor{keyword}{false}>(\_x);}
+\DoxyCodeLine{259 \}}
+\DoxyCodeLine{260 }
+\DoxyCodeLine{261 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{262 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS}
+\DoxyCodeLine{263 EIGEN\_UNUSED}
+\DoxyCodeLine{264 Packet plog2\_float(\textcolor{keyword}{const} Packet \_x)}
+\DoxyCodeLine{265 \{}
+\DoxyCodeLine{266   \textcolor{keywordflow}{return} plog\_impl\_float<Packet, \textcolor{comment}{/* base2 */} \textcolor{keyword}{true}>(\_x);}
+\DoxyCodeLine{267 \}}
+\DoxyCodeLine{268 }
+\DoxyCodeLine{269 \textcolor{comment}{/* Returns the base e (2.718...) or base 2 logarithm of x.}}
+\DoxyCodeLine{270 \textcolor{comment}{ * The argument is separated into its exponent and fractional parts.}}
+\DoxyCodeLine{271 \textcolor{comment}{ * The logarithm of the fraction in the interval [sqrt(1/2), sqrt(2)],}}
+\DoxyCodeLine{272 \textcolor{comment}{ * is approximated by}}
+\DoxyCodeLine{273 \textcolor{comment}{ *}}
+\DoxyCodeLine{274 \textcolor{comment}{ *     log(1+x) = x -\/ 0.5 x**2 + x**3 P(x)/Q(x).}}
+\DoxyCodeLine{275 \textcolor{comment}{ *}}
+\DoxyCodeLine{276 \textcolor{comment}{ * for more detail see: http://www.netlib.org/cephes/}}
+\DoxyCodeLine{277 \textcolor{comment}{ */}}
+\DoxyCodeLine{278 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet, \textcolor{keywordtype}{bool} base2>}
+\DoxyCodeLine{279 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS}
+\DoxyCodeLine{280 EIGEN\_UNUSED}
+\DoxyCodeLine{281 Packet plog\_impl\_double(\textcolor{keyword}{const} Packet \_x)}
+\DoxyCodeLine{282 \{}
+\DoxyCodeLine{283   Packet x = \_x;}
+\DoxyCodeLine{284 }
+\DoxyCodeLine{285   \textcolor{keyword}{const} Packet cst\_1              = pset1<Packet>(1.0);}
+\DoxyCodeLine{286   \textcolor{keyword}{const} Packet cst\_neg\_half       = pset1<Packet>(-\/0.5);}
+\DoxyCodeLine{287   \textcolor{comment}{// The smallest non denormalized double.}}
+\DoxyCodeLine{288   \textcolor{keyword}{const} Packet cst\_min\_norm\_pos   = pset1frombits<Packet>( \textcolor{keyword}{static\_cast<}uint64\_t\textcolor{keyword}{>}(0x0010000000000000ull));}
+\DoxyCodeLine{289   \textcolor{keyword}{const} Packet cst\_minus\_inf      = pset1frombits<Packet>( \textcolor{keyword}{static\_cast<}uint64\_t\textcolor{keyword}{>}(0xfff0000000000000ull));}
+\DoxyCodeLine{290   \textcolor{keyword}{const} Packet cst\_pos\_inf        = pset1frombits<Packet>( \textcolor{keyword}{static\_cast<}uint64\_t\textcolor{keyword}{>}(0x7ff0000000000000ull));}
+\DoxyCodeLine{291 }
+\DoxyCodeLine{292 }
+\DoxyCodeLine{293  \textcolor{comment}{// Polynomial Coefficients for log(1+x) = x -\/ x**2/2 + x**3 P(x)/Q(x)}}
+\DoxyCodeLine{294  \textcolor{comment}{//                             1/sqrt(2) <= x < sqrt(2)}}
+\DoxyCodeLine{295   \textcolor{keyword}{const} Packet cst\_cephes\_SQRTHF = pset1<Packet>(0.70710678118654752440E0);}
+\DoxyCodeLine{296   \textcolor{keyword}{const} Packet cst\_cephes\_log\_p0 = pset1<Packet>(1.01875663804580931796E-\/4);}
+\DoxyCodeLine{297   \textcolor{keyword}{const} Packet cst\_cephes\_log\_p1 = pset1<Packet>(4.97494994976747001425E-\/1);}
+\DoxyCodeLine{298   \textcolor{keyword}{const} Packet cst\_cephes\_log\_p2 = pset1<Packet>(4.70579119878881725854E0);}
+\DoxyCodeLine{299   \textcolor{keyword}{const} Packet cst\_cephes\_log\_p3 = pset1<Packet>(1.44989225341610930846E1);}
+\DoxyCodeLine{300   \textcolor{keyword}{const} Packet cst\_cephes\_log\_p4 = pset1<Packet>(1.79368678507819816313E1);}
+\DoxyCodeLine{301   \textcolor{keyword}{const} Packet cst\_cephes\_log\_p5 = pset1<Packet>(7.70838733755885391666E0);}
+\DoxyCodeLine{302 }
+\DoxyCodeLine{303   \textcolor{keyword}{const} Packet cst\_cephes\_log\_q0 = pset1<Packet>(1.0);}
+\DoxyCodeLine{304   \textcolor{keyword}{const} Packet cst\_cephes\_log\_q1 = pset1<Packet>(1.12873587189167450590E1);}
+\DoxyCodeLine{305   \textcolor{keyword}{const} Packet cst\_cephes\_log\_q2 = pset1<Packet>(4.52279145837532221105E1);}
+\DoxyCodeLine{306   \textcolor{keyword}{const} Packet cst\_cephes\_log\_q3 = pset1<Packet>(8.29875266912776603211E1);}
+\DoxyCodeLine{307   \textcolor{keyword}{const} Packet cst\_cephes\_log\_q4 = pset1<Packet>(7.11544750618563894466E1);}
+\DoxyCodeLine{308   \textcolor{keyword}{const} Packet cst\_cephes\_log\_q5 = pset1<Packet>(2.31251620126765340583E1);}
+\DoxyCodeLine{309 }
+\DoxyCodeLine{310   \textcolor{comment}{// Truncate input values to the minimum positive normal.}}
+\DoxyCodeLine{311   x = pmax(x, cst\_min\_norm\_pos);}
+\DoxyCodeLine{312 }
+\DoxyCodeLine{313   Packet e;}
+\DoxyCodeLine{314   \textcolor{comment}{// extract significant in the range [0.5,1) and exponent}}
+\DoxyCodeLine{315   x = pfrexp(x,e);}
+\DoxyCodeLine{316   }
+\DoxyCodeLine{317   \textcolor{comment}{// Shift the inputs from the range [0.5,1) to [sqrt(1/2),sqrt(2))}}
+\DoxyCodeLine{318   \textcolor{comment}{// and shift by -\/1. The values are then centered around 0, which improves}}
+\DoxyCodeLine{319   \textcolor{comment}{// the stability of the polynomial evaluation.}}
+\DoxyCodeLine{320   \textcolor{comment}{//   if( x < SQRTHF ) \{}}
+\DoxyCodeLine{321   \textcolor{comment}{//     e -\/= 1;}}
+\DoxyCodeLine{322   \textcolor{comment}{//     x = x + x -\/ 1.0;}}
+\DoxyCodeLine{323   \textcolor{comment}{//   \} else \{ x = x -\/ 1.0; \}}}
+\DoxyCodeLine{324   Packet mask = pcmp\_lt(x, cst\_cephes\_SQRTHF);}
+\DoxyCodeLine{325   Packet tmp = pand(x, mask);}
+\DoxyCodeLine{326   x = psub(x, cst\_1);}
+\DoxyCodeLine{327   e = psub(e, pand(cst\_1, mask));}
+\DoxyCodeLine{328   x = padd(x, tmp);}
+\DoxyCodeLine{329 }
+\DoxyCodeLine{330   Packet x2 = pmul(x, x);}
+\DoxyCodeLine{331   Packet x3 = pmul(x2, x);}
+\DoxyCodeLine{332 }
+\DoxyCodeLine{333   \textcolor{comment}{// Evaluate the polynomial approximant , probably to improve instruction-\/level parallelism.}}
+\DoxyCodeLine{334   \textcolor{comment}{// y = x -\/ 0.5*x\string^2 + x\string^3 * polevl( x, P, 5 ) / p1evl( x, Q, 5 ) );}}
+\DoxyCodeLine{335   Packet y, y1, y\_;}
+\DoxyCodeLine{336   y  = pmadd(cst\_cephes\_log\_p0, x, cst\_cephes\_log\_p1);}
+\DoxyCodeLine{337   y1 = pmadd(cst\_cephes\_log\_p3, x, cst\_cephes\_log\_p4);}
+\DoxyCodeLine{338   y  = pmadd(y, x, cst\_cephes\_log\_p2);}
+\DoxyCodeLine{339   y1 = pmadd(y1, x, cst\_cephes\_log\_p5);}
+\DoxyCodeLine{340   y\_ = pmadd(y, x3, y1);}
+\DoxyCodeLine{341 }
+\DoxyCodeLine{342   y  = pmadd(cst\_cephes\_log\_q0, x, cst\_cephes\_log\_q1);}
+\DoxyCodeLine{343   y1 = pmadd(cst\_cephes\_log\_q3, x, cst\_cephes\_log\_q4);}
+\DoxyCodeLine{344   y  = pmadd(y, x, cst\_cephes\_log\_q2);}
+\DoxyCodeLine{345   y1 = pmadd(y1, x, cst\_cephes\_log\_q5);}
+\DoxyCodeLine{346   y  = pmadd(y, x3, y1);}
+\DoxyCodeLine{347 }
+\DoxyCodeLine{348   y\_ = pmul(y\_, x3);}
+\DoxyCodeLine{349   y  = pdiv(y\_, y);}
+\DoxyCodeLine{350 }
+\DoxyCodeLine{351   y = pmadd(cst\_neg\_half, x2, y);}
+\DoxyCodeLine{352   x = padd(x, y);}
+\DoxyCodeLine{353 }
+\DoxyCodeLine{354   \textcolor{comment}{// Add the logarithm of the exponent back to the result of the interpolation.}}
+\DoxyCodeLine{355   \textcolor{keywordflow}{if} (base2) \{}
+\DoxyCodeLine{356     \textcolor{keyword}{const} Packet cst\_log2e = pset1<Packet>(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{double}\textcolor{keyword}{>}(EIGEN\_LOG2E));}
+\DoxyCodeLine{357     x = pmadd(x, cst\_log2e, e);}
+\DoxyCodeLine{358   \} \textcolor{keywordflow}{else} \{}
+\DoxyCodeLine{359     \textcolor{keyword}{const} Packet cst\_ln2 = pset1<Packet>(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{double}\textcolor{keyword}{>}(EIGEN\_LN2));}
+\DoxyCodeLine{360     x = pmadd(e, cst\_ln2, x);}
+\DoxyCodeLine{361   \}}
+\DoxyCodeLine{362 }
+\DoxyCodeLine{363   Packet invalid\_mask = pcmp\_lt\_or\_nan(\_x, pzero(\_x));}
+\DoxyCodeLine{364   Packet iszero\_mask  = pcmp\_eq(\_x,pzero(\_x));}
+\DoxyCodeLine{365   Packet pos\_inf\_mask = pcmp\_eq(\_x,cst\_pos\_inf);}
+\DoxyCodeLine{366   \textcolor{comment}{// Filter out invalid inputs, i.e.:}}
+\DoxyCodeLine{367   \textcolor{comment}{//  -\/ negative arg will be NAN}}
+\DoxyCodeLine{368   \textcolor{comment}{//  -\/ 0 will be -\/INF}}
+\DoxyCodeLine{369   \textcolor{comment}{//  -\/ +INF will be +INF}}
+\DoxyCodeLine{370   \textcolor{keywordflow}{return} pselect(iszero\_mask, cst\_minus\_inf,}
+\DoxyCodeLine{371                               por(pselect(pos\_inf\_mask,cst\_pos\_inf,x), invalid\_mask));}
+\DoxyCodeLine{372 \}}
+\DoxyCodeLine{373 }
+\DoxyCodeLine{374 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{375 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS}
+\DoxyCodeLine{376 EIGEN\_UNUSED}
+\DoxyCodeLine{377 Packet plog\_double(\textcolor{keyword}{const} Packet \_x)}
+\DoxyCodeLine{378 \{}
+\DoxyCodeLine{379   \textcolor{keywordflow}{return} plog\_impl\_double<Packet, \textcolor{comment}{/* base2 */} \textcolor{keyword}{false}>(\_x);}
+\DoxyCodeLine{380 \}}
+\DoxyCodeLine{381 }
+\DoxyCodeLine{382 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{383 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS}
+\DoxyCodeLine{384 EIGEN\_UNUSED}
+\DoxyCodeLine{385 Packet plog2\_double(\textcolor{keyword}{const} Packet \_x)}
+\DoxyCodeLine{386 \{}
+\DoxyCodeLine{387   \textcolor{keywordflow}{return} plog\_impl\_double<Packet, \textcolor{comment}{/* base2 */} \textcolor{keyword}{true}>(\_x);}
+\DoxyCodeLine{388 \}}
+\DoxyCodeLine{389 }
+\DoxyCodeLine{393 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{394 Packet generic\_plog1p(\textcolor{keyword}{const} Packet\& x)}
+\DoxyCodeLine{395 \{}
+\DoxyCodeLine{396   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} unpacket\_traits<Packet>::type ScalarType;}
+\DoxyCodeLine{397   \textcolor{keyword}{const} Packet one = pset1<Packet>(ScalarType(1));}
+\DoxyCodeLine{398   Packet xp1 = padd(x, one);}
+\DoxyCodeLine{399   Packet small\_mask = pcmp\_eq(xp1, one);}
+\DoxyCodeLine{400   Packet log1 = plog(xp1);}
+\DoxyCodeLine{401   Packet inf\_mask = pcmp\_eq(xp1, log1);}
+\DoxyCodeLine{402   Packet log\_large = pmul(x, pdiv(log1, psub(xp1, one)));}
+\DoxyCodeLine{403   \textcolor{keywordflow}{return} pselect(por(small\_mask, inf\_mask), x, log\_large);}
+\DoxyCodeLine{404 \}}
+\DoxyCodeLine{405 }
+\DoxyCodeLine{409 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{410 Packet generic\_expm1(\textcolor{keyword}{const} Packet\& x)}
+\DoxyCodeLine{411 \{}
+\DoxyCodeLine{412   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} unpacket\_traits<Packet>::type ScalarType;}
+\DoxyCodeLine{413   \textcolor{keyword}{const} Packet one = pset1<Packet>(ScalarType(1));}
+\DoxyCodeLine{414   \textcolor{keyword}{const} Packet neg\_one = pset1<Packet>(ScalarType(-\/1));}
+\DoxyCodeLine{415   Packet u = pexp(x);}
+\DoxyCodeLine{416   Packet one\_mask = pcmp\_eq(u, one);}
+\DoxyCodeLine{417   Packet u\_minus\_one = psub(u, one);}
+\DoxyCodeLine{418   Packet neg\_one\_mask = pcmp\_eq(u\_minus\_one, neg\_one);}
+\DoxyCodeLine{419   Packet logu = plog(u);}
+\DoxyCodeLine{420   \textcolor{comment}{// The following comparison is to catch the case where}}
+\DoxyCodeLine{421   \textcolor{comment}{// exp(x) = +inf. It is written in this way to avoid having}}
+\DoxyCodeLine{422   \textcolor{comment}{// to form the constant +inf, which depends on the packet}}
+\DoxyCodeLine{423   \textcolor{comment}{// type.}}
+\DoxyCodeLine{424   Packet pos\_inf\_mask = pcmp\_eq(logu, u);}
+\DoxyCodeLine{425   Packet expm1 = pmul(u\_minus\_one, pdiv(x, logu));}
+\DoxyCodeLine{426   expm1 = pselect(pos\_inf\_mask, u, expm1);}
+\DoxyCodeLine{427   \textcolor{keywordflow}{return} pselect(one\_mask,}
+\DoxyCodeLine{428                  x,}
+\DoxyCodeLine{429                  pselect(neg\_one\_mask,}
+\DoxyCodeLine{430                          neg\_one,}
+\DoxyCodeLine{431                          expm1));}
+\DoxyCodeLine{432 \}}
+\DoxyCodeLine{433 }
+\DoxyCodeLine{434 }
+\DoxyCodeLine{435 \textcolor{comment}{// Exponential function. Works by writing "{}x = m*log(2) + r"{} where}}
+\DoxyCodeLine{436 \textcolor{comment}{// "{}m = floor(x/log(2)+1/2)"{} and "{}r"{} is the remainder. The result is then}}
+\DoxyCodeLine{437 \textcolor{comment}{// "{}exp(x) = 2\string^m*exp(r)"{} where exp(r) is in the range [-\/1,1).}}
+\DoxyCodeLine{438 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{439 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS}
+\DoxyCodeLine{440 EIGEN\_UNUSED}
+\DoxyCodeLine{441 Packet pexp\_float(\textcolor{keyword}{const} Packet \_x)}
+\DoxyCodeLine{442 \{}
+\DoxyCodeLine{443   \textcolor{keyword}{const} Packet cst\_1      = pset1<Packet>(1.0f);}
+\DoxyCodeLine{444   \textcolor{keyword}{const} Packet cst\_half   = pset1<Packet>(0.5f);}
+\DoxyCodeLine{445   \textcolor{keyword}{const} Packet cst\_exp\_hi = pset1<Packet>( 88.723f);}
+\DoxyCodeLine{446   \textcolor{keyword}{const} Packet cst\_exp\_lo = pset1<Packet>(-\/88.723f);}
+\DoxyCodeLine{447 }
+\DoxyCodeLine{448   \textcolor{keyword}{const} Packet cst\_cephes\_LOG2EF = pset1<Packet>(1.44269504088896341f);}
+\DoxyCodeLine{449   \textcolor{keyword}{const} Packet cst\_cephes\_exp\_p0 = pset1<Packet>(1.9875691500E-\/4f);}
+\DoxyCodeLine{450   \textcolor{keyword}{const} Packet cst\_cephes\_exp\_p1 = pset1<Packet>(1.3981999507E-\/3f);}
+\DoxyCodeLine{451   \textcolor{keyword}{const} Packet cst\_cephes\_exp\_p2 = pset1<Packet>(8.3334519073E-\/3f);}
+\DoxyCodeLine{452   \textcolor{keyword}{const} Packet cst\_cephes\_exp\_p3 = pset1<Packet>(4.1665795894E-\/2f);}
+\DoxyCodeLine{453   \textcolor{keyword}{const} Packet cst\_cephes\_exp\_p4 = pset1<Packet>(1.6666665459E-\/1f);}
+\DoxyCodeLine{454   \textcolor{keyword}{const} Packet cst\_cephes\_exp\_p5 = pset1<Packet>(5.0000001201E-\/1f);}
+\DoxyCodeLine{455 }
+\DoxyCodeLine{456   \textcolor{comment}{// Clamp x.}}
+\DoxyCodeLine{457   Packet x = pmax(pmin(\_x, cst\_exp\_hi), cst\_exp\_lo);}
+\DoxyCodeLine{458 }
+\DoxyCodeLine{459   \textcolor{comment}{// Express exp(x) as exp(m*ln(2) + r), start by extracting}}
+\DoxyCodeLine{460   \textcolor{comment}{// m = floor(x/ln(2) + 0.5).}}
+\DoxyCodeLine{461   Packet m = pfloor(pmadd(x, cst\_cephes\_LOG2EF, cst\_half));}
+\DoxyCodeLine{462 }
+\DoxyCodeLine{463   \textcolor{comment}{// Get r = x -\/ m*ln(2). If no FMA instructions are available, m*ln(2) is}}
+\DoxyCodeLine{464   \textcolor{comment}{// subtracted out in two parts, m*C1+m*C2 = m*ln(2), to avoid accumulating}}
+\DoxyCodeLine{465   \textcolor{comment}{// truncation errors.}}
+\DoxyCodeLine{466   \textcolor{keyword}{const} Packet cst\_cephes\_exp\_C1 = pset1<Packet>(-\/0.693359375f);}
+\DoxyCodeLine{467   \textcolor{keyword}{const} Packet cst\_cephes\_exp\_C2 = pset1<Packet>(2.12194440e-\/4f);}
+\DoxyCodeLine{468   Packet r = pmadd(m, cst\_cephes\_exp\_C1, x);}
+\DoxyCodeLine{469   r = pmadd(m, cst\_cephes\_exp\_C2, r);}
+\DoxyCodeLine{470 }
+\DoxyCodeLine{471   Packet r2 = pmul(r, r);}
+\DoxyCodeLine{472   Packet r3 = pmul(r2, r);}
+\DoxyCodeLine{473 }
+\DoxyCodeLine{474   \textcolor{comment}{// Evaluate the polynomial approximant,improved by instruction-\/level parallelism.}}
+\DoxyCodeLine{475   Packet y, y1, y2;}
+\DoxyCodeLine{476   y  = pmadd(cst\_cephes\_exp\_p0, r, cst\_cephes\_exp\_p1);}
+\DoxyCodeLine{477   y1 = pmadd(cst\_cephes\_exp\_p3, r, cst\_cephes\_exp\_p4);}
+\DoxyCodeLine{478   y2 = padd(r, cst\_1);}
+\DoxyCodeLine{479   y  = pmadd(y, r, cst\_cephes\_exp\_p2);}
+\DoxyCodeLine{480   y1 = pmadd(y1, r, cst\_cephes\_exp\_p5);}
+\DoxyCodeLine{481   y  = pmadd(y, r3, y1);}
+\DoxyCodeLine{482   y  = pmadd(y, r2, y2);}
+\DoxyCodeLine{483 }
+\DoxyCodeLine{484   \textcolor{comment}{// Return 2\string^m * exp(r).}}
+\DoxyCodeLine{485   \textcolor{comment}{// TODO: replace pldexp with faster implementation since y in [-\/1, 1).}}
+\DoxyCodeLine{486   \textcolor{keywordflow}{return} pmax(pldexp(y,m), \_x);}
+\DoxyCodeLine{487 \}}
+\DoxyCodeLine{488 }
+\DoxyCodeLine{489 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{490 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS}
+\DoxyCodeLine{491 EIGEN\_UNUSED}
+\DoxyCodeLine{492 Packet pexp\_double(\textcolor{keyword}{const} Packet \_x)}
+\DoxyCodeLine{493 \{}
+\DoxyCodeLine{494   Packet x = \_x;}
+\DoxyCodeLine{495 }
+\DoxyCodeLine{496   \textcolor{keyword}{const} Packet cst\_1 = pset1<Packet>(1.0);}
+\DoxyCodeLine{497   \textcolor{keyword}{const} Packet cst\_2 = pset1<Packet>(2.0);}
+\DoxyCodeLine{498   \textcolor{keyword}{const} Packet cst\_half = pset1<Packet>(0.5);}
+\DoxyCodeLine{499 }
+\DoxyCodeLine{500   \textcolor{keyword}{const} Packet cst\_exp\_hi = pset1<Packet>(709.784);}
+\DoxyCodeLine{501   \textcolor{keyword}{const} Packet cst\_exp\_lo = pset1<Packet>(-\/709.784);}
+\DoxyCodeLine{502 }
+\DoxyCodeLine{503   \textcolor{keyword}{const} Packet cst\_cephes\_LOG2EF = pset1<Packet>(1.4426950408889634073599);}
+\DoxyCodeLine{504   \textcolor{keyword}{const} Packet cst\_cephes\_exp\_p0 = pset1<Packet>(1.26177193074810590878e-\/4);}
+\DoxyCodeLine{505   \textcolor{keyword}{const} Packet cst\_cephes\_exp\_p1 = pset1<Packet>(3.02994407707441961300e-\/2);}
+\DoxyCodeLine{506   \textcolor{keyword}{const} Packet cst\_cephes\_exp\_p2 = pset1<Packet>(9.99999999999999999910e-\/1);}
+\DoxyCodeLine{507   \textcolor{keyword}{const} Packet cst\_cephes\_exp\_q0 = pset1<Packet>(3.00198505138664455042e-\/6);}
+\DoxyCodeLine{508   \textcolor{keyword}{const} Packet cst\_cephes\_exp\_q1 = pset1<Packet>(2.52448340349684104192e-\/3);}
+\DoxyCodeLine{509   \textcolor{keyword}{const} Packet cst\_cephes\_exp\_q2 = pset1<Packet>(2.27265548208155028766e-\/1);}
+\DoxyCodeLine{510   \textcolor{keyword}{const} Packet cst\_cephes\_exp\_q3 = pset1<Packet>(2.00000000000000000009e0);}
+\DoxyCodeLine{511   \textcolor{keyword}{const} Packet cst\_cephes\_exp\_C1 = pset1<Packet>(0.693145751953125);}
+\DoxyCodeLine{512   \textcolor{keyword}{const} Packet cst\_cephes\_exp\_C2 = pset1<Packet>(1.42860682030941723212e-\/6);}
+\DoxyCodeLine{513 }
+\DoxyCodeLine{514   Packet tmp, fx;}
+\DoxyCodeLine{515 }
+\DoxyCodeLine{516   \textcolor{comment}{// clamp x}}
+\DoxyCodeLine{517   x = pmax(pmin(x, cst\_exp\_hi), cst\_exp\_lo);}
+\DoxyCodeLine{518   \textcolor{comment}{// Express exp(x) as exp(g + n*log(2)).}}
+\DoxyCodeLine{519   fx = pmadd(cst\_cephes\_LOG2EF, x, cst\_half);}
+\DoxyCodeLine{520 }
+\DoxyCodeLine{521   \textcolor{comment}{// Get the integer modulus of log(2), i.e. the "{}n"{} described above.}}
+\DoxyCodeLine{522   fx = pfloor(fx);}
+\DoxyCodeLine{523 }
+\DoxyCodeLine{524   \textcolor{comment}{// Get the remainder modulo log(2), i.e. the "{}g"{} described above. Subtract}}
+\DoxyCodeLine{525   \textcolor{comment}{// n*log(2) out in two steps, i.e. n*C1 + n*C2, C1+C2=log2 to get the last}}
+\DoxyCodeLine{526   \textcolor{comment}{// digits right.}}
+\DoxyCodeLine{527   tmp = pmul(fx, cst\_cephes\_exp\_C1);}
+\DoxyCodeLine{528   Packet z = pmul(fx, cst\_cephes\_exp\_C2);}
+\DoxyCodeLine{529   x = psub(x, tmp);}
+\DoxyCodeLine{530   x = psub(x, z);}
+\DoxyCodeLine{531 }
+\DoxyCodeLine{532   Packet x2 = pmul(x, x);}
+\DoxyCodeLine{533 }
+\DoxyCodeLine{534   \textcolor{comment}{// Evaluate the numerator polynomial of the rational interpolant.}}
+\DoxyCodeLine{535   Packet px = cst\_cephes\_exp\_p0;}
+\DoxyCodeLine{536   px = pmadd(px, x2, cst\_cephes\_exp\_p1);}
+\DoxyCodeLine{537   px = pmadd(px, x2, cst\_cephes\_exp\_p2);}
+\DoxyCodeLine{538   px = pmul(px, x);}
+\DoxyCodeLine{539 }
+\DoxyCodeLine{540   \textcolor{comment}{// Evaluate the denominator polynomial of the rational interpolant.}}
+\DoxyCodeLine{541   Packet qx = cst\_cephes\_exp\_q0;}
+\DoxyCodeLine{542   qx = pmadd(qx, x2, cst\_cephes\_exp\_q1);}
+\DoxyCodeLine{543   qx = pmadd(qx, x2, cst\_cephes\_exp\_q2);}
+\DoxyCodeLine{544   qx = pmadd(qx, x2, cst\_cephes\_exp\_q3);}
+\DoxyCodeLine{545 }
+\DoxyCodeLine{546   \textcolor{comment}{// I don't really get this bit, copied from the SSE2 routines, so...}}
+\DoxyCodeLine{547   \textcolor{comment}{// TODO(gonnet): Figure out what is going on here, perhaps find a better}}
+\DoxyCodeLine{548   \textcolor{comment}{// rational interpolant?}}
+\DoxyCodeLine{549   x = pdiv(px, psub(qx, px));}
+\DoxyCodeLine{550   x = pmadd(cst\_2, x, cst\_1);}
+\DoxyCodeLine{551 }
+\DoxyCodeLine{552   \textcolor{comment}{// Construct the result 2\string^n * exp(g) = e * x. The max is used to catch}}
+\DoxyCodeLine{553   \textcolor{comment}{// non-\/finite values in the input.}}
+\DoxyCodeLine{554   \textcolor{comment}{// TODO: replace pldexp with faster implementation since x in [-\/1, 1).}}
+\DoxyCodeLine{555   \textcolor{keywordflow}{return} pmax(pldexp(x,fx), \_x);}
+\DoxyCodeLine{556 \}}
+\DoxyCodeLine{557 }
+\DoxyCodeLine{558 \textcolor{comment}{// The following code is inspired by the following stack-\/overflow answer:}}
+\DoxyCodeLine{559 \textcolor{comment}{//   https://stackoverflow.com/questions/30463616/payne-\/hanek-\/algorithm-\/implementation-\/in-\/c/30465751\#30465751}}
+\DoxyCodeLine{560 \textcolor{comment}{// It has been largely optimized:}}
+\DoxyCodeLine{561 \textcolor{comment}{//  -\/ By-\/pass calls to frexp.}}
+\DoxyCodeLine{562 \textcolor{comment}{//  -\/ Aligned loads of required 96 bits of 2/pi. This is accomplished by}}
+\DoxyCodeLine{563 \textcolor{comment}{//    (1) balancing the mantissa and exponent to the required bits of 2/pi are}}
+\DoxyCodeLine{564 \textcolor{comment}{//    aligned on 8-\/bits, and (2) replicating the storage of the bits of 2/pi.}}
+\DoxyCodeLine{565 \textcolor{comment}{//  -\/ Avoid a branch in rounding and extraction of the remaining fractional part.}}
+\DoxyCodeLine{566 \textcolor{comment}{// Overall, I measured a speed up higher than x2 on x86-\/64.}}
+\DoxyCodeLine{567 \textcolor{keyword}{inline} \textcolor{keywordtype}{float} trig\_reduce\_huge (\textcolor{keywordtype}{float} xf, \textcolor{keywordtype}{int} *quadrant)}
+\DoxyCodeLine{568 \{}
+\DoxyCodeLine{569   \textcolor{keyword}{using} Eigen::numext::int32\_t;}
+\DoxyCodeLine{570   \textcolor{keyword}{using} Eigen::numext::uint32\_t;}
+\DoxyCodeLine{571   \textcolor{keyword}{using} Eigen::numext::int64\_t;}
+\DoxyCodeLine{572   \textcolor{keyword}{using} Eigen::numext::uint64\_t;}
+\DoxyCodeLine{573 }
+\DoxyCodeLine{574   \textcolor{keyword}{const} \textcolor{keywordtype}{double} pio2\_62 = 3.4061215800865545e-\/19;    \textcolor{comment}{// pi/2 * 2\string^-\/62}}
+\DoxyCodeLine{575   \textcolor{keyword}{const} uint64\_t zero\_dot\_five = uint64\_t(1) << 61; \textcolor{comment}{// 0.5 in 2.62-\/bit fixed-\/point format}}
+\DoxyCodeLine{576 }
+\DoxyCodeLine{577   \textcolor{comment}{// 192 bits of 2/pi for Payne-\/Hanek reduction}}
+\DoxyCodeLine{578   \textcolor{comment}{// Bits are introduced by packet of 8 to enable aligned reads.}}
+\DoxyCodeLine{579   \textcolor{keyword}{static} \textcolor{keyword}{const} uint32\_t two\_over\_pi [] = }
+\DoxyCodeLine{580   \{}
+\DoxyCodeLine{581     0x00000028, 0x000028be, 0x0028be60, 0x28be60db,}
+\DoxyCodeLine{582     0xbe60db93, 0x60db9391, 0xdb939105, 0x9391054a,}
+\DoxyCodeLine{583     0x91054a7f, 0x054a7f09, 0x4a7f09d5, 0x7f09d5f4,}
+\DoxyCodeLine{584     0x09d5f47d, 0xd5f47d4d, 0xf47d4d37, 0x7d4d3770,}
+\DoxyCodeLine{585     0x4d377036, 0x377036d8, 0x7036d8a5, 0x36d8a566,}
+\DoxyCodeLine{586     0xd8a5664f, 0xa5664f10, 0x664f10e4, 0x4f10e410,}
+\DoxyCodeLine{587     0x10e41000, 0xe4100000}
+\DoxyCodeLine{588   \};}
+\DoxyCodeLine{589   }
+\DoxyCodeLine{590   uint32\_t xi = numext::bit\_cast<uint32\_t>(xf);}
+\DoxyCodeLine{591   \textcolor{comment}{// Below, -\/118 = -\/126 + 8.}}
+\DoxyCodeLine{592   \textcolor{comment}{//   -\/126 is to get the exponent,}}
+\DoxyCodeLine{593   \textcolor{comment}{//   +8 is to enable alignment of 2/pi's bits on 8 bits.}}
+\DoxyCodeLine{594   \textcolor{comment}{// This is possible because the fractional part of x as only 24 meaningful bits.}}
+\DoxyCodeLine{595   uint32\_t e = (xi >> 23) -\/ 118;}
+\DoxyCodeLine{596   \textcolor{comment}{// Extract the mantissa and shift it to align it wrt the exponent}}
+\DoxyCodeLine{597   xi = ((xi \& 0x007fffffu)| 0x00800000u) << (e \& 0x7);}
+\DoxyCodeLine{598 }
+\DoxyCodeLine{599   uint32\_t i = e >> 3;}
+\DoxyCodeLine{600   uint32\_t twoopi\_1  = two\_over\_pi[i-\/1];}
+\DoxyCodeLine{601   uint32\_t twoopi\_2  = two\_over\_pi[i+3];}
+\DoxyCodeLine{602   uint32\_t twoopi\_3  = two\_over\_pi[i+7];}
+\DoxyCodeLine{603 }
+\DoxyCodeLine{604   \textcolor{comment}{// Compute x * 2/pi in 2.62-\/bit fixed-\/point format.}}
+\DoxyCodeLine{605   uint64\_t p;}
+\DoxyCodeLine{606   p = uint64\_t(xi) * twoopi\_3;}
+\DoxyCodeLine{607   p = uint64\_t(xi) * twoopi\_2 + (p >> 32);}
+\DoxyCodeLine{608   p = (uint64\_t(xi * twoopi\_1) << 32) + p;}
+\DoxyCodeLine{609 }
+\DoxyCodeLine{610   \textcolor{comment}{// Round to nearest: add 0.5 and extract integral part.}}
+\DoxyCodeLine{611   uint64\_t q = (p + zero\_dot\_five) >> 62;}
+\DoxyCodeLine{612   *quadrant = int(q);}
+\DoxyCodeLine{613   \textcolor{comment}{// Now it remains to compute "{}r = x -\/ q*pi/2"{} with high accuracy,}}
+\DoxyCodeLine{614   \textcolor{comment}{// since we have p=x/(pi/2) with high accuracy, we can more efficiently compute r as:}}
+\DoxyCodeLine{615   \textcolor{comment}{//   r = (p-\/q)*pi/2,}}
+\DoxyCodeLine{616   \textcolor{comment}{// where the product can be be carried out with sufficient accuracy using double precision.}}
+\DoxyCodeLine{617   p -\/= q<<62;}
+\DoxyCodeLine{618   \textcolor{keywordflow}{return} float(\textcolor{keywordtype}{double}(int64\_t(p)) * pio2\_62);}
+\DoxyCodeLine{619 \}}
+\DoxyCodeLine{620 }
+\DoxyCodeLine{621 \textcolor{keyword}{template}<\textcolor{keywordtype}{bool} ComputeSine,\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{622 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS}
+\DoxyCodeLine{623 EIGEN\_UNUSED}
+\DoxyCodeLine{624 \textcolor{preprocessor}{\#if EIGEN\_GNUC\_AT\_LEAST(4,4) \&\& EIGEN\_COMP\_GNUC\_STRICT}}
+\DoxyCodeLine{625 \_\_attribute\_\_((optimize(\textcolor{stringliteral}{"{}-\/fno-\/unsafe-\/math-\/optimizations"{}})))}
+\DoxyCodeLine{626 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{627 Packet psincos\_float(\textcolor{keyword}{const} Packet\& \_x)}
+\DoxyCodeLine{628 \{}
+\DoxyCodeLine{629   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} unpacket\_traits<Packet>::integer\_packet PacketI;}
+\DoxyCodeLine{630 }
+\DoxyCodeLine{631   \textcolor{keyword}{const} Packet  cst\_2oPI            = pset1<Packet>(0.636619746685028076171875f); \textcolor{comment}{// 2/PI}}
+\DoxyCodeLine{632   \textcolor{keyword}{const} Packet  cst\_rounding\_magic  = pset1<Packet>(12582912); \textcolor{comment}{// 2\string^23 for rounding}}
+\DoxyCodeLine{633   \textcolor{keyword}{const} PacketI csti\_1              = pset1<PacketI>(1);}
+\DoxyCodeLine{634   \textcolor{keyword}{const} Packet  cst\_sign\_mask       = pset1frombits<Packet>(0x80000000u);}
+\DoxyCodeLine{635 }
+\DoxyCodeLine{636   Packet x = pabs(\_x);}
+\DoxyCodeLine{637 }
+\DoxyCodeLine{638   \textcolor{comment}{// Scale x by 2/Pi to find x's octant.}}
+\DoxyCodeLine{639   Packet y = pmul(x, cst\_2oPI);}
+\DoxyCodeLine{640 }
+\DoxyCodeLine{641   \textcolor{comment}{// Rounding trick:}}
+\DoxyCodeLine{642   Packet y\_round = padd(y, cst\_rounding\_magic);}
+\DoxyCodeLine{643   EIGEN\_OPTIMIZATION\_BARRIER(y\_round)}
+\DoxyCodeLine{644   PacketI y\_int = preinterpret<PacketI>(y\_round); \textcolor{comment}{// last 23 digits represent integer (if abs(x)<2\string^24)}}
+\DoxyCodeLine{645   y = psub(y\_round, cst\_rounding\_magic); \textcolor{comment}{// nearest integer to x*4/pi}}
+\DoxyCodeLine{646 }
+\DoxyCodeLine{647   \textcolor{comment}{// Reduce x by y octants to get: -\/Pi/4 <= x <= +Pi/4}}
+\DoxyCodeLine{648   \textcolor{comment}{// using "{}Extended precision modular arithmetic"{}}}
+\DoxyCodeLine{649 \textcolor{preprocessor}{  \#if defined(EIGEN\_HAS\_SINGLE\_INSTRUCTION\_MADD)}}
+\DoxyCodeLine{650   \textcolor{comment}{// This version requires true FMA for high accuracy}}
+\DoxyCodeLine{651   \textcolor{comment}{// It provides a max error of 1ULP up to (with absolute\_error < 5.9605e-\/08):}}
+\DoxyCodeLine{652   \textcolor{keyword}{const} \textcolor{keywordtype}{float} huge\_th = ComputeSine ? 117435.992f : 71476.0625f;}
+\DoxyCodeLine{653   x = pmadd(y, pset1<Packet>(-\/1.57079601287841796875f), x);}
+\DoxyCodeLine{654   x = pmadd(y, pset1<Packet>(-\/3.1391647326017846353352069854736328125e-\/07f), x);}
+\DoxyCodeLine{655   x = pmadd(y, pset1<Packet>(-\/5.390302529957764765544681040410068817436695098876953125e-\/15f), x);}
+\DoxyCodeLine{656 \textcolor{preprocessor}{  \#else}}
+\DoxyCodeLine{657   \textcolor{comment}{// Without true FMA, the previous set of coefficients maintain 1ULP accuracy}}
+\DoxyCodeLine{658   \textcolor{comment}{// up to x<15.7 (for sin), but accuracy is immediately lost for x>15.7.}}
+\DoxyCodeLine{659   \textcolor{comment}{// We thus use one more iteration to maintain 2ULPs up to reasonably large inputs.}}
+\DoxyCodeLine{660 }
+\DoxyCodeLine{661   \textcolor{comment}{// The following set of coefficients maintain 1ULP up to 9.43 and 14.16 for sin and cos respectively.}}
+\DoxyCodeLine{662   \textcolor{comment}{// and 2 ULP up to:}}
+\DoxyCodeLine{663   \textcolor{keyword}{const} \textcolor{keywordtype}{float} huge\_th = ComputeSine ? 25966.f : 18838.f;}
+\DoxyCodeLine{664   x = pmadd(y, pset1<Packet>(-\/1.5703125), x); \textcolor{comment}{// = 0xbfc90000}}
+\DoxyCodeLine{665   EIGEN\_OPTIMIZATION\_BARRIER(x)}
+\DoxyCodeLine{666   x = pmadd(y, pset1<Packet>(-\/0.000483989715576171875), x); \textcolor{comment}{// = 0xb9fdc000}}
+\DoxyCodeLine{667   EIGEN\_OPTIMIZATION\_BARRIER(x)}
+\DoxyCodeLine{668   x = pmadd(y, pset1<Packet>(1.62865035235881805419921875e-\/07), x); \textcolor{comment}{// = 0x342ee000}}
+\DoxyCodeLine{669   x = pmadd(y, pset1<Packet>(5.5644315544167710640977020375430583953857421875e-\/11), x); \textcolor{comment}{// = 0x2e74b9ee}}
+\DoxyCodeLine{670 }
+\DoxyCodeLine{671   \textcolor{comment}{// For the record, the following set of coefficients maintain 2ULP up}}
+\DoxyCodeLine{672   \textcolor{comment}{// to a slightly larger range:}}
+\DoxyCodeLine{673   \textcolor{comment}{// const float huge\_th = ComputeSine ? 51981.f : 39086.125f;}}
+\DoxyCodeLine{674   \textcolor{comment}{// but it slightly fails to maintain 1ULP for two values of sin below pi.}}
+\DoxyCodeLine{675   \textcolor{comment}{// x = pmadd(y, pset1<Packet>(-\/3.140625/2.), x);}}
+\DoxyCodeLine{676   \textcolor{comment}{// x = pmadd(y, pset1<Packet>(-\/0.00048351287841796875), x);}}
+\DoxyCodeLine{677   \textcolor{comment}{// x = pmadd(y, pset1<Packet>(-\/3.13855707645416259765625e-\/07), x);}}
+\DoxyCodeLine{678   \textcolor{comment}{// x = pmadd(y, pset1<Packet>(-\/6.0771006282767103812147979624569416046142578125e-\/11), x);}}
+\DoxyCodeLine{679 }
+\DoxyCodeLine{680   \textcolor{comment}{// For the record, with only 3 iterations it is possible to maintain}}
+\DoxyCodeLine{681   \textcolor{comment}{// 1 ULP up to 3PI (maybe more) and 2ULP up to 255.}}
+\DoxyCodeLine{682   \textcolor{comment}{// The coefficients are: 0xbfc90f80, 0xb7354480, 0x2e74b9ee}}
+\DoxyCodeLine{683 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{684 }
+\DoxyCodeLine{685   \textcolor{keywordflow}{if}(predux\_any(pcmp\_le(pset1<Packet>(huge\_th),pabs(\_x))))}
+\DoxyCodeLine{686   \{}
+\DoxyCodeLine{687     \textcolor{keyword}{const} \textcolor{keywordtype}{int} PacketSize = unpacket\_traits<Packet>::size;}
+\DoxyCodeLine{688     EIGEN\_ALIGN\_TO\_BOUNDARY(\textcolor{keyword}{sizeof}(Packet)) \textcolor{keywordtype}{float} vals[PacketSize];}
+\DoxyCodeLine{689     EIGEN\_ALIGN\_TO\_BOUNDARY(\textcolor{keyword}{sizeof}(Packet)) \textcolor{keywordtype}{float} x\_cpy[PacketSize];}
+\DoxyCodeLine{690     EIGEN\_ALIGN\_TO\_BOUNDARY(\textcolor{keyword}{sizeof}(Packet)) \textcolor{keywordtype}{int} y\_int2[PacketSize];}
+\DoxyCodeLine{691     pstoreu(vals, pabs(\_x));}
+\DoxyCodeLine{692     pstoreu(x\_cpy, x);}
+\DoxyCodeLine{693     pstoreu(y\_int2, y\_int);}
+\DoxyCodeLine{694     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<PacketSize;++k)}
+\DoxyCodeLine{695     \{}
+\DoxyCodeLine{696       \textcolor{keywordtype}{float} val = vals[k];}
+\DoxyCodeLine{697       \textcolor{keywordflow}{if}(val>=huge\_th \&\& (numext::isfinite)(val))}
+\DoxyCodeLine{698         x\_cpy[k] = trig\_reduce\_huge(val,\&y\_int2[k]);}
+\DoxyCodeLine{699     \}}
+\DoxyCodeLine{700     x = ploadu<Packet>(x\_cpy);}
+\DoxyCodeLine{701     y\_int = ploadu<PacketI>(y\_int2);}
+\DoxyCodeLine{702   \}}
+\DoxyCodeLine{703 }
+\DoxyCodeLine{704   \textcolor{comment}{// Compute the sign to apply to the polynomial.}}
+\DoxyCodeLine{705   \textcolor{comment}{// sin: sign = second\_bit(y\_int) xor signbit(\_x)}}
+\DoxyCodeLine{706   \textcolor{comment}{// cos: sign = second\_bit(y\_int+1)}}
+\DoxyCodeLine{707   Packet sign\_bit = ComputeSine ? pxor(\_x, preinterpret<Packet>(plogical\_shift\_left<30>(y\_int)))}
+\DoxyCodeLine{708                                 : preinterpret<Packet>(plogical\_shift\_left<30>(padd(y\_int,csti\_1)));}
+\DoxyCodeLine{709   sign\_bit = pand(sign\_bit, cst\_sign\_mask); \textcolor{comment}{// clear all but left most bit}}
+\DoxyCodeLine{710 }
+\DoxyCodeLine{711   \textcolor{comment}{// Get the polynomial selection mask from the second bit of y\_int}}
+\DoxyCodeLine{712   \textcolor{comment}{// We'll calculate both (sin and cos) polynomials and then select from the two.}}
+\DoxyCodeLine{713   Packet poly\_mask = preinterpret<Packet>(pcmp\_eq(pand(y\_int, csti\_1), pzero(y\_int)));}
+\DoxyCodeLine{714 }
+\DoxyCodeLine{715   Packet x2 = pmul(x,x);}
+\DoxyCodeLine{716 }
+\DoxyCodeLine{717   \textcolor{comment}{// Evaluate the cos(x) polynomial. (-\/Pi/4 <= x <= Pi/4)}}
+\DoxyCodeLine{718   Packet y1 =        pset1<Packet>(2.4372266125283204019069671630859375e-\/05f);}
+\DoxyCodeLine{719   y1 = pmadd(y1, x2, pset1<Packet>(-\/0.00138865201734006404876708984375f     ));}
+\DoxyCodeLine{720   y1 = pmadd(y1, x2, pset1<Packet>(0.041666619479656219482421875f           ));}
+\DoxyCodeLine{721   y1 = pmadd(y1, x2, pset1<Packet>(-\/0.5f));}
+\DoxyCodeLine{722   y1 = pmadd(y1, x2, pset1<Packet>(1.f));}
+\DoxyCodeLine{723 }
+\DoxyCodeLine{724   \textcolor{comment}{// Evaluate the sin(x) polynomial. (Pi/4 <= x <= Pi/4)}}
+\DoxyCodeLine{725   \textcolor{comment}{// octave/matlab code to compute those coefficients:}}
+\DoxyCodeLine{726   \textcolor{comment}{//    x = (0:0.0001:pi/4)';}}
+\DoxyCodeLine{727   \textcolor{comment}{//    A = [x.\string^3 x.\string^5 x.\string^7];}}
+\DoxyCodeLine{728   \textcolor{comment}{//    w = ((1.-\/(x/(pi/4)).\string^2).\string^5)*2000+1;         \# weights trading relative accuracy}}
+\DoxyCodeLine{729   \textcolor{comment}{//    c = (A'*diag(w)*A)\(\backslash\)(A'*diag(w)*(sin(x)-\/x)); \# weighted LS, linear coeff forced to 1}}
+\DoxyCodeLine{730   \textcolor{comment}{//    printf('\%.64f\(\backslash\)n \%.64f\(\backslash\)n\%.64f\(\backslash\)n', c(3), c(2), c(1))}}
+\DoxyCodeLine{731   \textcolor{comment}{//}}
+\DoxyCodeLine{732   Packet y2 =        pset1<Packet>(-\/0.0001959234114083702898469196984621021329076029360294342041015625f);}
+\DoxyCodeLine{733   y2 = pmadd(y2, x2, pset1<Packet>( 0.0083326873655616851693794799871284340042620897293090820312500000f));}
+\DoxyCodeLine{734   y2 = pmadd(y2, x2, pset1<Packet>(-\/0.1666666203982298255503735617821803316473960876464843750000000000f));}
+\DoxyCodeLine{735   y2 = pmul(y2, x2);}
+\DoxyCodeLine{736   y2 = pmadd(y2, x, x);}
+\DoxyCodeLine{737 }
+\DoxyCodeLine{738   \textcolor{comment}{// Select the correct result from the two polynomials.}}
+\DoxyCodeLine{739   y = ComputeSine ? pselect(poly\_mask,y2,y1)}
+\DoxyCodeLine{740                   : pselect(poly\_mask,y1,y2);}
+\DoxyCodeLine{741 }
+\DoxyCodeLine{742   \textcolor{comment}{// Update the sign and filter huge inputs}}
+\DoxyCodeLine{743   \textcolor{keywordflow}{return} pxor(y, sign\_bit);}
+\DoxyCodeLine{744 \}}
+\DoxyCodeLine{745 }
+\DoxyCodeLine{746 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{747 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS}
+\DoxyCodeLine{748 EIGEN\_UNUSED}
+\DoxyCodeLine{749 Packet psin\_float(\textcolor{keyword}{const} Packet\& x)}
+\DoxyCodeLine{750 \{}
+\DoxyCodeLine{751   \textcolor{keywordflow}{return} psincos\_float<true>(x);}
+\DoxyCodeLine{752 \}}
+\DoxyCodeLine{753 }
+\DoxyCodeLine{754 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{755 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS}
+\DoxyCodeLine{756 EIGEN\_UNUSED}
+\DoxyCodeLine{757 Packet pcos\_float(\textcolor{keyword}{const} Packet\& x)}
+\DoxyCodeLine{758 \{}
+\DoxyCodeLine{759   \textcolor{keywordflow}{return} psincos\_float<false>(x);}
+\DoxyCodeLine{760 \}}
+\DoxyCodeLine{761 }
+\DoxyCodeLine{762 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{763 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS}
+\DoxyCodeLine{764 EIGEN\_UNUSED Packet pdiv\_complex(\textcolor{keyword}{const} Packet\& x, \textcolor{keyword}{const} Packet\& y) \{}
+\DoxyCodeLine{765   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} unpacket\_traits<Packet>::as\_real RealPacket;}
+\DoxyCodeLine{766   \textcolor{comment}{// In the following we annotate the code for the case where the inputs}}
+\DoxyCodeLine{767   \textcolor{comment}{// are a pair length-\/2 SIMD vectors representing a single pair of complex}}
+\DoxyCodeLine{768   \textcolor{comment}{// numbers x = a + i*b, y = c + i*d.}}
+\DoxyCodeLine{769   \textcolor{keyword}{const} RealPacket y\_abs = pabs(y.v);  \textcolor{comment}{// |c|, |d|}}
+\DoxyCodeLine{770   \textcolor{keyword}{const} RealPacket y\_abs\_flip = pcplxflip(Packet(y\_abs)).v; \textcolor{comment}{// |d|, |c|}}
+\DoxyCodeLine{771   \textcolor{keyword}{const} RealPacket y\_max = pmax(y\_abs, y\_abs\_flip); \textcolor{comment}{// max(|c|, |d|), max(|c|, |d|)}}
+\DoxyCodeLine{772   \textcolor{keyword}{const} RealPacket y\_scaled = pdiv(y.v, y\_max);  \textcolor{comment}{// c / max(|c|, |d|), d / max(|c|, |d|)}}
+\DoxyCodeLine{773   \textcolor{comment}{// Compute scaled denominator.}}
+\DoxyCodeLine{774   \textcolor{keyword}{const} RealPacket y\_scaled\_sq = pmul(y\_scaled, y\_scaled); \textcolor{comment}{// c'**2, d'**2}}
+\DoxyCodeLine{775   \textcolor{keyword}{const} RealPacket denom = padd(y\_scaled\_sq, pcplxflip(Packet(y\_scaled\_sq)).v);}
+\DoxyCodeLine{776   Packet result\_scaled = pmul(x, pconj(Packet(y\_scaled)));  \textcolor{comment}{// a * c' + b * d', -\/a * d + b * c}}
+\DoxyCodeLine{777   \textcolor{comment}{// Divide elementwise by denom.}}
+\DoxyCodeLine{778   result\_scaled = Packet(pdiv(result\_scaled.v, denom));}
+\DoxyCodeLine{779   \textcolor{comment}{// Rescale result}}
+\DoxyCodeLine{780   \textcolor{keywordflow}{return} Packet(pdiv(result\_scaled.v, y\_max));}
+\DoxyCodeLine{781 \}}
+\DoxyCodeLine{782 }
+\DoxyCodeLine{783 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{784 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS}
+\DoxyCodeLine{785 EIGEN\_UNUSED}
+\DoxyCodeLine{786 Packet psqrt\_complex(\textcolor{keyword}{const} Packet\& a) \{}
+\DoxyCodeLine{787   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} unpacket\_traits<Packet>::type Scalar;}
+\DoxyCodeLine{788   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Scalar::value\_type RealScalar;}
+\DoxyCodeLine{789   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} unpacket\_traits<Packet>::as\_real RealPacket;}
+\DoxyCodeLine{790 }
+\DoxyCodeLine{791   \textcolor{comment}{// Computes the principal sqrt of the complex numbers in the input.}}
+\DoxyCodeLine{792   \textcolor{comment}{//}}
+\DoxyCodeLine{793   \textcolor{comment}{// For example, for packets containing 2 complex numbers stored in interleaved format}}
+\DoxyCodeLine{794   \textcolor{comment}{//    a = [a0, a1] = [x0, y0, x1, y1],}}
+\DoxyCodeLine{795   \textcolor{comment}{// where x0 = real(a0), y0 = imag(a0) etc., this function returns}}
+\DoxyCodeLine{796   \textcolor{comment}{//    b = [b0, b1] = [u0, v0, u1, v1],}}
+\DoxyCodeLine{797   \textcolor{comment}{// such that b0\string^2 = a0, b1\string^2 = a1.}}
+\DoxyCodeLine{798   \textcolor{comment}{//}}
+\DoxyCodeLine{799   \textcolor{comment}{// To derive the formula for the complex square roots, let's consider the equation for}}
+\DoxyCodeLine{800   \textcolor{comment}{// a single complex square root of the number x + i*y. We want to find real numbers}}
+\DoxyCodeLine{801   \textcolor{comment}{// u and v such that}}
+\DoxyCodeLine{802   \textcolor{comment}{//    (u + i*v)\string^2 = x + i*y  <=>}}
+\DoxyCodeLine{803   \textcolor{comment}{//    u\string^2 -\/ v\string^2 + i*2*u*v = x + i*v.}}
+\DoxyCodeLine{804   \textcolor{comment}{// By equating the real and imaginary parts we get:}}
+\DoxyCodeLine{805   \textcolor{comment}{//    u\string^2 -\/ v\string^2 = x}}
+\DoxyCodeLine{806   \textcolor{comment}{//    2*u*v = y.}}
+\DoxyCodeLine{807   \textcolor{comment}{//}}
+\DoxyCodeLine{808   \textcolor{comment}{// For x >= 0, this has the numerically stable solution}}
+\DoxyCodeLine{809   \textcolor{comment}{//    u = sqrt(0.5 * (x + sqrt(x\string^2 + y\string^2)))}}
+\DoxyCodeLine{810   \textcolor{comment}{//    v = 0.5 * (y / u)}}
+\DoxyCodeLine{811   \textcolor{comment}{// and for x < 0,}}
+\DoxyCodeLine{812   \textcolor{comment}{//    v = sign(y) * sqrt(0.5 * (-\/x + sqrt(x\string^2 + y\string^2)))}}
+\DoxyCodeLine{813   \textcolor{comment}{//    u = 0.5 * (y / v)}}
+\DoxyCodeLine{814   \textcolor{comment}{//}}
+\DoxyCodeLine{815   \textcolor{comment}{//  To avoid unnecessary over-\/ and underflow, we compute sqrt(x\string^2 + y\string^2) as}}
+\DoxyCodeLine{816   \textcolor{comment}{//     l = max(|x|, |y|) * sqrt(1 + (min(|x|, |y|) / max(|x|, |y|))\string^2) ,}}
+\DoxyCodeLine{817 }
+\DoxyCodeLine{818   \textcolor{comment}{// In the following, without lack of generality, we have annotated the code, assuming}}
+\DoxyCodeLine{819   \textcolor{comment}{// that the input is a packet of 2 complex numbers.}}
+\DoxyCodeLine{820   \textcolor{comment}{//}}
+\DoxyCodeLine{821   \textcolor{comment}{// Step 1. Compute l = [l0, l0, l1, l1], where}}
+\DoxyCodeLine{822   \textcolor{comment}{//    l0 = sqrt(x0\string^2 + y0\string^2),  l1 = sqrt(x1\string^2 + y1\string^2)}}
+\DoxyCodeLine{823   \textcolor{comment}{// To avoid over-\/ and underflow, we use the stable formula for each hypotenuse}}
+\DoxyCodeLine{824   \textcolor{comment}{//    l0 = (min0 == 0 ? max0 : max0 * sqrt(1 + (min0/max0)**2)),}}
+\DoxyCodeLine{825   \textcolor{comment}{// where max0 = max(|x0|, |y0|), min0 = min(|x0|, |y0|), and similarly for l1.}}
+\DoxyCodeLine{826 }
+\DoxyCodeLine{827   RealPacket a\_abs = pabs(a.v);           \textcolor{comment}{// [|x0|, |y0|, |x1|, |y1|]}}
+\DoxyCodeLine{828   RealPacket a\_abs\_flip = pcplxflip(Packet(a\_abs)).v; \textcolor{comment}{// [|y0|, |x0|, |y1|, |x1|]}}
+\DoxyCodeLine{829   RealPacket a\_max = pmax(a\_abs, a\_abs\_flip);}
+\DoxyCodeLine{830   RealPacket a\_min = pmin(a\_abs, a\_abs\_flip);}
+\DoxyCodeLine{831   RealPacket a\_min\_zero\_mask = pcmp\_eq(a\_min, pzero(a\_min));}
+\DoxyCodeLine{832   RealPacket a\_max\_zero\_mask = pcmp\_eq(a\_max, pzero(a\_max));}
+\DoxyCodeLine{833   RealPacket r = pdiv(a\_min, a\_max);}
+\DoxyCodeLine{834   \textcolor{keyword}{const} RealPacket cst\_one  = pset1<RealPacket>(RealScalar(1));}
+\DoxyCodeLine{835   RealPacket l = pmul(a\_max, psqrt(padd(cst\_one, pmul(r, r))));  \textcolor{comment}{// [l0, l0, l1, l1]}}
+\DoxyCodeLine{836   \textcolor{comment}{// Set l to a\_max if a\_min is zero.}}
+\DoxyCodeLine{837   l = pselect(a\_min\_zero\_mask, a\_max, l);}
+\DoxyCodeLine{838 }
+\DoxyCodeLine{839   \textcolor{comment}{// Step 2. Compute [rho0, *, rho1, *], where}}
+\DoxyCodeLine{840   \textcolor{comment}{// rho0 = sqrt(0.5 * (l0 + |x0|)), rho1 =  sqrt(0.5 * (l1 + |x1|))}}
+\DoxyCodeLine{841   \textcolor{comment}{// We don't care about the imaginary parts computed here. They will be overwritten later.}}
+\DoxyCodeLine{842   \textcolor{keyword}{const} RealPacket cst\_half = pset1<RealPacket>(RealScalar(0.5));}
+\DoxyCodeLine{843   Packet rho;}
+\DoxyCodeLine{844   rho.v = psqrt(pmul(cst\_half, padd(a\_abs, l)));}
+\DoxyCodeLine{845 }
+\DoxyCodeLine{846   \textcolor{comment}{// Step 3. Compute [rho0, eta0, rho1, eta1], where}}
+\DoxyCodeLine{847   \textcolor{comment}{// eta0 = (y0 / l0) / 2, and eta1 = (y1 / l1) / 2.}}
+\DoxyCodeLine{848   \textcolor{comment}{// set eta = 0 of input is 0 + i0.}}
+\DoxyCodeLine{849   RealPacket eta = pandnot(pmul(cst\_half, pdiv(a.v, pcplxflip(rho).v)), a\_max\_zero\_mask);}
+\DoxyCodeLine{850   RealPacket real\_mask = peven\_mask(a.v);}
+\DoxyCodeLine{851   Packet positive\_real\_result;}
+\DoxyCodeLine{852   \textcolor{comment}{// Compute result for inputs with positive real part.}}
+\DoxyCodeLine{853   positive\_real\_result.v = pselect(real\_mask, rho.v, eta);}
+\DoxyCodeLine{854 }
+\DoxyCodeLine{855   \textcolor{comment}{// Step 4. Compute solution for inputs with negative real part:}}
+\DoxyCodeLine{856   \textcolor{comment}{//         [|eta0|, sign(y0)*rho0, |eta1|, sign(y1)*rho1]}}
+\DoxyCodeLine{857   \textcolor{keyword}{const} RealScalar neg\_zero = RealScalar(numext::bit\_cast<float>(0x80000000u));}
+\DoxyCodeLine{858   \textcolor{keyword}{const} RealPacket cst\_imag\_sign\_mask = pset1<Packet>(Scalar(RealScalar(0.0), neg\_zero)).v;}
+\DoxyCodeLine{859   RealPacket imag\_signs = pand(a.v, cst\_imag\_sign\_mask);}
+\DoxyCodeLine{860   Packet negative\_real\_result;}
+\DoxyCodeLine{861   \textcolor{comment}{// Notice that rho is positive, so taking it's absolute value is a noop.}}
+\DoxyCodeLine{862   negative\_real\_result.v = por(pabs(pcplxflip(positive\_real\_result).v), imag\_signs);}
+\DoxyCodeLine{863 }
+\DoxyCodeLine{864   \textcolor{comment}{// Step 5. Select solution branch based on the sign of the real parts.}}
+\DoxyCodeLine{865   Packet negative\_real\_mask;}
+\DoxyCodeLine{866   negative\_real\_mask.v = pcmp\_lt(pand(real\_mask, a.v), pzero(a.v));}
+\DoxyCodeLine{867   negative\_real\_mask.v = por(negative\_real\_mask.v, pcplxflip(negative\_real\_mask).v);}
+\DoxyCodeLine{868   Packet result = pselect(negative\_real\_mask, negative\_real\_result, positive\_real\_result);}
+\DoxyCodeLine{869 }
+\DoxyCodeLine{870   \textcolor{comment}{// Step 6. Handle special cases for infinities:}}
+\DoxyCodeLine{871   \textcolor{comment}{// * If z is (x,+∞), the result is (+∞,+∞) even if x is NaN}}
+\DoxyCodeLine{872   \textcolor{comment}{// * If z is (x,-\/∞), the result is (+∞,-\/∞) even if x is NaN}}
+\DoxyCodeLine{873   \textcolor{comment}{// * If z is (-\/∞,y), the result is (0*|y|,+∞) for finite or NaN y}}
+\DoxyCodeLine{874   \textcolor{comment}{// * If z is (+∞,y), the result is (+∞,0*|y|) for finite or NaN y}}
+\DoxyCodeLine{875   \textcolor{keyword}{const} RealPacket cst\_pos\_inf = pset1<RealPacket>(NumTraits<RealScalar>::infinity());}
+\DoxyCodeLine{876   Packet is\_inf;}
+\DoxyCodeLine{877   is\_inf.v = pcmp\_eq(a\_abs, cst\_pos\_inf);}
+\DoxyCodeLine{878   Packet is\_real\_inf;}
+\DoxyCodeLine{879   is\_real\_inf.v = pand(is\_inf.v, real\_mask);}
+\DoxyCodeLine{880   is\_real\_inf = por(is\_real\_inf, pcplxflip(is\_real\_inf));}
+\DoxyCodeLine{881   \textcolor{comment}{// prepare packet of (+∞,0*|y|) or (0*|y|,+∞), depending on the sign of the infinite real part.}}
+\DoxyCodeLine{882   Packet real\_inf\_result;}
+\DoxyCodeLine{883   real\_inf\_result.v = pmul(a\_abs, pset1<Packet>(Scalar(RealScalar(1.0), RealScalar(0.0))).v);}
+\DoxyCodeLine{884   real\_inf\_result.v = pselect(negative\_real\_mask.v, pcplxflip(real\_inf\_result).v, real\_inf\_result.v);}
+\DoxyCodeLine{885   \textcolor{comment}{// prepare packet of (+∞,+∞) or (+∞,-\/∞), depending on the sign of the infinite imaginary part.}}
+\DoxyCodeLine{886   Packet is\_imag\_inf;}
+\DoxyCodeLine{887   is\_imag\_inf.v = pandnot(is\_inf.v, real\_mask);}
+\DoxyCodeLine{888   is\_imag\_inf = por(is\_imag\_inf, pcplxflip(is\_imag\_inf));}
+\DoxyCodeLine{889   Packet imag\_inf\_result;}
+\DoxyCodeLine{890   imag\_inf\_result.v = por(pand(cst\_pos\_inf, real\_mask), pandnot(a.v, real\_mask));}
+\DoxyCodeLine{891 }
+\DoxyCodeLine{892   \textcolor{keywordflow}{return}  pselect(is\_imag\_inf, imag\_inf\_result,}
+\DoxyCodeLine{893                   pselect(is\_real\_inf, real\_inf\_result,result));}
+\DoxyCodeLine{894 \}}
+\DoxyCodeLine{895 }
+\DoxyCodeLine{896 \textcolor{comment}{// TODO(rmlarsen): The following set of utilities for double word arithmetic}}
+\DoxyCodeLine{897 \textcolor{comment}{// should perhaps be refactored as a separate file, since it would be generally}}
+\DoxyCodeLine{898 \textcolor{comment}{// useful for special function implementation etc. Writing the algorithms in}}
+\DoxyCodeLine{899 \textcolor{comment}{// terms if a double word type would also make the code more readable.}}
+\DoxyCodeLine{900 }
+\DoxyCodeLine{901 \textcolor{comment}{// This function splits x into the nearest integer n and fractional part r,}}
+\DoxyCodeLine{902 \textcolor{comment}{// such that x = n + r holds exactly.}}
+\DoxyCodeLine{903 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{904 EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{905 \textcolor{keywordtype}{void} absolute\_split(\textcolor{keyword}{const} Packet\& x, Packet\& n, Packet\& r) \{}
+\DoxyCodeLine{906   n = pround(x);}
+\DoxyCodeLine{907   r = psub(x, n);}
+\DoxyCodeLine{908 \}}
+\DoxyCodeLine{909 }
+\DoxyCodeLine{910 \textcolor{comment}{// This function computes the sum \{s, r\}, such that x + y = s\_hi + s\_lo}}
+\DoxyCodeLine{911 \textcolor{comment}{// holds exactly, and s\_hi = fl(x+y), if |x| >= |y|.}}
+\DoxyCodeLine{912 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{913 EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{914 \textcolor{keywordtype}{void} fast\_twosum(\textcolor{keyword}{const} Packet\& x, \textcolor{keyword}{const} Packet\& y, Packet\& s\_hi, Packet\& s\_lo) \{}
+\DoxyCodeLine{915   s\_hi = padd(x, y);}
+\DoxyCodeLine{916   \textcolor{keyword}{const} Packet t = psub(s\_hi, x);}
+\DoxyCodeLine{917   s\_lo = psub(y, t);}
+\DoxyCodeLine{918 \}}
+\DoxyCodeLine{919 }
+\DoxyCodeLine{920 \textcolor{preprocessor}{\#ifdef EIGEN\_HAS\_SINGLE\_INSTRUCTION\_MADD}}
+\DoxyCodeLine{921 \textcolor{comment}{// This function implements the extended precision product of}}
+\DoxyCodeLine{922 \textcolor{comment}{// a pair of floating point numbers. Given \{x, y\}, it computes the pair}}
+\DoxyCodeLine{923 \textcolor{comment}{// \{p\_hi, p\_lo\} such that x * y = p\_hi + p\_lo holds exactly and}}
+\DoxyCodeLine{924 \textcolor{comment}{// p\_hi = fl(x * y).}}
+\DoxyCodeLine{925 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{926 EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{927 \textcolor{keywordtype}{void} twoprod(\textcolor{keyword}{const} Packet\& x, \textcolor{keyword}{const} Packet\& y,}
+\DoxyCodeLine{928              Packet\& p\_hi, Packet\& p\_lo) \{}
+\DoxyCodeLine{929   p\_hi = pmul(x, y);}
+\DoxyCodeLine{930   p\_lo = pmadd(x, y, pnegate(p\_hi));}
+\DoxyCodeLine{931 \}}
+\DoxyCodeLine{932 }
+\DoxyCodeLine{933 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{934 }
+\DoxyCodeLine{935 \textcolor{comment}{// This function implements the Veltkamp splitting. Given a floating point}}
+\DoxyCodeLine{936 \textcolor{comment}{// number x it returns the pair \{x\_hi, x\_lo\} such that x\_hi + x\_lo = x holds}}
+\DoxyCodeLine{937 \textcolor{comment}{// exactly and that half of the significant of x fits in x\_hi.}}
+\DoxyCodeLine{938 \textcolor{comment}{// This is Algorithm 3 from Jean-\/Michel Muller, "{}Elementary Functions"{},}}
+\DoxyCodeLine{939 \textcolor{comment}{// 3rd edition, Birkh\(\backslash\)"{}auser, 2016.}}
+\DoxyCodeLine{940 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{941 EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{942 \textcolor{keywordtype}{void} veltkamp\_splitting(\textcolor{keyword}{const} Packet\& x, Packet\& x\_hi, Packet\& x\_lo) \{}
+\DoxyCodeLine{943   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} unpacket\_traits<Packet>::type Scalar;}
+\DoxyCodeLine{944   EIGEN\_CONSTEXPR \textcolor{keywordtype}{int} shift = (NumTraits<Scalar>::digits() + 1) / 2;}
+\DoxyCodeLine{945   \textcolor{keyword}{const} Scalar shift\_scale = Scalar(uint64\_t(1) << shift);  \textcolor{comment}{// Scalar constructor not necessarily constexpr.}}
+\DoxyCodeLine{946   \textcolor{keyword}{const} Packet gamma = pmul(pset1<Packet>(shift\_scale + Scalar(1)), x);}
+\DoxyCodeLine{947   Packet rho = psub(x, gamma);}
+\DoxyCodeLine{948   x\_hi = padd(rho, gamma);}
+\DoxyCodeLine{949   x\_lo = psub(x, x\_hi);}
+\DoxyCodeLine{950 \}}
+\DoxyCodeLine{951 }
+\DoxyCodeLine{952 \textcolor{comment}{// This function implements Dekker's algorithm for products x * y.}}
+\DoxyCodeLine{953 \textcolor{comment}{// Given floating point numbers \{x, y\} computes the pair}}
+\DoxyCodeLine{954 \textcolor{comment}{// \{p\_hi, p\_lo\} such that x * y = p\_hi + p\_lo holds exactly and}}
+\DoxyCodeLine{955 \textcolor{comment}{// p\_hi = fl(x * y).}}
+\DoxyCodeLine{956 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{957 EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{958 \textcolor{keywordtype}{void} twoprod(\textcolor{keyword}{const} Packet\& x, \textcolor{keyword}{const} Packet\& y,}
+\DoxyCodeLine{959              Packet\& p\_hi, Packet\& p\_lo) \{}
+\DoxyCodeLine{960   Packet x\_hi, x\_lo, y\_hi, y\_lo;}
+\DoxyCodeLine{961   veltkamp\_splitting(x, x\_hi, x\_lo);}
+\DoxyCodeLine{962   veltkamp\_splitting(y, y\_hi, y\_lo);}
+\DoxyCodeLine{963 }
+\DoxyCodeLine{964   p\_hi = pmul(x, y);}
+\DoxyCodeLine{965   p\_lo = pmadd(x\_hi, y\_hi, pnegate(p\_hi));}
+\DoxyCodeLine{966   p\_lo = pmadd(x\_hi, y\_lo, p\_lo);}
+\DoxyCodeLine{967   p\_lo = pmadd(x\_lo, y\_hi, p\_lo);}
+\DoxyCodeLine{968   p\_lo = pmadd(x\_lo, y\_lo, p\_lo);}
+\DoxyCodeLine{969 \}}
+\DoxyCodeLine{970 }
+\DoxyCodeLine{971 \textcolor{preprocessor}{\#endif  }\textcolor{comment}{// EIGEN\_HAS\_SINGLE\_INSTRUCTION\_MADD}}
+\DoxyCodeLine{972 }
+\DoxyCodeLine{973 }
+\DoxyCodeLine{974 \textcolor{comment}{// This function implements Dekker's algorithm for the addition}}
+\DoxyCodeLine{975 \textcolor{comment}{// of two double word numbers represented by \{x\_hi, x\_lo\} and \{y\_hi, y\_lo\}.}}
+\DoxyCodeLine{976 \textcolor{comment}{// It returns the result as a pair \{s\_hi, s\_lo\} such that}}
+\DoxyCodeLine{977 \textcolor{comment}{// x\_hi + x\_lo + y\_hi + y\_lo = s\_hi + s\_lo holds exactly.}}
+\DoxyCodeLine{978 \textcolor{comment}{// This is Algorithm 5 from Jean-\/Michel Muller, "{}Elementary Functions"{},}}
+\DoxyCodeLine{979 \textcolor{comment}{// 3rd edition, Birkh\(\backslash\)"{}auser, 2016.}}
+\DoxyCodeLine{980 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{981 EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{982   \textcolor{keywordtype}{void} twosum(\textcolor{keyword}{const} Packet\& x\_hi, \textcolor{keyword}{const} Packet\& x\_lo,}
+\DoxyCodeLine{983               \textcolor{keyword}{const} Packet\& y\_hi, \textcolor{keyword}{const} Packet\& y\_lo,}
+\DoxyCodeLine{984               Packet\& s\_hi, Packet\& s\_lo) \{}
+\DoxyCodeLine{985   \textcolor{keyword}{const} Packet x\_greater\_mask = pcmp\_lt(pabs(y\_hi), pabs(x\_hi));}
+\DoxyCodeLine{986   Packet r\_hi\_1, r\_lo\_1;}
+\DoxyCodeLine{987   fast\_twosum(x\_hi, y\_hi,r\_hi\_1, r\_lo\_1);}
+\DoxyCodeLine{988   Packet r\_hi\_2, r\_lo\_2;}
+\DoxyCodeLine{989   fast\_twosum(y\_hi, x\_hi,r\_hi\_2, r\_lo\_2);}
+\DoxyCodeLine{990   \textcolor{keyword}{const} Packet r\_hi = pselect(x\_greater\_mask, r\_hi\_1, r\_hi\_2);}
+\DoxyCodeLine{991 }
+\DoxyCodeLine{992   \textcolor{keyword}{const} Packet s1 = padd(padd(y\_lo, r\_lo\_1), x\_lo);}
+\DoxyCodeLine{993   \textcolor{keyword}{const} Packet s2 = padd(padd(x\_lo, r\_lo\_2), y\_lo);}
+\DoxyCodeLine{994   \textcolor{keyword}{const} Packet s = pselect(x\_greater\_mask, s1, s2);}
+\DoxyCodeLine{995 }
+\DoxyCodeLine{996   fast\_twosum(r\_hi, s, s\_hi, s\_lo);}
+\DoxyCodeLine{997 \}}
+\DoxyCodeLine{998 }
+\DoxyCodeLine{999 \textcolor{comment}{// This is a version of twosum for double word numbers,}}
+\DoxyCodeLine{1000 \textcolor{comment}{// which assumes that |x\_hi| >= |y\_hi|.}}
+\DoxyCodeLine{1001 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{1002 EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1003   \textcolor{keywordtype}{void} fast\_twosum(\textcolor{keyword}{const} Packet\& x\_hi, \textcolor{keyword}{const} Packet\& x\_lo,}
+\DoxyCodeLine{1004               \textcolor{keyword}{const} Packet\& y\_hi, \textcolor{keyword}{const} Packet\& y\_lo,}
+\DoxyCodeLine{1005               Packet\& s\_hi, Packet\& s\_lo) \{}
+\DoxyCodeLine{1006   Packet r\_hi, r\_lo;}
+\DoxyCodeLine{1007   fast\_twosum(x\_hi, y\_hi, r\_hi, r\_lo);}
+\DoxyCodeLine{1008   \textcolor{keyword}{const} Packet s = padd(padd(y\_lo, r\_lo), x\_lo);}
+\DoxyCodeLine{1009   fast\_twosum(r\_hi, s, s\_hi, s\_lo);}
+\DoxyCodeLine{1010 \}}
+\DoxyCodeLine{1011 }
+\DoxyCodeLine{1012 \textcolor{comment}{// This is a version of twosum for adding a floating point number x to}}
+\DoxyCodeLine{1013 \textcolor{comment}{// double word number \{y\_hi, y\_lo\} number, with the assumption}}
+\DoxyCodeLine{1014 \textcolor{comment}{// that |x| >= |y\_hi|.}}
+\DoxyCodeLine{1015 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{1016 EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1017 \textcolor{keywordtype}{void} fast\_twosum(\textcolor{keyword}{const} Packet\& x,}
+\DoxyCodeLine{1018                  \textcolor{keyword}{const} Packet\& y\_hi, \textcolor{keyword}{const} Packet\& y\_lo,}
+\DoxyCodeLine{1019                  Packet\& s\_hi, Packet\& s\_lo) \{}
+\DoxyCodeLine{1020   Packet r\_hi, r\_lo;}
+\DoxyCodeLine{1021   fast\_twosum(x, y\_hi, r\_hi, r\_lo);}
+\DoxyCodeLine{1022   \textcolor{keyword}{const} Packet s = padd(y\_lo, r\_lo);}
+\DoxyCodeLine{1023   fast\_twosum(r\_hi, s, s\_hi, s\_lo);}
+\DoxyCodeLine{1024 \}}
+\DoxyCodeLine{1025 }
+\DoxyCodeLine{1026 \textcolor{comment}{// This function implements the multiplication of a double word}}
+\DoxyCodeLine{1027 \textcolor{comment}{// number represented by \{x\_hi, x\_lo\} by a floating point number y.}}
+\DoxyCodeLine{1028 \textcolor{comment}{// It returns the result as a pair \{p\_hi, p\_lo\} such that}}
+\DoxyCodeLine{1029 \textcolor{comment}{// (x\_hi + x\_lo) * y = p\_hi + p\_lo hold with a relative error}}
+\DoxyCodeLine{1030 \textcolor{comment}{// of less than 2*2\string^\{-\/2p\}, where p is the number of significand bit}}
+\DoxyCodeLine{1031 \textcolor{comment}{// in the floating point type.}}
+\DoxyCodeLine{1032 \textcolor{comment}{// This is Algorithm 7 from Jean-\/Michel Muller, "{}Elementary Functions"{},}}
+\DoxyCodeLine{1033 \textcolor{comment}{// 3rd edition, Birkh\(\backslash\)"{}auser, 2016.}}
+\DoxyCodeLine{1034 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{1035 EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1036 \textcolor{keywordtype}{void} twoprod(\textcolor{keyword}{const} Packet\& x\_hi, \textcolor{keyword}{const} Packet\& x\_lo, \textcolor{keyword}{const} Packet\& y,}
+\DoxyCodeLine{1037              Packet\& p\_hi, Packet\& p\_lo) \{}
+\DoxyCodeLine{1038   Packet c\_hi, c\_lo1;}
+\DoxyCodeLine{1039   twoprod(x\_hi, y, c\_hi, c\_lo1);}
+\DoxyCodeLine{1040   \textcolor{keyword}{const} Packet c\_lo2 = pmul(x\_lo, y);}
+\DoxyCodeLine{1041   Packet t\_hi, t\_lo1;}
+\DoxyCodeLine{1042   fast\_twosum(c\_hi, c\_lo2, t\_hi, t\_lo1);}
+\DoxyCodeLine{1043   \textcolor{keyword}{const} Packet t\_lo2 = padd(t\_lo1, c\_lo1);}
+\DoxyCodeLine{1044   fast\_twosum(t\_hi, t\_lo2, p\_hi, p\_lo);}
+\DoxyCodeLine{1045 \}}
+\DoxyCodeLine{1046 }
+\DoxyCodeLine{1047 \textcolor{comment}{// This function implements the multiplication of two double word}}
+\DoxyCodeLine{1048 \textcolor{comment}{// numbers represented by \{x\_hi, x\_lo\} and \{y\_hi, y\_lo\}.}}
+\DoxyCodeLine{1049 \textcolor{comment}{// It returns the result as a pair \{p\_hi, p\_lo\} such that}}
+\DoxyCodeLine{1050 \textcolor{comment}{// (x\_hi + x\_lo) * (y\_hi + y\_lo) = p\_hi + p\_lo holds with a relative error}}
+\DoxyCodeLine{1051 \textcolor{comment}{// of less than 2*2\string^\{-\/2p\}, where p is the number of significand bit}}
+\DoxyCodeLine{1052 \textcolor{comment}{// in the floating point type.}}
+\DoxyCodeLine{1053 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{1054 EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1055 \textcolor{keywordtype}{void} twoprod(\textcolor{keyword}{const} Packet\& x\_hi, \textcolor{keyword}{const} Packet\& x\_lo,}
+\DoxyCodeLine{1056              \textcolor{keyword}{const} Packet\& y\_hi, \textcolor{keyword}{const} Packet\& y\_lo,}
+\DoxyCodeLine{1057              Packet\& p\_hi, Packet\& p\_lo) \{}
+\DoxyCodeLine{1058   Packet p\_hi\_hi, p\_hi\_lo;}
+\DoxyCodeLine{1059   twoprod(x\_hi, x\_lo, y\_hi, p\_hi\_hi, p\_hi\_lo);}
+\DoxyCodeLine{1060   Packet p\_lo\_hi, p\_lo\_lo;}
+\DoxyCodeLine{1061   twoprod(x\_hi, x\_lo, y\_lo, p\_lo\_hi, p\_lo\_lo);}
+\DoxyCodeLine{1062   fast\_twosum(p\_hi\_hi, p\_hi\_lo, p\_lo\_hi, p\_lo\_lo, p\_hi, p\_lo);}
+\DoxyCodeLine{1063 \}}
+\DoxyCodeLine{1064 }
+\DoxyCodeLine{1065 \textcolor{comment}{// This function computes the reciprocal of a floating point number}}
+\DoxyCodeLine{1066 \textcolor{comment}{// with extra precision and returns the result as a double word.}}
+\DoxyCodeLine{1067 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{1068 \textcolor{keywordtype}{void} doubleword\_reciprocal(\textcolor{keyword}{const} Packet\& x, Packet\& recip\_hi, Packet\& recip\_lo) \{}
+\DoxyCodeLine{1069   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} unpacket\_traits<Packet>::type Scalar;}
+\DoxyCodeLine{1070   \textcolor{comment}{// 1. Approximate the reciprocal as the reciprocal of the high order element.}}
+\DoxyCodeLine{1071   Packet approx\_recip = prsqrt(x);}
+\DoxyCodeLine{1072   approx\_recip = pmul(approx\_recip, approx\_recip);}
+\DoxyCodeLine{1073 }
+\DoxyCodeLine{1074   \textcolor{comment}{// 2. Run one step of Newton-\/Raphson iteration in double word arithmetic}}
+\DoxyCodeLine{1075   \textcolor{comment}{// to get the bottom half. The NR iteration for reciprocal of 'a' is}}
+\DoxyCodeLine{1076   \textcolor{comment}{//    x\_\{i+1\} = x\_i * (2 -\/ a * x\_i)}}
+\DoxyCodeLine{1077 }
+\DoxyCodeLine{1078   \textcolor{comment}{// -\/a*x\_i}}
+\DoxyCodeLine{1079   Packet t1\_hi, t1\_lo;}
+\DoxyCodeLine{1080   twoprod(pnegate(x), approx\_recip, t1\_hi, t1\_lo);}
+\DoxyCodeLine{1081   \textcolor{comment}{// 2 -\/ a*x\_i}}
+\DoxyCodeLine{1082   Packet t2\_hi, t2\_lo;}
+\DoxyCodeLine{1083   fast\_twosum(pset1<Packet>(Scalar(2)), t1\_hi, t2\_hi, t2\_lo);}
+\DoxyCodeLine{1084   Packet t3\_hi, t3\_lo;}
+\DoxyCodeLine{1085   fast\_twosum(t2\_hi, padd(t2\_lo, t1\_lo), t3\_hi, t3\_lo);}
+\DoxyCodeLine{1086   \textcolor{comment}{// x\_i * (2 -\/ a * x\_i)}}
+\DoxyCodeLine{1087   twoprod(t3\_hi, t3\_lo, approx\_recip, recip\_hi, recip\_lo);}
+\DoxyCodeLine{1088 \}}
+\DoxyCodeLine{1089 }
+\DoxyCodeLine{1090 }
+\DoxyCodeLine{1091 \textcolor{comment}{// This function computes log2(x) and returns the result as a double word.}}
+\DoxyCodeLine{1092 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{1093 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1accurate__log2}{accurate\_log2}} \{}
+\DoxyCodeLine{1094   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{1095   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1096   \textcolor{keywordtype}{void} operator()(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& x, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& log2\_x\_hi, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& log2\_x\_lo) \{}
+\DoxyCodeLine{1097     log2\_x\_hi = plog2(x);}
+\DoxyCodeLine{1098     log2\_x\_lo = pzero(x);}
+\DoxyCodeLine{1099   \}}
+\DoxyCodeLine{1100 \};}
+\DoxyCodeLine{1101 }
+\DoxyCodeLine{1102 \textcolor{comment}{// This specialization uses a more accurate algorithm to compute log2(x) for}}
+\DoxyCodeLine{1103 \textcolor{comment}{// floats in [1/sqrt(2);sqrt(2)] with a relative accuracy of \string~6.42e-\/10.}}
+\DoxyCodeLine{1104 \textcolor{comment}{// This additional accuracy is needed to counter the error-\/magnification}}
+\DoxyCodeLine{1105 \textcolor{comment}{// inherent in multiplying by a potentially large exponent in pow(x,y).}}
+\DoxyCodeLine{1106 \textcolor{comment}{// The minimax polynomial used was calculated using the Sollya tool.}}
+\DoxyCodeLine{1107 \textcolor{comment}{// See sollya.org.}}
+\DoxyCodeLine{1108 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1109 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1accurate__log2}{accurate\_log2}}<float> \{}
+\DoxyCodeLine{1110   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{1111   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1112   \textcolor{keywordtype}{void} operator()(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& z, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& log2\_x\_hi, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& log2\_x\_lo) \{}
+\DoxyCodeLine{1113     \textcolor{comment}{// The function log(1+x)/x is approximated in the interval}}
+\DoxyCodeLine{1114     \textcolor{comment}{// [1/sqrt(2)-\/1;sqrt(2)-\/1] by a degree 10 polynomial of the form}}
+\DoxyCodeLine{1115     \textcolor{comment}{//  Q(x) = (C0 + x * (C1 + x * (C2 + x * (C3 + x * P(x))))),}}
+\DoxyCodeLine{1116     \textcolor{comment}{// where the degree 6 polynomial P(x) is evaluated in single precision,}}
+\DoxyCodeLine{1117     \textcolor{comment}{// while the remaining 4 terms of Q(x), as well as the final multiplication by x}}
+\DoxyCodeLine{1118     \textcolor{comment}{// to reconstruct log(1+x) are evaluated in extra precision using}}
+\DoxyCodeLine{1119     \textcolor{comment}{// double word arithmetic. C0 through C3 are extra precise constants}}
+\DoxyCodeLine{1120     \textcolor{comment}{// stored as double words.}}
+\DoxyCodeLine{1121     \textcolor{comment}{//}}
+\DoxyCodeLine{1122     \textcolor{comment}{// The polynomial coefficients were calculated using Sollya commands:}}
+\DoxyCodeLine{1123     \textcolor{comment}{// > n = 10;}}
+\DoxyCodeLine{1124     \textcolor{comment}{// > f = log2(1+x)/x;}}
+\DoxyCodeLine{1125     \textcolor{comment}{// > interval = [sqrt(0.5)-\/1;sqrt(2)-\/1];}}
+\DoxyCodeLine{1126     \textcolor{comment}{// > p = fpminimax(f,n,[|double,double,double,double,single...|],interval,relative,floating);}}
+\DoxyCodeLine{1127     }
+\DoxyCodeLine{1128     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p6 = pset1<Packet>( 9.703654795885e-\/2f);}
+\DoxyCodeLine{1129     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p5 = pset1<Packet>(-\/0.1690667718648f);}
+\DoxyCodeLine{1130     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p4 = pset1<Packet>( 0.1720575392246f);}
+\DoxyCodeLine{1131     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p3 = pset1<Packet>(-\/0.1789081543684f);}
+\DoxyCodeLine{1132     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p2 = pset1<Packet>( 0.2050433009862f);}
+\DoxyCodeLine{1133     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p1 = pset1<Packet>(-\/0.2404672354459f);}
+\DoxyCodeLine{1134     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p0 = pset1<Packet>( 0.2885761857032f);}
+\DoxyCodeLine{1135 }
+\DoxyCodeLine{1136     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} C3\_hi = pset1<Packet>(-\/0.360674142838f);}
+\DoxyCodeLine{1137     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} C3\_lo = pset1<Packet>(-\/6.13283912543e-\/09f);}
+\DoxyCodeLine{1138     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} C2\_hi = pset1<Packet>(0.480897903442f);}
+\DoxyCodeLine{1139     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} C2\_lo = pset1<Packet>(-\/1.44861207474e-\/08f);}
+\DoxyCodeLine{1140     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} C1\_hi = pset1<Packet>(-\/0.721347510815f);}
+\DoxyCodeLine{1141     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} C1\_lo = pset1<Packet>(-\/4.84483164698e-\/09f);}
+\DoxyCodeLine{1142     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} C0\_hi = pset1<Packet>(1.44269502163f);}
+\DoxyCodeLine{1143     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} C0\_lo = pset1<Packet>(2.01711713999e-\/08f);}
+\DoxyCodeLine{1144     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} one = pset1<Packet>(1.0f);}
+\DoxyCodeLine{1145 }
+\DoxyCodeLine{1146     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} x = psub(z, one);}
+\DoxyCodeLine{1147     \textcolor{comment}{// Evaluate P(x) in working precision.}}
+\DoxyCodeLine{1148     \textcolor{comment}{// We evaluate it in multiple parts to improve instruction level}}
+\DoxyCodeLine{1149     \textcolor{comment}{// parallelism.}}
+\DoxyCodeLine{1150     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} x2 = pmul(x,x);}
+\DoxyCodeLine{1151     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p\_even = pmadd(p6, x2, p4);}
+\DoxyCodeLine{1152     p\_even = pmadd(p\_even, x2, p2);}
+\DoxyCodeLine{1153     p\_even = pmadd(p\_even, x2, p0);}
+\DoxyCodeLine{1154     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p\_odd = pmadd(p5, x2, p3);}
+\DoxyCodeLine{1155     p\_odd = pmadd(p\_odd, x2, p1);}
+\DoxyCodeLine{1156     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p = pmadd(p\_odd, x, p\_even);}
+\DoxyCodeLine{1157 }
+\DoxyCodeLine{1158     \textcolor{comment}{// Now evaluate the low-\/order tems of Q(x) in double word precision.}}
+\DoxyCodeLine{1159     \textcolor{comment}{// In the following, due to the alternating signs and the fact that}}
+\DoxyCodeLine{1160     \textcolor{comment}{// |x| < sqrt(2)-\/1, we can assume that |C*\_hi| >= q\_i, and use}}
+\DoxyCodeLine{1161     \textcolor{comment}{// fast\_twosum instead of the slower twosum.}}
+\DoxyCodeLine{1162     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} q\_hi, q\_lo;}
+\DoxyCodeLine{1163     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} t\_hi, t\_lo;}
+\DoxyCodeLine{1164     \textcolor{comment}{// C3 + x * p(x)}}
+\DoxyCodeLine{1165     twoprod(p, x, t\_hi, t\_lo);}
+\DoxyCodeLine{1166     fast\_twosum(C3\_hi, C3\_lo, t\_hi, t\_lo, q\_hi, q\_lo);}
+\DoxyCodeLine{1167     \textcolor{comment}{// C2 + x * p(x)}}
+\DoxyCodeLine{1168     twoprod(q\_hi, q\_lo, x, t\_hi, t\_lo);}
+\DoxyCodeLine{1169     fast\_twosum(C2\_hi, C2\_lo, t\_hi, t\_lo, q\_hi, q\_lo);}
+\DoxyCodeLine{1170     \textcolor{comment}{// C1 + x * p(x)}}
+\DoxyCodeLine{1171     twoprod(q\_hi, q\_lo, x, t\_hi, t\_lo);}
+\DoxyCodeLine{1172     fast\_twosum(C1\_hi, C1\_lo, t\_hi, t\_lo, q\_hi, q\_lo);}
+\DoxyCodeLine{1173     \textcolor{comment}{// C0 + x * p(x)}}
+\DoxyCodeLine{1174     twoprod(q\_hi, q\_lo, x, t\_hi, t\_lo);}
+\DoxyCodeLine{1175     fast\_twosum(C0\_hi, C0\_lo, t\_hi, t\_lo, q\_hi, q\_lo);}
+\DoxyCodeLine{1176 }
+\DoxyCodeLine{1177     \textcolor{comment}{// log(z) \string~= x * Q(x)}}
+\DoxyCodeLine{1178     twoprod(q\_hi, q\_lo, x, log2\_x\_hi, log2\_x\_lo);}
+\DoxyCodeLine{1179   \}}
+\DoxyCodeLine{1180 \};}
+\DoxyCodeLine{1181 }
+\DoxyCodeLine{1182 \textcolor{comment}{// This specialization uses a more accurate algorithm to compute log2(x) for}}
+\DoxyCodeLine{1183 \textcolor{comment}{// floats in [1/sqrt(2);sqrt(2)] with a relative accuracy of \string~1.27e-\/18.}}
+\DoxyCodeLine{1184 \textcolor{comment}{// This additional accuracy is needed to counter the error-\/magnification}}
+\DoxyCodeLine{1185 \textcolor{comment}{// inherent in multiplying by a potentially large exponent in pow(x,y).}}
+\DoxyCodeLine{1186 \textcolor{comment}{// The minimax polynomial used was calculated using the Sollya tool.}}
+\DoxyCodeLine{1187 \textcolor{comment}{// See sollya.org.}}
+\DoxyCodeLine{1188 }
+\DoxyCodeLine{1189 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1190 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1accurate__log2}{accurate\_log2}}<double> \{}
+\DoxyCodeLine{1191   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{1192   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1193   \textcolor{keywordtype}{void} operator()(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& x, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& log2\_x\_hi, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& log2\_x\_lo) \{}
+\DoxyCodeLine{1194     \textcolor{comment}{// We use a transformation of variables:}}
+\DoxyCodeLine{1195     \textcolor{comment}{//    r = c * (x-\/1) / (x+1),}}
+\DoxyCodeLine{1196     \textcolor{comment}{// such that}}
+\DoxyCodeLine{1197     \textcolor{comment}{//    log2(x) = log2((1 + r/c) / (1 -\/ r/c)) = f(r).}}
+\DoxyCodeLine{1198     \textcolor{comment}{// The function f(r) can be approximated well using an odd polynomial}}
+\DoxyCodeLine{1199     \textcolor{comment}{// of the form}}
+\DoxyCodeLine{1200     \textcolor{comment}{//   P(r) = ((Q(r\string^2) * r\string^2 + C) * r\string^2 + 1) * r,}}
+\DoxyCodeLine{1201     \textcolor{comment}{// For the implementation of log2<double> here, Q is of degree 6 with}}
+\DoxyCodeLine{1202     \textcolor{comment}{// coefficient represented in working precision (double), while C is a}}
+\DoxyCodeLine{1203     \textcolor{comment}{// constant represented in extra precision as a double word to achieve}}
+\DoxyCodeLine{1204     \textcolor{comment}{// full accuracy.}}
+\DoxyCodeLine{1205     \textcolor{comment}{//}}
+\DoxyCodeLine{1206     \textcolor{comment}{// The polynomial coefficients were computed by the Sollya script:}}
+\DoxyCodeLine{1207     \textcolor{comment}{//}}
+\DoxyCodeLine{1208     \textcolor{comment}{// c = 2 / log(2);}}
+\DoxyCodeLine{1209     \textcolor{comment}{// trans = c * (x-\/1)/(x+1);}}
+\DoxyCodeLine{1210     \textcolor{comment}{// itrans = (1+x/c)/(1-\/x/c);}}
+\DoxyCodeLine{1211     \textcolor{comment}{// interval=[trans(sqrt(0.5)); trans(sqrt(2))];}}
+\DoxyCodeLine{1212     \textcolor{comment}{// print(interval);}}
+\DoxyCodeLine{1213     \textcolor{comment}{// f = log2(itrans(x));}}
+\DoxyCodeLine{1214     \textcolor{comment}{// p=fpminimax(f,[|1,3,5,7,9,11,13,15,17|],[|1,DD,double...|],interval,relative,floating);}}
+\DoxyCodeLine{1215     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} q12 = pset1<Packet>(2.87074255468000586e-\/9);}
+\DoxyCodeLine{1216     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} q10 = pset1<Packet>(2.38957980901884082e-\/8);}
+\DoxyCodeLine{1217     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} q8 = pset1<Packet>(2.31032094540014656e-\/7);}
+\DoxyCodeLine{1218     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} q6 = pset1<Packet>(2.27279857398537278e-\/6);}
+\DoxyCodeLine{1219     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} q4 = pset1<Packet>(2.31271023278625638e-\/5);}
+\DoxyCodeLine{1220     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} q2 = pset1<Packet>(2.47556738444535513e-\/4);}
+\DoxyCodeLine{1221     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} q0 = pset1<Packet>(2.88543873228900172e-\/3);}
+\DoxyCodeLine{1222     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} C\_hi = pset1<Packet>(0.0400377511598501157);}
+\DoxyCodeLine{1223     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} C\_lo = pset1<Packet>(-\/4.77726582251425391e-\/19);}
+\DoxyCodeLine{1224     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} one = pset1<Packet>(1.0);}
+\DoxyCodeLine{1225 }
+\DoxyCodeLine{1226     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} cst\_2\_log2e\_hi = pset1<Packet>(2.88539008177792677);}
+\DoxyCodeLine{1227     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} cst\_2\_log2e\_lo = pset1<Packet>(4.07660016854549667e-\/17);}
+\DoxyCodeLine{1228     \textcolor{comment}{// c * (x -\/ 1)}}
+\DoxyCodeLine{1229     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} num\_hi, num\_lo;}
+\DoxyCodeLine{1230     twoprod(cst\_2\_log2e\_hi, cst\_2\_log2e\_lo, psub(x, one), num\_hi, num\_lo);}
+\DoxyCodeLine{1231     \textcolor{comment}{// TODO(rmlarsen): Investigate if using the division algorithm by}}
+\DoxyCodeLine{1232     \textcolor{comment}{// Muller et al. is faster/more accurate.}}
+\DoxyCodeLine{1233     \textcolor{comment}{// 1 / (x + 1)}}
+\DoxyCodeLine{1234     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} denom\_hi, denom\_lo;}
+\DoxyCodeLine{1235     doubleword\_reciprocal(padd(x, one), denom\_hi, denom\_lo);}
+\DoxyCodeLine{1236     \textcolor{comment}{// r =  c * (x-\/1) / (x+1),}}
+\DoxyCodeLine{1237     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} r\_hi, r\_lo;}
+\DoxyCodeLine{1238     twoprod(num\_hi, num\_lo, denom\_hi, denom\_lo, r\_hi, r\_lo);}
+\DoxyCodeLine{1239     \textcolor{comment}{// r2 = r * r}}
+\DoxyCodeLine{1240     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} r2\_hi, r2\_lo;}
+\DoxyCodeLine{1241     twoprod(r\_hi, r\_lo, r\_hi, r\_lo, r2\_hi, r2\_lo);}
+\DoxyCodeLine{1242     \textcolor{comment}{// r4 = r2 * r2}}
+\DoxyCodeLine{1243     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} r4\_hi, r4\_lo;}
+\DoxyCodeLine{1244     twoprod(r2\_hi, r2\_lo, r2\_hi, r2\_lo, r4\_hi, r4\_lo);}
+\DoxyCodeLine{1245 }
+\DoxyCodeLine{1246     \textcolor{comment}{// Evaluate Q(r\string^2) in working precision. We evaluate it in two parts}}
+\DoxyCodeLine{1247     \textcolor{comment}{// (even and odd in r\string^2) to improve instruction level parallelism.}}
+\DoxyCodeLine{1248     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} q\_even = pmadd(q12, r4\_hi, q8);}
+\DoxyCodeLine{1249     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} q\_odd = pmadd(q10, r4\_hi, q6);}
+\DoxyCodeLine{1250     q\_even = pmadd(q\_even, r4\_hi, q4);}
+\DoxyCodeLine{1251     q\_odd = pmadd(q\_odd, r4\_hi, q2);}
+\DoxyCodeLine{1252     q\_even = pmadd(q\_even, r4\_hi, q0);}
+\DoxyCodeLine{1253     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} q = pmadd(q\_odd, r2\_hi, q\_even);}
+\DoxyCodeLine{1254 }
+\DoxyCodeLine{1255     \textcolor{comment}{// Now evaluate the low order terms of P(x) in double word precision.}}
+\DoxyCodeLine{1256     \textcolor{comment}{// In the following, due to the increasing magnitude of the coefficients}}
+\DoxyCodeLine{1257     \textcolor{comment}{// and r being constrained to [-\/0.5, 0.5] we can use fast\_twosum instead}}
+\DoxyCodeLine{1258     \textcolor{comment}{// of the slower twosum.}}
+\DoxyCodeLine{1259     \textcolor{comment}{// Q(r\string^2) * r\string^2}}
+\DoxyCodeLine{1260     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p\_hi, p\_lo;}
+\DoxyCodeLine{1261     twoprod(r2\_hi, r2\_lo, q, p\_hi, p\_lo);}
+\DoxyCodeLine{1262     \textcolor{comment}{// Q(r\string^2) * r\string^2 + C}}
+\DoxyCodeLine{1263     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p1\_hi, p1\_lo;}
+\DoxyCodeLine{1264     fast\_twosum(C\_hi, C\_lo, p\_hi, p\_lo, p1\_hi, p1\_lo);}
+\DoxyCodeLine{1265     \textcolor{comment}{// (Q(r\string^2) * r\string^2 + C) * r\string^2}}
+\DoxyCodeLine{1266     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p2\_hi, p2\_lo;}
+\DoxyCodeLine{1267     twoprod(r2\_hi, r2\_lo, p1\_hi, p1\_lo, p2\_hi, p2\_lo);}
+\DoxyCodeLine{1268     \textcolor{comment}{// ((Q(r\string^2) * r\string^2 + C) * r\string^2 + 1)}}
+\DoxyCodeLine{1269     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p3\_hi, p3\_lo;}
+\DoxyCodeLine{1270     fast\_twosum(one, p2\_hi, p2\_lo, p3\_hi, p3\_lo);}
+\DoxyCodeLine{1271 }
+\DoxyCodeLine{1272     \textcolor{comment}{// log(z) \string~= ((Q(r\string^2) * r\string^2 + C) * r\string^2 + 1) * r}}
+\DoxyCodeLine{1273     twoprod(p3\_hi, p3\_lo, r\_hi, r\_lo, log2\_x\_hi, log2\_x\_lo);}
+\DoxyCodeLine{1274   \}}
+\DoxyCodeLine{1275 \};}
+\DoxyCodeLine{1276 }
+\DoxyCodeLine{1277 \textcolor{comment}{// This function computes exp2(x) (i.e. 2**x).}}
+\DoxyCodeLine{1278 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{1279 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1fast__accurate__exp2}{fast\_accurate\_exp2}} \{}
+\DoxyCodeLine{1280   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{1281   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1282   \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} operator()(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& x) \{}
+\DoxyCodeLine{1283     \textcolor{comment}{// TODO(rmlarsen): Add a pexp2 packetop.}}
+\DoxyCodeLine{1284     \textcolor{keywordflow}{return} pexp(pmul(pset1<Packet>(Scalar(EIGEN\_LN2)), x));}
+\DoxyCodeLine{1285   \}}
+\DoxyCodeLine{1286 \};}
+\DoxyCodeLine{1287 }
+\DoxyCodeLine{1288 \textcolor{comment}{// This specialization uses a faster algorithm to compute exp2(x) for floats}}
+\DoxyCodeLine{1289 \textcolor{comment}{// in [-\/0.5;0.5] with a relative accuracy of 1 ulp.}}
+\DoxyCodeLine{1290 \textcolor{comment}{// The minimax polynomial used was calculated using the Sollya tool.}}
+\DoxyCodeLine{1291 \textcolor{comment}{// See sollya.org.}}
+\DoxyCodeLine{1292 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1293 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1fast__accurate__exp2}{fast\_accurate\_exp2}}<float> \{}
+\DoxyCodeLine{1294   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{1295   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1296   \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} operator()(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& x) \{}
+\DoxyCodeLine{1297     \textcolor{comment}{// This function approximates exp2(x) by a degree 6 polynomial of the form}}
+\DoxyCodeLine{1298     \textcolor{comment}{// Q(x) = 1 + x * (C + x * P(x)), where the degree 4 polynomial P(x) is evaluated in}}
+\DoxyCodeLine{1299     \textcolor{comment}{// single precision, and the remaining steps are evaluated with extra precision using}}
+\DoxyCodeLine{1300     \textcolor{comment}{// double word arithmetic. C is an extra precise constant stored as a double word.}}
+\DoxyCodeLine{1301     \textcolor{comment}{//}}
+\DoxyCodeLine{1302     \textcolor{comment}{// The polynomial coefficients were calculated using Sollya commands:}}
+\DoxyCodeLine{1303     \textcolor{comment}{// > n = 6;}}
+\DoxyCodeLine{1304     \textcolor{comment}{// > f = 2\string^x;}}
+\DoxyCodeLine{1305     \textcolor{comment}{// > interval = [-\/0.5;0.5];}}
+\DoxyCodeLine{1306     \textcolor{comment}{// > p = fpminimax(f,n,[|1,double,single...|],interval,relative,floating);}}
+\DoxyCodeLine{1307 }
+\DoxyCodeLine{1308     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p4 = pset1<Packet>(1.539513905e-\/4f);}
+\DoxyCodeLine{1309     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p3 = pset1<Packet>(1.340007293e-\/3f);}
+\DoxyCodeLine{1310     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p2 = pset1<Packet>(9.618283249e-\/3f);}
+\DoxyCodeLine{1311     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p1 = pset1<Packet>(5.550328270e-\/2f);}
+\DoxyCodeLine{1312     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p0 = pset1<Packet>(0.2402264923f);}
+\DoxyCodeLine{1313 }
+\DoxyCodeLine{1314     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} C\_hi = pset1<Packet>(0.6931471825f);}
+\DoxyCodeLine{1315     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} C\_lo = pset1<Packet>(2.36836577e-\/08f);}
+\DoxyCodeLine{1316     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} one = pset1<Packet>(1.0f);}
+\DoxyCodeLine{1317 }
+\DoxyCodeLine{1318     \textcolor{comment}{// Evaluate P(x) in working precision.}}
+\DoxyCodeLine{1319     \textcolor{comment}{// We evaluate even and odd parts of the polynomial separately}}
+\DoxyCodeLine{1320     \textcolor{comment}{// to gain some instruction level parallelism.}}
+\DoxyCodeLine{1321     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} x2 = pmul(x,x);}
+\DoxyCodeLine{1322     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p\_even = pmadd(p4, x2, p2);}
+\DoxyCodeLine{1323     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p\_odd = pmadd(p3, x2, p1);}
+\DoxyCodeLine{1324     p\_even = pmadd(p\_even, x2, p0);}
+\DoxyCodeLine{1325     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p = pmadd(p\_odd, x, p\_even);}
+\DoxyCodeLine{1326 }
+\DoxyCodeLine{1327     \textcolor{comment}{// Evaluate the remaining terms of Q(x) with extra precision using}}
+\DoxyCodeLine{1328     \textcolor{comment}{// double word arithmetic.}}
+\DoxyCodeLine{1329     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p\_hi, p\_lo;}
+\DoxyCodeLine{1330     \textcolor{comment}{// x * p(x)}}
+\DoxyCodeLine{1331     twoprod(p, x, p\_hi, p\_lo);}
+\DoxyCodeLine{1332     \textcolor{comment}{// C + x * p(x)}}
+\DoxyCodeLine{1333     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} q1\_hi, q1\_lo;}
+\DoxyCodeLine{1334     twosum(p\_hi, p\_lo, C\_hi, C\_lo, q1\_hi, q1\_lo);}
+\DoxyCodeLine{1335     \textcolor{comment}{// x * (C + x * p(x))}}
+\DoxyCodeLine{1336     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} q2\_hi, q2\_lo;}
+\DoxyCodeLine{1337     twoprod(q1\_hi, q1\_lo, x, q2\_hi, q2\_lo);}
+\DoxyCodeLine{1338     \textcolor{comment}{// 1 + x * (C + x * p(x))}}
+\DoxyCodeLine{1339     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} q3\_hi, q3\_lo;}
+\DoxyCodeLine{1340     \textcolor{comment}{// Since |q2\_hi| <= sqrt(2)-\/1 < 1, we can use fast\_twosum}}
+\DoxyCodeLine{1341     \textcolor{comment}{// for adding it to unity here.}}
+\DoxyCodeLine{1342     fast\_twosum(one, q2\_hi, q3\_hi, q3\_lo);}
+\DoxyCodeLine{1343     \textcolor{keywordflow}{return} padd(q3\_hi, padd(q2\_lo, q3\_lo));}
+\DoxyCodeLine{1344   \}}
+\DoxyCodeLine{1345 \};}
+\DoxyCodeLine{1346 }
+\DoxyCodeLine{1347 \textcolor{comment}{// in [-\/0.5;0.5] with a relative accuracy of 1 ulp.}}
+\DoxyCodeLine{1348 \textcolor{comment}{// The minimax polynomial used was calculated using the Sollya tool.}}
+\DoxyCodeLine{1349 \textcolor{comment}{// See sollya.org.}}
+\DoxyCodeLine{1350 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1351 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1fast__accurate__exp2}{fast\_accurate\_exp2}}<double> \{}
+\DoxyCodeLine{1352   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{1353   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1354   \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} operator()(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& x) \{}
+\DoxyCodeLine{1355     \textcolor{comment}{// This function approximates exp2(x) by a degree 10 polynomial of the form}}
+\DoxyCodeLine{1356     \textcolor{comment}{// Q(x) = 1 + x * (C + x * P(x)), where the degree 8 polynomial P(x) is evaluated in}}
+\DoxyCodeLine{1357     \textcolor{comment}{// single precision, and the remaining steps are evaluated with extra precision using}}
+\DoxyCodeLine{1358     \textcolor{comment}{// double word arithmetic. C is an extra precise constant stored as a double word.}}
+\DoxyCodeLine{1359     \textcolor{comment}{//}}
+\DoxyCodeLine{1360     \textcolor{comment}{// The polynomial coefficients were calculated using Sollya commands:}}
+\DoxyCodeLine{1361     \textcolor{comment}{// > n = 11;}}
+\DoxyCodeLine{1362     \textcolor{comment}{// > f = 2\string^x;}}
+\DoxyCodeLine{1363     \textcolor{comment}{// > interval = [-\/0.5;0.5];}}
+\DoxyCodeLine{1364     \textcolor{comment}{// > p = fpminimax(f,n,[|1,DD,double...|],interval,relative,floating);}}
+\DoxyCodeLine{1365 }
+\DoxyCodeLine{1366     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p9 = pset1<Packet>(4.431642109085495276e-\/10);}
+\DoxyCodeLine{1367     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p8 = pset1<Packet>(7.073829923303358410e-\/9);}
+\DoxyCodeLine{1368     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p7 = pset1<Packet>(1.017822306737031311e-\/7);}
+\DoxyCodeLine{1369     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p6 = pset1<Packet>(1.321543498017646657e-\/6);}
+\DoxyCodeLine{1370     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p5 = pset1<Packet>(1.525273342728892877e-\/5);}
+\DoxyCodeLine{1371     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p4 = pset1<Packet>(1.540353045780084423e-\/4);}
+\DoxyCodeLine{1372     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p3 = pset1<Packet>(1.333355814685869807e-\/3);}
+\DoxyCodeLine{1373     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p2 = pset1<Packet>(9.618129107593478832e-\/3);}
+\DoxyCodeLine{1374     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p1 = pset1<Packet>(5.550410866481961247e-\/2);}
+\DoxyCodeLine{1375     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p0 = pset1<Packet>(0.240226506959101332);}
+\DoxyCodeLine{1376     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} C\_hi = pset1<Packet>(0.693147180559945286); }
+\DoxyCodeLine{1377     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} C\_lo = pset1<Packet>(4.81927865669806721e-\/17);}
+\DoxyCodeLine{1378     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} one = pset1<Packet>(1.0);}
+\DoxyCodeLine{1379 }
+\DoxyCodeLine{1380     \textcolor{comment}{// Evaluate P(x) in working precision.}}
+\DoxyCodeLine{1381     \textcolor{comment}{// We evaluate even and odd parts of the polynomial separately}}
+\DoxyCodeLine{1382     \textcolor{comment}{// to gain some instruction level parallelism.}}
+\DoxyCodeLine{1383     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} x2 = pmul(x,x);}
+\DoxyCodeLine{1384     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p\_even = pmadd(p8, x2, p6);}
+\DoxyCodeLine{1385     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p\_odd = pmadd(p9, x2, p7);}
+\DoxyCodeLine{1386     p\_even = pmadd(p\_even, x2, p4);}
+\DoxyCodeLine{1387     p\_odd = pmadd(p\_odd, x2, p5);}
+\DoxyCodeLine{1388     p\_even = pmadd(p\_even, x2, p2);}
+\DoxyCodeLine{1389     p\_odd = pmadd(p\_odd, x2, p3);}
+\DoxyCodeLine{1390     p\_even = pmadd(p\_even, x2, p0);}
+\DoxyCodeLine{1391     p\_odd = pmadd(p\_odd, x2, p1);}
+\DoxyCodeLine{1392     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p = pmadd(p\_odd, x, p\_even);}
+\DoxyCodeLine{1393 }
+\DoxyCodeLine{1394     \textcolor{comment}{// Evaluate the remaining terms of Q(x) with extra precision using}}
+\DoxyCodeLine{1395     \textcolor{comment}{// double word arithmetic.}}
+\DoxyCodeLine{1396     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p\_hi, p\_lo;}
+\DoxyCodeLine{1397     \textcolor{comment}{// x * p(x)}}
+\DoxyCodeLine{1398     twoprod(p, x, p\_hi, p\_lo);}
+\DoxyCodeLine{1399     \textcolor{comment}{// C + x * p(x)}}
+\DoxyCodeLine{1400     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} q1\_hi, q1\_lo;}
+\DoxyCodeLine{1401     twosum(p\_hi, p\_lo, C\_hi, C\_lo, q1\_hi, q1\_lo);}
+\DoxyCodeLine{1402     \textcolor{comment}{// x * (C + x * p(x))}}
+\DoxyCodeLine{1403     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} q2\_hi, q2\_lo;}
+\DoxyCodeLine{1404     twoprod(q1\_hi, q1\_lo, x, q2\_hi, q2\_lo);}
+\DoxyCodeLine{1405     \textcolor{comment}{// 1 + x * (C + x * p(x))}}
+\DoxyCodeLine{1406     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} q3\_hi, q3\_lo;}
+\DoxyCodeLine{1407     \textcolor{comment}{// Since |q2\_hi| <= sqrt(2)-\/1 < 1, we can use fast\_twosum}}
+\DoxyCodeLine{1408     \textcolor{comment}{// for adding it to unity here.}}
+\DoxyCodeLine{1409     fast\_twosum(one, q2\_hi, q3\_hi, q3\_lo);}
+\DoxyCodeLine{1410     \textcolor{keywordflow}{return} padd(q3\_hi, padd(q2\_lo, q3\_lo));}
+\DoxyCodeLine{1411   \}}
+\DoxyCodeLine{1412 \};}
+\DoxyCodeLine{1413 }
+\DoxyCodeLine{1414 \textcolor{comment}{// This function implements the non-\/trivial case of pow(x,y) where x is}}
+\DoxyCodeLine{1415 \textcolor{comment}{// positive and y is (possibly) non-\/integer.}}
+\DoxyCodeLine{1416 \textcolor{comment}{// Formally, pow(x,y) = exp2(y * log2(x)), where exp2(x) is shorthand for 2\string^x.}}
+\DoxyCodeLine{1417 \textcolor{comment}{// TODO(rmlarsen): We should probably add this as a packet up 'ppow', to make it}}
+\DoxyCodeLine{1418 \textcolor{comment}{// easier to specialize or turn off for specific types and/or backends.x}}
+\DoxyCodeLine{1419 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{1420 EIGEN\_STRONG\_INLINE \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} generic\_pow\_impl(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& x, \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& y) \{}
+\DoxyCodeLine{1421   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{unpacket\_traits<Packet>::type}} Scalar;}
+\DoxyCodeLine{1422   \textcolor{comment}{// Split x into exponent e\_x and mantissa m\_x.}}
+\DoxyCodeLine{1423   \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} e\_x;}
+\DoxyCodeLine{1424   \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} m\_x = pfrexp(x, e\_x);}
+\DoxyCodeLine{1425 }
+\DoxyCodeLine{1426   \textcolor{comment}{// Adjust m\_x to lie in [1/sqrt(2):sqrt(2)] to minimize absolute error in log2(m\_x).}}
+\DoxyCodeLine{1427   EIGEN\_CONSTEXPR Scalar sqrt\_half = Scalar(0.70710678118654752440);}
+\DoxyCodeLine{1428   \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} m\_x\_scale\_mask = pcmp\_lt(m\_x, pset1<Packet>(sqrt\_half));}
+\DoxyCodeLine{1429   m\_x = pselect(m\_x\_scale\_mask, pmul(pset1<Packet>(Scalar(2)), m\_x), m\_x);}
+\DoxyCodeLine{1430   e\_x = pselect(m\_x\_scale\_mask, psub(e\_x, pset1<Packet>(Scalar(1))), e\_x);}
+\DoxyCodeLine{1431 }
+\DoxyCodeLine{1432   \textcolor{comment}{// Compute log2(m\_x) with 6 extra bits of accuracy.}}
+\DoxyCodeLine{1433   \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} rx\_hi, rx\_lo;}
+\DoxyCodeLine{1434   \mbox{\hyperlink{structEigen_1_1internal_1_1accurate__log2}{accurate\_log2<Scalar>}}()(m\_x, rx\_hi, rx\_lo);}
+\DoxyCodeLine{1435 }
+\DoxyCodeLine{1436   \textcolor{comment}{// Compute the two terms \{y * e\_x, y * r\_x\} in f = y * log2(x) with doubled}}
+\DoxyCodeLine{1437   \textcolor{comment}{// precision using double word arithmetic.}}
+\DoxyCodeLine{1438   \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} f1\_hi, f1\_lo, f2\_hi, f2\_lo;}
+\DoxyCodeLine{1439   twoprod(e\_x, y, f1\_hi, f1\_lo);}
+\DoxyCodeLine{1440   twoprod(rx\_hi, rx\_lo, y, f2\_hi, f2\_lo);}
+\DoxyCodeLine{1441   \textcolor{comment}{// Sum the two terms in f using double word arithmetic. We know}}
+\DoxyCodeLine{1442   \textcolor{comment}{// that |e\_x| > |log2(m\_x)|, except for the case where e\_x==0.}}
+\DoxyCodeLine{1443   \textcolor{comment}{// This means that we can use fast\_twosum(f1,f2).}}
+\DoxyCodeLine{1444   \textcolor{comment}{// In the case e\_x == 0, e\_x * y = f1 = 0, so we don't lose any}}
+\DoxyCodeLine{1445   \textcolor{comment}{// accuracy by violating the assumption of fast\_twosum, because}}
+\DoxyCodeLine{1446   \textcolor{comment}{// it's a no-\/op.}}
+\DoxyCodeLine{1447   \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} f\_hi, f\_lo;}
+\DoxyCodeLine{1448   fast\_twosum(f1\_hi, f1\_lo, f2\_hi, f2\_lo, f\_hi, f\_lo);}
+\DoxyCodeLine{1449 }
+\DoxyCodeLine{1450   \textcolor{comment}{// Split f into integer and fractional parts.}}
+\DoxyCodeLine{1451   \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} n\_z, r\_z;}
+\DoxyCodeLine{1452   absolute\_split(f\_hi, n\_z, r\_z);}
+\DoxyCodeLine{1453   r\_z = padd(r\_z, f\_lo);}
+\DoxyCodeLine{1454   \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} n\_r;}
+\DoxyCodeLine{1455   absolute\_split(r\_z, n\_r, r\_z);}
+\DoxyCodeLine{1456   n\_z = padd(n\_z, n\_r);}
+\DoxyCodeLine{1457 }
+\DoxyCodeLine{1458   \textcolor{comment}{// We now have an accurate split of f = n\_z + r\_z and can compute}}
+\DoxyCodeLine{1459   \textcolor{comment}{//   x\string^y = 2**\{n\_z + r\_z) = exp2(r\_z) * 2**\{n\_z\}.}}
+\DoxyCodeLine{1460   \textcolor{comment}{// Since r\_z is in [-\/0.5;0.5], we compute the first factor to high accuracy}}
+\DoxyCodeLine{1461   \textcolor{comment}{// using a specialized algorithm. Multiplication by the second factor can}}
+\DoxyCodeLine{1462   \textcolor{comment}{// be done exactly using pldexp(), since it is an integer power of 2.}}
+\DoxyCodeLine{1463   \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} e\_r = \mbox{\hyperlink{structEigen_1_1internal_1_1fast__accurate__exp2}{fast\_accurate\_exp2<Scalar>}}()(r\_z);}
+\DoxyCodeLine{1464   \textcolor{keywordflow}{return} pldexp(e\_r, n\_z);}
+\DoxyCodeLine{1465 \}}
+\DoxyCodeLine{1466 }
+\DoxyCodeLine{1467 \textcolor{comment}{// Generic implementation of pow(x,y).}}
+\DoxyCodeLine{1468 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{1469 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS}
+\DoxyCodeLine{1470 EIGEN\_UNUSED}
+\DoxyCodeLine{1471 Packet generic\_pow(\textcolor{keyword}{const} Packet\& x, \textcolor{keyword}{const} Packet\& y) \{}
+\DoxyCodeLine{1472   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} unpacket\_traits<Packet>::type Scalar;}
+\DoxyCodeLine{1473 }
+\DoxyCodeLine{1474   \textcolor{keyword}{const} Packet cst\_pos\_inf = pset1<Packet>(\mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::infinity}}());}
+\DoxyCodeLine{1475   \textcolor{keyword}{const} Packet cst\_zero = pset1<Packet>(Scalar(0));}
+\DoxyCodeLine{1476   \textcolor{keyword}{const} Packet cst\_one = pset1<Packet>(Scalar(1));}
+\DoxyCodeLine{1477   \textcolor{keyword}{const} Packet cst\_nan = pset1<Packet>(\mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::quiet\_NaN}}());}
+\DoxyCodeLine{1478 }
+\DoxyCodeLine{1479   \textcolor{keyword}{const} Packet abs\_x = pabs(x);}
+\DoxyCodeLine{1480   \textcolor{comment}{// Predicates for sign and magnitude of x.}}
+\DoxyCodeLine{1481   \textcolor{keyword}{const} Packet x\_is\_zero = pcmp\_eq(x, cst\_zero);}
+\DoxyCodeLine{1482   \textcolor{keyword}{const} Packet x\_is\_neg = pcmp\_lt(x, cst\_zero);}
+\DoxyCodeLine{1483   \textcolor{keyword}{const} Packet abs\_x\_is\_inf = pcmp\_eq(abs\_x, cst\_pos\_inf);}
+\DoxyCodeLine{1484   \textcolor{keyword}{const} Packet abs\_x\_is\_one =  pcmp\_eq(abs\_x, cst\_one);}
+\DoxyCodeLine{1485   \textcolor{keyword}{const} Packet abs\_x\_is\_gt\_one = pcmp\_lt(cst\_one, abs\_x);}
+\DoxyCodeLine{1486   \textcolor{keyword}{const} Packet abs\_x\_is\_lt\_one = pcmp\_lt(abs\_x, cst\_one);}
+\DoxyCodeLine{1487   \textcolor{keyword}{const} Packet x\_is\_one =  pandnot(abs\_x\_is\_one, x\_is\_neg);}
+\DoxyCodeLine{1488   \textcolor{keyword}{const} Packet x\_is\_neg\_one =  pand(abs\_x\_is\_one, x\_is\_neg);}
+\DoxyCodeLine{1489   \textcolor{keyword}{const} Packet x\_is\_nan = pandnot(ptrue(x), pcmp\_eq(x, x));}
+\DoxyCodeLine{1490 }
+\DoxyCodeLine{1491   \textcolor{comment}{// Predicates for sign and magnitude of y.}}
+\DoxyCodeLine{1492   \textcolor{keyword}{const} Packet y\_is\_one = pcmp\_eq(y, cst\_one);}
+\DoxyCodeLine{1493   \textcolor{keyword}{const} Packet y\_is\_zero = pcmp\_eq(y, cst\_zero);}
+\DoxyCodeLine{1494   \textcolor{keyword}{const} Packet y\_is\_neg = pcmp\_lt(y, cst\_zero);}
+\DoxyCodeLine{1495   \textcolor{keyword}{const} Packet y\_is\_pos = pandnot(ptrue(y), por(y\_is\_zero, y\_is\_neg));}
+\DoxyCodeLine{1496   \textcolor{keyword}{const} Packet y\_is\_nan = pandnot(ptrue(y), pcmp\_eq(y, y));}
+\DoxyCodeLine{1497   \textcolor{keyword}{const} Packet abs\_y\_is\_inf = pcmp\_eq(pabs(y), cst\_pos\_inf);}
+\DoxyCodeLine{1498   EIGEN\_CONSTEXPR Scalar huge\_exponent =}
+\DoxyCodeLine{1499       (\mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::max\_exponent}}() * Scalar(EIGEN\_LN2)) /}
+\DoxyCodeLine{1500        \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::epsilon}}();}
+\DoxyCodeLine{1501   \textcolor{keyword}{const} Packet abs\_y\_is\_huge = pcmp\_le(pset1<Packet>(huge\_exponent), pabs(y));}
+\DoxyCodeLine{1502 }
+\DoxyCodeLine{1503   \textcolor{comment}{// Predicates for whether y is integer and/or even.}}
+\DoxyCodeLine{1504   \textcolor{keyword}{const} Packet y\_is\_int = pcmp\_eq(pfloor(y), y);}
+\DoxyCodeLine{1505   \textcolor{keyword}{const} Packet y\_div\_2 = pmul(y, pset1<Packet>(Scalar(0.5)));}
+\DoxyCodeLine{1506   \textcolor{keyword}{const} Packet y\_is\_even = pcmp\_eq(pround(y\_div\_2), y\_div\_2);}
+\DoxyCodeLine{1507 }
+\DoxyCodeLine{1508   \textcolor{comment}{// Predicates encoding special cases for the value of pow(x,y)}}
+\DoxyCodeLine{1509   \textcolor{keyword}{const} Packet invalid\_negative\_x = pandnot(pandnot(pandnot(x\_is\_neg, abs\_x\_is\_inf),}
+\DoxyCodeLine{1510                                                     y\_is\_int),}
+\DoxyCodeLine{1511                                             abs\_y\_is\_inf);}
+\DoxyCodeLine{1512   \textcolor{keyword}{const} Packet pow\_is\_one = por(por(x\_is\_one, y\_is\_zero),}
+\DoxyCodeLine{1513                                 pand(x\_is\_neg\_one,}
+\DoxyCodeLine{1514                                      por(abs\_y\_is\_inf, pandnot(y\_is\_even, invalid\_negative\_x))));}
+\DoxyCodeLine{1515   \textcolor{keyword}{const} Packet pow\_is\_nan = por(invalid\_negative\_x, por(x\_is\_nan, y\_is\_nan));}
+\DoxyCodeLine{1516   \textcolor{keyword}{const} Packet pow\_is\_zero = por(por(por(pand(x\_is\_zero, y\_is\_pos),}
+\DoxyCodeLine{1517                                          pand(abs\_x\_is\_inf, y\_is\_neg)),}
+\DoxyCodeLine{1518                                      pand(pand(abs\_x\_is\_lt\_one, abs\_y\_is\_huge),}
+\DoxyCodeLine{1519                                           y\_is\_pos)),}
+\DoxyCodeLine{1520                                  pand(pand(abs\_x\_is\_gt\_one, abs\_y\_is\_huge),}
+\DoxyCodeLine{1521                                       y\_is\_neg));}
+\DoxyCodeLine{1522   \textcolor{keyword}{const} Packet pow\_is\_inf = por(por(por(pand(x\_is\_zero, y\_is\_neg),}
+\DoxyCodeLine{1523                                         pand(abs\_x\_is\_inf, y\_is\_pos)),}
+\DoxyCodeLine{1524                                     pand(pand(abs\_x\_is\_lt\_one, abs\_y\_is\_huge),}
+\DoxyCodeLine{1525                                          y\_is\_neg)),}
+\DoxyCodeLine{1526                                 pand(pand(abs\_x\_is\_gt\_one, abs\_y\_is\_huge),}
+\DoxyCodeLine{1527                                      y\_is\_pos));}
+\DoxyCodeLine{1528 }
+\DoxyCodeLine{1529   \textcolor{comment}{// General computation of pow(x,y) for positive x or negative x and integer y.}}
+\DoxyCodeLine{1530   \textcolor{keyword}{const} Packet negate\_pow\_abs = pandnot(x\_is\_neg, y\_is\_even);}
+\DoxyCodeLine{1531   \textcolor{keyword}{const} Packet pow\_abs = generic\_pow\_impl(abs\_x, y);}
+\DoxyCodeLine{1532   \textcolor{keywordflow}{return} pselect(y\_is\_one, x,}
+\DoxyCodeLine{1533                  pselect(pow\_is\_one, cst\_one,}
+\DoxyCodeLine{1534                          pselect(pow\_is\_nan, cst\_nan,}
+\DoxyCodeLine{1535                                  pselect(pow\_is\_inf, cst\_pos\_inf,}
+\DoxyCodeLine{1536                                          pselect(pow\_is\_zero, cst\_zero,}
+\DoxyCodeLine{1537                                                  pselect(negate\_pow\_abs, pnegate(pow\_abs), pow\_abs))))));}
+\DoxyCodeLine{1538 \}}
+\DoxyCodeLine{1539 }
+\DoxyCodeLine{1540 }
+\DoxyCodeLine{1541 }
+\DoxyCodeLine{1542 \textcolor{comment}{/* polevl (modified for Eigen)}}
+\DoxyCodeLine{1543 \textcolor{comment}{ *}}
+\DoxyCodeLine{1544 \textcolor{comment}{ *      Evaluate polynomial}}
+\DoxyCodeLine{1545 \textcolor{comment}{ *}}
+\DoxyCodeLine{1546 \textcolor{comment}{ *}}
+\DoxyCodeLine{1547 \textcolor{comment}{ *}}
+\DoxyCodeLine{1548 \textcolor{comment}{ * SYNOPSIS:}}
+\DoxyCodeLine{1549 \textcolor{comment}{ *}}
+\DoxyCodeLine{1550 \textcolor{comment}{ * int N;}}
+\DoxyCodeLine{1551 \textcolor{comment}{ * Scalar x, y, coef[N+1];}}
+\DoxyCodeLine{1552 \textcolor{comment}{ *}}
+\DoxyCodeLine{1553 \textcolor{comment}{ * y = polevl<decltype(x), N>( x, coef);}}
+\DoxyCodeLine{1554 \textcolor{comment}{ *}}
+\DoxyCodeLine{1555 \textcolor{comment}{ *}}
+\DoxyCodeLine{1556 \textcolor{comment}{ *}}
+\DoxyCodeLine{1557 \textcolor{comment}{ * DESCRIPTION:}}
+\DoxyCodeLine{1558 \textcolor{comment}{ *}}
+\DoxyCodeLine{1559 \textcolor{comment}{ * Evaluates polynomial of degree N:}}
+\DoxyCodeLine{1560 \textcolor{comment}{ *}}
+\DoxyCodeLine{1561 \textcolor{comment}{ *                     2          N}}
+\DoxyCodeLine{1562 \textcolor{comment}{ * y  =  C  + C x + C x  +...+ C x}}
+\DoxyCodeLine{1563 \textcolor{comment}{ *        0    1     2          N}}
+\DoxyCodeLine{1564 \textcolor{comment}{ *}}
+\DoxyCodeLine{1565 \textcolor{comment}{ * Coefficients are stored in reverse order:}}
+\DoxyCodeLine{1566 \textcolor{comment}{ *}}
+\DoxyCodeLine{1567 \textcolor{comment}{ * coef[0] = C  , ..., coef[N] = C  .}}
+\DoxyCodeLine{1568 \textcolor{comment}{ *            N                   0}}
+\DoxyCodeLine{1569 \textcolor{comment}{ *}}
+\DoxyCodeLine{1570 \textcolor{comment}{ *  The function p1evl() assumes that coef[N] = 1.0 and is}}
+\DoxyCodeLine{1571 \textcolor{comment}{ * omitted from the array.  Its calling arguments are}}
+\DoxyCodeLine{1572 \textcolor{comment}{ * otherwise the same as polevl().}}
+\DoxyCodeLine{1573 \textcolor{comment}{ *}}
+\DoxyCodeLine{1574 \textcolor{comment}{ *}}
+\DoxyCodeLine{1575 \textcolor{comment}{ * The Eigen implementation is templatized.  For best speed, store}}
+\DoxyCodeLine{1576 \textcolor{comment}{ * coef as a const array (constexpr), e.g.}}
+\DoxyCodeLine{1577 \textcolor{comment}{ *}}
+\DoxyCodeLine{1578 \textcolor{comment}{ * const double coef[] = \{1.0, 2.0, 3.0, ...\};}}
+\DoxyCodeLine{1579 \textcolor{comment}{ *}}
+\DoxyCodeLine{1580 \textcolor{comment}{ */}}
+\DoxyCodeLine{1581 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet, \textcolor{keywordtype}{int} N>}
+\DoxyCodeLine{1582 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1ppolevl}{ppolevl}} \{}
+\DoxyCodeLine{1583   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} run(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& x, \textcolor{keyword}{const} \textcolor{keyword}{typename} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{unpacket\_traits<Packet>::type}} coeff[]) \{}
+\DoxyCodeLine{1584     EIGEN\_STATIC\_ASSERT((N > 0), YOU\_MADE\_A\_PROGRAMMING\_MISTAKE);}
+\DoxyCodeLine{1585     \textcolor{keywordflow}{return} pmadd(\mbox{\hyperlink{structEigen_1_1internal_1_1ppolevl}{ppolevl<Packet, N-\/1>::run}}(x, coeff), x, pset1<Packet>(coeff[N]));}
+\DoxyCodeLine{1586   \}}
+\DoxyCodeLine{1587 \};}
+\DoxyCodeLine{1588 }
+\DoxyCodeLine{1589 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{1590 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1ppolevl}{ppolevl}}<\mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}, 0> \{}
+\DoxyCodeLine{1591   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} run(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& x, \textcolor{keyword}{const} \textcolor{keyword}{typename} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{unpacket\_traits<Packet>::type}} coeff[]) \{}
+\DoxyCodeLine{1592     EIGEN\_UNUSED\_VARIABLE(x);}
+\DoxyCodeLine{1593     \textcolor{keywordflow}{return} pset1<Packet>(coeff[0]);}
+\DoxyCodeLine{1594   \}}
+\DoxyCodeLine{1595 \};}
+\DoxyCodeLine{1596 }
+\DoxyCodeLine{1597 \textcolor{comment}{/* chbevl (modified for Eigen)}}
+\DoxyCodeLine{1598 \textcolor{comment}{ *}}
+\DoxyCodeLine{1599 \textcolor{comment}{ *     Evaluate Chebyshev series}}
+\DoxyCodeLine{1600 \textcolor{comment}{ *}}
+\DoxyCodeLine{1601 \textcolor{comment}{ *}}
+\DoxyCodeLine{1602 \textcolor{comment}{ *}}
+\DoxyCodeLine{1603 \textcolor{comment}{ * SYNOPSIS:}}
+\DoxyCodeLine{1604 \textcolor{comment}{ *}}
+\DoxyCodeLine{1605 \textcolor{comment}{ * int N;}}
+\DoxyCodeLine{1606 \textcolor{comment}{ * Scalar x, y, coef[N], chebevl();}}
+\DoxyCodeLine{1607 \textcolor{comment}{ *}}
+\DoxyCodeLine{1608 \textcolor{comment}{ * y = chbevl( x, coef, N );}}
+\DoxyCodeLine{1609 \textcolor{comment}{ *}}
+\DoxyCodeLine{1610 \textcolor{comment}{ *}}
+\DoxyCodeLine{1611 \textcolor{comment}{ *}}
+\DoxyCodeLine{1612 \textcolor{comment}{ * DESCRIPTION:}}
+\DoxyCodeLine{1613 \textcolor{comment}{ *}}
+\DoxyCodeLine{1614 \textcolor{comment}{ * Evaluates the series}}
+\DoxyCodeLine{1615 \textcolor{comment}{ *}}
+\DoxyCodeLine{1616 \textcolor{comment}{ *        N-\/1}}
+\DoxyCodeLine{1617 \textcolor{comment}{ *         -\/ '}}
+\DoxyCodeLine{1618 \textcolor{comment}{ *  y  =   >   coef[i] T (x/2)}}
+\DoxyCodeLine{1619 \textcolor{comment}{ *         -\/            i}}
+\DoxyCodeLine{1620 \textcolor{comment}{ *        i=0}}
+\DoxyCodeLine{1621 \textcolor{comment}{ *}}
+\DoxyCodeLine{1622 \textcolor{comment}{ * of Chebyshev polynomials Ti at argument x/2.}}
+\DoxyCodeLine{1623 \textcolor{comment}{ *}}
+\DoxyCodeLine{1624 \textcolor{comment}{ * Coefficients are stored in reverse order, i.e. the zero}}
+\DoxyCodeLine{1625 \textcolor{comment}{ * order term is last in the array.  Note N is the number of}}
+\DoxyCodeLine{1626 \textcolor{comment}{ * coefficients, not the order.}}
+\DoxyCodeLine{1627 \textcolor{comment}{ *}}
+\DoxyCodeLine{1628 \textcolor{comment}{ * If coefficients are for the interval a to b, x must}}
+\DoxyCodeLine{1629 \textcolor{comment}{ * have been transformed to x -\/> 2(2x -\/ b -\/ a)/(b-\/a) before}}
+\DoxyCodeLine{1630 \textcolor{comment}{ * entering the routine.  This maps x from (a, b) to (-\/1, 1),}}
+\DoxyCodeLine{1631 \textcolor{comment}{ * over which the Chebyshev polynomials are defined.}}
+\DoxyCodeLine{1632 \textcolor{comment}{ *}}
+\DoxyCodeLine{1633 \textcolor{comment}{ * If the coefficients are for the inverted interval, in}}
+\DoxyCodeLine{1634 \textcolor{comment}{ * which (a, b) is mapped to (1/b, 1/a), the transformation}}
+\DoxyCodeLine{1635 \textcolor{comment}{ * required is x -\/> 2(2ab/x -\/ b -\/ a)/(b-\/a).  If b is infinity,}}
+\DoxyCodeLine{1636 \textcolor{comment}{ * this becomes x -\/> 4a/x -\/ 1.}}
+\DoxyCodeLine{1637 \textcolor{comment}{ *}}
+\DoxyCodeLine{1638 \textcolor{comment}{ *}}
+\DoxyCodeLine{1639 \textcolor{comment}{ *}}
+\DoxyCodeLine{1640 \textcolor{comment}{ * SPEED:}}
+\DoxyCodeLine{1641 \textcolor{comment}{ *}}
+\DoxyCodeLine{1642 \textcolor{comment}{ * Taking advantage of the recurrence properties of the}}
+\DoxyCodeLine{1643 \textcolor{comment}{ * Chebyshev polynomials, the routine requires one more}}
+\DoxyCodeLine{1644 \textcolor{comment}{ * addition per loop than evaluating a nested polynomial of}}
+\DoxyCodeLine{1645 \textcolor{comment}{ * the same degree.}}
+\DoxyCodeLine{1646 \textcolor{comment}{ *}}
+\DoxyCodeLine{1647 \textcolor{comment}{ */}}
+\DoxyCodeLine{1648 }
+\DoxyCodeLine{1649 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet, \textcolor{keywordtype}{int} N>}
+\DoxyCodeLine{1650 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1pchebevl}{pchebevl}} \{}
+\DoxyCodeLine{1651   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{1652   \textcolor{keyword}{static} EIGEN\_STRONG\_INLINE \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} run(\mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} x, \textcolor{keyword}{const} \textcolor{keyword}{typename} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{unpacket\_traits<Packet>::type}} coef[]) \{}
+\DoxyCodeLine{1653     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{unpacket\_traits<Packet>::type}} Scalar;}
+\DoxyCodeLine{1654     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} b0 = pset1<Packet>(coef[0]);}
+\DoxyCodeLine{1655     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} b1 = pset1<Packet>(\textcolor{keyword}{static\_cast<}Scalar\textcolor{keyword}{>}(0.f));}
+\DoxyCodeLine{1656     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} b2;}
+\DoxyCodeLine{1657 }
+\DoxyCodeLine{1658     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 1; i < N; i++) \{}
+\DoxyCodeLine{1659       b2 = b1;}
+\DoxyCodeLine{1660       b1 = b0;}
+\DoxyCodeLine{1661       b0 = psub(pmadd(x, b1, pset1<Packet>(coef[i])), b2);}
+\DoxyCodeLine{1662     \}}
+\DoxyCodeLine{1663 }
+\DoxyCodeLine{1664     \textcolor{keywordflow}{return} pmul(pset1<Packet>(\textcolor{keyword}{static\_cast<}Scalar\textcolor{keyword}{>}(0.5f)), psub(b0, b2));}
+\DoxyCodeLine{1665   \}}
+\DoxyCodeLine{1666 \};}
+\DoxyCodeLine{1667 }
+\DoxyCodeLine{1668 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{1669 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{1670 }
+\DoxyCodeLine{1671 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_ARCH\_GENERIC\_PACKET\_MATH\_FUNCTIONS\_H}}
+
+\end{DoxyCode}

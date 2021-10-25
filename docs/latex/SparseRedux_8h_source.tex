@@ -1,0 +1,57 @@
+\hypertarget{SparseRedux_8h_source}{}\doxysection{Sparse\+Redux.\+h}
+\label{SparseRedux_8h_source}\index{include/Eigen/src/SparseCore/SparseRedux.h@{include/Eigen/src/SparseCore/SparseRedux.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2008-\/2014 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_SPARSEREDUX\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_SPARSEREDUX\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{18 \textcolor{keyword}{typename} internal::traits<Derived>::Scalar}
+\DoxyCodeLine{19 SparseMatrixBase<Derived>::sum()\textcolor{keyword}{ const}}
+\DoxyCodeLine{20 \textcolor{keyword}{}\{}
+\DoxyCodeLine{21   eigen\_assert(rows()>0 \&\& cols()>0 \&\& \textcolor{stringliteral}{"{}you are using a non initialized matrix"{}});}
+\DoxyCodeLine{22   Scalar res(0);}
+\DoxyCodeLine{23   internal::evaluator<Derived> thisEval(derived());}
+\DoxyCodeLine{24   \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j=0; j<outerSize(); ++j)}
+\DoxyCodeLine{25     \textcolor{keywordflow}{for} (\textcolor{keyword}{typename} internal::evaluator<Derived>::InnerIterator iter(thisEval,j); iter; ++iter)}
+\DoxyCodeLine{26       res += iter.value();}
+\DoxyCodeLine{27   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{28 \}}
+\DoxyCodeLine{29 }
+\DoxyCodeLine{30 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar\_, \textcolor{keywordtype}{int} Options\_, \textcolor{keyword}{typename} Index\_>}
+\DoxyCodeLine{31 \textcolor{keyword}{typename} internal::traits<SparseMatrix<Scalar\_,Options\_,Index\_> >::Scalar}
+\DoxyCodeLine{32 \mbox{\hyperlink{classEigen_1_1SparseMatrix_ad2b635a54bf2fe66facd1cb1872aae9f}{SparseMatrix<Scalar\_,Options\_,Index\_>::sum}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{33 \textcolor{keyword}{}\{}
+\DoxyCodeLine{34   eigen\_assert(rows()>0 \&\& cols()>0 \&\& \textcolor{stringliteral}{"{}you are using a non initialized matrix"{}});}
+\DoxyCodeLine{35   \textcolor{keywordflow}{if}(this-\/>isCompressed())}
+\DoxyCodeLine{36     \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar,1,Dynamic>::Map}}(m\_data.valuePtr(), m\_data.size()).sum();}
+\DoxyCodeLine{37   \textcolor{keywordflow}{else}}
+\DoxyCodeLine{38     \textcolor{keywordflow}{return} Base::sum();}
+\DoxyCodeLine{39 \}}
+\DoxyCodeLine{40 }
+\DoxyCodeLine{41 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar\_, \textcolor{keywordtype}{int} Options\_, \textcolor{keyword}{typename} Index\_>}
+\DoxyCodeLine{42 \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<SparseVector<Scalar\_,Options\_, Index\_>}} >::Scalar}
+\DoxyCodeLine{43 \mbox{\hyperlink{classEigen_1_1SparseVector_af9c187a697e11a8abf9110d54631846c}{SparseVector<Scalar\_,Options\_,Index\_>::sum}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{44 \textcolor{keyword}{}\{}
+\DoxyCodeLine{45   eigen\_assert(rows()>0 \&\& cols()>0 \&\& \textcolor{stringliteral}{"{}you are using a non initialized matrix"{}});}
+\DoxyCodeLine{46   \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar,1,Dynamic>::Map}}(m\_data.valuePtr(), m\_data.size()).sum();}
+\DoxyCodeLine{47 \}}
+\DoxyCodeLine{48 }
+\DoxyCodeLine{49 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{50 }
+\DoxyCodeLine{51 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_SPARSEREDUX\_H}}
+
+\end{DoxyCode}

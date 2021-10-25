@@ -1,0 +1,97 @@
+\hypertarget{AVX512_2TypeCasting_8h_source}{}\doxysection{Type\+Casting.\+h}
+\label{AVX512_2TypeCasting_8h_source}\index{include/Eigen/src/Core/arch/AVX512/TypeCasting.h@{include/Eigen/src/Core/arch/AVX512/TypeCasting.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2019 Rasmus Munk Larsen <rmlarsen@google.com>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_TYPE\_CASTING\_AVX512\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_TYPE\_CASTING\_AVX512\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}../../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet16i pcast<Packet16f, Packet16i>(\textcolor{keyword}{const} Packet16f\& a) \{}
+\DoxyCodeLine{20   \textcolor{keywordflow}{return} \_mm512\_cvttps\_epi32(a);}
+\DoxyCodeLine{21 \}}
+\DoxyCodeLine{22 }
+\DoxyCodeLine{23 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet16f pcast<Packet16i, Packet16f>(\textcolor{keyword}{const} Packet16i\& a) \{}
+\DoxyCodeLine{24   \textcolor{keywordflow}{return} \_mm512\_cvtepi32\_ps(a);}
+\DoxyCodeLine{25 \}}
+\DoxyCodeLine{26 }
+\DoxyCodeLine{27 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet16i preinterpret<Packet16i, Packet16f>(\textcolor{keyword}{const} Packet16f\& a) \{}
+\DoxyCodeLine{28   \textcolor{keywordflow}{return} \_mm512\_castps\_si512(a);}
+\DoxyCodeLine{29 \}}
+\DoxyCodeLine{30 }
+\DoxyCodeLine{31 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet16f preinterpret<Packet16f, Packet16i>(\textcolor{keyword}{const} Packet16i\& a) \{}
+\DoxyCodeLine{32   \textcolor{keywordflow}{return} \_mm512\_castsi512\_ps(a);}
+\DoxyCodeLine{33 \}}
+\DoxyCodeLine{34 }
+\DoxyCodeLine{35 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{36 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<\mbox{\hyperlink{structEigen_1_1half}{half}}, float> \{}
+\DoxyCodeLine{37   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{38     VectorizedCast = 1,}
+\DoxyCodeLine{39     SrcCoeffRatio = 1,}
+\DoxyCodeLine{40     TgtCoeffRatio = 1}
+\DoxyCodeLine{41   \};}
+\DoxyCodeLine{42 \};}
+\DoxyCodeLine{43 }
+\DoxyCodeLine{44 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet16f pcast<Packet16h, Packet16f>(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1eigen__packet__wrapper}{Packet16h}}\& a) \{}
+\DoxyCodeLine{45   \textcolor{keywordflow}{return} half2float(a);}
+\DoxyCodeLine{46 \}}
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{49 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<float, \mbox{\hyperlink{structEigen_1_1half}{half}}> \{}
+\DoxyCodeLine{50   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{51     VectorizedCast = 1,}
+\DoxyCodeLine{52     SrcCoeffRatio = 1,}
+\DoxyCodeLine{53     TgtCoeffRatio = 1}
+\DoxyCodeLine{54   \};}
+\DoxyCodeLine{55 \};}
+\DoxyCodeLine{56 }
+\DoxyCodeLine{57 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \mbox{\hyperlink{structEigen_1_1internal_1_1eigen__packet__wrapper}{Packet16h}} pcast<Packet16f, Packet16h>(\textcolor{keyword}{const} Packet16f\& a) \{}
+\DoxyCodeLine{58   \textcolor{keywordflow}{return} float2half(a);}
+\DoxyCodeLine{59 \}}
+\DoxyCodeLine{60 }
+\DoxyCodeLine{61 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{62 \textcolor{keyword}{struct }type\_casting\_traits<\mbox{\hyperlink{structEigen_1_1bfloat16}{bfloat16}}, float> \{}
+\DoxyCodeLine{63   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{64     VectorizedCast = 1,}
+\DoxyCodeLine{65     SrcCoeffRatio = 1,}
+\DoxyCodeLine{66     TgtCoeffRatio = 1}
+\DoxyCodeLine{67   \};}
+\DoxyCodeLine{68 \};}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet16f pcast<Packet16bf, Packet16f>(\textcolor{keyword}{const} Packet16bf\& a) \{}
+\DoxyCodeLine{71   \textcolor{keywordflow}{return} Bf16ToF32(a);}
+\DoxyCodeLine{72 \}}
+\DoxyCodeLine{73 }
+\DoxyCodeLine{74 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{75 \textcolor{keyword}{struct }type\_casting\_traits<float, bfloat16> \{}
+\DoxyCodeLine{76   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{77     VectorizedCast = 1,}
+\DoxyCodeLine{78     SrcCoeffRatio = 1,}
+\DoxyCodeLine{79     TgtCoeffRatio = 1}
+\DoxyCodeLine{80   \};}
+\DoxyCodeLine{81 \};}
+\DoxyCodeLine{82 }
+\DoxyCodeLine{83 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet16bf pcast<Packet16f, Packet16bf>(\textcolor{keyword}{const} Packet16f\& a) \{}
+\DoxyCodeLine{84   \textcolor{keywordflow}{return} F32ToBf16(a);}
+\DoxyCodeLine{85 \}}
+\DoxyCodeLine{86 }
+\DoxyCodeLine{87 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{88 }
+\DoxyCodeLine{89 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{90 }
+\DoxyCodeLine{91 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_TYPE\_CASTING\_AVX512\_H}}
+
+\end{DoxyCode}

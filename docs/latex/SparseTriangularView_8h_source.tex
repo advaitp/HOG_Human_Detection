@@ -1,0 +1,186 @@
+\hypertarget{SparseTriangularView_8h_source}{}\doxysection{Sparse\+Triangular\+View.\+h}
+\label{SparseTriangularView_8h_source}\index{include/Eigen/src/SparseCore/SparseTriangularView.h@{include/Eigen/src/SparseCore/SparseTriangularView.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2009-\/2015 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2012 Désiré Nuentsa-\/Wakam <desire.nuentsa\_wakam@inria.fr>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_SPARSE\_TRIANGULARVIEW\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_SPARSE\_TRIANGULARVIEW\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{27 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} Mode> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1TriangularViewImpl}{TriangularViewImpl}}<MatrixType,Mode,\mbox{\hyperlink{structEigen_1_1Sparse}{Sparse}}>}
+\DoxyCodeLine{28   : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{SparseMatrixBase}}<TriangularView<MatrixType,Mode> >}
+\DoxyCodeLine{29 \{}
+\DoxyCodeLine{30     \textcolor{keyword}{enum} \{ SkipFirst = ((Mode\&\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}}) \&\& !(MatrixType::Flags\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}))}
+\DoxyCodeLine{31                     || ((Mode\&\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}}) \&\&  (MatrixType::Flags\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})),}
+\DoxyCodeLine{32            SkipLast = !SkipFirst,}
+\DoxyCodeLine{33            SkipDiag = (Mode\&\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdac4dc554a61510151ddd5bafaf6040223}{ZeroDiag}}) ? 1 : 0,}
+\DoxyCodeLine{34            HasUnitDiag = (Mode\&\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cda2ef430bff6cc12c2d1e0ef01b95f7ff3}{UnitDiag}}) ? 1 : 0}
+\DoxyCodeLine{35     \};}
+\DoxyCodeLine{36     }
+\DoxyCodeLine{37     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView<MatrixType,Mode>}} \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularViewType}};}
+\DoxyCodeLine{38     }
+\DoxyCodeLine{39   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{40     \textcolor{comment}{// dummy solve function to make TriangularView happy.}}
+\DoxyCodeLine{41     \textcolor{keywordtype}{void} solve() \textcolor{keyword}{const};}
+\DoxyCodeLine{42 }
+\DoxyCodeLine{43     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{SparseMatrixBase<TriangularViewType>}} \mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{Base}};}
+\DoxyCodeLine{44   \textcolor{keyword}{public}:}
+\DoxyCodeLine{45     }
+\DoxyCodeLine{46     EIGEN\_SPARSE\_PUBLIC\_INTERFACE(\mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularViewType}})}
+\DoxyCodeLine{47     }
+\DoxyCodeLine{48     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Nested MatrixTypeNested;}
+\DoxyCodeLine{49     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_reference<MatrixTypeNested>::type MatrixTypeNestedNonRef;}
+\DoxyCodeLine{50     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<MatrixTypeNested>::type MatrixTypeNestedCleaned;}
+\DoxyCodeLine{51 }
+\DoxyCodeLine{52     \textcolor{keyword}{template}<\textcolor{keyword}{typename} RhsType, \textcolor{keyword}{typename} DstType>}
+\DoxyCodeLine{53     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{54     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} \_solve\_impl(\textcolor{keyword}{const} RhsType \&rhs, DstType \&dst)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{55       \textcolor{keywordflow}{if}(!(\mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{internal::is\_same<RhsType,DstType>::value}} \&\& internal::extract\_data(dst) == internal::extract\_data(rhs)))}
+\DoxyCodeLine{56         dst = rhs;}
+\DoxyCodeLine{57       this-\/>solveInPlace(dst);}
+\DoxyCodeLine{58     \}}
+\DoxyCodeLine{59 }
+\DoxyCodeLine{61     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived> \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType_00_01Mode_00_01Sparse_01_4_a3f3385e827fcc0bf27d1ec21c80740bc}{solveInPlace}}(\mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<OtherDerived>}}\& other) \textcolor{keyword}{const};}
+\DoxyCodeLine{62 }
+\DoxyCodeLine{64     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived> \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType_00_01Mode_00_01Sparse_01_4_a70190d4105e1fd4f27abbf73365dfa0c}{solveInPlace}}(\mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{SparseMatrixBase<OtherDerived>}}\& other) \textcolor{keyword}{const};}
+\DoxyCodeLine{65   }
+\DoxyCodeLine{66 \};}
+\DoxyCodeLine{67 }
+\DoxyCodeLine{68 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ArgType, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} Mode>}
+\DoxyCodeLine{71 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView}}<ArgType,Mode>, \mbox{\hyperlink{structEigen_1_1internal_1_1IteratorBased}{IteratorBased}}>}
+\DoxyCodeLine{72  : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<TriangularView<ArgType,Mode> >}
+\DoxyCodeLine{73 \{}
+\DoxyCodeLine{74   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView<ArgType,Mode>}} \mbox{\hyperlink{classEigen_1_1TriangularView}{XprType}};}
+\DoxyCodeLine{75   }
+\DoxyCodeLine{76 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{77   }
+\DoxyCodeLine{78   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Scalar Scalar;}
+\DoxyCodeLine{79   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::StorageIndex StorageIndex;}
+\DoxyCodeLine{80   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::InnerIterator}} EvalIterator;}
+\DoxyCodeLine{81   }
+\DoxyCodeLine{82   \textcolor{keyword}{enum} \{ SkipFirst = ((Mode\&\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}}) \&\& !(ArgType::Flags\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}))}
+\DoxyCodeLine{83                     || ((Mode\&\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}}) \&\&  (ArgType::Flags\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})),}
+\DoxyCodeLine{84          SkipLast = !SkipFirst,}
+\DoxyCodeLine{85          SkipDiag = (Mode\&\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdac4dc554a61510151ddd5bafaf6040223}{ZeroDiag}}) ? 1 : 0,}
+\DoxyCodeLine{86          HasUnitDiag = (Mode\&\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cda2ef430bff6cc12c2d1e0ef01b95f7ff3}{UnitDiag}}) ? 1 : 0}
+\DoxyCodeLine{87   \};}
+\DoxyCodeLine{88   }
+\DoxyCodeLine{89 \textcolor{keyword}{public}:}
+\DoxyCodeLine{90   }
+\DoxyCodeLine{91   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{92     CoeffReadCost = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::CoeffReadCost}},}
+\DoxyCodeLine{93     Flags = XprType::Flags}
+\DoxyCodeLine{94   \};}
+\DoxyCodeLine{95     }
+\DoxyCodeLine{96   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1TriangularView}{XprType}} \&xpr) : m\_argImpl(xpr.\mbox{\hyperlink{classEigen_1_1TriangularView_a2b70e70011b9e18fc6e8f859e3f3dc76}{nestedExpression}}()), m\_arg(xpr.\mbox{\hyperlink{classEigen_1_1TriangularView_a2b70e70011b9e18fc6e8f859e3f3dc76}{nestedExpression}}()) \{\}}
+\DoxyCodeLine{97   }
+\DoxyCodeLine{98   \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nonZerosEstimate()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{99     \textcolor{keywordflow}{return} m\_argImpl.nonZerosEstimate();}
+\DoxyCodeLine{100   \}}
+\DoxyCodeLine{101   }
+\DoxyCodeLine{102   \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1InnerIterator}{InnerIterator}} : \textcolor{keyword}{public} EvalIterator}
+\DoxyCodeLine{103   \{}
+\DoxyCodeLine{104       \textcolor{keyword}{typedef} EvalIterator \mbox{\hyperlink{classBase}{Base}};}
+\DoxyCodeLine{105     \textcolor{keyword}{public}:}
+\DoxyCodeLine{106 }
+\DoxyCodeLine{107       EIGEN\_STRONG\_INLINE \mbox{\hyperlink{classEigen_1_1InnerIterator}{InnerIterator}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}\& xprEval, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outer)}
+\DoxyCodeLine{108         : \mbox{\hyperlink{classBase}{Base}}(xprEval.m\_argImpl,outer), m\_returnOne(\textcolor{keyword}{false}), m\_containsDiag(Base::outer()<xprEval.m\_arg.innerSize())}
+\DoxyCodeLine{109       \{}
+\DoxyCodeLine{110         \textcolor{keywordflow}{if}(SkipFirst)}
+\DoxyCodeLine{111         \{}
+\DoxyCodeLine{112           \textcolor{keywordflow}{while}((*\textcolor{keyword}{this}) \&\& ((HasUnitDiag||SkipDiag)  ? this-\/>index()<=outer : this-\/>index()<outer))}
+\DoxyCodeLine{113             Base::operator++();}
+\DoxyCodeLine{114           \textcolor{keywordflow}{if}(HasUnitDiag)}
+\DoxyCodeLine{115             m\_returnOne = m\_containsDiag;}
+\DoxyCodeLine{116         \}}
+\DoxyCodeLine{117         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(HasUnitDiag \&\& ((!Base::operator \textcolor{keywordtype}{bool}()) || Base::index()>=Base::outer()))}
+\DoxyCodeLine{118         \{}
+\DoxyCodeLine{119           \textcolor{keywordflow}{if}((!SkipFirst) \&\& Base::operator \textcolor{keywordtype}{bool}())}
+\DoxyCodeLine{120             Base::operator++();}
+\DoxyCodeLine{121           m\_returnOne = m\_containsDiag;}
+\DoxyCodeLine{122         \}}
+\DoxyCodeLine{123       \}}
+\DoxyCodeLine{124 }
+\DoxyCodeLine{125       EIGEN\_STRONG\_INLINE \mbox{\hyperlink{classEigen_1_1InnerIterator}{InnerIterator}}\& operator++()}
+\DoxyCodeLine{126       \{}
+\DoxyCodeLine{127         \textcolor{keywordflow}{if}(HasUnitDiag \&\& m\_returnOne)}
+\DoxyCodeLine{128           m\_returnOne = \textcolor{keyword}{false};}
+\DoxyCodeLine{129         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{130         \{}
+\DoxyCodeLine{131           Base::operator++();}
+\DoxyCodeLine{132           \textcolor{keywordflow}{if}(HasUnitDiag \&\& (!SkipFirst) \&\& ((!Base::operator \textcolor{keywordtype}{bool}()) || Base::index()>=Base::outer()))}
+\DoxyCodeLine{133           \{}
+\DoxyCodeLine{134             \textcolor{keywordflow}{if}((!SkipFirst) \&\& Base::operator \textcolor{keywordtype}{bool}())}
+\DoxyCodeLine{135               Base::operator++();}
+\DoxyCodeLine{136             m\_returnOne = m\_containsDiag;}
+\DoxyCodeLine{137           \}}
+\DoxyCodeLine{138         \}}
+\DoxyCodeLine{139         \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{140       \}}
+\DoxyCodeLine{141       }
+\DoxyCodeLine{142       EIGEN\_STRONG\_INLINE \textcolor{keyword}{operator} bool()\textcolor{keyword}{ const}}
+\DoxyCodeLine{143 \textcolor{keyword}{      }\{}
+\DoxyCodeLine{144         \textcolor{keywordflow}{if}(HasUnitDiag \&\& m\_returnOne)}
+\DoxyCodeLine{145           \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
+\DoxyCodeLine{146         \textcolor{keywordflow}{if}(SkipFirst) \textcolor{keywordflow}{return}  Base::operator bool();}
+\DoxyCodeLine{147         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{148         \{}
+\DoxyCodeLine{149           \textcolor{keywordflow}{if} (SkipDiag) \textcolor{keywordflow}{return} (Base::operator \textcolor{keywordtype}{bool}() \&\& this-\/>index() < this-\/>outer());}
+\DoxyCodeLine{150           \textcolor{keywordflow}{else} \textcolor{keywordflow}{return} (Base::operator \textcolor{keywordtype}{bool}() \&\& this-\/>index() <= this-\/>outer());}
+\DoxyCodeLine{151         \}}
+\DoxyCodeLine{152       \}}
+\DoxyCodeLine{153 }
+\DoxyCodeLine{154 \textcolor{comment}{//       inline Index row() const \{ return (ArgType::Flags\&RowMajorBit ? Base::outer() : this-\/>index()); \}}}
+\DoxyCodeLine{155 \textcolor{comment}{//       inline Index col() const \{ return (ArgType::Flags\&RowMajorBit ? this-\/>index() : Base::outer()); \}}}
+\DoxyCodeLine{156       \textcolor{keyword}{inline} StorageIndex index()\textcolor{keyword}{ const}}
+\DoxyCodeLine{157 \textcolor{keyword}{      }\{}
+\DoxyCodeLine{158         \textcolor{keywordflow}{if}(HasUnitDiag \&\& m\_returnOne)  \textcolor{keywordflow}{return} internal::convert\_index<StorageIndex>(Base::outer());}
+\DoxyCodeLine{159         \textcolor{keywordflow}{else}                            \textcolor{keywordflow}{return} Base::index();}
+\DoxyCodeLine{160       \}}
+\DoxyCodeLine{161       \textcolor{keyword}{inline} Scalar value()\textcolor{keyword}{ const}}
+\DoxyCodeLine{162 \textcolor{keyword}{      }\{}
+\DoxyCodeLine{163         \textcolor{keywordflow}{if}(HasUnitDiag \&\& m\_returnOne)  \textcolor{keywordflow}{return} Scalar(1);}
+\DoxyCodeLine{164         \textcolor{keywordflow}{else}                            \textcolor{keywordflow}{return} Base::value();}
+\DoxyCodeLine{165       \}}
+\DoxyCodeLine{166 }
+\DoxyCodeLine{167     \textcolor{keyword}{protected}:}
+\DoxyCodeLine{168       \textcolor{keywordtype}{bool} m\_returnOne;}
+\DoxyCodeLine{169       \textcolor{keywordtype}{bool} m\_containsDiag;}
+\DoxyCodeLine{170     \textcolor{keyword}{private}:}
+\DoxyCodeLine{171       Scalar\& valueRef();}
+\DoxyCodeLine{172   \};}
+\DoxyCodeLine{173   }
+\DoxyCodeLine{174 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{175   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>}} m\_argImpl;}
+\DoxyCodeLine{176   \textcolor{keyword}{const} ArgType\& m\_arg;}
+\DoxyCodeLine{177 \};}
+\DoxyCodeLine{178 }
+\DoxyCodeLine{179 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{180 }
+\DoxyCodeLine{181 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{182 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Mode>}
+\DoxyCodeLine{183 \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView<const Derived, Mode>}}}
+\DoxyCodeLine{184 \mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{SparseMatrixBase<Derived>::triangularView}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{185 \textcolor{keyword}{}\{}
+\DoxyCodeLine{186   \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView<const Derived, Mode>}}(derived());}
+\DoxyCodeLine{187 \}}
+\DoxyCodeLine{188 }
+\DoxyCodeLine{189 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{190 }
+\DoxyCodeLine{191 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_SPARSE\_TRIANGULARVIEW\_H}}
+
+\end{DoxyCode}

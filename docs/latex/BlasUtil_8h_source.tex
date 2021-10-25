@@ -1,0 +1,587 @@
+\hypertarget{BlasUtil_8h_source}{}\doxysection{Blas\+Util.\+h}
+\label{BlasUtil_8h_source}\index{include/Eigen/src/Core/util/BlasUtil.h@{include/Eigen/src/Core/util/BlasUtil.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2009-\/2010 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_BLASUTIL\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_BLASUTIL\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{comment}{// This file contains many lightweight helper classes used to}}
+\DoxyCodeLine{14 \textcolor{comment}{// implement and control fast level 2 and level 3 BLAS-\/like routines.}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{preprocessor}{\#include "{}../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{19 }
+\DoxyCodeLine{20 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{21 }
+\DoxyCodeLine{22 \textcolor{comment}{// forward declarations}}
+\DoxyCodeLine{23 \textcolor{keyword}{template}<\textcolor{keyword}{typename} LhsScalar, \textcolor{keyword}{typename} RhsScalar, \textcolor{keyword}{typename} Index, \textcolor{keyword}{typename} DataMapper, \textcolor{keywordtype}{int} mr, \textcolor{keywordtype}{int} nr, \textcolor{keywordtype}{bool} ConjugateLhs=false, \textcolor{keywordtype}{bool} ConjugateRhs=false>}
+\DoxyCodeLine{24 \textcolor{keyword}{struct }gebp\_kernel;}
+\DoxyCodeLine{25 }
+\DoxyCodeLine{26 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Index, \textcolor{keyword}{typename} DataMapper, \textcolor{keywordtype}{int} nr, \textcolor{keywordtype}{int} StorageOrder, \textcolor{keywordtype}{bool} Conjugate = false, \textcolor{keywordtype}{bool} PanelMode=false>}
+\DoxyCodeLine{27 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1gemm__pack__rhs}{gemm\_pack\_rhs}};}
+\DoxyCodeLine{28 }
+\DoxyCodeLine{29 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Index, \textcolor{keyword}{typename} DataMapper, \textcolor{keywordtype}{int} Pack1, \textcolor{keywordtype}{int} Pack2, \textcolor{keyword}{typename} Packet, \textcolor{keywordtype}{int} StorageOrder, \textcolor{keywordtype}{bool} Conjugate = false, \textcolor{keywordtype}{bool} PanelMode = false>}
+\DoxyCodeLine{30 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1gemm__pack__lhs}{gemm\_pack\_lhs}};}
+\DoxyCodeLine{31 }
+\DoxyCodeLine{32 \textcolor{keyword}{template}<}
+\DoxyCodeLine{33   \textcolor{keyword}{typename} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}},}
+\DoxyCodeLine{34   \textcolor{keyword}{typename} LhsScalar, \textcolor{keywordtype}{int} LhsStorageOrder, \textcolor{keywordtype}{bool} ConjugateLhs,}
+\DoxyCodeLine{35   \textcolor{keyword}{typename} RhsScalar, \textcolor{keywordtype}{int} RhsStorageOrder, \textcolor{keywordtype}{bool} ConjugateRhs,}
+\DoxyCodeLine{36   \textcolor{keywordtype}{int} ResStorageOrder, \textcolor{keywordtype}{int} ResInnerStride>}
+\DoxyCodeLine{37 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1general__matrix__matrix__product}{general\_matrix\_matrix\_product}};}
+\DoxyCodeLine{38 }
+\DoxyCodeLine{39 \textcolor{keyword}{template}<\textcolor{keyword}{typename} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}},}
+\DoxyCodeLine{40          \textcolor{keyword}{typename} LhsScalar, \textcolor{keyword}{typename} LhsMapper, \textcolor{keywordtype}{int} LhsStorageOrder, \textcolor{keywordtype}{bool} ConjugateLhs,}
+\DoxyCodeLine{41          \textcolor{keyword}{typename} RhsScalar, \textcolor{keyword}{typename} RhsMapper, \textcolor{keywordtype}{bool} ConjugateRhs, \textcolor{keywordtype}{int} Version=Specialized>}
+\DoxyCodeLine{42 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1general__matrix__vector__product}{general\_matrix\_vector\_product}};}
+\DoxyCodeLine{43 }
+\DoxyCodeLine{44 \textcolor{keyword}{template}<\textcolor{keyword}{typename} From,\textcolor{keyword}{typename} To> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1get__factor}{get\_factor}} \{}
+\DoxyCodeLine{45   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{static} EIGEN\_STRONG\_INLINE To run(\textcolor{keyword}{const} From\& x) \{ \textcolor{keywordflow}{return} To(x); \}}
+\DoxyCodeLine{46 \};}
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1get__factor}{get\_factor}}<Scalar,typename \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits}}<Scalar>::Real> \{}
+\DoxyCodeLine{49   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{50   \textcolor{keyword}{static} EIGEN\_STRONG\_INLINE \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}} run(\textcolor{keyword}{const} Scalar\& x) \{ \textcolor{keywordflow}{return} numext::real(x); \}}
+\DoxyCodeLine{51 \};}
+\DoxyCodeLine{52 }
+\DoxyCodeLine{53 }
+\DoxyCodeLine{54 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Index>}
+\DoxyCodeLine{55 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1BlasVectorMapper}{BlasVectorMapper}} \{}
+\DoxyCodeLine{56   \textcolor{keyword}{public}:}
+\DoxyCodeLine{57   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \mbox{\hyperlink{classEigen_1_1internal_1_1BlasVectorMapper}{BlasVectorMapper}}(Scalar *data) : m\_data(data) \{\}}
+\DoxyCodeLine{58 }
+\DoxyCodeLine{59   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE Scalar operator()(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{60     \textcolor{keywordflow}{return} m\_data[i];}
+\DoxyCodeLine{61   \}}
+\DoxyCodeLine{62   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet, \textcolor{keywordtype}{int} AlignmentType>}
+\DoxyCodeLine{63   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} load(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{64     \textcolor{keywordflow}{return} ploadt<Packet, AlignmentType>(m\_data + i);}
+\DoxyCodeLine{65   \}}
+\DoxyCodeLine{66 }
+\DoxyCodeLine{67   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{68   EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{bool} aligned(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{69     \textcolor{keywordflow}{return} (UIntPtr(m\_data+i)\%\textcolor{keyword}{sizeof}(\mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}))==0;}
+\DoxyCodeLine{70   \}}
+\DoxyCodeLine{71 }
+\DoxyCodeLine{72   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{73   Scalar* m\_data;}
+\DoxyCodeLine{74 \};}
+\DoxyCodeLine{75 }
+\DoxyCodeLine{76 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Index, \textcolor{keywordtype}{int} AlignmentType, \textcolor{keywordtype}{int} Incr=1>}
+\DoxyCodeLine{77 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1BlasLinearMapper}{BlasLinearMapper}};}
+\DoxyCodeLine{78 }
+\DoxyCodeLine{79 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Index, \textcolor{keywordtype}{int} AlignmentType>}
+\DoxyCodeLine{80 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1BlasLinearMapper}{BlasLinearMapper}}<Scalar,\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}},\mbox{\hyperlink{group__enums_ga45fe06e29902b7a2773de05ba27b47a1}{AlignmentType}}>}
+\DoxyCodeLine{81 \{}
+\DoxyCodeLine{82 \textcolor{keyword}{public}:}
+\DoxyCodeLine{83   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \mbox{\hyperlink{classEigen_1_1internal_1_1BlasLinearMapper}{BlasLinearMapper}}(Scalar *data, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} incr=1)}
+\DoxyCodeLine{84     : m\_data(data)}
+\DoxyCodeLine{85   \{}
+\DoxyCodeLine{86     EIGEN\_ONLY\_USED\_FOR\_DEBUG(incr);}
+\DoxyCodeLine{87     eigen\_assert(incr==1);}
+\DoxyCodeLine{88   \}}
+\DoxyCodeLine{89 }
+\DoxyCodeLine{90   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} prefetch(\textcolor{keywordtype}{int} i)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{91     internal::prefetch(\&\textcolor{keyword}{operator}()(i));}
+\DoxyCodeLine{92   \}}
+\DoxyCodeLine{93 }
+\DoxyCodeLine{94   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE Scalar\& operator()(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{95     \textcolor{keywordflow}{return} m\_data[i];}
+\DoxyCodeLine{96   \}}
+\DoxyCodeLine{97 }
+\DoxyCodeLine{98   \textcolor{keyword}{template}<\textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{99   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE PacketType loadPacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{100     \textcolor{keywordflow}{return} ploadt<PacketType, AlignmentType>(m\_data + i);}
+\DoxyCodeLine{101   \}}
+\DoxyCodeLine{102 }
+\DoxyCodeLine{103   \textcolor{keyword}{template}<\textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{104   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} storePacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \textcolor{keyword}{const} PacketType \&p)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{105     pstoret<Scalar, PacketType, AlignmentType>(m\_data + i, p);}
+\DoxyCodeLine{106   \}}
+\DoxyCodeLine{107 }
+\DoxyCodeLine{108 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{109   Scalar *m\_data;}
+\DoxyCodeLine{110 \};}
+\DoxyCodeLine{111 }
+\DoxyCodeLine{112 \textcolor{comment}{// Lightweight helper class to access matrix coefficients.}}
+\DoxyCodeLine{113 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Index, \textcolor{keywordtype}{int} StorageOrder, \textcolor{keywordtype}{int} AlignmentType = Unaligned, \textcolor{keywordtype}{int} Incr = 1>}
+\DoxyCodeLine{114 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1blas__data__mapper}{blas\_data\_mapper}};}
+\DoxyCodeLine{115 }
+\DoxyCodeLine{116 \textcolor{comment}{// TMP to help PacketBlock store implementation.}}
+\DoxyCodeLine{117 \textcolor{comment}{// There's currently no known use case for PacketBlock load.}}
+\DoxyCodeLine{118 \textcolor{comment}{// The default implementation assumes ColMajor order.}}
+\DoxyCodeLine{119 \textcolor{comment}{// It always store each packet sequentially one `stride` apart.}}
+\DoxyCodeLine{120 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Index, \textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Packet, \textcolor{keywordtype}{int} n, \textcolor{keywordtype}{int} \textcolor{keywordtype}{id}x, \textcolor{keywordtype}{int} StorageOrder>}
+\DoxyCodeLine{121 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1PacketBlockManagement}{PacketBlockManagement}}}
+\DoxyCodeLine{122 \{}
+\DoxyCodeLine{123   \mbox{\hyperlink{structEigen_1_1internal_1_1PacketBlockManagement}{PacketBlockManagement}}<\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}, Scalar, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}, n, idx -\/ 1, StorageOrder> pbm;}
+\DoxyCodeLine{124   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} store(Scalar *to, \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1PacketBlock}{PacketBlock<Packet, n>}} \&block)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{125     pbm.store(to, stride, i, j, block);}
+\DoxyCodeLine{126     pstoreu<Scalar>(to + i + (j + idx)*stride, block.packet[idx]);}
+\DoxyCodeLine{127   \}}
+\DoxyCodeLine{128 \};}
+\DoxyCodeLine{129 }
+\DoxyCodeLine{130 \textcolor{comment}{// PacketBlockManagement specialization to take care of RowMajor order without ifs.}}
+\DoxyCodeLine{131 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Index, \textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Packet, \textcolor{keywordtype}{int} n, \textcolor{keywordtype}{int} \textcolor{keywordtype}{id}x>}
+\DoxyCodeLine{132 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1PacketBlockManagement}{PacketBlockManagement}}<\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}, Scalar, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}, n, idx, \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}}>}
+\DoxyCodeLine{133 \{}
+\DoxyCodeLine{134   \mbox{\hyperlink{structEigen_1_1internal_1_1PacketBlockManagement}{PacketBlockManagement}}<\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}, Scalar, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}, n, idx -\/ 1, \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}}> pbm;}
+\DoxyCodeLine{135   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} store(Scalar *to, \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1PacketBlock}{PacketBlock<Packet, n>}} \&block)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{136     pbm.store(to, stride, i, j, block);}
+\DoxyCodeLine{137     pstoreu<Scalar>(to + j + (i + idx)*stride, block.packet[idx]);}
+\DoxyCodeLine{138   \}}
+\DoxyCodeLine{139 \};}
+\DoxyCodeLine{140 }
+\DoxyCodeLine{141 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Index, \textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Packet, \textcolor{keywordtype}{int} n, \textcolor{keywordtype}{int} StorageOrder>}
+\DoxyCodeLine{142 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1PacketBlockManagement}{PacketBlockManagement}}<\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}, Scalar, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}, n, -\/1, StorageOrder>}
+\DoxyCodeLine{143 \{}
+\DoxyCodeLine{144   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} store(Scalar *to, \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1PacketBlock}{PacketBlock<Packet, n>}} \&block)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{145     EIGEN\_UNUSED\_VARIABLE(to);}
+\DoxyCodeLine{146     EIGEN\_UNUSED\_VARIABLE(stride);}
+\DoxyCodeLine{147     EIGEN\_UNUSED\_VARIABLE(i);}
+\DoxyCodeLine{148     EIGEN\_UNUSED\_VARIABLE(j);}
+\DoxyCodeLine{149     EIGEN\_UNUSED\_VARIABLE(block);}
+\DoxyCodeLine{150   \}}
+\DoxyCodeLine{151 \};}
+\DoxyCodeLine{152 }
+\DoxyCodeLine{153 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Index, \textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Packet, \textcolor{keywordtype}{int} n>}
+\DoxyCodeLine{154 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1PacketBlockManagement}{PacketBlockManagement}}<\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}, Scalar, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}, n, -\/1, \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}}>}
+\DoxyCodeLine{155 \{}
+\DoxyCodeLine{156   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} store(Scalar *to, \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1PacketBlock}{PacketBlock<Packet, n>}} \&block)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{157     EIGEN\_UNUSED\_VARIABLE(to);}
+\DoxyCodeLine{158     EIGEN\_UNUSED\_VARIABLE(stride);}
+\DoxyCodeLine{159     EIGEN\_UNUSED\_VARIABLE(i);}
+\DoxyCodeLine{160     EIGEN\_UNUSED\_VARIABLE(j);}
+\DoxyCodeLine{161     EIGEN\_UNUSED\_VARIABLE(block);}
+\DoxyCodeLine{162   \}}
+\DoxyCodeLine{163 \};}
+\DoxyCodeLine{164 }
+\DoxyCodeLine{165 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Index, \textcolor{keywordtype}{int} StorageOrder, \textcolor{keywordtype}{int} AlignmentType>}
+\DoxyCodeLine{166 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1blas__data__mapper}{blas\_data\_mapper}}<Scalar,\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}},StorageOrder,\mbox{\hyperlink{group__enums_ga45fe06e29902b7a2773de05ba27b47a1}{AlignmentType}},1>}
+\DoxyCodeLine{167 \{}
+\DoxyCodeLine{168 \textcolor{keyword}{public}:}
+\DoxyCodeLine{169   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1internal_1_1BlasLinearMapper_3_01Scalar_00_01Index_00_01AlignmentType_01_4}{BlasLinearMapper<Scalar, Index, AlignmentType>}} \mbox{\hyperlink{classEigen_1_1internal_1_1BlasLinearMapper_3_01Scalar_00_01Index_00_01AlignmentType_01_4}{LinearMapper}};}
+\DoxyCodeLine{170   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1internal_1_1BlasVectorMapper}{BlasVectorMapper<Scalar, Index>}} \mbox{\hyperlink{classEigen_1_1internal_1_1BlasVectorMapper}{VectorMapper}};}
+\DoxyCodeLine{171 }
+\DoxyCodeLine{172   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \mbox{\hyperlink{classEigen_1_1internal_1_1blas__data__mapper}{blas\_data\_mapper}}(Scalar* data, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} incr=1)}
+\DoxyCodeLine{173    : m\_data(data), m\_stride(stride)}
+\DoxyCodeLine{174   \{}
+\DoxyCodeLine{175     EIGEN\_ONLY\_USED\_FOR\_DEBUG(incr);}
+\DoxyCodeLine{176     eigen\_assert(incr==1);}
+\DoxyCodeLine{177   \}}
+\DoxyCodeLine{178 }
+\DoxyCodeLine{179   EIGEN\_DEVICE\_FUNC  EIGEN\_ALWAYS\_INLINE \mbox{\hyperlink{classEigen_1_1internal_1_1blas__data__mapper}{blas\_data\_mapper<Scalar, Index, StorageOrder, AlignmentType>}}}
+\DoxyCodeLine{180   getSubMapper(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{181     \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1internal_1_1blas__data__mapper}{blas\_data\_mapper<Scalar, Index, StorageOrder, AlignmentType>}}(\&\textcolor{keyword}{operator}()(i, j), m\_stride);}
+\DoxyCodeLine{182   \}}
+\DoxyCodeLine{183 }
+\DoxyCodeLine{184   EIGEN\_DEVICE\_FUNC  EIGEN\_ALWAYS\_INLINE \mbox{\hyperlink{classEigen_1_1internal_1_1BlasLinearMapper_3_01Scalar_00_01Index_00_01AlignmentType_01_4}{LinearMapper}} getLinearMapper(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{185     \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1internal_1_1BlasLinearMapper_3_01Scalar_00_01Index_00_01AlignmentType_01_4}{LinearMapper}}(\&\textcolor{keyword}{operator}()(i, j));}
+\DoxyCodeLine{186   \}}
+\DoxyCodeLine{187 }
+\DoxyCodeLine{188   EIGEN\_DEVICE\_FUNC  EIGEN\_ALWAYS\_INLINE \mbox{\hyperlink{classEigen_1_1internal_1_1BlasVectorMapper}{VectorMapper}} getVectorMapper(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{189     \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1internal_1_1BlasVectorMapper}{VectorMapper}}(\&\textcolor{keyword}{operator}()(i, j));}
+\DoxyCodeLine{190   \}}
+\DoxyCodeLine{191 }
+\DoxyCodeLine{192 }
+\DoxyCodeLine{193   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{194   EIGEN\_ALWAYS\_INLINE Scalar\& operator()(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{195     \textcolor{keywordflow}{return} m\_data[StorageOrder==\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}} ? j + i*m\_stride : i + j*m\_stride];}
+\DoxyCodeLine{196   \}}
+\DoxyCodeLine{197 }
+\DoxyCodeLine{198   \textcolor{keyword}{template}<\textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{199   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE PacketType loadPacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{200     \textcolor{keywordflow}{return} ploadt<PacketType, AlignmentType>(\&\textcolor{keyword}{operator}()(i, j));}
+\DoxyCodeLine{201   \}}
+\DoxyCodeLine{202 }
+\DoxyCodeLine{203   \textcolor{keyword}{template} <\textcolor{keyword}{typename} PacketT, \textcolor{keywordtype}{int} AlignmentT>}
+\DoxyCodeLine{204   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE PacketT load(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{205     \textcolor{keywordflow}{return} ploadt<PacketT, AlignmentT>(\&\textcolor{keyword}{operator}()(i, j));}
+\DoxyCodeLine{206   \}}
+\DoxyCodeLine{207 }
+\DoxyCodeLine{208   \textcolor{keyword}{template}<\textcolor{keyword}{typename} SubPacket>}
+\DoxyCodeLine{209   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} scatterPacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j, \textcolor{keyword}{const} SubPacket \&p)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{210     pscatter<Scalar, SubPacket>(\&\textcolor{keyword}{operator}()(i, j), p, m\_stride);}
+\DoxyCodeLine{211   \}}
+\DoxyCodeLine{212 }
+\DoxyCodeLine{213   \textcolor{keyword}{template}<\textcolor{keyword}{typename} SubPacket>}
+\DoxyCodeLine{214   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE SubPacket gatherPacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{215     \textcolor{keywordflow}{return} pgather<Scalar, SubPacket>(\&\textcolor{keyword}{operator}()(i, j), m\_stride);}
+\DoxyCodeLine{216   \}}
+\DoxyCodeLine{217 }
+\DoxyCodeLine{218   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_stride; \}}
+\DoxyCodeLine{219   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{const} Scalar* data()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_data; \}}
+\DoxyCodeLine{220 }
+\DoxyCodeLine{221   EIGEN\_DEVICE\_FUNC \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} firstAligned(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{222     \textcolor{keywordflow}{if} (UIntPtr(m\_data)\%\textcolor{keyword}{sizeof}(Scalar)) \{}
+\DoxyCodeLine{223       \textcolor{keywordflow}{return} -\/1;}
+\DoxyCodeLine{224     \}}
+\DoxyCodeLine{225     \textcolor{keywordflow}{return} internal::first\_default\_aligned(m\_data, size);}
+\DoxyCodeLine{226   \}}
+\DoxyCodeLine{227 }
+\DoxyCodeLine{228   \textcolor{keyword}{template}<\textcolor{keyword}{typename} SubPacket, \textcolor{keywordtype}{int} n>}
+\DoxyCodeLine{229   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} storePacketBlock(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1PacketBlock}{PacketBlock<SubPacket, n>}} \&block)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{230     \mbox{\hyperlink{structEigen_1_1internal_1_1PacketBlockManagement}{PacketBlockManagement}}<\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}, Scalar, SubPacket, n, n-\/1, StorageOrder> pbm;}
+\DoxyCodeLine{231     pbm.store(m\_data, m\_stride, i, j, block);}
+\DoxyCodeLine{232   \}}
+\DoxyCodeLine{233 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{234   Scalar* EIGEN\_RESTRICT m\_data;}
+\DoxyCodeLine{235   \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m\_stride;}
+\DoxyCodeLine{236 \};}
+\DoxyCodeLine{237 }
+\DoxyCodeLine{238 \textcolor{comment}{// Implementation of non-\/natural increment (i.e. inner-\/stride != 1)}}
+\DoxyCodeLine{239 \textcolor{comment}{// The exposed API is not complete yet compared to the Incr==1 case}}
+\DoxyCodeLine{240 \textcolor{comment}{// because some features makes less sense in this case.}}
+\DoxyCodeLine{241 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Index, \textcolor{keywordtype}{int} AlignmentType, \textcolor{keywordtype}{int} Incr>}
+\DoxyCodeLine{242 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1BlasLinearMapper}{BlasLinearMapper}}}
+\DoxyCodeLine{243 \{}
+\DoxyCodeLine{244 \textcolor{keyword}{public}:}
+\DoxyCodeLine{245   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \mbox{\hyperlink{classEigen_1_1internal_1_1BlasLinearMapper}{BlasLinearMapper}}(Scalar *data,\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} incr) : m\_data(data), m\_incr(incr) \{\}}
+\DoxyCodeLine{246 }
+\DoxyCodeLine{247   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} prefetch(\textcolor{keywordtype}{int} i)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{248     internal::prefetch(\&\textcolor{keyword}{operator}()(i));}
+\DoxyCodeLine{249   \}}
+\DoxyCodeLine{250 }
+\DoxyCodeLine{251   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE Scalar\& operator()(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{252     \textcolor{keywordflow}{return} m\_data[i*m\_incr.value()];}
+\DoxyCodeLine{253   \}}
+\DoxyCodeLine{254 }
+\DoxyCodeLine{255   \textcolor{keyword}{template}<\textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{256   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE PacketType loadPacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{257     \textcolor{keywordflow}{return} pgather<Scalar,PacketType>(m\_data + i*m\_incr.value(), m\_incr.value());}
+\DoxyCodeLine{258   \}}
+\DoxyCodeLine{259 }
+\DoxyCodeLine{260   \textcolor{keyword}{template}<\textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{261   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} storePacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \textcolor{keyword}{const} PacketType \&p)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{262     pscatter<Scalar, PacketType>(m\_data + i*m\_incr.value(), p, m\_incr.value());}
+\DoxyCodeLine{263   \}}
+\DoxyCodeLine{264 }
+\DoxyCodeLine{265 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{266   Scalar *m\_data;}
+\DoxyCodeLine{267   \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1variable__if__dynamic}{internal::variable\_if\_dynamic<Index,Incr>}} m\_incr;}
+\DoxyCodeLine{268 \};}
+\DoxyCodeLine{269 }
+\DoxyCodeLine{270 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Index, \textcolor{keywordtype}{int} StorageOrder, \textcolor{keywordtype}{int} AlignmentType,\textcolor{keywordtype}{int} Incr>}
+\DoxyCodeLine{271 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1blas__data__mapper}{blas\_data\_mapper}}}
+\DoxyCodeLine{272 \{}
+\DoxyCodeLine{273 \textcolor{keyword}{public}:}
+\DoxyCodeLine{274   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1internal_1_1BlasLinearMapper}{BlasLinearMapper<Scalar, Index, AlignmentType,Incr>}} \mbox{\hyperlink{classEigen_1_1internal_1_1BlasLinearMapper}{LinearMapper}};}
+\DoxyCodeLine{275 }
+\DoxyCodeLine{276   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \mbox{\hyperlink{classEigen_1_1internal_1_1blas__data__mapper}{blas\_data\_mapper}}(Scalar* data, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} incr) : m\_data(data), m\_stride(stride), m\_incr(incr) \{\}}
+\DoxyCodeLine{277 }
+\DoxyCodeLine{278   EIGEN\_DEVICE\_FUNC  EIGEN\_ALWAYS\_INLINE \mbox{\hyperlink{classEigen_1_1internal_1_1blas__data__mapper}{blas\_data\_mapper}}}
+\DoxyCodeLine{279   getSubMapper(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{280     \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1internal_1_1blas__data__mapper}{blas\_data\_mapper}}(\&\textcolor{keyword}{operator}()(i, j), m\_stride, m\_incr.value());}
+\DoxyCodeLine{281   \}}
+\DoxyCodeLine{282 }
+\DoxyCodeLine{283   EIGEN\_DEVICE\_FUNC  EIGEN\_ALWAYS\_INLINE \mbox{\hyperlink{classEigen_1_1internal_1_1BlasLinearMapper}{LinearMapper}} getLinearMapper(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{284     \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1internal_1_1BlasLinearMapper}{LinearMapper}}(\&\textcolor{keyword}{operator}()(i, j), m\_incr.value());}
+\DoxyCodeLine{285   \}}
+\DoxyCodeLine{286 }
+\DoxyCodeLine{287   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{288   EIGEN\_ALWAYS\_INLINE Scalar\& operator()(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{289     \textcolor{keywordflow}{return} m\_data[StorageOrder==\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}} ? j*m\_incr.value() + i*m\_stride : i*m\_incr.value() + j*m\_stride];}
+\DoxyCodeLine{290   \}}
+\DoxyCodeLine{291 }
+\DoxyCodeLine{292   \textcolor{keyword}{template}<\textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{293   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE PacketType loadPacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{294     \textcolor{keywordflow}{return} pgather<Scalar,PacketType>(\&\textcolor{keyword}{operator}()(i, j),m\_incr.value());}
+\DoxyCodeLine{295   \}}
+\DoxyCodeLine{296 }
+\DoxyCodeLine{297   \textcolor{keyword}{template} <\textcolor{keyword}{typename} PacketT, \textcolor{keywordtype}{int} AlignmentT>}
+\DoxyCodeLine{298   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE PacketT load(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{299     \textcolor{keywordflow}{return} pgather<Scalar,PacketT>(\&\textcolor{keyword}{operator}()(i, j),m\_incr.value());}
+\DoxyCodeLine{300   \}}
+\DoxyCodeLine{301 }
+\DoxyCodeLine{302   \textcolor{keyword}{template}<\textcolor{keyword}{typename} SubPacket>}
+\DoxyCodeLine{303   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} scatterPacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j, \textcolor{keyword}{const} SubPacket \&p)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{304     pscatter<Scalar, SubPacket>(\&\textcolor{keyword}{operator}()(i, j), p, m\_stride);}
+\DoxyCodeLine{305   \}}
+\DoxyCodeLine{306 }
+\DoxyCodeLine{307   \textcolor{keyword}{template}<\textcolor{keyword}{typename} SubPacket>}
+\DoxyCodeLine{308   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE SubPacket gatherPacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{309     \textcolor{keywordflow}{return} pgather<Scalar, SubPacket>(\&\textcolor{keyword}{operator}()(i, j), m\_stride);}
+\DoxyCodeLine{310   \}}
+\DoxyCodeLine{311 }
+\DoxyCodeLine{312   \textcolor{comment}{// storePacketBlock\_helper defines a way to access values inside the PacketBlock, this is essentially required by the Complex types.}}
+\DoxyCodeLine{313   \textcolor{keyword}{template}<\textcolor{keyword}{typename} SubPacket, \textcolor{keyword}{typename} Scalar\_, \textcolor{keywordtype}{int} n, \textcolor{keywordtype}{int} \textcolor{keywordtype}{id}x>}
+\DoxyCodeLine{314   \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1blas__data__mapper_1_1storePacketBlock__helper}{storePacketBlock\_helper}}}
+\DoxyCodeLine{315   \{}
+\DoxyCodeLine{316     \mbox{\hyperlink{structEigen_1_1internal_1_1blas__data__mapper_1_1storePacketBlock__helper}{storePacketBlock\_helper}}<SubPacket, Scalar\_, n, idx-\/1> spbh;}
+\DoxyCodeLine{317     EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} store(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1blas__data__mapper}{blas\_data\_mapper<Scalar, Index, StorageOrder, AlignmentType, Incr>}}* sup, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1PacketBlock}{PacketBlock<SubPacket, n>}}\& block)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{318       spbh.store(sup, i,j,block);}
+\DoxyCodeLine{319       \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} l = 0; l < unpacket\_traits<SubPacket>::size; l++)}
+\DoxyCodeLine{320       \{}
+\DoxyCodeLine{321         Scalar\_ *v = \&sup-\/>operator()(i+l, j+idx);}
+\DoxyCodeLine{322         *v = block.packet[idx][l];}
+\DoxyCodeLine{323       \}}
+\DoxyCodeLine{324     \}}
+\DoxyCodeLine{325   \};}
+\DoxyCodeLine{326 }
+\DoxyCodeLine{327   \textcolor{keyword}{template}<\textcolor{keyword}{typename} SubPacket, \textcolor{keywordtype}{int} n, \textcolor{keywordtype}{int} \textcolor{keywordtype}{id}x>}
+\DoxyCodeLine{328   \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1blas__data__mapper_1_1storePacketBlock__helper}{storePacketBlock\_helper}}<SubPacket, std::complex<float>, n, idx>}
+\DoxyCodeLine{329   \{}
+\DoxyCodeLine{330     \mbox{\hyperlink{structEigen_1_1internal_1_1blas__data__mapper_1_1storePacketBlock__helper}{storePacketBlock\_helper<SubPacket, std::complex<float>}}, n, idx-\/1> spbh;}
+\DoxyCodeLine{331     EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} store(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1blas__data__mapper}{blas\_data\_mapper<Scalar, Index, StorageOrder, AlignmentType, Incr>}}* sup, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1PacketBlock}{PacketBlock<SubPacket, n>}}\& block)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{332       spbh.store(sup,i,j,block);}
+\DoxyCodeLine{333       \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} l = 0; l < unpacket\_traits<SubPacket>::size; l++)}
+\DoxyCodeLine{334       \{}
+\DoxyCodeLine{335         std::complex<float> *v = \&sup-\/>operator()(i+l, j+idx);}
+\DoxyCodeLine{336         v-\/>real(block.packet[idx].v[2*l+0]);}
+\DoxyCodeLine{337         v-\/>imag(block.packet[idx].v[2*l+1]);}
+\DoxyCodeLine{338       \}}
+\DoxyCodeLine{339     \}}
+\DoxyCodeLine{340   \};}
+\DoxyCodeLine{341 }
+\DoxyCodeLine{342   \textcolor{keyword}{template}<\textcolor{keyword}{typename} SubPacket, \textcolor{keywordtype}{int} n, \textcolor{keywordtype}{int} \textcolor{keywordtype}{id}x>}
+\DoxyCodeLine{343   \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1blas__data__mapper_1_1storePacketBlock__helper}{storePacketBlock\_helper}}<SubPacket, std::complex<double>, n, idx>}
+\DoxyCodeLine{344   \{}
+\DoxyCodeLine{345     \mbox{\hyperlink{structEigen_1_1internal_1_1blas__data__mapper_1_1storePacketBlock__helper}{storePacketBlock\_helper<SubPacket, std::complex<double>}}, n, idx-\/1> spbh;}
+\DoxyCodeLine{346     EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} store(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1blas__data__mapper}{blas\_data\_mapper<Scalar, Index, StorageOrder, AlignmentType, Incr>}}* sup, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1PacketBlock}{PacketBlock<SubPacket, n>}}\& block)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{347       spbh.store(sup,i,j,block);}
+\DoxyCodeLine{348       \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} l = 0; l < unpacket\_traits<SubPacket>::size; l++)}
+\DoxyCodeLine{349       \{}
+\DoxyCodeLine{350         std::complex<double> *v = \&sup-\/>operator()(i+l, j+idx);}
+\DoxyCodeLine{351         v-\/>real(block.packet[idx].v[2*l+0]);}
+\DoxyCodeLine{352         v-\/>imag(block.packet[idx].v[2*l+1]);}
+\DoxyCodeLine{353       \}}
+\DoxyCodeLine{354     \}}
+\DoxyCodeLine{355   \};}
+\DoxyCodeLine{356 }
+\DoxyCodeLine{357   \textcolor{keyword}{template}<\textcolor{keyword}{typename} SubPacket, \textcolor{keyword}{typename} Scalar\_, \textcolor{keywordtype}{int} n>}
+\DoxyCodeLine{358   \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1blas__data__mapper_1_1storePacketBlock__helper}{storePacketBlock\_helper}}<SubPacket, Scalar\_, n, -\/1>}
+\DoxyCodeLine{359   \{}
+\DoxyCodeLine{360     EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} store(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1blas__data__mapper}{blas\_data\_mapper<Scalar, Index, StorageOrder, AlignmentType, Incr>}}*, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1PacketBlock}{PacketBlock<SubPacket, n>}}\& )\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{361     \}}
+\DoxyCodeLine{362   \};}
+\DoxyCodeLine{363 }
+\DoxyCodeLine{364   \textcolor{keyword}{template}<\textcolor{keyword}{typename} SubPacket, \textcolor{keywordtype}{int} n>}
+\DoxyCodeLine{365   \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1blas__data__mapper_1_1storePacketBlock__helper}{storePacketBlock\_helper}}<SubPacket, std::complex<float>, n, -\/1>}
+\DoxyCodeLine{366   \{}
+\DoxyCodeLine{367     EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} store(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1blas__data__mapper}{blas\_data\_mapper<Scalar, Index, StorageOrder, AlignmentType, Incr>}}*, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1PacketBlock}{PacketBlock<SubPacket, n>}}\& )\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{368     \}}
+\DoxyCodeLine{369   \};}
+\DoxyCodeLine{370 }
+\DoxyCodeLine{371   \textcolor{keyword}{template}<\textcolor{keyword}{typename} SubPacket, \textcolor{keywordtype}{int} n>}
+\DoxyCodeLine{372   \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1blas__data__mapper_1_1storePacketBlock__helper}{storePacketBlock\_helper}}<SubPacket, std::complex<double>, n, -\/1>}
+\DoxyCodeLine{373   \{}
+\DoxyCodeLine{374     EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} store(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1blas__data__mapper}{blas\_data\_mapper<Scalar, Index, StorageOrder, AlignmentType, Incr>}}*, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1PacketBlock}{PacketBlock<SubPacket, n>}}\& )\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{375     \}}
+\DoxyCodeLine{376   \};}
+\DoxyCodeLine{377   \textcolor{comment}{// This function stores a PacketBlock on m\_data, this approach is really quite slow compare to Incr=1 and should be avoided when possible.}}
+\DoxyCodeLine{378   \textcolor{keyword}{template}<\textcolor{keyword}{typename} SubPacket, \textcolor{keywordtype}{int} n>}
+\DoxyCodeLine{379   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} storePacketBlock(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1PacketBlock}{PacketBlock<SubPacket, n>}}\&block)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{380     \mbox{\hyperlink{structEigen_1_1internal_1_1blas__data__mapper_1_1storePacketBlock__helper}{storePacketBlock\_helper}}<SubPacket, Scalar, n, n-\/1> spb;}
+\DoxyCodeLine{381     spb.store(\textcolor{keyword}{this}, i,j,block);}
+\DoxyCodeLine{382   \}}
+\DoxyCodeLine{383 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{384   Scalar* EIGEN\_RESTRICT m\_data;}
+\DoxyCodeLine{385   \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m\_stride;}
+\DoxyCodeLine{386   \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1variable__if__dynamic}{internal::variable\_if\_dynamic<Index,Incr>}} m\_incr;}
+\DoxyCodeLine{387 \};}
+\DoxyCodeLine{388 }
+\DoxyCodeLine{389 \textcolor{comment}{// lightweight helper class to access matrix coefficients (const version)}}
+\DoxyCodeLine{390 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Index, \textcolor{keywordtype}{int} StorageOrder>}
+\DoxyCodeLine{391 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1const__blas__data__mapper}{const\_blas\_data\_mapper}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1internal_1_1blas__data__mapper}{blas\_data\_mapper}}<const Scalar, Index, StorageOrder> \{}
+\DoxyCodeLine{392   \textcolor{keyword}{public}:}
+\DoxyCodeLine{393   EIGEN\_ALWAYS\_INLINE \mbox{\hyperlink{classEigen_1_1internal_1_1const__blas__data__mapper}{const\_blas\_data\_mapper}}(\textcolor{keyword}{const} Scalar *data, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride) : \mbox{\hyperlink{classEigen_1_1internal_1_1blas__data__mapper}{blas\_data\_mapper<const Scalar, Index, StorageOrder>}}(data, stride) \{\}}
+\DoxyCodeLine{394 }
+\DoxyCodeLine{395   EIGEN\_ALWAYS\_INLINE \mbox{\hyperlink{classEigen_1_1internal_1_1const__blas__data__mapper}{const\_blas\_data\_mapper<Scalar, Index, StorageOrder>}} getSubMapper(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{396     \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1internal_1_1const__blas__data__mapper}{const\_blas\_data\_mapper<Scalar, Index, StorageOrder>}}(\&(this-\/>\textcolor{keyword}{operator}()(i, j)), this-\/>m\_stride);}
+\DoxyCodeLine{397   \}}
+\DoxyCodeLine{398 \};}
+\DoxyCodeLine{399 }
+\DoxyCodeLine{400 }
+\DoxyCodeLine{401 \textcolor{comment}{/* Helper class to analyze the factors of a Product expression.}}
+\DoxyCodeLine{402 \textcolor{comment}{ * In particular it allows to pop out operator-\/, scalar multiples,}}
+\DoxyCodeLine{403 \textcolor{comment}{ * and conjugate */}}
+\DoxyCodeLine{404 \textcolor{keyword}{template}<\textcolor{keyword}{typename} XprType> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits}}}
+\DoxyCodeLine{405 \{}
+\DoxyCodeLine{406   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<XprType>::Scalar}} Scalar;}
+\DoxyCodeLine{407   \textcolor{keyword}{typedef} \textcolor{keyword}{const} XprType\& ExtractType;}
+\DoxyCodeLine{408   \textcolor{keyword}{typedef} XprType \_ExtractType;}
+\DoxyCodeLine{409   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{410     IsComplex = \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::IsComplex}},}
+\DoxyCodeLine{411     IsTransposed = \textcolor{keyword}{false},}
+\DoxyCodeLine{412     NeedToConjugate = \textcolor{keyword}{false},}
+\DoxyCodeLine{413     HasUsableDirectAccess = (    (int(XprType::Flags)\&\mbox{\hyperlink{group__flags_gabf1e9d0516a933445a4c307ad8f14915}{DirectAccessBit}})}
+\DoxyCodeLine{414                               \&\& (   \textcolor{keywordtype}{bool}(XprType::IsVectorAtCompileTime)}
+\DoxyCodeLine{415                                   || int(\mbox{\hyperlink{structEigen_1_1internal_1_1inner__stride__at__compile__time}{inner\_stride\_at\_compile\_time<XprType>::ret}}) == 1)}
+\DoxyCodeLine{416                              ) ?  1 : 0,}
+\DoxyCodeLine{417     HasScalarFactor = \textcolor{keyword}{false}}
+\DoxyCodeLine{418   \};}
+\DoxyCodeLine{419   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1conditional}{conditional}}<bool(HasUsableDirectAccess),}
+\DoxyCodeLine{420     ExtractType,}
+\DoxyCodeLine{421     \textcolor{keyword}{typename} \_ExtractType::PlainObject}
+\DoxyCodeLine{422     >::type \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{DirectLinearAccessType}};}
+\DoxyCodeLine{423   \textcolor{keyword}{static} \textcolor{keyword}{inline} EIGEN\_DEVICE\_FUNC ExtractType extract(\textcolor{keyword}{const} XprType\& x) \{ \textcolor{keywordflow}{return} x; \}}
+\DoxyCodeLine{424   \textcolor{keyword}{static} \textcolor{keyword}{inline} EIGEN\_DEVICE\_FUNC \textcolor{keyword}{const} Scalar extractScalarFactor(\textcolor{keyword}{const} XprType\&) \{ \textcolor{keywordflow}{return} Scalar(1); \}}
+\DoxyCodeLine{425 \};}
+\DoxyCodeLine{426 }
+\DoxyCodeLine{427 \textcolor{comment}{// pop conjugate}}
+\DoxyCodeLine{428 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} NestedXpr>}
+\DoxyCodeLine{429 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits}}<\mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{CwiseUnaryOp}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__conjugate__op}{scalar\_conjugate\_op}}<Scalar>, NestedXpr> >}
+\DoxyCodeLine{430  : \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits}}<NestedXpr>}
+\DoxyCodeLine{431 \{}
+\DoxyCodeLine{432   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits<NestedXpr>}} \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{Base}};}
+\DoxyCodeLine{433   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{CwiseUnaryOp<scalar\_conjugate\_op<Scalar>}}, NestedXpr> \mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{XprType}};}
+\DoxyCodeLine{434   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::ExtractType ExtractType;}
+\DoxyCodeLine{435 }
+\DoxyCodeLine{436   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{437     IsComplex = \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::IsComplex}},}
+\DoxyCodeLine{438     NeedToConjugate = Base::NeedToConjugate ? 0 : IsComplex}
+\DoxyCodeLine{439   \};}
+\DoxyCodeLine{440   \textcolor{keyword}{static} \textcolor{keyword}{inline} ExtractType extract(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{XprType}}\& x) \{ \textcolor{keywordflow}{return} Base::extract(x.\mbox{\hyperlink{classEigen_1_1CwiseUnaryOp_a5b22c2e851e86c801e395792708c1f7c}{nestedExpression}}()); \}}
+\DoxyCodeLine{441   \textcolor{keyword}{static} \textcolor{keyword}{inline} Scalar extractScalarFactor(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{XprType}}\& x) \{ \textcolor{keywordflow}{return} conj(Base::extractScalarFactor(x.\mbox{\hyperlink{classEigen_1_1CwiseUnaryOp_a5b22c2e851e86c801e395792708c1f7c}{nestedExpression}}())); \}}
+\DoxyCodeLine{442 \};}
+\DoxyCodeLine{443 }
+\DoxyCodeLine{444 \textcolor{comment}{// pop scalar multiple}}
+\DoxyCodeLine{445 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} NestedXpr, \textcolor{keyword}{typename} Plain>}
+\DoxyCodeLine{446 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits}}<\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__product__op}{scalar\_product\_op}}<Scalar>, const \mbox{\hyperlink{classEigen_1_1CwiseNullaryOp}{CwiseNullaryOp}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__constant__op}{scalar\_constant\_op}}<Scalar>,Plain>, NestedXpr> >}
+\DoxyCodeLine{447  : \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits}}<NestedXpr>}
+\DoxyCodeLine{448 \{}
+\DoxyCodeLine{449   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{450     HasScalarFactor = \textcolor{keyword}{true}}
+\DoxyCodeLine{451   \};}
+\DoxyCodeLine{452   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits<NestedXpr>}} \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{Base}};}
+\DoxyCodeLine{453   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp<scalar\_product\_op<Scalar>}}, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseNullaryOp}{CwiseNullaryOp<scalar\_constant\_op<Scalar>}},Plain>, NestedXpr> \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}};}
+\DoxyCodeLine{454   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::ExtractType ExtractType;}
+\DoxyCodeLine{455   \textcolor{keyword}{static} \textcolor{keyword}{inline} EIGEN\_DEVICE\_FUNC ExtractType extract(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}}\& x) \{ \textcolor{keywordflow}{return} Base::extract(x.\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp_a243d6e1e98290a0a57cddd7f58472b25}{rhs}}()); \}}
+\DoxyCodeLine{456   \textcolor{keyword}{static} \textcolor{keyword}{inline} EIGEN\_DEVICE\_FUNC Scalar extractScalarFactor(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}}\& x)}
+\DoxyCodeLine{457   \{ \textcolor{keywordflow}{return} x.\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp_ae42aa9e1940f262f443d0138b6e840cd}{lhs}}().functor().m\_other * Base::extractScalarFactor(x.\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp_a243d6e1e98290a0a57cddd7f58472b25}{rhs}}()); \}}
+\DoxyCodeLine{458 \};}
+\DoxyCodeLine{459 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} NestedXpr, \textcolor{keyword}{typename} Plain>}
+\DoxyCodeLine{460 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits}}<\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__product__op}{scalar\_product\_op}}<Scalar>, NestedXpr, const \mbox{\hyperlink{classEigen_1_1CwiseNullaryOp}{CwiseNullaryOp}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__constant__op}{scalar\_constant\_op}}<Scalar>,Plain> > >}
+\DoxyCodeLine{461  : \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits}}<NestedXpr>}
+\DoxyCodeLine{462 \{}
+\DoxyCodeLine{463   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{464     HasScalarFactor = \textcolor{keyword}{true}}
+\DoxyCodeLine{465   \};}
+\DoxyCodeLine{466   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits<NestedXpr>}} \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{Base}};}
+\DoxyCodeLine{467   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp<scalar\_product\_op<Scalar>}}, NestedXpr, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseNullaryOp}{CwiseNullaryOp<scalar\_constant\_op<Scalar>}},Plain> > \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}};}
+\DoxyCodeLine{468   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::ExtractType ExtractType;}
+\DoxyCodeLine{469   \textcolor{keyword}{static} \textcolor{keyword}{inline} ExtractType extract(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}}\& x) \{ \textcolor{keywordflow}{return} Base::extract(x.\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp_ae42aa9e1940f262f443d0138b6e840cd}{lhs}}()); \}}
+\DoxyCodeLine{470   \textcolor{keyword}{static} \textcolor{keyword}{inline} Scalar extractScalarFactor(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}}\& x)}
+\DoxyCodeLine{471   \{ \textcolor{keywordflow}{return} Base::extractScalarFactor(x.\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp_ae42aa9e1940f262f443d0138b6e840cd}{lhs}}()) * x.\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp_a243d6e1e98290a0a57cddd7f58472b25}{rhs}}().functor().m\_other; \}}
+\DoxyCodeLine{472 \};}
+\DoxyCodeLine{473 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Plain1, \textcolor{keyword}{typename} Plain2>}
+\DoxyCodeLine{474 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits}}<\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__product__op}{scalar\_product\_op}}<Scalar>, const \mbox{\hyperlink{classEigen_1_1CwiseNullaryOp}{CwiseNullaryOp}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__constant__op}{scalar\_constant\_op}}<Scalar>,Plain1>,}
+\DoxyCodeLine{475                                                             const \mbox{\hyperlink{classEigen_1_1CwiseNullaryOp}{CwiseNullaryOp}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__constant__op}{scalar\_constant\_op}}<Scalar>,Plain2> > >}
+\DoxyCodeLine{476  : \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits}}<CwiseNullaryOp<scalar\_constant\_op<Scalar>,Plain1> >}
+\DoxyCodeLine{477 \{\};}
+\DoxyCodeLine{478 }
+\DoxyCodeLine{479 \textcolor{comment}{// pop opposite}}
+\DoxyCodeLine{480 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} NestedXpr>}
+\DoxyCodeLine{481 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits}}<\mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{CwiseUnaryOp}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__opposite__op}{scalar\_opposite\_op}}<Scalar>, NestedXpr> >}
+\DoxyCodeLine{482  : \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits}}<NestedXpr>}
+\DoxyCodeLine{483 \{}
+\DoxyCodeLine{484   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{485     HasScalarFactor = \textcolor{keyword}{true}}
+\DoxyCodeLine{486   \};}
+\DoxyCodeLine{487   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits<NestedXpr>}} \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{Base}};}
+\DoxyCodeLine{488   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{CwiseUnaryOp<scalar\_opposite\_op<Scalar>}}, NestedXpr> \mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{XprType}};}
+\DoxyCodeLine{489   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::ExtractType ExtractType;}
+\DoxyCodeLine{490   \textcolor{keyword}{static} \textcolor{keyword}{inline} ExtractType extract(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{XprType}}\& x) \{ \textcolor{keywordflow}{return} Base::extract(x.\mbox{\hyperlink{classEigen_1_1CwiseUnaryOp_a5b22c2e851e86c801e395792708c1f7c}{nestedExpression}}()); \}}
+\DoxyCodeLine{491   \textcolor{keyword}{static} \textcolor{keyword}{inline} Scalar extractScalarFactor(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{XprType}}\& x)}
+\DoxyCodeLine{492   \{ \textcolor{keywordflow}{return} -\/ Base::extractScalarFactor(x.\mbox{\hyperlink{classEigen_1_1CwiseUnaryOp_a5b22c2e851e86c801e395792708c1f7c}{nestedExpression}}()); \}}
+\DoxyCodeLine{493 \};}
+\DoxyCodeLine{494 }
+\DoxyCodeLine{495 \textcolor{comment}{// pop/push transpose}}
+\DoxyCodeLine{496 \textcolor{keyword}{template}<\textcolor{keyword}{typename} NestedXpr>}
+\DoxyCodeLine{497 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits}}<\mbox{\hyperlink{classEigen_1_1Transpose}{Transpose}}<NestedXpr> >}
+\DoxyCodeLine{498  : \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits}}<NestedXpr>}
+\DoxyCodeLine{499 \{}
+\DoxyCodeLine{500   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} NestedXpr::Scalar Scalar;}
+\DoxyCodeLine{501   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits<NestedXpr>}} \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{Base}};}
+\DoxyCodeLine{502   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Transpose}{Transpose<NestedXpr>}} \mbox{\hyperlink{classEigen_1_1Transpose}{XprType}};}
+\DoxyCodeLine{503   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Transpose}{Transpose<const typename Base::\_ExtractType>}}  \mbox{\hyperlink{classEigen_1_1Transpose}{ExtractType}}; \textcolor{comment}{// const to get rid of a compile error; anyway blas traits are only used on the RHS}}
+\DoxyCodeLine{504   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Transpose}{Transpose<const typename Base::\_ExtractType>}} \mbox{\hyperlink{classEigen_1_1Transpose}{\_ExtractType}};}
+\DoxyCodeLine{505   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1conditional}{conditional}}<bool(Base::HasUsableDirectAccess),}
+\DoxyCodeLine{506     \mbox{\hyperlink{classEigen_1_1Transpose}{ExtractType}},}
+\DoxyCodeLine{507     \textcolor{keyword}{typename} ExtractType::PlainObject}
+\DoxyCodeLine{508     >::type \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{DirectLinearAccessType}};}
+\DoxyCodeLine{509   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{510     IsTransposed = Base::IsTransposed ? 0 : 1}
+\DoxyCodeLine{511   \};}
+\DoxyCodeLine{512   \textcolor{keyword}{static} \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Transpose}{ExtractType}} extract(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Transpose}{XprType}}\& x) \{ \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Transpose}{ExtractType}}(Base::extract(x.\mbox{\hyperlink{classEigen_1_1Transpose_ad7a6e63756170ed6bf8512f7ee795a69}{nestedExpression}}())); \}}
+\DoxyCodeLine{513   \textcolor{keyword}{static} \textcolor{keyword}{inline} Scalar extractScalarFactor(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Transpose}{XprType}}\& x) \{ \textcolor{keywordflow}{return} Base::extractScalarFactor(x.\mbox{\hyperlink{classEigen_1_1Transpose_ad7a6e63756170ed6bf8512f7ee795a69}{nestedExpression}}()); \}}
+\DoxyCodeLine{514 \};}
+\DoxyCodeLine{515 }
+\DoxyCodeLine{516 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{517 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits}}<const T>}
+\DoxyCodeLine{518      : \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits}}<T>}
+\DoxyCodeLine{519 \{\};}
+\DoxyCodeLine{520 }
+\DoxyCodeLine{521 template<typename T, bool HasUsableDirectAccess=blas\_traits<T>::HasUsableDirectAccess>}
+\DoxyCodeLine{522 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1extract__data__selector}{extract\_data\_selector}} \{}
+\DoxyCodeLine{523   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keyword}{typename} T::Scalar* run(\textcolor{keyword}{const} T\& m)}
+\DoxyCodeLine{524   \{}
+\DoxyCodeLine{525     \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits<T>::extract}}(m).data();}
+\DoxyCodeLine{526   \}}
+\DoxyCodeLine{527 \};}
+\DoxyCodeLine{528 }
+\DoxyCodeLine{529 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{530 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1extract__data__selector}{extract\_data\_selector}}<T,false> \{}
+\DoxyCodeLine{531   \textcolor{keyword}{static} \textcolor{keyword}{typename} T::Scalar* run(\textcolor{keyword}{const} T\&) \{ \textcolor{keywordflow}{return} 0; \}}
+\DoxyCodeLine{532 \};}
+\DoxyCodeLine{533 }
+\DoxyCodeLine{534 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{535 EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keyword}{const} \textcolor{keyword}{typename} T::Scalar* extract\_data(\textcolor{keyword}{const} T\& m)}
+\DoxyCodeLine{536 \{}
+\DoxyCodeLine{537   \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1extract__data__selector}{extract\_data\_selector<T>::run}}(m);}
+\DoxyCodeLine{538 \}}
+\DoxyCodeLine{539 }
+\DoxyCodeLine{544 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ResScalar, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{545 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1combine__scalar__factors__impl}{combine\_scalar\_factors\_impl}}}
+\DoxyCodeLine{546 \{}
+\DoxyCodeLine{547   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keyword}{static} ResScalar run(\textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{548   \{}
+\DoxyCodeLine{549     \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits<Lhs>::extractScalarFactor}}(lhs) * \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits<Rhs>::extractScalarFactor}}(rhs);}
+\DoxyCodeLine{550   \}}
+\DoxyCodeLine{551   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keyword}{static} ResScalar run(\textcolor{keyword}{const} ResScalar\& alpha, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{552   \{}
+\DoxyCodeLine{553     \textcolor{keywordflow}{return} alpha * \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits<Lhs>::extractScalarFactor}}(lhs) * \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits<Rhs>::extractScalarFactor}}(rhs);}
+\DoxyCodeLine{554   \}}
+\DoxyCodeLine{555 \};}
+\DoxyCodeLine{556 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{557 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1combine__scalar__factors__impl}{combine\_scalar\_factors\_impl}}<bool, Lhs, Rhs>}
+\DoxyCodeLine{558 \{}
+\DoxyCodeLine{559   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keyword}{static} \textcolor{keywordtype}{bool} run(\textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{560   \{}
+\DoxyCodeLine{561     \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits<Lhs>::extractScalarFactor}}(lhs) \&\& \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits<Rhs>::extractScalarFactor}}(rhs);}
+\DoxyCodeLine{562   \}}
+\DoxyCodeLine{563   EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE \textcolor{keyword}{static} \textcolor{keywordtype}{bool} run(\textcolor{keyword}{const} \textcolor{keywordtype}{bool}\& alpha, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{564   \{}
+\DoxyCodeLine{565     \textcolor{keywordflow}{return} alpha \&\& \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits<Lhs>::extractScalarFactor}}(lhs) \&\& \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits<Rhs>::extractScalarFactor}}(rhs);}
+\DoxyCodeLine{566   \}}
+\DoxyCodeLine{567 \};}
+\DoxyCodeLine{568 }
+\DoxyCodeLine{569 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ResScalar, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{570 EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE ResScalar combine\_scalar\_factors(\textcolor{keyword}{const} ResScalar\& alpha, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{571 \{}
+\DoxyCodeLine{572   \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1combine__scalar__factors__impl}{combine\_scalar\_factors\_impl<ResScalar,Lhs,Rhs>::run}}(alpha, lhs, rhs);}
+\DoxyCodeLine{573 \}}
+\DoxyCodeLine{574 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ResScalar, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{575 EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE ResScalar combine\_scalar\_factors(\textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{576 \{}
+\DoxyCodeLine{577   \textcolor{keywordflow}{return} combine\_scalar\_factors\_impl<ResScalar,Lhs,Rhs>::run(lhs, rhs);}
+\DoxyCodeLine{578 \}}
+\DoxyCodeLine{579 }
+\DoxyCodeLine{580 }
+\DoxyCodeLine{581 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{582 }
+\DoxyCodeLine{583 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{584 }
+\DoxyCodeLine{585 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_BLASUTIL\_H}}
+
+\end{DoxyCode}

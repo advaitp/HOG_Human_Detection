@@ -1,0 +1,383 @@
+\hypertarget{SparseRef_8h_source}{}\doxysection{Sparse\+Ref.\+h}
+\label{SparseRef_8h_source}\index{include/Eigen/src/SparseCore/SparseRef.h@{include/Eigen/src/SparseCore/SparseRef.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2015 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_SPARSE\_REF\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_SPARSE\_REF\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{18   \mbox{\hyperlink{namespaceEigen_a0f56b8246b6ab8e2c7f1ffbbe4c0f535abd3632507a3697fb48c77eff79851a74}{StandardCompressedFormat}} = 2 }
+\DoxyCodeLine{19 \};}
+\DoxyCodeLine{20   }
+\DoxyCodeLine{21 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{22 }
+\DoxyCodeLine{23 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived> \textcolor{keyword}{class }SparseRefBase;}
+\DoxyCodeLine{24 }
+\DoxyCodeLine{25 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatScalar, \textcolor{keywordtype}{int} MatOptions, \textcolor{keyword}{typename} MatIndex, \textcolor{keywordtype}{int} Options\_, \textcolor{keyword}{typename} \_Str\textcolor{keywordtype}{id}eType>}
+\DoxyCodeLine{26 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{classEigen_1_1Ref}{Ref}}<\mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix}}<MatScalar,MatOptions,MatIndex>, Options\_, \_StrideType> >}
+\DoxyCodeLine{27   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<SparseMatrix<MatScalar,MatOptions,MatIndex> >}
+\DoxyCodeLine{28 \{}
+\DoxyCodeLine{29   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<MatScalar,MatOptions,MatIndex>}} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{PlainObjectType}};}
+\DoxyCodeLine{30   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{31     Options = Options\_,}
+\DoxyCodeLine{32     Flags = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<PlainObjectType>::Flags}} | \mbox{\hyperlink{group__flags_gaed0244284da47a2b8661261431173caf}{CompressedAccessBit}} | NestByRefBit}
+\DoxyCodeLine{33   \};}
+\DoxyCodeLine{34 }
+\DoxyCodeLine{35   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived> \textcolor{keyword}{struct }match \{}
+\DoxyCodeLine{36     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{37       StorageOrderMatch = PlainObjectType::IsVectorAtCompileTime || Derived::IsVectorAtCompileTime || ((PlainObjectType::Flags\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})==(Derived::Flags\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})),}
+\DoxyCodeLine{38       MatchAtCompileTime = (Derived::Flags\&\mbox{\hyperlink{group__flags_gaed0244284da47a2b8661261431173caf}{CompressedAccessBit}}) \&\& StorageOrderMatch}
+\DoxyCodeLine{39     \};}
+\DoxyCodeLine{40     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::conditional<MatchAtCompileTime,internal::true\_type,internal::false\_type>::type}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{type}};}
+\DoxyCodeLine{41   \};}
+\DoxyCodeLine{42   }
+\DoxyCodeLine{43 \};}
+\DoxyCodeLine{44 }
+\DoxyCodeLine{45 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatScalar, \textcolor{keywordtype}{int} MatOptions, \textcolor{keyword}{typename} MatIndex, \textcolor{keywordtype}{int} Options\_, \textcolor{keyword}{typename} \_Str\textcolor{keywordtype}{id}eType>}
+\DoxyCodeLine{46 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{classEigen_1_1Ref}{Ref}}<const \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix}}<MatScalar,MatOptions,MatIndex>, Options\_, \_StrideType> >}
+\DoxyCodeLine{47   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<Ref<SparseMatrix<MatScalar,MatOptions,MatIndex>, Options\_, \_StrideType> >}
+\DoxyCodeLine{48 \{}
+\DoxyCodeLine{49   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{50     Flags = (\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<SparseMatrix<MatScalar,MatOptions,MatIndex>}} >::Flags | \mbox{\hyperlink{group__flags_gaed0244284da47a2b8661261431173caf}{CompressedAccessBit}} | NestByRefBit) \& \string~\mbox{\hyperlink{group__flags_gae2c323957f20dfdc6cb8f44428eaec1a}{LvalueBit}}}
+\DoxyCodeLine{51   \};}
+\DoxyCodeLine{52 \};}
+\DoxyCodeLine{53 }
+\DoxyCodeLine{54 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatScalar, \textcolor{keywordtype}{int} MatOptions, \textcolor{keyword}{typename} MatIndex, \textcolor{keywordtype}{int} Options\_, \textcolor{keyword}{typename} \_Str\textcolor{keywordtype}{id}eType>}
+\DoxyCodeLine{55 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{classEigen_1_1Ref}{Ref}}<\mbox{\hyperlink{classEigen_1_1SparseVector}{SparseVector}}<MatScalar,MatOptions,MatIndex>, Options\_, \_StrideType> >}
+\DoxyCodeLine{56   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<SparseVector<MatScalar,MatOptions,MatIndex> >}
+\DoxyCodeLine{57 \{}
+\DoxyCodeLine{58   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseVector}{SparseVector<MatScalar,MatOptions,MatIndex>}} \mbox{\hyperlink{classEigen_1_1SparseVector}{PlainObjectType}};}
+\DoxyCodeLine{59   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{60     Options = Options\_,}
+\DoxyCodeLine{61     Flags = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<PlainObjectType>::Flags}} | \mbox{\hyperlink{group__flags_gaed0244284da47a2b8661261431173caf}{CompressedAccessBit}} | NestByRefBit}
+\DoxyCodeLine{62   \};}
+\DoxyCodeLine{63 }
+\DoxyCodeLine{64   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived> \textcolor{keyword}{struct }match \{}
+\DoxyCodeLine{65     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{66       MatchAtCompileTime = (Derived::Flags\&\mbox{\hyperlink{group__flags_gaed0244284da47a2b8661261431173caf}{CompressedAccessBit}}) \&\& Derived::IsVectorAtCompileTime}
+\DoxyCodeLine{67     \};}
+\DoxyCodeLine{68     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::conditional<MatchAtCompileTime,internal::true\_type,internal::false\_type>::type}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{type}};}
+\DoxyCodeLine{69   \};}
+\DoxyCodeLine{70 }
+\DoxyCodeLine{71 \};}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatScalar, \textcolor{keywordtype}{int} MatOptions, \textcolor{keyword}{typename} MatIndex, \textcolor{keywordtype}{int} Options\_, \textcolor{keyword}{typename} \_Str\textcolor{keywordtype}{id}eType>}
+\DoxyCodeLine{74 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{classEigen_1_1Ref}{Ref}}<const \mbox{\hyperlink{classEigen_1_1SparseVector}{SparseVector}}<MatScalar,MatOptions,MatIndex>, Options\_, \_StrideType> >}
+\DoxyCodeLine{75   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<Ref<SparseVector<MatScalar,MatOptions,MatIndex>, Options\_, \_StrideType> >}
+\DoxyCodeLine{76 \{}
+\DoxyCodeLine{77   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{78     Flags = (\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<SparseVector<MatScalar,MatOptions,MatIndex>}} >::Flags | \mbox{\hyperlink{group__flags_gaed0244284da47a2b8661261431173caf}{CompressedAccessBit}} | NestByRefBit) \& \string~\mbox{\hyperlink{group__flags_gae2c323957f20dfdc6cb8f44428eaec1a}{LvalueBit}}}
+\DoxyCodeLine{79   \};}
+\DoxyCodeLine{80 \};}
+\DoxyCodeLine{81 }
+\DoxyCodeLine{82 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{83 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{classEigen_1_1internal_1_1SparseRefBase}{SparseRefBase}}<Derived> > : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<Derived> \{\};}
+\DoxyCodeLine{84 }
+\DoxyCodeLine{85 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1SparseRefBase}{SparseRefBase}}}
+\DoxyCodeLine{86   : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1SparseMapBase}{SparseMapBase}}<Derived>}
+\DoxyCodeLine{87 \{}
+\DoxyCodeLine{88 \textcolor{keyword}{public}:}
+\DoxyCodeLine{89 }
+\DoxyCodeLine{90   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMapBase}{SparseMapBase<Derived>}} \mbox{\hyperlink{classEigen_1_1SparseMapBase}{Base}};}
+\DoxyCodeLine{91   EIGEN\_SPARSE\_PUBLIC\_INTERFACE(\mbox{\hyperlink{classEigen_1_1internal_1_1SparseRefBase}{SparseRefBase}})}
+\DoxyCodeLine{92 }
+\DoxyCodeLine{93   \mbox{\hyperlink{classEigen_1_1internal_1_1SparseRefBase}{SparseRefBase}}()}
+\DoxyCodeLine{94     : \mbox{\hyperlink{classEigen_1_1SparseMapBase}{Base}}(RowsAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}?0:RowsAtCompileTime,ColsAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}?0:ColsAtCompileTime, 0, 0, 0, 0, 0)}
+\DoxyCodeLine{95   \{\}}
+\DoxyCodeLine{96   }
+\DoxyCodeLine{97 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{98 }
+\DoxyCodeLine{99   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Expression>}
+\DoxyCodeLine{100   \textcolor{keywordtype}{void} construct(Expression\& expr)}
+\DoxyCodeLine{101   \{}
+\DoxyCodeLine{102     \textcolor{keywordflow}{if}(expr.outerIndexPtr()==0)}
+\DoxyCodeLine{103       ::new (\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{classEigen_1_1SparseMapBase}{Base}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})) \mbox{\hyperlink{classEigen_1_1SparseMapBase}{Base}}(expr.size(), expr.nonZeros(), expr.innerIndexPtr(), expr.valuePtr());}
+\DoxyCodeLine{104     else}
+\DoxyCodeLine{105       ::new (\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{classEigen_1_1SparseMapBase}{Base}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})) \mbox{\hyperlink{classEigen_1_1SparseMapBase}{Base}}(expr.rows(), expr.cols(), expr.nonZeros(), expr.outerIndexPtr(), expr.innerIndexPtr(), expr.valuePtr(), expr.innerNonZeroPtr());}
+\DoxyCodeLine{106   \}}
+\DoxyCodeLine{107 \};}
+\DoxyCodeLine{108 }
+\DoxyCodeLine{109 \} \textcolor{comment}{// namespace internal}}
+\DoxyCodeLine{110 }
+\DoxyCodeLine{111 }
+\DoxyCodeLine{123 \textcolor{preprocessor}{\#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{124 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatScalar, \textcolor{keywordtype}{int} MatOptions, \textcolor{keyword}{typename} MatIndex, \textcolor{keywordtype}{int} Options, \textcolor{keyword}{typename} Str\textcolor{keywordtype}{id}eType>}
+\DoxyCodeLine{125 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1Ref}{Ref}}<\mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix}}<MatScalar,MatOptions,MatIndex>, Options, StrideType >}
+\DoxyCodeLine{126   : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1internal_1_1SparseRefBase}{internal::SparseRefBase}}<Ref<SparseMatrix<MatScalar,MatOptions,MatIndex>, Options, StrideType > >}
+\DoxyCodeLine{127 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{128 template<typename SparseMatrixType, int Options>}
+\DoxyCodeLine{129 class \mbox{\hyperlink{classEigen_1_1Ref}{Ref}}<SparseMatrixType, Options>}
+\DoxyCodeLine{130   : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1SparseMapBase}{SparseMapBase}}<Derived,WriteAccessors> \textcolor{comment}{// yes, that's weird to use Derived here, but that works!}}
+\DoxyCodeLine{131 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{132 \{}
+\DoxyCodeLine{133     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<MatScalar,MatOptions,MatIndex>}} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{PlainObjectType}};}
+\DoxyCodeLine{134     \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Ref>}} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{Traits}};}
+\DoxyCodeLine{135     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} OtherOptions>}
+\DoxyCodeLine{136     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Ref}{Ref}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<MatScalar,OtherOptions,MatIndex>}}\& expr);}
+\DoxyCodeLine{137     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} OtherOptions>}
+\DoxyCodeLine{138     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Ref}{Ref}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MappedSparseMatrix}{MappedSparseMatrix<MatScalar,OtherOptions,MatIndex>}}\& expr);}
+\DoxyCodeLine{139   \textcolor{keyword}{public}:}
+\DoxyCodeLine{140 }
+\DoxyCodeLine{141     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1internal_1_1SparseRefBase}{internal::SparseRefBase<Ref>}} \mbox{\hyperlink{classEigen_1_1internal_1_1SparseRefBase}{Base}};}
+\DoxyCodeLine{142     EIGEN\_SPARSE\_PUBLIC\_INTERFACE(\mbox{\hyperlink{classEigen_1_1Ref}{Ref}})}
+\DoxyCodeLine{143 }
+\DoxyCodeLine{144 }
+\DoxyCodeLine{145     \textcolor{preprocessor}{\#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{146     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} OtherOptions>}
+\DoxyCodeLine{147     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Ref}{Ref}}(\mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<MatScalar,OtherOptions,MatIndex>}}\& expr)}
+\DoxyCodeLine{148     \{}
+\DoxyCodeLine{149       EIGEN\_STATIC\_ASSERT(\textcolor{keywordtype}{bool}(Traits::template match<\mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<MatScalar,OtherOptions,MatIndex>}} >::MatchAtCompileTime), STORAGE\_LAYOUT\_DOES\_NOT\_MATCH);}
+\DoxyCodeLine{150       eigen\_assert( ((Options \& \textcolor{keywordtype}{int}(\mbox{\hyperlink{namespaceEigen_a0f56b8246b6ab8e2c7f1ffbbe4c0f535abd3632507a3697fb48c77eff79851a74}{StandardCompressedFormat}}))==0) || (expr.\mbox{\hyperlink{classEigen_1_1SparseMatrix_a837934b33a80fe996ff20500373d3a61}{isCompressed}}()) );}
+\DoxyCodeLine{151       Base::construct(expr.derived());}
+\DoxyCodeLine{152     \}}
+\DoxyCodeLine{153     }
+\DoxyCodeLine{154     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} OtherOptions>}
+\DoxyCodeLine{155     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Ref}{Ref}}(\mbox{\hyperlink{classEigen_1_1MappedSparseMatrix}{MappedSparseMatrix<MatScalar,OtherOptions,MatIndex>}}\& expr)}
+\DoxyCodeLine{156     \{}
+\DoxyCodeLine{157       EIGEN\_STATIC\_ASSERT(\textcolor{keywordtype}{bool}(Traits::template match<\mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<MatScalar,OtherOptions,MatIndex>}} >::MatchAtCompileTime), STORAGE\_LAYOUT\_DOES\_NOT\_MATCH);}
+\DoxyCodeLine{158       eigen\_assert( ((Options \& \textcolor{keywordtype}{int}(\mbox{\hyperlink{namespaceEigen_a0f56b8246b6ab8e2c7f1ffbbe4c0f535abd3632507a3697fb48c77eff79851a74}{StandardCompressedFormat}}))==0) || (expr.isCompressed()) );}
+\DoxyCodeLine{159       Base::construct(expr.derived());}
+\DoxyCodeLine{160     \}}
+\DoxyCodeLine{161     }
+\DoxyCodeLine{162     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{163     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Ref}{Ref}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SparseCompressedBase}{SparseCompressedBase<Derived>}}\& expr)}
+\DoxyCodeLine{164     \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{166     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{167     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Ref}{Ref}}(\mbox{\hyperlink{classEigen_1_1SparseCompressedBase}{SparseCompressedBase<Derived>}}\& expr)}
+\DoxyCodeLine{168     \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{169     \{}
+\DoxyCodeLine{170       EIGEN\_STATIC\_ASSERT(\textcolor{keywordtype}{bool}(\mbox{\hyperlink{structEigen_1_1internal_1_1is__lvalue}{internal::is\_lvalue<Derived>::value}}), THIS\_EXPRESSION\_IS\_NOT\_A\_LVALUE\_\_IT\_IS\_READ\_ONLY);}
+\DoxyCodeLine{171       EIGEN\_STATIC\_ASSERT(\textcolor{keywordtype}{bool}(Traits::template match<Derived>::MatchAtCompileTime), STORAGE\_LAYOUT\_DOES\_NOT\_MATCH);}
+\DoxyCodeLine{172       eigen\_assert( ((Options \& \textcolor{keywordtype}{int}(\mbox{\hyperlink{namespaceEigen_a0f56b8246b6ab8e2c7f1ffbbe4c0f535abd3632507a3697fb48c77eff79851a74}{StandardCompressedFormat}}))==0) || (expr.\mbox{\hyperlink{classEigen_1_1SparseMatrix_a837934b33a80fe996ff20500373d3a61}{isCompressed}}()) );}
+\DoxyCodeLine{173       Base::construct(expr.const\_cast\_derived());}
+\DoxyCodeLine{174     \}}
+\DoxyCodeLine{175 \};}
+\DoxyCodeLine{176 }
+\DoxyCodeLine{177 \textcolor{comment}{// this is the const ref version}}
+\DoxyCodeLine{178 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatScalar, \textcolor{keywordtype}{int} MatOptions, \textcolor{keyword}{typename} MatIndex, \textcolor{keywordtype}{int} Options, \textcolor{keyword}{typename} Str\textcolor{keywordtype}{id}eType>}
+\DoxyCodeLine{179 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1Ref}{Ref}}<const \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix}}<MatScalar,MatOptions,MatIndex>, Options, StrideType>}
+\DoxyCodeLine{180   : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1internal_1_1SparseRefBase}{internal::SparseRefBase}}<Ref<const SparseMatrix<MatScalar,MatOptions,MatIndex>, Options, StrideType> >}
+\DoxyCodeLine{181 \{}
+\DoxyCodeLine{182     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<MatScalar,MatOptions,MatIndex>}} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{TPlainObjectType}};}
+\DoxyCodeLine{183     \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Ref>}} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{Traits}};}
+\DoxyCodeLine{184   \textcolor{keyword}{public}:}
+\DoxyCodeLine{185 }
+\DoxyCodeLine{186     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1internal_1_1SparseRefBase}{internal::SparseRefBase<Ref>}} \mbox{\hyperlink{classEigen_1_1internal_1_1SparseRefBase}{Base}};}
+\DoxyCodeLine{187     EIGEN\_SPARSE\_PUBLIC\_INTERFACE(\mbox{\hyperlink{classEigen_1_1Ref}{Ref}})}
+\DoxyCodeLine{188 }
+\DoxyCodeLine{189     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{190     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Ref}{Ref}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{SparseMatrixBase<Derived>}}\& expr) : m\_hasCopy(\textcolor{keyword}{false})}
+\DoxyCodeLine{191     \{}
+\DoxyCodeLine{192       construct(expr.derived(), \textcolor{keyword}{typename} Traits::template match<Derived>::type());}
+\DoxyCodeLine{193     \}}
+\DoxyCodeLine{194 }
+\DoxyCodeLine{195     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Ref}{Ref}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Ref}{Ref}}\& other) : \mbox{\hyperlink{classEigen_1_1internal_1_1SparseRefBase}{Base}}(other), m\_hasCopy(\textcolor{keyword}{false}) \{}
+\DoxyCodeLine{196       \textcolor{comment}{// copy constructor shall not copy the m\_object, to avoid unnecessary malloc and copy}}
+\DoxyCodeLine{197     \}}
+\DoxyCodeLine{198 }
+\DoxyCodeLine{199     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherRef>}
+\DoxyCodeLine{200     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Ref}{Ref}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1RefBase}{RefBase<OtherRef>}}\& other) : m\_hasCopy(\textcolor{keyword}{false}) \{}
+\DoxyCodeLine{201       construct(other.derived(), \textcolor{keyword}{typename} Traits::template match<OtherRef>::type());}
+\DoxyCodeLine{202     \}}
+\DoxyCodeLine{203 }
+\DoxyCodeLine{204     \mbox{\hyperlink{classEigen_1_1Ref}{\string~Ref}}() \{}
+\DoxyCodeLine{205       \textcolor{keywordflow}{if}(m\_hasCopy) \{}
+\DoxyCodeLine{206         \mbox{\hyperlink{classEigen_1_1SparseMatrix}{TPlainObjectType}}* obj = \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{classEigen_1_1SparseMatrix}{TPlainObjectType}}*\textcolor{keyword}{>}(\&m\_storage);}
+\DoxyCodeLine{207         obj-\/>\string~TPlainObjectType();}
+\DoxyCodeLine{208       \}}
+\DoxyCodeLine{209     \}}
+\DoxyCodeLine{210 }
+\DoxyCodeLine{211   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{212 }
+\DoxyCodeLine{213     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Expression>}
+\DoxyCodeLine{214     \textcolor{keywordtype}{void} construct(\textcolor{keyword}{const} Expression\& expr,\mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::true\_type}})}
+\DoxyCodeLine{215     \{}
+\DoxyCodeLine{216       \textcolor{keywordflow}{if}((Options \& \textcolor{keywordtype}{int}(\mbox{\hyperlink{namespaceEigen_a0f56b8246b6ab8e2c7f1ffbbe4c0f535abd3632507a3697fb48c77eff79851a74}{StandardCompressedFormat}})) \&\& (!expr.isCompressed()))}
+\DoxyCodeLine{217       \{}
+\DoxyCodeLine{218         \mbox{\hyperlink{classEigen_1_1SparseMatrix}{TPlainObjectType}}* obj = \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{classEigen_1_1SparseMatrix}{TPlainObjectType}}*\textcolor{keyword}{>}(\&m\_storage);}
+\DoxyCodeLine{219         ::new (obj) \mbox{\hyperlink{classEigen_1_1SparseMatrix}{TPlainObjectType}}(expr);}
+\DoxyCodeLine{220         m\_hasCopy = \textcolor{keyword}{true};}
+\DoxyCodeLine{221         Base::construct(*obj);}
+\DoxyCodeLine{222       \}}
+\DoxyCodeLine{223       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{224       \{}
+\DoxyCodeLine{225         Base::construct(expr);}
+\DoxyCodeLine{226       \}}
+\DoxyCodeLine{227     \}}
+\DoxyCodeLine{228 }
+\DoxyCodeLine{229     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Expression>}
+\DoxyCodeLine{230     \textcolor{keywordtype}{void} construct(\textcolor{keyword}{const} Expression\& expr, \mbox{\hyperlink{structEigen_1_1internal_1_1false__type}{internal::false\_type}})}
+\DoxyCodeLine{231     \{}
+\DoxyCodeLine{232       \mbox{\hyperlink{classEigen_1_1SparseMatrix}{TPlainObjectType}}* obj = \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{classEigen_1_1SparseMatrix}{TPlainObjectType}}*\textcolor{keyword}{>}(\&m\_storage);}
+\DoxyCodeLine{233       ::new (obj) \mbox{\hyperlink{classEigen_1_1SparseMatrix}{TPlainObjectType}}(expr);}
+\DoxyCodeLine{234       m\_hasCopy = \textcolor{keyword}{true};}
+\DoxyCodeLine{235       Base::construct(*obj);}
+\DoxyCodeLine{236     \}}
+\DoxyCodeLine{237 }
+\DoxyCodeLine{238   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{239     \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1aligned__storage}{internal::aligned\_storage}}<\textcolor{keyword}{sizeof}(\mbox{\hyperlink{classEigen_1_1SparseMatrix}{TPlainObjectType}}), EIGEN\_ALIGNOF(\mbox{\hyperlink{classEigen_1_1SparseMatrix}{TPlainObjectType}})>::type m\_storage;}
+\DoxyCodeLine{240     \textcolor{keywordtype}{bool} m\_hasCopy;}
+\DoxyCodeLine{241 \};}
+\DoxyCodeLine{242 }
+\DoxyCodeLine{243 }
+\DoxyCodeLine{244 }
+\DoxyCodeLine{254 \textcolor{preprocessor}{\#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{255 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatScalar, \textcolor{keywordtype}{int} MatOptions, \textcolor{keyword}{typename} MatIndex, \textcolor{keywordtype}{int} Options, \textcolor{keyword}{typename} Str\textcolor{keywordtype}{id}eType>}
+\DoxyCodeLine{256 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1Ref}{Ref}}<\mbox{\hyperlink{classEigen_1_1SparseVector}{SparseVector}}<MatScalar,MatOptions,MatIndex>, Options, StrideType >}
+\DoxyCodeLine{257   : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1internal_1_1SparseRefBase}{internal::SparseRefBase}}<Ref<SparseVector<MatScalar,MatOptions,MatIndex>, Options, StrideType > >}
+\DoxyCodeLine{258 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{259 template<typename SparseVectorType>}
+\DoxyCodeLine{260 class \mbox{\hyperlink{classEigen_1_1Ref}{Ref}}<SparseVectorType>}
+\DoxyCodeLine{261   : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1SparseMapBase}{SparseMapBase}}<Derived,WriteAccessors>}
+\DoxyCodeLine{262 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{263 \{}
+\DoxyCodeLine{264     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseVector}{SparseVector<MatScalar,MatOptions,MatIndex>}} \mbox{\hyperlink{classEigen_1_1SparseVector}{PlainObjectType}};}
+\DoxyCodeLine{265     \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Ref>}} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{Traits}};}
+\DoxyCodeLine{266     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} OtherOptions>}
+\DoxyCodeLine{267     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Ref}{Ref}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SparseVector}{SparseVector<MatScalar,OtherOptions,MatIndex>}}\& expr);}
+\DoxyCodeLine{268   \textcolor{keyword}{public}:}
+\DoxyCodeLine{269 }
+\DoxyCodeLine{270     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1internal_1_1SparseRefBase}{internal::SparseRefBase<Ref>}} \mbox{\hyperlink{classEigen_1_1internal_1_1SparseRefBase}{Base}};}
+\DoxyCodeLine{271     EIGEN\_SPARSE\_PUBLIC\_INTERFACE(\mbox{\hyperlink{classEigen_1_1Ref}{Ref}})}
+\DoxyCodeLine{272 }
+\DoxyCodeLine{273     \textcolor{preprocessor}{\#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{274     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} OtherOptions>}
+\DoxyCodeLine{275     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Ref}{Ref}}(\mbox{\hyperlink{classEigen_1_1SparseVector}{SparseVector<MatScalar,OtherOptions,MatIndex>}}\& expr)}
+\DoxyCodeLine{276     \{}
+\DoxyCodeLine{277       EIGEN\_STATIC\_ASSERT(\textcolor{keywordtype}{bool}(Traits::template match<\mbox{\hyperlink{classEigen_1_1SparseVector}{SparseVector<MatScalar,OtherOptions,MatIndex>}} >::MatchAtCompileTime), STORAGE\_LAYOUT\_DOES\_NOT\_MATCH);}
+\DoxyCodeLine{278       Base::construct(expr.derived());}
+\DoxyCodeLine{279     \}}
+\DoxyCodeLine{280 }
+\DoxyCodeLine{281     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{282     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Ref}{Ref}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SparseCompressedBase}{SparseCompressedBase<Derived>}}\& expr)}
+\DoxyCodeLine{283     \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{285     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{286     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Ref}{Ref}}(\mbox{\hyperlink{classEigen_1_1SparseCompressedBase}{SparseCompressedBase<Derived>}}\& expr)}
+\DoxyCodeLine{287     \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{288     \{}
+\DoxyCodeLine{289       EIGEN\_STATIC\_ASSERT(\textcolor{keywordtype}{bool}(\mbox{\hyperlink{structEigen_1_1internal_1_1is__lvalue}{internal::is\_lvalue<Derived>::value}}), THIS\_EXPRESSION\_IS\_NOT\_A\_LVALUE\_\_IT\_IS\_READ\_ONLY);}
+\DoxyCodeLine{290       EIGEN\_STATIC\_ASSERT(\textcolor{keywordtype}{bool}(Traits::template match<Derived>::MatchAtCompileTime), STORAGE\_LAYOUT\_DOES\_NOT\_MATCH);}
+\DoxyCodeLine{291       Base::construct(expr.const\_cast\_derived());}
+\DoxyCodeLine{292     \}}
+\DoxyCodeLine{293 \};}
+\DoxyCodeLine{294 }
+\DoxyCodeLine{295 \textcolor{comment}{// this is the const ref version}}
+\DoxyCodeLine{296 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatScalar, \textcolor{keywordtype}{int} MatOptions, \textcolor{keyword}{typename} MatIndex, \textcolor{keywordtype}{int} Options, \textcolor{keyword}{typename} Str\textcolor{keywordtype}{id}eType>}
+\DoxyCodeLine{297 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1Ref}{Ref}}<const \mbox{\hyperlink{classEigen_1_1SparseVector}{SparseVector}}<MatScalar,MatOptions,MatIndex>, Options, StrideType>}
+\DoxyCodeLine{298   : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1internal_1_1SparseRefBase}{internal::SparseRefBase}}<Ref<const SparseVector<MatScalar,MatOptions,MatIndex>, Options, StrideType> >}
+\DoxyCodeLine{299 \{}
+\DoxyCodeLine{300     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseVector}{SparseVector<MatScalar,MatOptions,MatIndex>}} \mbox{\hyperlink{classEigen_1_1SparseVector}{TPlainObjectType}};}
+\DoxyCodeLine{301     \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Ref>}} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{Traits}};}
+\DoxyCodeLine{302   \textcolor{keyword}{public}:}
+\DoxyCodeLine{303 }
+\DoxyCodeLine{304     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1internal_1_1SparseRefBase}{internal::SparseRefBase<Ref>}} \mbox{\hyperlink{classEigen_1_1internal_1_1SparseRefBase}{Base}};}
+\DoxyCodeLine{305     EIGEN\_SPARSE\_PUBLIC\_INTERFACE(\mbox{\hyperlink{classEigen_1_1Ref}{Ref}})}
+\DoxyCodeLine{306 }
+\DoxyCodeLine{307     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{308     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Ref}{Ref}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{SparseMatrixBase<Derived>}}\& expr) : m\_hasCopy(\textcolor{keyword}{false})}
+\DoxyCodeLine{309     \{}
+\DoxyCodeLine{310       construct(expr.derived(), \textcolor{keyword}{typename} Traits::template match<Derived>::type());}
+\DoxyCodeLine{311     \}}
+\DoxyCodeLine{312 }
+\DoxyCodeLine{313     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Ref}{Ref}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Ref}{Ref}}\& other) : \mbox{\hyperlink{classEigen_1_1internal_1_1SparseRefBase}{Base}}(other), m\_hasCopy(\textcolor{keyword}{false}) \{}
+\DoxyCodeLine{314       \textcolor{comment}{// copy constructor shall not copy the m\_object, to avoid unnecessary malloc and copy}}
+\DoxyCodeLine{315     \}}
+\DoxyCodeLine{316 }
+\DoxyCodeLine{317     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherRef>}
+\DoxyCodeLine{318     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Ref}{Ref}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1RefBase}{RefBase<OtherRef>}}\& other) : m\_hasCopy(\textcolor{keyword}{false}) \{}
+\DoxyCodeLine{319       construct(other.derived(), \textcolor{keyword}{typename} Traits::template match<OtherRef>::type());}
+\DoxyCodeLine{320     \}}
+\DoxyCodeLine{321 }
+\DoxyCodeLine{322     \mbox{\hyperlink{classEigen_1_1Ref}{\string~Ref}}() \{}
+\DoxyCodeLine{323       \textcolor{keywordflow}{if}(m\_hasCopy) \{}
+\DoxyCodeLine{324         \mbox{\hyperlink{classEigen_1_1SparseVector}{TPlainObjectType}}* obj = \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{classEigen_1_1SparseVector}{TPlainObjectType}}*\textcolor{keyword}{>}(\&m\_storage);}
+\DoxyCodeLine{325         obj-\/>\string~TPlainObjectType();}
+\DoxyCodeLine{326       \}}
+\DoxyCodeLine{327     \}}
+\DoxyCodeLine{328 }
+\DoxyCodeLine{329   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{330 }
+\DoxyCodeLine{331     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Expression>}
+\DoxyCodeLine{332     \textcolor{keywordtype}{void} construct(\textcolor{keyword}{const} Expression\& expr,\mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::true\_type}})}
+\DoxyCodeLine{333     \{}
+\DoxyCodeLine{334       Base::construct(expr);}
+\DoxyCodeLine{335     \}}
+\DoxyCodeLine{336 }
+\DoxyCodeLine{337     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Expression>}
+\DoxyCodeLine{338     \textcolor{keywordtype}{void} construct(\textcolor{keyword}{const} Expression\& expr, \mbox{\hyperlink{structEigen_1_1internal_1_1false__type}{internal::false\_type}})}
+\DoxyCodeLine{339     \{}
+\DoxyCodeLine{340       \mbox{\hyperlink{classEigen_1_1SparseVector}{TPlainObjectType}}* obj = \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{classEigen_1_1SparseVector}{TPlainObjectType}}*\textcolor{keyword}{>}(\&m\_storage);}
+\DoxyCodeLine{341       ::new (obj) \mbox{\hyperlink{classEigen_1_1SparseVector}{TPlainObjectType}}(expr);}
+\DoxyCodeLine{342       m\_hasCopy = \textcolor{keyword}{true};}
+\DoxyCodeLine{343       Base::construct(*obj);}
+\DoxyCodeLine{344     \}}
+\DoxyCodeLine{345 }
+\DoxyCodeLine{346   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{347     \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1aligned__storage}{internal::aligned\_storage}}<\textcolor{keyword}{sizeof}(\mbox{\hyperlink{classEigen_1_1SparseVector}{TPlainObjectType}}), EIGEN\_ALIGNOF(\mbox{\hyperlink{classEigen_1_1SparseVector}{TPlainObjectType}})>::type m\_storage;}
+\DoxyCodeLine{348     \textcolor{keywordtype}{bool} m\_hasCopy;}
+\DoxyCodeLine{349 \};}
+\DoxyCodeLine{350 }
+\DoxyCodeLine{351 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{352 }
+\DoxyCodeLine{353 \textcolor{comment}{// FIXME shall we introduce a general evaluatior\_ref that we can specialize for any sparse object once, and thus remove this copy-\/pasta thing...}}
+\DoxyCodeLine{354 }
+\DoxyCodeLine{355 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatScalar, \textcolor{keywordtype}{int} MatOptions, \textcolor{keyword}{typename} MatIndex, \textcolor{keywordtype}{int} Options, \textcolor{keyword}{typename} Str\textcolor{keywordtype}{id}eType>}
+\DoxyCodeLine{356 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<\mbox{\hyperlink{classEigen_1_1Ref}{Ref}}<\mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix}}<MatScalar,MatOptions,MatIndex>, Options, StrideType> >}
+\DoxyCodeLine{357   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<SparseCompressedBase<Ref<SparseMatrix<MatScalar,MatOptions,MatIndex>, Options, StrideType> > >}
+\DoxyCodeLine{358 \{}
+\DoxyCodeLine{359   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<SparseCompressedBase<Ref<SparseMatrix<MatScalar,MatOptions,MatIndex>}}, Options, StrideType> > > \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}};}
+\DoxyCodeLine{360   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Ref}{Ref<SparseMatrix<MatScalar,MatOptions,MatIndex>}}, Options, StrideType> \mbox{\hyperlink{classEigen_1_1Ref_3_01SparseMatrix_3_01MatScalar_00_01MatOptions_00_01MatIndex_01_4_00_01Options_00_01StrideType_01_4}{XprType}};  }
+\DoxyCodeLine{361   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}() : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}() \{\}}
+\DoxyCodeLine{362   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Ref_3_01SparseMatrix_3_01MatScalar_00_01MatOptions_00_01MatIndex_01_4_00_01Options_00_01StrideType_01_4}{XprType}} \&mat) : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}(mat) \{\}}
+\DoxyCodeLine{363 \};}
+\DoxyCodeLine{364 }
+\DoxyCodeLine{365 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatScalar, \textcolor{keywordtype}{int} MatOptions, \textcolor{keyword}{typename} MatIndex, \textcolor{keywordtype}{int} Options, \textcolor{keyword}{typename} Str\textcolor{keywordtype}{id}eType>}
+\DoxyCodeLine{366 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<\mbox{\hyperlink{classEigen_1_1Ref}{Ref}}<const \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix}}<MatScalar,MatOptions,MatIndex>, Options, StrideType> >}
+\DoxyCodeLine{367   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<SparseCompressedBase<Ref<const SparseMatrix<MatScalar,MatOptions,MatIndex>, Options, StrideType> > >}
+\DoxyCodeLine{368 \{}
+\DoxyCodeLine{369   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<SparseCompressedBase<Ref<const SparseMatrix<MatScalar,MatOptions,MatIndex>}}, Options, StrideType> > > \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}};}
+\DoxyCodeLine{370   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Ref}{Ref<const SparseMatrix<MatScalar,MatOptions,MatIndex>}}, Options, StrideType> \mbox{\hyperlink{classEigen_1_1Ref_3_01const_01SparseMatrix_3_01MatScalar_00_01MatOptions_00_01MatIndex_01_4_00_01Options_00_01StrideType_01_4}{XprType}};  }
+\DoxyCodeLine{371   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}() : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}() \{\}}
+\DoxyCodeLine{372   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Ref_3_01const_01SparseMatrix_3_01MatScalar_00_01MatOptions_00_01MatIndex_01_4_00_01Options_00_01StrideType_01_4}{XprType}} \&mat) : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}(mat) \{\}}
+\DoxyCodeLine{373 \};}
+\DoxyCodeLine{374 }
+\DoxyCodeLine{375 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatScalar, \textcolor{keywordtype}{int} MatOptions, \textcolor{keyword}{typename} MatIndex, \textcolor{keywordtype}{int} Options, \textcolor{keyword}{typename} Str\textcolor{keywordtype}{id}eType>}
+\DoxyCodeLine{376 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<\mbox{\hyperlink{classEigen_1_1Ref}{Ref}}<\mbox{\hyperlink{classEigen_1_1SparseVector}{SparseVector}}<MatScalar,MatOptions,MatIndex>, Options, StrideType> >}
+\DoxyCodeLine{377   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<SparseCompressedBase<Ref<SparseVector<MatScalar,MatOptions,MatIndex>, Options, StrideType> > >}
+\DoxyCodeLine{378 \{}
+\DoxyCodeLine{379   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<SparseCompressedBase<Ref<SparseVector<MatScalar,MatOptions,MatIndex>}}, Options, StrideType> > > \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}};}
+\DoxyCodeLine{380   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Ref}{Ref<SparseVector<MatScalar,MatOptions,MatIndex>}}, Options, StrideType> \mbox{\hyperlink{classEigen_1_1Ref_3_01SparseVector_3_01MatScalar_00_01MatOptions_00_01MatIndex_01_4_00_01Options_00_01StrideType_01_4}{XprType}};}
+\DoxyCodeLine{381   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}() : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}() \{\}}
+\DoxyCodeLine{382   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Ref_3_01SparseVector_3_01MatScalar_00_01MatOptions_00_01MatIndex_01_4_00_01Options_00_01StrideType_01_4}{XprType}} \&mat) : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}(mat) \{\}}
+\DoxyCodeLine{383 \};}
+\DoxyCodeLine{384 }
+\DoxyCodeLine{385 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatScalar, \textcolor{keywordtype}{int} MatOptions, \textcolor{keyword}{typename} MatIndex, \textcolor{keywordtype}{int} Options, \textcolor{keyword}{typename} Str\textcolor{keywordtype}{id}eType>}
+\DoxyCodeLine{386 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<\mbox{\hyperlink{classEigen_1_1Ref}{Ref}}<const \mbox{\hyperlink{classEigen_1_1SparseVector}{SparseVector}}<MatScalar,MatOptions,MatIndex>, Options, StrideType> >}
+\DoxyCodeLine{387   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<SparseCompressedBase<Ref<const SparseVector<MatScalar,MatOptions,MatIndex>, Options, StrideType> > >}
+\DoxyCodeLine{388 \{}
+\DoxyCodeLine{389   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<SparseCompressedBase<Ref<const SparseVector<MatScalar,MatOptions,MatIndex>}}, Options, StrideType> > > \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}};}
+\DoxyCodeLine{390   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Ref}{Ref<const SparseVector<MatScalar,MatOptions,MatIndex>}}, Options, StrideType> \mbox{\hyperlink{classEigen_1_1Ref_3_01const_01SparseVector_3_01MatScalar_00_01MatOptions_00_01MatIndex_01_4_00_01Options_00_01StrideType_01_4}{XprType}};}
+\DoxyCodeLine{391   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}() : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}() \{\}}
+\DoxyCodeLine{392   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Ref_3_01const_01SparseVector_3_01MatScalar_00_01MatOptions_00_01MatIndex_01_4_00_01Options_00_01StrideType_01_4}{XprType}} \&mat) : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}(mat) \{\}}
+\DoxyCodeLine{393 \};}
+\DoxyCodeLine{394 }
+\DoxyCodeLine{395 \}}
+\DoxyCodeLine{396 }
+\DoxyCodeLine{397 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{398 }
+\DoxyCodeLine{399 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_SPARSE\_REF\_H}}
+
+\end{DoxyCode}

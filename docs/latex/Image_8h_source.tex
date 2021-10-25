@@ -1,0 +1,87 @@
+\hypertarget{Image_8h_source}{}\doxysection{Image.\+h}
+\label{Image_8h_source}\index{include/Eigen/src/misc/Image.h@{include/Eigen/src/misc/Image.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2009 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_MISC\_IMAGE\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_MISC\_IMAGE\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{22 \textcolor{keyword}{template}<\textcolor{keyword}{typename} DecompositionType>}
+\DoxyCodeLine{23 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1image__retval__base}{image\_retval\_base}}<DecompositionType> >}
+\DoxyCodeLine{24 \{}
+\DoxyCodeLine{25   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} DecompositionType::MatrixType MatrixType;}
+\DoxyCodeLine{26   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix}}<}
+\DoxyCodeLine{27     \textcolor{keyword}{typename} MatrixType::Scalar,}
+\DoxyCodeLine{28     MatrixType::RowsAtCompileTime, \textcolor{comment}{// the image is a subspace of the destination space, whose}}
+\DoxyCodeLine{29                                    \textcolor{comment}{// dimension is the number of rows of the original matrix}}
+\DoxyCodeLine{30     \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}},                       \textcolor{comment}{// we don't know at compile time the dimension of the image (the rank)}}
+\DoxyCodeLine{31     MatrixType::Options,}
+\DoxyCodeLine{32     MatrixType::MaxRowsAtCompileTime, \textcolor{comment}{// the image matrix will consist of columns from the original matrix,}}
+\DoxyCodeLine{33     MatrixType::MaxColsAtCompileTime  \textcolor{comment}{// so it has the same number of rows and at most as many columns.}}
+\DoxyCodeLine{34   > \mbox{\hyperlink{classEigen_1_1Matrix}{ReturnType}};}
+\DoxyCodeLine{35 \};}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{37 \textcolor{keyword}{template}<\textcolor{keyword}{typename} DecompositionType\_> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1image__retval__base}{image\_retval\_base}}}
+\DoxyCodeLine{38  : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1ReturnByValue}{ReturnByValue}}<image\_retval\_base<DecompositionType\_> >}
+\DoxyCodeLine{39 \{}
+\DoxyCodeLine{40   \textcolor{keyword}{typedef} DecompositionType\_ DecompositionType;}
+\DoxyCodeLine{41   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} DecompositionType::MatrixType MatrixType;}
+\DoxyCodeLine{42   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1ReturnByValue}{ReturnByValue<image\_retval\_base>}} \mbox{\hyperlink{classEigen_1_1ReturnByValue}{Base}};}
+\DoxyCodeLine{43 }
+\DoxyCodeLine{44   \mbox{\hyperlink{structEigen_1_1internal_1_1image__retval__base}{image\_retval\_base}}(\textcolor{keyword}{const} DecompositionType\& dec, \textcolor{keyword}{const} MatrixType\& originalMatrix)}
+\DoxyCodeLine{45     : m\_dec(dec), m\_rank(dec.rank()),}
+\DoxyCodeLine{46       m\_cols(m\_rank == 0 ? 1 : m\_rank),}
+\DoxyCodeLine{47       m\_originalMatrix(originalMatrix)}
+\DoxyCodeLine{48   \{\}}
+\DoxyCodeLine{49 }
+\DoxyCodeLine{50   \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_dec.rows(); \}}
+\DoxyCodeLine{51   \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_cols; \}}
+\DoxyCodeLine{52   \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rank()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_rank; \}}
+\DoxyCodeLine{53   \textcolor{keyword}{inline} \textcolor{keyword}{const} DecompositionType\& dec()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_dec; \}}
+\DoxyCodeLine{54   \textcolor{keyword}{inline} \textcolor{keyword}{const} MatrixType\& originalMatrix()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_originalMatrix; \}}
+\DoxyCodeLine{55 }
+\DoxyCodeLine{56   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest> \textcolor{keyword}{inline} \textcolor{keywordtype}{void} evalTo(Dest\& dst)\textcolor{keyword}{ const}}
+\DoxyCodeLine{57 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{58     \textcolor{keyword}{static\_cast<}\textcolor{keyword}{const }\mbox{\hyperlink{structEigen_1_1internal_1_1image__retval}{image\_retval<DecompositionType>}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})-\/>evalTo(dst);}
+\DoxyCodeLine{59   \}}
+\DoxyCodeLine{60 }
+\DoxyCodeLine{61   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{62     \textcolor{keyword}{const} DecompositionType\& m\_dec;}
+\DoxyCodeLine{63     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m\_rank, m\_cols;}
+\DoxyCodeLine{64     \textcolor{keyword}{const} MatrixType\& m\_originalMatrix;}
+\DoxyCodeLine{65 \};}
+\DoxyCodeLine{66 }
+\DoxyCodeLine{67 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{69 \textcolor{preprocessor}{\#define EIGEN\_MAKE\_IMAGE\_HELPERS(DecompositionType) \(\backslash\)}}
+\DoxyCodeLine{70 \textcolor{preprocessor}{  typedef typename DecompositionType::MatrixType MatrixType; \(\backslash\)}}
+\DoxyCodeLine{71 \textcolor{preprocessor}{  typedef typename MatrixType::Scalar Scalar; \(\backslash\)}}
+\DoxyCodeLine{72 \textcolor{preprocessor}{  typedef typename MatrixType::RealScalar RealScalar; \(\backslash\)}}
+\DoxyCodeLine{73 \textcolor{preprocessor}{  typedef Eigen::internal::image\_retval\_base<DecompositionType> Base; \(\backslash\)}}
+\DoxyCodeLine{74 \textcolor{preprocessor}{  using Base::dec; \(\backslash\)}}
+\DoxyCodeLine{75 \textcolor{preprocessor}{  using Base::originalMatrix; \(\backslash\)}}
+\DoxyCodeLine{76 \textcolor{preprocessor}{  using Base::rank; \(\backslash\)}}
+\DoxyCodeLine{77 \textcolor{preprocessor}{  using Base::rows; \(\backslash\)}}
+\DoxyCodeLine{78 \textcolor{preprocessor}{  using Base::cols; \(\backslash\)}}
+\DoxyCodeLine{79 \textcolor{preprocessor}{  image\_retval(const DecompositionType\& dec, const MatrixType\& originalMatrix) \(\backslash\)}}
+\DoxyCodeLine{80 \textcolor{preprocessor}{    : Base(dec, originalMatrix) \{\}}}
+\DoxyCodeLine{81 }
+\DoxyCodeLine{82 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{83 }
+\DoxyCodeLine{84 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_MISC\_IMAGE\_H}}
+
+\end{DoxyCode}

@@ -1,0 +1,205 @@
+\hypertarget{SparseLU__Memory_8h_source}{}\doxysection{Sparse\+LU\+\_\+\+Memory.\+h}
+\label{SparseLU__Memory_8h_source}\index{include/Eigen/src/SparseLU/SparseLU\_Memory.h@{include/Eigen/src/SparseLU/SparseLU\_Memory.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2012 Désiré Nuentsa-\/Wakam <desire.nuentsa\_wakam@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{comment}{/* }}
+\DoxyCodeLine{11 \textcolor{comment}{ }}
+\DoxyCodeLine{12 \textcolor{comment}{ * NOTE: This file is the modified version of [s,d,c,z]memory.c files in SuperLU }}
+\DoxyCodeLine{13 \textcolor{comment}{ }}
+\DoxyCodeLine{14 \textcolor{comment}{ * -\/-\/ SuperLU routine (version 3.1) -\/-\/}}
+\DoxyCodeLine{15 \textcolor{comment}{ * Univ. of California Berkeley, Xerox Palo Alto Research Center,}}
+\DoxyCodeLine{16 \textcolor{comment}{ * and Lawrence Berkeley National Lab.}}
+\DoxyCodeLine{17 \textcolor{comment}{ * August 1, 2008}}
+\DoxyCodeLine{18 \textcolor{comment}{ *}}
+\DoxyCodeLine{19 \textcolor{comment}{ * Copyright (c) 1994 by Xerox Corporation.  All rights reserved.}}
+\DoxyCodeLine{20 \textcolor{comment}{ *}}
+\DoxyCodeLine{21 \textcolor{comment}{ * THIS MATERIAL IS PROVIDED AS IS, WITH ABSOLUTELY NO WARRANTY}}
+\DoxyCodeLine{22 \textcolor{comment}{ * EXPRESSED OR IMPLIED.  ANY USE IS AT YOUR OWN RISK.}}
+\DoxyCodeLine{23 \textcolor{comment}{ *}}
+\DoxyCodeLine{24 \textcolor{comment}{ * Permission is hereby granted to use or copy this program for any}}
+\DoxyCodeLine{25 \textcolor{comment}{ * purpose, provided the above notices are retained on all copies.}}
+\DoxyCodeLine{26 \textcolor{comment}{ * Permission to modify the code and to distribute modified code is}}
+\DoxyCodeLine{27 \textcolor{comment}{ * granted, provided the above notices are retained, and a notice that}}
+\DoxyCodeLine{28 \textcolor{comment}{ * the code was modified is included with the above copyright notice.}}
+\DoxyCodeLine{29 \textcolor{comment}{ */}}
+\DoxyCodeLine{30 }
+\DoxyCodeLine{31 \textcolor{preprocessor}{\#ifndef EIGEN\_SPARSELU\_MEMORY}}
+\DoxyCodeLine{32 \textcolor{preprocessor}{\#define EIGEN\_SPARSELU\_MEMORY}}
+\DoxyCodeLine{33 }
+\DoxyCodeLine{34 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{35 }
+\DoxyCodeLine{36 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{37 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{38   }
+\DoxyCodeLine{39 \textcolor{keyword}{enum} \{ LUNoMarker = 3 \};}
+\DoxyCodeLine{40 \textcolor{keyword}{enum} \{emptyIdxLU = -\/1\};}
+\DoxyCodeLine{41 \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} LUnumTempV(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}\& m, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}\& w, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}\& t, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}\& b)}
+\DoxyCodeLine{42 \{}
+\DoxyCodeLine{43   \textcolor{keywordflow}{return} (std::max)(m, (t+b)*w);}
+\DoxyCodeLine{44 \}}
+\DoxyCodeLine{45 }
+\DoxyCodeLine{46 \textcolor{keyword}{template}< \textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{47 \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} LUTempSpace(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}\&m, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}\& w)}
+\DoxyCodeLine{48 \{}
+\DoxyCodeLine{49   \textcolor{keywordflow}{return} (2*w + 4 + LUNoMarker) * m * \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}) + (w + 1) * m * \textcolor{keyword}{sizeof}(Scalar);}
+\DoxyCodeLine{50 \}}
+\DoxyCodeLine{51 }
+\DoxyCodeLine{52 }
+\DoxyCodeLine{53 }
+\DoxyCodeLine{54 }
+\DoxyCodeLine{63 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} StorageIndex>}
+\DoxyCodeLine{64 \textcolor{keyword}{template} <\textcolor{keyword}{typename} VectorType>}
+\DoxyCodeLine{65 \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}  \mbox{\hyperlink{classEigen_1_1internal_1_1SparseLUImpl_acc7811f7de19ffb804cb4b1fd5288f3e}{SparseLUImpl<Scalar,StorageIndex>::expand}}(VectorType\& vec, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}\& length, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nbElts, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} keep\_prev, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}\& num\_expansions) }
+\DoxyCodeLine{66 \{}
+\DoxyCodeLine{67   }
+\DoxyCodeLine{68   \textcolor{keywordtype}{float} alpha = 1.5; \textcolor{comment}{// Ratio of the memory increase }}
+\DoxyCodeLine{69   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} new\_len; \textcolor{comment}{// New size of the allocated memory}}
+\DoxyCodeLine{70   }
+\DoxyCodeLine{71   \textcolor{keywordflow}{if}(num\_expansions == 0 || keep\_prev) }
+\DoxyCodeLine{72     new\_len = length ; \textcolor{comment}{// First time allocate requested}}
+\DoxyCodeLine{73   \textcolor{keywordflow}{else} }
+\DoxyCodeLine{74     new\_len = (std::max)(length+1,\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}(alpha * length));}
+\DoxyCodeLine{75   }
+\DoxyCodeLine{76   VectorType old\_vec; \textcolor{comment}{// Temporary vector to hold the previous values   }}
+\DoxyCodeLine{77   \textcolor{keywordflow}{if} (nbElts > 0 )}
+\DoxyCodeLine{78     old\_vec = vec.segment(0,nbElts); }
+\DoxyCodeLine{79   }
+\DoxyCodeLine{80   \textcolor{comment}{//Allocate or expand the current vector}}
+\DoxyCodeLine{81 \textcolor{preprocessor}{\#ifdef EIGEN\_EXCEPTIONS}}
+\DoxyCodeLine{82   \textcolor{keywordflow}{try}}
+\DoxyCodeLine{83 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{84   \{}
+\DoxyCodeLine{85     vec.resize(new\_len); }
+\DoxyCodeLine{86   \}}
+\DoxyCodeLine{87 \textcolor{preprocessor}{\#ifdef EIGEN\_EXCEPTIONS}}
+\DoxyCodeLine{88   \textcolor{keywordflow}{catch}(std::bad\_alloc\& )}
+\DoxyCodeLine{89 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{90   \textcolor{keywordflow}{if}(!vec.size())}
+\DoxyCodeLine{91 \#endif}
+\DoxyCodeLine{92   \{}
+\DoxyCodeLine{93     \textcolor{keywordflow}{if} (!num\_expansions)}
+\DoxyCodeLine{94     \{}
+\DoxyCodeLine{95       \textcolor{comment}{// First time to allocate from LUMemInit()}}
+\DoxyCodeLine{96       \textcolor{comment}{// Let LUMemInit() deals with it.}}
+\DoxyCodeLine{97       \textcolor{keywordflow}{return} -\/1;}
+\DoxyCodeLine{98     \}}
+\DoxyCodeLine{99     \textcolor{keywordflow}{if} (keep\_prev)}
+\DoxyCodeLine{100     \{}
+\DoxyCodeLine{101       \textcolor{comment}{// In this case, the memory length should not not be reduced}}
+\DoxyCodeLine{102       \textcolor{keywordflow}{return} new\_len;}
+\DoxyCodeLine{103     \}}
+\DoxyCodeLine{104     \textcolor{keywordflow}{else} }
+\DoxyCodeLine{105     \{}
+\DoxyCodeLine{106       \textcolor{comment}{// Reduce the size and increase again }}
+\DoxyCodeLine{107       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} tries = 0; \textcolor{comment}{// Number of attempts}}
+\DoxyCodeLine{108       \textcolor{keywordflow}{do} }
+\DoxyCodeLine{109       \{}
+\DoxyCodeLine{110         alpha = (alpha + 1)/2;}
+\DoxyCodeLine{111         new\_len = (std::max)(length+1,\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}(alpha * length));}
+\DoxyCodeLine{112 \textcolor{preprocessor}{\#ifdef EIGEN\_EXCEPTIONS}}
+\DoxyCodeLine{113         \textcolor{keywordflow}{try}}
+\DoxyCodeLine{114 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{115         \{}
+\DoxyCodeLine{116           vec.resize(new\_len); }
+\DoxyCodeLine{117         \}}
+\DoxyCodeLine{118 \textcolor{preprocessor}{\#ifdef EIGEN\_EXCEPTIONS}}
+\DoxyCodeLine{119         \textcolor{keywordflow}{catch}(std::bad\_alloc\& )}
+\DoxyCodeLine{120 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{121         \textcolor{keywordflow}{if} (!vec.size())}
+\DoxyCodeLine{122 \#endif}
+\DoxyCodeLine{123         \{}
+\DoxyCodeLine{124           tries += 1; }
+\DoxyCodeLine{125           \textcolor{keywordflow}{if} ( tries > 10) \textcolor{keywordflow}{return} new\_len; }
+\DoxyCodeLine{126         \}}
+\DoxyCodeLine{127       \} \textcolor{keywordflow}{while} (!vec.size());}
+\DoxyCodeLine{128     \}}
+\DoxyCodeLine{129   \}}
+\DoxyCodeLine{130   \textcolor{comment}{//Copy the previous values to the newly allocated space }}
+\DoxyCodeLine{131   \textcolor{keywordflow}{if} (nbElts > 0)}
+\DoxyCodeLine{132     vec.segment(0, nbElts) = old\_vec;   }
+\DoxyCodeLine{133    }
+\DoxyCodeLine{134   }
+\DoxyCodeLine{135   length  = new\_len;}
+\DoxyCodeLine{136   \textcolor{keywordflow}{if}(num\_expansions) ++num\_expansions;}
+\DoxyCodeLine{137   \textcolor{keywordflow}{return} 0; }
+\DoxyCodeLine{138 \}}
+\DoxyCodeLine{139 }
+\DoxyCodeLine{152 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} StorageIndex>}
+\DoxyCodeLine{153 \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1SparseLUImpl_ac018b8ed9664d4e19e34f1ff2d6c578a}{SparseLUImpl<Scalar,StorageIndex>::memInit}}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} n, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} annz, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} lwork, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} fillratio, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} panel\_size,  \mbox{\hyperlink{structEigen_1_1internal_1_1LU__GlobalLU__t}{GlobalLU\_t}}\& glu)}
+\DoxyCodeLine{154 \{}
+\DoxyCodeLine{155   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}\& num\_expansions = glu.num\_expansions; \textcolor{comment}{//No memory expansions so far}}
+\DoxyCodeLine{156   num\_expansions = 0;}
+\DoxyCodeLine{157   glu.nzumax = glu.nzlumax = (std::min)(fillratio * (annz+1) / n, m) * n; \textcolor{comment}{// estimated number of nonzeros in U }}
+\DoxyCodeLine{158   glu.nzlmax = (std::max)(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}(4), fillratio) * (annz+1) / 4; \textcolor{comment}{// estimated  nnz in L factor}}
+\DoxyCodeLine{159   \textcolor{comment}{// Return the estimated size to the user if necessary}}
+\DoxyCodeLine{160   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} tempSpace;}
+\DoxyCodeLine{161   tempSpace = (2*panel\_size + 4 + LUNoMarker) * m * \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}) + (panel\_size + 1) * m * \textcolor{keyword}{sizeof}(Scalar);}
+\DoxyCodeLine{162   \textcolor{keywordflow}{if} (lwork == emptyIdxLU) }
+\DoxyCodeLine{163   \{}
+\DoxyCodeLine{164     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} estimated\_size;}
+\DoxyCodeLine{165     estimated\_size = (5 * n + 5) * \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}})  + tempSpace}
+\DoxyCodeLine{166                     + (glu.nzlmax + glu.nzumax) * \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}) + (glu.nzlumax+glu.nzumax) *  \textcolor{keyword}{sizeof}(Scalar) + n; }
+\DoxyCodeLine{167     \textcolor{keywordflow}{return} estimated\_size;}
+\DoxyCodeLine{168   \}}
+\DoxyCodeLine{169   }
+\DoxyCodeLine{170   \textcolor{comment}{// Setup the required space }}
+\DoxyCodeLine{171   }
+\DoxyCodeLine{172   \textcolor{comment}{// First allocate Integer pointers for L\(\backslash\)U factors}}
+\DoxyCodeLine{173   glu.xsup.resize(n+1);}
+\DoxyCodeLine{174   glu.supno.resize(n+1);}
+\DoxyCodeLine{175   glu.xlsub.resize(n+1);}
+\DoxyCodeLine{176   glu.xlusup.resize(n+1);}
+\DoxyCodeLine{177   glu.xusub.resize(n+1);}
+\DoxyCodeLine{178 }
+\DoxyCodeLine{179   \textcolor{comment}{// Reserve memory for L/U factors}}
+\DoxyCodeLine{180   \textcolor{keywordflow}{do} }
+\DoxyCodeLine{181   \{}
+\DoxyCodeLine{182     \textcolor{keywordflow}{if}(     (expand<ScalarVector>(glu.lusup, glu.nzlumax, 0, 0, num\_expansions)<0)}
+\DoxyCodeLine{183         ||  (expand<ScalarVector>(glu.ucol,  glu.nzumax,  0, 0, num\_expansions)<0)}
+\DoxyCodeLine{184         ||  (expand<IndexVector> (glu.lsub,  glu.nzlmax,  0, 0, num\_expansions)<0)}
+\DoxyCodeLine{185         ||  (expand<IndexVector> (glu.usub,  glu.nzumax,  0, 1, num\_expansions)<0) )}
+\DoxyCodeLine{186     \{}
+\DoxyCodeLine{187       \textcolor{comment}{//Reduce the estimated size and retry}}
+\DoxyCodeLine{188       glu.nzlumax /= 2;}
+\DoxyCodeLine{189       glu.nzumax /= 2;}
+\DoxyCodeLine{190       glu.nzlmax /= 2;}
+\DoxyCodeLine{191       \textcolor{keywordflow}{if} (glu.nzlumax < annz ) \textcolor{keywordflow}{return} glu.nzlumax; }
+\DoxyCodeLine{192     \}}
+\DoxyCodeLine{193   \} \textcolor{keywordflow}{while} (!glu.lusup.size() || !glu.ucol.size() || !glu.lsub.size() || !glu.usub.size());}
+\DoxyCodeLine{194   }
+\DoxyCodeLine{195   ++num\_expansions;}
+\DoxyCodeLine{196   \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{197   }
+\DoxyCodeLine{198 \} \textcolor{comment}{// end LuMemInit}}
+\DoxyCodeLine{199 }
+\DoxyCodeLine{209 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} StorageIndex>}
+\DoxyCodeLine{210 \textcolor{keyword}{template} <\textcolor{keyword}{typename} VectorType>}
+\DoxyCodeLine{211 \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1SparseLUImpl_a2a6465f1173fd8b74b2e5b8ceec53343}{SparseLUImpl<Scalar,StorageIndex>::memXpand}}(VectorType\& vec, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}\& maxlen, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nbElts, MemType memtype, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}\& num\_expansions)}
+\DoxyCodeLine{212 \{}
+\DoxyCodeLine{213   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} failed\_size; }
+\DoxyCodeLine{214   \textcolor{keywordflow}{if} (memtype == USUB)}
+\DoxyCodeLine{215      failed\_size = this-\/>expand<VectorType>(vec, maxlen, nbElts, 1, num\_expansions);}
+\DoxyCodeLine{216   \textcolor{keywordflow}{else}}
+\DoxyCodeLine{217     failed\_size = this-\/>expand<VectorType>(vec, maxlen, nbElts, 0, num\_expansions);}
+\DoxyCodeLine{218 }
+\DoxyCodeLine{219   \textcolor{keywordflow}{if} (failed\_size)}
+\DoxyCodeLine{220     \textcolor{keywordflow}{return} failed\_size; }
+\DoxyCodeLine{221   }
+\DoxyCodeLine{222   \textcolor{keywordflow}{return} 0 ;  }
+\DoxyCodeLine{223 \}}
+\DoxyCodeLine{224 }
+\DoxyCodeLine{225 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{226 }
+\DoxyCodeLine{227 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{228 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_SPARSELU\_MEMORY}}
+
+\end{DoxyCode}

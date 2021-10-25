@@ -1,0 +1,161 @@
+\hypertarget{CwiseBinaryOp_8h_source}{}\doxysection{Cwise\+Binary\+Op.\+h}
+\label{CwiseBinaryOp_8h_source}\index{include/Eigen/src/Core/CwiseBinaryOp.h@{include/Eigen/src/Core/CwiseBinaryOp.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2008-\/2014 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2006-\/2008 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_CWISE\_BINARY\_OP\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_CWISE\_BINARY\_OP\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{19 \textcolor{keyword}{template}<\textcolor{keyword}{typename} BinaryOp, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{20 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}<BinaryOp, Lhs, Rhs> >}
+\DoxyCodeLine{21 \{}
+\DoxyCodeLine{22   \textcolor{comment}{// we must not inherit from traits<Lhs> since it has}}
+\DoxyCodeLine{23   \textcolor{comment}{// the potential to cause problems with MSVC}}
+\DoxyCodeLine{24   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<Lhs>::type Ancestor;}
+\DoxyCodeLine{25   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<Ancestor>::XprKind}} XprKind;}
+\DoxyCodeLine{26   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{27     RowsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<Ancestor>::RowsAtCompileTime}},}
+\DoxyCodeLine{28     ColsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<Ancestor>::ColsAtCompileTime}},}
+\DoxyCodeLine{29     MaxRowsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<Ancestor>::MaxRowsAtCompileTime}},}
+\DoxyCodeLine{30     MaxColsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<Ancestor>::MaxColsAtCompileTime}}}
+\DoxyCodeLine{31   \};}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33   \textcolor{comment}{// even though we require Lhs and Rhs to have the same scalar type (see CwiseBinaryOp constructor),}}
+\DoxyCodeLine{34   \textcolor{comment}{// we still want to handle the case when the result type is different.}}
+\DoxyCodeLine{35   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1result__of}{result\_of}}<}
+\DoxyCodeLine{36                      BinaryOp(}
+\DoxyCodeLine{37                        \textcolor{keyword}{const} \textcolor{keyword}{typename} Lhs::Scalar\&,}
+\DoxyCodeLine{38                        \textcolor{keyword}{const} \textcolor{keyword}{typename} Rhs::Scalar\&}
+\DoxyCodeLine{39                      )}
+\DoxyCodeLine{40                    >::type Scalar;}
+\DoxyCodeLine{41   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1cwise__promote__storage__type}{cwise\_promote\_storage\_type<typename traits<Lhs>::StorageKind}},}
+\DoxyCodeLine{42                                               \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<Rhs>::StorageKind}},}
+\DoxyCodeLine{43                                               BinaryOp>::ret StorageKind;}
+\DoxyCodeLine{44   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1promote__index__type}{promote\_index\_type<typename traits<Lhs>::StorageIndex}},}
+\DoxyCodeLine{45                                       \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<Rhs>::StorageIndex}}>::type \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{StorageIndex}};}
+\DoxyCodeLine{46   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Lhs::Nested LhsNested;}
+\DoxyCodeLine{47   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Rhs::Nested RhsNested;}
+\DoxyCodeLine{48   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_reference<LhsNested>::type \_LhsNested;}
+\DoxyCodeLine{49   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_reference<RhsNested>::type \_RhsNested;}
+\DoxyCodeLine{50   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{51     Flags = \mbox{\hyperlink{structEigen_1_1internal_1_1cwise__promote__storage__order}{cwise\_promote\_storage\_order<typename traits<Lhs>::StorageKind}},\textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<Rhs>::StorageKind}},\_LhsNested::Flags \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}},\_RhsNested::Flags \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}>::value}
+\DoxyCodeLine{52   \};}
+\DoxyCodeLine{53 \};}
+\DoxyCodeLine{54 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{55 }
+\DoxyCodeLine{56 \textcolor{keyword}{template}<\textcolor{keyword}{typename} BinaryOp, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} StorageKind>}
+\DoxyCodeLine{57 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1CwiseBinaryOpImpl}{CwiseBinaryOpImpl}};}
+\DoxyCodeLine{58 }
+\DoxyCodeLine{78 \textcolor{keyword}{template}<\textcolor{keyword}{typename} BinaryOp, \textcolor{keyword}{typename} LhsType, \textcolor{keyword}{typename} RhsType>}
+\DoxyCodeLine{79 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}} :}
+\DoxyCodeLine{80   \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOpImpl}{CwiseBinaryOpImpl}}<}
+\DoxyCodeLine{81           BinaryOp, LhsType, RhsType,}
+\DoxyCodeLine{82           typename internal::cwise\_promote\_storage\_type<typename internal::traits<LhsType>::StorageKind,}
+\DoxyCodeLine{83                                                         typename internal::traits<RhsType>::StorageKind,}
+\DoxyCodeLine{84                                                         BinaryOp>::ret>,}
+\DoxyCodeLine{85   \mbox{\hyperlink{classEigen_1_1internal_1_1no__assignment__operator}{internal::no\_assignment\_operator}}}
+\DoxyCodeLine{86 \{}
+\DoxyCodeLine{87   \textcolor{keyword}{public}:}
+\DoxyCodeLine{88 }
+\DoxyCodeLine{89     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<BinaryOp>::type Functor;}
+\DoxyCodeLine{90     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<LhsType>::type Lhs;}
+\DoxyCodeLine{91     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<RhsType>::type Rhs;}
+\DoxyCodeLine{92 }
+\DoxyCodeLine{93     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOpImpl}{CwiseBinaryOpImpl}}<}
+\DoxyCodeLine{94         BinaryOp, LhsType, RhsType,}
+\DoxyCodeLine{95         \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1cwise__promote__storage__type}{internal::cwise\_promote\_storage\_type<typename internal::traits<LhsType>::StorageKind}},}
+\DoxyCodeLine{96                                                       \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Rhs>::StorageKind}},}
+\DoxyCodeLine{97                                                       BinaryOp>::ret>::Base \mbox{\hyperlink{classBase}{Base}};}
+\DoxyCodeLine{98     EIGEN\_GENERIC\_PUBLIC\_INTERFACE(\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}})}
+\DoxyCodeLine{99 }
+\DoxyCodeLine{100     EIGEN\_CHECK\_BINARY\_COMPATIBILIY(BinaryOp,\textcolor{keyword}{typename} Lhs::Scalar,\textcolor{keyword}{typename} Rhs::Scalar)}
+\DoxyCodeLine{101     EIGEN\_STATIC\_ASSERT\_SAME\_MATRIX\_SIZE(Lhs, Rhs)}
+\DoxyCodeLine{102 }
+\DoxyCodeLine{103     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::ref\_selector<LhsType>::type}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{LhsNested}};}
+\DoxyCodeLine{104     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::ref\_selector<RhsType>::type}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{RhsNested}};}
+\DoxyCodeLine{105     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_reference<LhsNested>::type \_LhsNested;}
+\DoxyCodeLine{106     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_reference<RhsNested>::type \_RhsNested;}
+\DoxyCodeLine{107 }
+\DoxyCodeLine{108 \textcolor{preprocessor}{\#if EIGEN\_COMP\_MSVC \&\& EIGEN\_HAS\_CXX11}}
+\DoxyCodeLine{109     \textcolor{comment}{//Required for Visual Studio or the Copy constructor will probably not get inlined!}}
+\DoxyCodeLine{110     EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{111     \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp<BinaryOp,LhsType,RhsType>}}\&) = \textcolor{keywordflow}{default};}
+\DoxyCodeLine{112 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{113 }
+\DoxyCodeLine{114     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{115     \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}(\textcolor{keyword}{const} Lhs\& aLhs, \textcolor{keyword}{const} Rhs\& aRhs, \textcolor{keyword}{const} BinaryOp\& func = BinaryOp())}
+\DoxyCodeLine{116       : m\_lhs(aLhs), m\_rhs(aRhs), m\_functor(func)}
+\DoxyCodeLine{117     \{}
+\DoxyCodeLine{118       eigen\_assert(aLhs.rows() == aRhs.rows() \&\& aLhs.cols() == aRhs.cols());}
+\DoxyCodeLine{119     \}}
+\DoxyCodeLine{120 }
+\DoxyCodeLine{121     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE EIGEN\_CONSTEXPR}
+\DoxyCodeLine{122     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{}
+\DoxyCodeLine{123       \textcolor{comment}{// return the fixed size type if available to enable compile time optimizations}}
+\DoxyCodeLine{124       \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<typename internal::remove\_all<LhsNested>::type}}>::RowsAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} ? m\_rhs.rows() : m\_lhs.rows();}
+\DoxyCodeLine{125     \}}
+\DoxyCodeLine{126     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE EIGEN\_CONSTEXPR}
+\DoxyCodeLine{127     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{}
+\DoxyCodeLine{128       \textcolor{comment}{// return the fixed size type if available to enable compile time optimizations}}
+\DoxyCodeLine{129       \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<typename internal::remove\_all<LhsNested>::type}}>::ColsAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} ? m\_rhs.cols() : m\_lhs.cols();}
+\DoxyCodeLine{130     \}}
+\DoxyCodeLine{131 }
+\DoxyCodeLine{133     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{134     \textcolor{keyword}{const} \_LhsNested\& \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp_ae42aa9e1940f262f443d0138b6e840cd}{lhs}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_lhs; \}}
+\DoxyCodeLine{136     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{137     \textcolor{keyword}{const} \_RhsNested\& \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp_a243d6e1e98290a0a57cddd7f58472b25}{rhs}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_rhs; \}}
+\DoxyCodeLine{139     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{140     \textcolor{keyword}{const} BinaryOp\& \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp_acb2d81a45c25b654370c6447c890f9ed}{functor}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_functor; \}}
+\DoxyCodeLine{141 }
+\DoxyCodeLine{142   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{143     LhsNested m\_lhs;}
+\DoxyCodeLine{144     RhsNested m\_rhs;}
+\DoxyCodeLine{145     \textcolor{keyword}{const} BinaryOp m\_functor;}
+\DoxyCodeLine{146 \};}
+\DoxyCodeLine{147 }
+\DoxyCodeLine{148 \textcolor{comment}{// Generic API dispatcher}}
+\DoxyCodeLine{149 \textcolor{keyword}{template}<\textcolor{keyword}{typename} BinaryOp, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} StorageKind>}
+\DoxyCodeLine{150 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1CwiseBinaryOpImpl}{CwiseBinaryOpImpl}}}
+\DoxyCodeLine{151   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1generic__xpr__base}{internal::generic\_xpr\_base}}<CwiseBinaryOp<BinaryOp, Lhs, Rhs> >::type}
+\DoxyCodeLine{152 \{}
+\DoxyCodeLine{153 \textcolor{keyword}{public}:}
+\DoxyCodeLine{154   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1generic__xpr__base}{internal::generic\_xpr\_base<CwiseBinaryOp<BinaryOp, Lhs, Rhs>}} >::type \mbox{\hyperlink{classBase}{Base}};}
+\DoxyCodeLine{155 \};}
+\DoxyCodeLine{156 }
+\DoxyCodeLine{161 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{162 \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{163 EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE Derived \&}
+\DoxyCodeLine{164 \mbox{\hyperlink{classEigen_1_1MatrixBase_a64c96de8247e0b182963d4cb16e95f00}{MatrixBase<Derived>::operator-\/=}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<OtherDerived>}} \&other)}
+\DoxyCodeLine{165 \{}
+\DoxyCodeLine{166   call\_assignment(derived(), other.derived(), \mbox{\hyperlink{structEigen_1_1internal_1_1sub__assign__op}{internal::sub\_assign\_op<Scalar,typename OtherDerived::Scalar>}}());}
+\DoxyCodeLine{167   \textcolor{keywordflow}{return} derived();}
+\DoxyCodeLine{168 \}}
+\DoxyCodeLine{169 }
+\DoxyCodeLine{174 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{175 \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{176 EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE Derived \&}
+\DoxyCodeLine{177 \mbox{\hyperlink{classEigen_1_1MatrixBase_ad641d65d14cf19f7e0da5df38c61e23e}{MatrixBase<Derived>::operator+=}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<OtherDerived>}}\& other)}
+\DoxyCodeLine{178 \{}
+\DoxyCodeLine{179   call\_assignment(derived(), other.derived(), \mbox{\hyperlink{structEigen_1_1internal_1_1add__assign__op}{internal::add\_assign\_op<Scalar,typename OtherDerived::Scalar>}}());}
+\DoxyCodeLine{180   \textcolor{keywordflow}{return} derived();}
+\DoxyCodeLine{181 \}}
+\DoxyCodeLine{182 }
+\DoxyCodeLine{183 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{184 }
+\DoxyCodeLine{185 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_CWISE\_BINARY\_OP\_H}}
+
+\end{DoxyCode}

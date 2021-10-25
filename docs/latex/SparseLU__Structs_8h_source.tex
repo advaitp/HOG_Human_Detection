@@ -1,0 +1,118 @@
+\hypertarget{SparseLU__Structs_8h_source}{}\doxysection{Sparse\+LU\+\_\+\+Structs.\+h}
+\label{SparseLU__Structs_8h_source}\index{include/Eigen/src/SparseLU/SparseLU\_Structs.h@{include/Eigen/src/SparseLU/SparseLU\_Structs.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2012 Désiré Nuentsa-\/Wakam <desire.nuentsa\_wakam@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{comment}{/* }}
+\DoxyCodeLine{11 \textcolor{comment}{ * NOTE: This file comes from a partly modified version of files slu\_[s,d,c,z]defs.h}}
+\DoxyCodeLine{12 \textcolor{comment}{ * -\/-\/ SuperLU routine (version 4.1) -\/-\/}}
+\DoxyCodeLine{13 \textcolor{comment}{ * Univ. of California Berkeley, Xerox Palo Alto Research Center,}}
+\DoxyCodeLine{14 \textcolor{comment}{ * and Lawrence Berkeley National Lab.}}
+\DoxyCodeLine{15 \textcolor{comment}{ * November, 2010}}
+\DoxyCodeLine{16 \textcolor{comment}{ * }}
+\DoxyCodeLine{17 \textcolor{comment}{ * Global data structures used in LU factorization -\/}}
+\DoxyCodeLine{18 \textcolor{comment}{ * }}
+\DoxyCodeLine{19 \textcolor{comment}{ *   nsuper: \#supernodes = nsuper + 1, numbered [0, nsuper].}}
+\DoxyCodeLine{20 \textcolor{comment}{ *   (xsup,supno): supno[i] is the supernode no to which i belongs;}}
+\DoxyCodeLine{21 \textcolor{comment}{ *  xsup(s) points to the beginning of the s-\/th supernode.}}
+\DoxyCodeLine{22 \textcolor{comment}{ *  e.g.   supno 0 1 2 2 3 3 3 4 4 4 4 4   (n=12)}}
+\DoxyCodeLine{23 \textcolor{comment}{ *          xsup 0 1 2 4 7 12}}
+\DoxyCodeLine{24 \textcolor{comment}{ *  Note: dfs will be performed on supernode rep. relative to the new }}
+\DoxyCodeLine{25 \textcolor{comment}{ *        row pivoting ordering}}
+\DoxyCodeLine{26 \textcolor{comment}{ *}}
+\DoxyCodeLine{27 \textcolor{comment}{ *   (xlsub,lsub): lsub[*] contains the compressed subscript of}}
+\DoxyCodeLine{28 \textcolor{comment}{ *  rectangular supernodes; xlsub[j] points to the starting}}
+\DoxyCodeLine{29 \textcolor{comment}{ *  location of the j-\/th column in lsub[*]. Note that xlsub }}
+\DoxyCodeLine{30 \textcolor{comment}{ *  is indexed by column.}}
+\DoxyCodeLine{31 \textcolor{comment}{ *  Storage: original row subscripts}}
+\DoxyCodeLine{32 \textcolor{comment}{ *}}
+\DoxyCodeLine{33 \textcolor{comment}{ *      During the course of sparse LU factorization, we also use}}
+\DoxyCodeLine{34 \textcolor{comment}{ *  (xlsub,lsub) for the purpose of symmetric pruning. For each}}
+\DoxyCodeLine{35 \textcolor{comment}{ *  supernode \{s,s+1,...,t=s+r\} with first column s and last}}
+\DoxyCodeLine{36 \textcolor{comment}{ *  column t, the subscript set}}
+\DoxyCodeLine{37 \textcolor{comment}{ *    lsub[j], j=xlsub[s], .., xlsub[s+1]-\/1}}
+\DoxyCodeLine{38 \textcolor{comment}{ *  is the structure of column s (i.e. structure of this supernode).}}
+\DoxyCodeLine{39 \textcolor{comment}{ *  It is used for the storage of numerical values.}}
+\DoxyCodeLine{40 \textcolor{comment}{ *  Furthermore,}}
+\DoxyCodeLine{41 \textcolor{comment}{ *    lsub[j], j=xlsub[t], .., xlsub[t+1]-\/1}}
+\DoxyCodeLine{42 \textcolor{comment}{ *  is the structure of the last column t of this supernode.}}
+\DoxyCodeLine{43 \textcolor{comment}{ *  It is for the purpose of symmetric pruning. Therefore, the}}
+\DoxyCodeLine{44 \textcolor{comment}{ *  structural subscripts can be rearranged without making physical}}
+\DoxyCodeLine{45 \textcolor{comment}{ *  interchanges among the numerical values.}}
+\DoxyCodeLine{46 \textcolor{comment}{ *}}
+\DoxyCodeLine{47 \textcolor{comment}{ *  However, if the supernode has only one column, then we}}
+\DoxyCodeLine{48 \textcolor{comment}{ *  only keep one set of subscripts. For any subscript interchange}}
+\DoxyCodeLine{49 \textcolor{comment}{ *  performed, similar interchange must be done on the numerical}}
+\DoxyCodeLine{50 \textcolor{comment}{ *  values.}}
+\DoxyCodeLine{51 \textcolor{comment}{ *}}
+\DoxyCodeLine{52 \textcolor{comment}{ *  The last column structures (for pruning) will be removed}}
+\DoxyCodeLine{53 \textcolor{comment}{ *  after the numercial LU factorization phase.}}
+\DoxyCodeLine{54 \textcolor{comment}{ *}}
+\DoxyCodeLine{55 \textcolor{comment}{ *   (xlusup,lusup): lusup[*] contains the numerical values of the}}
+\DoxyCodeLine{56 \textcolor{comment}{ *  rectangular supernodes; xlusup[j] points to the starting}}
+\DoxyCodeLine{57 \textcolor{comment}{ *  location of the j-\/th column in storage vector lusup[*]}}
+\DoxyCodeLine{58 \textcolor{comment}{ *  Note: xlusup is indexed by column.}}
+\DoxyCodeLine{59 \textcolor{comment}{ *  Each rectangular supernode is stored by column-\/major}}
+\DoxyCodeLine{60 \textcolor{comment}{ *  scheme, consistent with Fortran 2-\/dim array storage.}}
+\DoxyCodeLine{61 \textcolor{comment}{ *}}
+\DoxyCodeLine{62 \textcolor{comment}{ *   (xusub,ucol,usub): ucol[*] stores the numerical values of}}
+\DoxyCodeLine{63 \textcolor{comment}{ *  U-\/columns outside the rectangular supernodes. The row}}
+\DoxyCodeLine{64 \textcolor{comment}{ *  subscript of nonzero ucol[k] is stored in usub[k].}}
+\DoxyCodeLine{65 \textcolor{comment}{ *  xusub[i] points to the starting location of column i in ucol.}}
+\DoxyCodeLine{66 \textcolor{comment}{ *  Storage: new row subscripts; that is subscripts of PA.}}
+\DoxyCodeLine{67 \textcolor{comment}{ */}}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{69 \textcolor{preprocessor}{\#ifndef EIGEN\_LU\_STRUCTS}}
+\DoxyCodeLine{70 \textcolor{preprocessor}{\#define EIGEN\_LU\_STRUCTS}}
+\DoxyCodeLine{71 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{74 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{75   }
+\DoxyCodeLine{76 \textcolor{keyword}{typedef} \textcolor{keyword}{enum} \{LUSUP, UCOL, LSUB, USUB, LLVL, ULVL\} MemType; }
+\DoxyCodeLine{77 }
+\DoxyCodeLine{78 \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexVector, \textcolor{keyword}{typename} ScalarVector>}
+\DoxyCodeLine{79 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1LU__GlobalLU__t}{LU\_GlobalLU\_t}} \{}
+\DoxyCodeLine{80   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} IndexVector::Scalar StorageIndex; }
+\DoxyCodeLine{81   IndexVector xsup; \textcolor{comment}{//First supernode column ... xsup(s) points to the beginning of the s-\/th supernode}}
+\DoxyCodeLine{82   IndexVector supno; \textcolor{comment}{// Supernode number corresponding to this column (column to supernode mapping)}}
+\DoxyCodeLine{83   ScalarVector  lusup; \textcolor{comment}{// nonzero values of L ordered by columns }}
+\DoxyCodeLine{84   IndexVector lsub; \textcolor{comment}{// Compressed row indices of L rectangular supernodes. }}
+\DoxyCodeLine{85   IndexVector xlusup; \textcolor{comment}{// pointers to the beginning of each column in lusup}}
+\DoxyCodeLine{86   IndexVector xlsub; \textcolor{comment}{// pointers to the beginning of each column in lsub}}
+\DoxyCodeLine{87   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}   nzlmax; \textcolor{comment}{// Current max size of lsub}}
+\DoxyCodeLine{88   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}   nzlumax; \textcolor{comment}{// Current max size of lusup}}
+\DoxyCodeLine{89   ScalarVector  ucol; \textcolor{comment}{// nonzero values of U ordered by columns }}
+\DoxyCodeLine{90   IndexVector usub; \textcolor{comment}{// row indices of U columns in ucol}}
+\DoxyCodeLine{91   IndexVector xusub; \textcolor{comment}{// Pointers to the beginning of each column of U in ucol }}
+\DoxyCodeLine{92   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}   nzumax; \textcolor{comment}{// Current max size of ucol}}
+\DoxyCodeLine{93   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}   n; \textcolor{comment}{// Number of columns in the matrix  }}
+\DoxyCodeLine{94   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}   num\_expansions; }
+\DoxyCodeLine{95 \};}
+\DoxyCodeLine{96 }
+\DoxyCodeLine{97 \textcolor{comment}{// Values to set for performance}}
+\DoxyCodeLine{98 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1perfvalues}{perfvalues}} \{}
+\DoxyCodeLine{99   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} panel\_size; \textcolor{comment}{// a panel consists of at most <panel\_size> consecutive columns}}
+\DoxyCodeLine{100   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} relax; \textcolor{comment}{// To control degree of relaxing supernodes. If the number of nodes (columns) }}
+\DoxyCodeLine{101                 \textcolor{comment}{// in a subtree of the elimination tree is less than relax, this subtree is considered }}
+\DoxyCodeLine{102                 \textcolor{comment}{// as one supernode regardless of the row structures of those columns}}
+\DoxyCodeLine{103   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} maxsuper; \textcolor{comment}{// The maximum size for a supernode in complete LU}}
+\DoxyCodeLine{104   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rowblk; \textcolor{comment}{// The minimum row dimension for 2-\/D blocking to be used;}}
+\DoxyCodeLine{105   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} colblk; \textcolor{comment}{// The minimum column dimension for 2-\/D blocking to be used;}}
+\DoxyCodeLine{106   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} fillfactor; \textcolor{comment}{// The estimated fills factors for L and U, compared with A}}
+\DoxyCodeLine{107 \}; }
+\DoxyCodeLine{108 }
+\DoxyCodeLine{109 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{110 }
+\DoxyCodeLine{111 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{112 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_LU\_STRUCTS}}
+
+\end{DoxyCode}

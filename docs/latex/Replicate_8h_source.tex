@@ -1,0 +1,118 @@
+\hypertarget{Replicate_8h_source}{}\doxysection{Replicate.\+h}
+\label{Replicate_8h_source}\index{include/Eigen/src/Core/Replicate.h@{include/Eigen/src/Core/Replicate.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2009-\/2010 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_REPLICATE\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_REPLICATE\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{18 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType,\textcolor{keywordtype}{int} RowFactor,\textcolor{keywordtype}{int} ColFactor>}
+\DoxyCodeLine{19 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{classEigen_1_1Replicate}{Replicate}}<MatrixType,RowFactor,ColFactor> >}
+\DoxyCodeLine{20  : \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<MatrixType>}
+\DoxyCodeLine{21 \{}
+\DoxyCodeLine{22   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar Scalar;}
+\DoxyCodeLine{23   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<MatrixType>::StorageKind}} StorageKind;}
+\DoxyCodeLine{24   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<MatrixType>::XprKind}} XprKind;}
+\DoxyCodeLine{25   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1ref__selector}{ref\_selector<MatrixType>::type}} MatrixTypeNested;}
+\DoxyCodeLine{26   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_reference<MatrixTypeNested>::type \_MatrixTypeNested;}
+\DoxyCodeLine{27   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{28     RowsAtCompileTime = RowFactor==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} || int(MatrixType::RowsAtCompileTime)==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}}
+\DoxyCodeLine{29                       ? \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}}
+\DoxyCodeLine{30                       : RowFactor * MatrixType::RowsAtCompileTime,}
+\DoxyCodeLine{31     ColsAtCompileTime = ColFactor==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} || int(MatrixType::ColsAtCompileTime)==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}}
+\DoxyCodeLine{32                       ? \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}}
+\DoxyCodeLine{33                       : ColFactor * MatrixType::ColsAtCompileTime,}
+\DoxyCodeLine{34    \textcolor{comment}{//FIXME we don't propagate the max sizes !!!}}
+\DoxyCodeLine{35     MaxRowsAtCompileTime = RowsAtCompileTime,}
+\DoxyCodeLine{36     MaxColsAtCompileTime = ColsAtCompileTime,}
+\DoxyCodeLine{37     IsRowMajor = MaxRowsAtCompileTime==1 \&\& MaxColsAtCompileTime!=1 ? 1}
+\DoxyCodeLine{38                : MaxColsAtCompileTime==1 \&\& MaxRowsAtCompileTime!=1 ? 0}
+\DoxyCodeLine{39                : (MatrixType::Flags \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) ? 1 : 0,}
+\DoxyCodeLine{40 }
+\DoxyCodeLine{41     \textcolor{comment}{// FIXME enable DirectAccess with negative strides?}}
+\DoxyCodeLine{42     Flags = IsRowMajor ? \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}} : 0}
+\DoxyCodeLine{43   \};}
+\DoxyCodeLine{44 \};}
+\DoxyCodeLine{45 \}}
+\DoxyCodeLine{46 }
+\DoxyCodeLine{63 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType,\textcolor{keywordtype}{int} RowFactor,\textcolor{keywordtype}{int} ColFactor> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1Replicate}{Replicate}}}
+\DoxyCodeLine{64   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1dense__xpr__base}{internal::dense\_xpr\_base}}< Replicate<MatrixType,RowFactor,ColFactor> >::type}
+\DoxyCodeLine{65 \{}
+\DoxyCodeLine{66     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Replicate>::MatrixTypeNested}} MatrixTypeNested;}
+\DoxyCodeLine{67     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Replicate>::\_MatrixTypeNested}} \_MatrixTypeNested;}
+\DoxyCodeLine{68   \textcolor{keyword}{public}:}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1dense__xpr__base}{internal::dense\_xpr\_base<Replicate>::type}} \mbox{\hyperlink{classBase}{Base}};}
+\DoxyCodeLine{71     EIGEN\_DENSE\_PUBLIC\_INTERFACE(\mbox{\hyperlink{classEigen_1_1Replicate}{Replicate}})}
+\DoxyCodeLine{72     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<MatrixType>::type NestedExpression;}
+\DoxyCodeLine{73 }
+\DoxyCodeLine{74     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OriginalMatrixType>}
+\DoxyCodeLine{75     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{76     \textcolor{keyword}{inline} \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1Replicate}{Replicate}}(\textcolor{keyword}{const} OriginalMatrixType\& matrix)}
+\DoxyCodeLine{77       : m\_matrix(matrix), m\_rowFactor(RowFactor), m\_colFactor(ColFactor)}
+\DoxyCodeLine{78     \{}
+\DoxyCodeLine{79       EIGEN\_STATIC\_ASSERT((\mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{internal::is\_same}}<\textcolor{keyword}{typename} internal::remove\_const<MatrixType>::type,OriginalMatrixType>::value),}
+\DoxyCodeLine{80                           THE\_MATRIX\_OR\_EXPRESSION\_THAT\_YOU\_PASSED\_DOES\_NOT\_HAVE\_THE\_EXPECTED\_TYPE)}
+\DoxyCodeLine{81       eigen\_assert(RowFactor!=\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} \&\& ColFactor!=\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}});}
+\DoxyCodeLine{82     \}}
+\DoxyCodeLine{83 }
+\DoxyCodeLine{84     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OriginalMatrixType>}
+\DoxyCodeLine{85     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{86     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Replicate}{Replicate}}(\textcolor{keyword}{const} OriginalMatrixType\& matrix, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rowFactor, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} colFactor)}
+\DoxyCodeLine{87       : m\_matrix(matrix), m\_rowFactor(rowFactor), m\_colFactor(colFactor)}
+\DoxyCodeLine{88     \{}
+\DoxyCodeLine{89       EIGEN\_STATIC\_ASSERT((\mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{internal::is\_same}}<\textcolor{keyword}{typename} internal::remove\_const<MatrixType>::type,OriginalMatrixType>::value),}
+\DoxyCodeLine{90                           THE\_MATRIX\_OR\_EXPRESSION\_THAT\_YOU\_PASSED\_DOES\_NOT\_HAVE\_THE\_EXPECTED\_TYPE)}
+\DoxyCodeLine{91     \}}
+\DoxyCodeLine{92 }
+\DoxyCodeLine{93     EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{94     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_matrix.rows() * m\_rowFactor.value(); \}}
+\DoxyCodeLine{95     EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{96     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_matrix.cols() * m\_colFactor.value(); \}}
+\DoxyCodeLine{97 }
+\DoxyCodeLine{98     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{99     \textcolor{keyword}{const} \_MatrixTypeNested\& nestedExpression()\textcolor{keyword}{ const}}
+\DoxyCodeLine{100 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{101       \textcolor{keywordflow}{return} m\_matrix;}
+\DoxyCodeLine{102     \}}
+\DoxyCodeLine{103 }
+\DoxyCodeLine{104   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{105     MatrixTypeNested m\_matrix;}
+\DoxyCodeLine{106     \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1variable__if__dynamic}{internal::variable\_if\_dynamic<Index, RowFactor>}} m\_rowFactor;}
+\DoxyCodeLine{107     \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1variable__if__dynamic}{internal::variable\_if\_dynamic<Index, ColFactor>}} m\_colFactor;}
+\DoxyCodeLine{108 \};}
+\DoxyCodeLine{109 }
+\DoxyCodeLine{118 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{119 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} RowFactor, \textcolor{keywordtype}{int} ColFactor>}
+\DoxyCodeLine{120 EIGEN\_DEVICE\_FUNC \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Replicate}{Replicate<Derived,RowFactor,ColFactor>}}}
+\DoxyCodeLine{121 \mbox{\hyperlink{classEigen_1_1DenseBase_ae36c50ce9e9d49a2b7a32ef54da5540c}{DenseBase<Derived>::replicate}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{122 \textcolor{keyword}{}\{}
+\DoxyCodeLine{123   \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Replicate}{Replicate<Derived,RowFactor,ColFactor>}}(derived());}
+\DoxyCodeLine{124 \}}
+\DoxyCodeLine{125 }
+\DoxyCodeLine{134 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ExpressionType, \textcolor{keywordtype}{int} Direction>}
+\DoxyCodeLine{135 EIGEN\_DEVICE\_FUNC \textcolor{keyword}{const} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Replicate}{VectorwiseOp<ExpressionType,Direction>::ReplicateReturnType}}}
+\DoxyCodeLine{136 \mbox{\hyperlink{classEigen_1_1VectorwiseOp_a73fc08418d4fada0221cf6f96dbf30d0}{VectorwiseOp<ExpressionType,Direction>::replicate}}(\mbox{\hyperlink{classEigen_1_1VectorwiseOp_a4907c654e5810edd98e4162093b19532}{Index}} factor)\textcolor{keyword}{ const}}
+\DoxyCodeLine{137 \textcolor{keyword}{}\{}
+\DoxyCodeLine{138   \textcolor{keywordflow}{return} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Replicate}{VectorwiseOp<ExpressionType,Direction>::ReplicateReturnType}}}
+\DoxyCodeLine{139           (\_expression(),Direction==\mbox{\hyperlink{group__enums_ggad49a7b3738e273eb00932271b36127f7ae2efac6e74ecab5e3b0b1561c5ddf83e}{Vertical}}?factor:1,Direction==\mbox{\hyperlink{group__enums_ggad49a7b3738e273eb00932271b36127f7a961c62410157b64033839488f4d7f7e4}{Horizontal}}?factor:1);}
+\DoxyCodeLine{140 \}}
+\DoxyCodeLine{141 }
+\DoxyCodeLine{142 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{143 }
+\DoxyCodeLine{144 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_REPLICATE\_H}}
+
+\end{DoxyCode}

@@ -1,0 +1,111 @@
+\hypertarget{SparseSolverBase_8h_source}{}\doxysection{Sparse\+Solver\+Base.\+h}
+\label{SparseSolverBase_8h_source}\index{include/Eigen/src/SparseCore/SparseSolverBase.h@{include/Eigen/src/SparseCore/SparseSolverBase.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2014 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_SPARSESOLVERBASE\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_SPARSESOLVERBASE\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{23 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Decomposition, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{24 \textcolor{keyword}{typename} enable\_if<Rhs::ColsAtCompileTime!=1 \&\& Dest::ColsAtCompileTime!=1>::type}
+\DoxyCodeLine{25 solve\_sparse\_through\_dense\_panels(\textcolor{keyword}{const} Decomposition \&dec, \textcolor{keyword}{const} Rhs\& rhs, Dest \&dest)}
+\DoxyCodeLine{26 \{}
+\DoxyCodeLine{27   EIGEN\_STATIC\_ASSERT((Dest::Flags\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})==0,THIS\_METHOD\_IS\_ONLY\_FOR\_COLUMN\_MAJOR\_MATRICES);}
+\DoxyCodeLine{28   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Dest::Scalar DestScalar;}
+\DoxyCodeLine{29   \textcolor{comment}{// we process the sparse rhs per block of NbColsAtOnce columns temporarily stored into a dense matrix.}}
+\DoxyCodeLine{30   \textcolor{keyword}{static} \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} NbColsAtOnce = 4;}
+\DoxyCodeLine{31   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rhsCols = rhs.cols();}
+\DoxyCodeLine{32   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size = rhs.rows();}
+\DoxyCodeLine{33   \textcolor{comment}{// the temporary matrices do not need more columns than NbColsAtOnce:}}
+\DoxyCodeLine{34   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} tmpCols = (std::min)(rhsCols, NbColsAtOnce); }
+\DoxyCodeLine{35   \mbox{\hyperlink{classEigen_1_1Matrix}{Eigen::Matrix<DestScalar,Dynamic,Dynamic>}} tmp(size,tmpCols);}
+\DoxyCodeLine{36   \mbox{\hyperlink{classEigen_1_1Matrix}{Eigen::Matrix<DestScalar,Dynamic,Dynamic>}} tmpX(size,tmpCols);}
+\DoxyCodeLine{37   \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} k=0; k<rhsCols; k+=NbColsAtOnce)}
+\DoxyCodeLine{38   \{}
+\DoxyCodeLine{39     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} actualCols = std::min<Index>(rhsCols-\/k, NbColsAtOnce);}
+\DoxyCodeLine{40     tmp.leftCols(actualCols) = rhs.middleCols(k,actualCols);}
+\DoxyCodeLine{41     tmpX.leftCols(actualCols) = dec.solve(tmp.leftCols(actualCols));}
+\DoxyCodeLine{42     dest.middleCols(k,actualCols) = tmpX.leftCols(actualCols).sparseView();}
+\DoxyCodeLine{43   \}}
+\DoxyCodeLine{44 \}}
+\DoxyCodeLine{45 }
+\DoxyCodeLine{46 \textcolor{comment}{// Overload for vector as rhs}}
+\DoxyCodeLine{47 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Decomposition, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{48 \textcolor{keyword}{typename} enable\_if<Rhs::ColsAtCompileTime==1 || Dest::ColsAtCompileTime==1>::type}
+\DoxyCodeLine{49 solve\_sparse\_through\_dense\_panels(\textcolor{keyword}{const} Decomposition \&dec, \textcolor{keyword}{const} Rhs\& rhs, Dest \&dest)}
+\DoxyCodeLine{50 \{}
+\DoxyCodeLine{51   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Dest::Scalar DestScalar;}
+\DoxyCodeLine{52   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size = rhs.rows();}
+\DoxyCodeLine{53   \mbox{\hyperlink{classEigen_1_1Matrix}{Eigen::Matrix<DestScalar,Dynamic,1>}} rhs\_dense(rhs);}
+\DoxyCodeLine{54   \mbox{\hyperlink{classEigen_1_1Matrix}{Eigen::Matrix<DestScalar,Dynamic,1>}} dest\_dense(size);}
+\DoxyCodeLine{55   dest\_dense = dec.solve(rhs\_dense);}
+\DoxyCodeLine{56   dest = dest\_dense.sparseView();}
+\DoxyCodeLine{57 \}}
+\DoxyCodeLine{58 }
+\DoxyCodeLine{59 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{60 }
+\DoxyCodeLine{68 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{69 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1SparseSolverBase}{SparseSolverBase}} : \mbox{\hyperlink{classEigen_1_1internal_1_1noncopyable}{internal::noncopyable}}}
+\DoxyCodeLine{70 \{}
+\DoxyCodeLine{71   \textcolor{keyword}{public}:}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{74     \mbox{\hyperlink{classEigen_1_1SparseSolverBase_aacd99fa17db475e74d3834767f392f33}{SparseSolverBase}}()}
+\DoxyCodeLine{75       : m\_isInitialized(false)}
+\DoxyCodeLine{76     \{\}}
+\DoxyCodeLine{77 }
+\DoxyCodeLine{78     \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{\string~SparseSolverBase}}()}
+\DoxyCodeLine{79     \{\}}
+\DoxyCodeLine{80 }
+\DoxyCodeLine{81     Derived\& derived() \{ \textcolor{keywordflow}{return} *\textcolor{keyword}{static\_cast<}Derived*\textcolor{keyword}{>}(\textcolor{keyword}{this}); \}}
+\DoxyCodeLine{82     \textcolor{keyword}{const} Derived\& derived()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} *\textcolor{keyword}{static\_cast<}\textcolor{keyword}{const }Derived*\textcolor{keyword}{>}(\textcolor{keyword}{this}); \}}
+\DoxyCodeLine{83     }
+\DoxyCodeLine{88     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{89     \textcolor{keyword}{inline} \textcolor{keyword}{const} Solve<Derived, Rhs>}
+\DoxyCodeLine{90     \mbox{\hyperlink{classEigen_1_1SparseSolverBase_a57c5b7f5e35274b55b5d57e8c88cc4a6}{solve}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Rhs>}}\& b)\textcolor{keyword}{ const}}
+\DoxyCodeLine{91 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{92       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}Solver is not initialized."{}});}
+\DoxyCodeLine{93       eigen\_assert(derived().rows()==b.rows() \&\& \textcolor{stringliteral}{"{}solve(): invalid number of rows of the right hand side matrix b"{}});}
+\DoxyCodeLine{94       \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Solve}{Solve<Derived, Rhs>}}(derived(), b.derived());}
+\DoxyCodeLine{95     \}}
+\DoxyCodeLine{96     }
+\DoxyCodeLine{101     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{102     \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Solve}{Solve<Derived, Rhs>}}}
+\DoxyCodeLine{103     \mbox{\hyperlink{classEigen_1_1SparseSolverBase_aa525407e654603e8275cefeda32054c9}{solve}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{SparseMatrixBase<Rhs>}}\& b)\textcolor{keyword}{ const}}
+\DoxyCodeLine{104 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{105       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}Solver is not initialized."{}});}
+\DoxyCodeLine{106       eigen\_assert(derived().rows()==b.\mbox{\hyperlink{classEigen_1_1SparseMatrixBase_a1944e9fa9ce7937bfc3a87b2cb94371f}{rows}}() \&\& \textcolor{stringliteral}{"{}solve(): invalid number of rows of the right hand side matrix b"{}});}
+\DoxyCodeLine{107       \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Solve}{Solve<Derived, Rhs>}}(derived(), b.derived());}
+\DoxyCodeLine{108     \}}
+\DoxyCodeLine{109     }
+\DoxyCodeLine{110 \textcolor{preprocessor}{    \#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{112     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs,\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{113     \textcolor{keywordtype}{void} \_solve\_impl(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{SparseMatrixBase<Rhs>}} \&b, \mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{SparseMatrixBase<Dest>}} \&dest)\textcolor{keyword}{ const}}
+\DoxyCodeLine{114 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{115       internal::solve\_sparse\_through\_dense\_panels(derived(), b.derived(), dest.derived());}
+\DoxyCodeLine{116     \}}
+\DoxyCodeLine{117 \textcolor{preprocessor}{    \#endif }\textcolor{comment}{// EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{118 }
+\DoxyCodeLine{119   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{120     }
+\DoxyCodeLine{121     \textcolor{keyword}{mutable} \textcolor{keywordtype}{bool} m\_isInitialized;}
+\DoxyCodeLine{122 \};}
+\DoxyCodeLine{123 }
+\DoxyCodeLine{124 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{125 }
+\DoxyCodeLine{126 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_SPARSESOLVERBASE\_H}}
+
+\end{DoxyCode}

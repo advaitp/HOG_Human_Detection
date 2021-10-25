@@ -1,0 +1,205 @@
+\hypertarget{OrthoMethods_8h_source}{}\doxysection{Ortho\+Methods.\+h}
+\label{OrthoMethods_8h_source}\index{include/Eigen/src/Geometry/OrthoMethods.h@{include/Eigen/src/Geometry/OrthoMethods.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2008-\/2009 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2006-\/2008 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_ORTHOMETHODS\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_ORTHOMETHODS\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{17 }
+\DoxyCodeLine{29 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{30 \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{31 \textcolor{preprocessor}{\#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{32 EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{33 \textcolor{keyword}{typename} MatrixBase<Derived>::template cross\_product\_return\_type<OtherDerived>::type}
+\DoxyCodeLine{34 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{35 \textcolor{keyword}{typename} MatrixBase<Derived>::PlainObject}
+\DoxyCodeLine{36 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{37 \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Derived>::cross}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<OtherDerived>}}\& other)\textcolor{keyword}{ const}}
+\DoxyCodeLine{38 \textcolor{keyword}{}\{}
+\DoxyCodeLine{39   EIGEN\_STATIC\_ASSERT\_VECTOR\_SPECIFIC\_SIZE(Derived,3)}
+\DoxyCodeLine{40   EIGEN\_STATIC\_ASSERT\_VECTOR\_SPECIFIC\_SIZE(OtherDerived,3)}
+\DoxyCodeLine{41 }
+\DoxyCodeLine{42   \textcolor{comment}{// Note that there is no need for an expression here since the compiler}}
+\DoxyCodeLine{43   \textcolor{comment}{// optimize such a small temporary very well (even within a complex expression)}}
+\DoxyCodeLine{44   \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::nested\_eval<Derived,2>::type}} lhs(derived());}
+\DoxyCodeLine{45   \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::nested\_eval<OtherDerived,2>::type}} rhs(other.derived());}
+\DoxyCodeLine{46   \textcolor{keywordflow}{return} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Matrix}{cross\_product\_return\_type<OtherDerived>::type}}(}
+\DoxyCodeLine{47     numext::conj(lhs.coeff(1) * rhs.coeff(2) -\/ lhs.coeff(2) * rhs.coeff(1)),}
+\DoxyCodeLine{48     numext::conj(lhs.coeff(2) * rhs.coeff(0) -\/ lhs.coeff(0) * rhs.coeff(2)),}
+\DoxyCodeLine{49     numext::conj(lhs.coeff(0) * rhs.coeff(1) -\/ lhs.coeff(1) * rhs.coeff(0))}
+\DoxyCodeLine{50   );}
+\DoxyCodeLine{51 \}}
+\DoxyCodeLine{52 }
+\DoxyCodeLine{53 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{54 }
+\DoxyCodeLine{55 \textcolor{keyword}{template}< \textcolor{keywordtype}{int} Arch,\textcolor{keyword}{typename} VectorLhs,\textcolor{keyword}{typename} VectorRhs,}
+\DoxyCodeLine{56           \textcolor{keyword}{typename} Scalar = \textcolor{keyword}{typename} VectorLhs::Scalar,}
+\DoxyCodeLine{57           \textcolor{keywordtype}{bool} Vectorizable = bool((VectorLhs::Flags\&VectorRhs::Flags)\&\mbox{\hyperlink{group__flags_ga1a306a438e1ab074e8be59512e887b9f}{PacketAccessBit}})>}
+\DoxyCodeLine{58 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1cross3__impl}{cross3\_impl}} \{}
+\DoxyCodeLine{59   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1plain__matrix__type}{internal::plain\_matrix\_type<VectorLhs>::type}}}
+\DoxyCodeLine{60   run(\textcolor{keyword}{const} VectorLhs\& lhs, \textcolor{keyword}{const} VectorRhs\& rhs)}
+\DoxyCodeLine{61   \{}
+\DoxyCodeLine{62     \textcolor{keywordflow}{return} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1plain__matrix__type}{internal::plain\_matrix\_type<VectorLhs>::type}}(}
+\DoxyCodeLine{63       numext::conj(lhs.coeff(1) * rhs.coeff(2) -\/ lhs.coeff(2) * rhs.coeff(1)),}
+\DoxyCodeLine{64       numext::conj(lhs.coeff(2) * rhs.coeff(0) -\/ lhs.coeff(0) * rhs.coeff(2)),}
+\DoxyCodeLine{65       numext::conj(lhs.coeff(0) * rhs.coeff(1) -\/ lhs.coeff(1) * rhs.coeff(0)),}
+\DoxyCodeLine{66       0}
+\DoxyCodeLine{67     );}
+\DoxyCodeLine{68   \}}
+\DoxyCodeLine{69 \};}
+\DoxyCodeLine{70 }
+\DoxyCodeLine{71 \}}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{82 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{83 \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{84 EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{typename} MatrixBase<Derived>::PlainObject}
+\DoxyCodeLine{85 \mbox{\hyperlink{group__Geometry__Module_gaf10988c8393785423ae68a5afdf83226}{MatrixBase<Derived>::cross3}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<OtherDerived>}}\& other)\textcolor{keyword}{ const}}
+\DoxyCodeLine{86 \textcolor{keyword}{}\{}
+\DoxyCodeLine{87   EIGEN\_STATIC\_ASSERT\_VECTOR\_SPECIFIC\_SIZE(Derived,4)}
+\DoxyCodeLine{88   EIGEN\_STATIC\_ASSERT\_VECTOR\_SPECIFIC\_SIZE(OtherDerived,4)}
+\DoxyCodeLine{89 }
+\DoxyCodeLine{90   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::nested\_eval<Derived,2>::type}} DerivedNested;}
+\DoxyCodeLine{91   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::nested\_eval<OtherDerived,2>::type}} OtherDerivedNested;}
+\DoxyCodeLine{92   DerivedNested lhs(derived());}
+\DoxyCodeLine{93   OtherDerivedNested rhs(other.derived());}
+\DoxyCodeLine{94 }
+\DoxyCodeLine{95   \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1cross3__impl}{internal::cross3\_impl}}<Architecture::Target,}
+\DoxyCodeLine{96                         \textcolor{keyword}{typename} internal::remove\_all<DerivedNested>::type,}
+\DoxyCodeLine{97                         \textcolor{keyword}{typename} internal::remove\_all<OtherDerivedNested>::type>::run(lhs,rhs);}
+\DoxyCodeLine{98 \}}
+\DoxyCodeLine{99 }
+\DoxyCodeLine{109 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ExpressionType, \textcolor{keywordtype}{int} Direction>}
+\DoxyCodeLine{110 \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{111 EIGEN\_DEVICE\_FUNC }
+\DoxyCodeLine{112 \textcolor{keyword}{const} \textcolor{keyword}{typename} VectorwiseOp<ExpressionType,Direction>::CrossReturnType}
+\DoxyCodeLine{113 \mbox{\hyperlink{group__Geometry__Module_gab3efae0c028a63a41cccb94d978d1437}{VectorwiseOp<ExpressionType,Direction>::cross}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<OtherDerived>}}\& other)\textcolor{keyword}{ const}}
+\DoxyCodeLine{114 \textcolor{keyword}{}\{}
+\DoxyCodeLine{115   EIGEN\_STATIC\_ASSERT\_VECTOR\_SPECIFIC\_SIZE(OtherDerived,3)}
+\DoxyCodeLine{116   EIGEN\_STATIC\_ASSERT((\mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{internal::is\_same<Scalar, typename OtherDerived::Scalar>::value}}),}
+\DoxyCodeLine{117     YOU\_MIXED\_DIFFERENT\_NUMERIC\_TYPES\_\_YOU\_NEED\_TO\_USE\_THE\_CAST\_METHOD\_OF\_MATRIXBASE\_TO\_CAST\_NUMERIC\_TYPES\_EXPLICITLY)}
+\DoxyCodeLine{118   }
+\DoxyCodeLine{119   \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::nested\_eval<ExpressionType,2>::type}} mat(\_expression());}
+\DoxyCodeLine{120   \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::nested\_eval<OtherDerived,2>::type}} vec(other.derived());}
+\DoxyCodeLine{121 }
+\DoxyCodeLine{122   CrossReturnType res(\_expression().rows(),\_expression().cols());}
+\DoxyCodeLine{123   \textcolor{keywordflow}{if}(Direction==\mbox{\hyperlink{group__enums_ggad49a7b3738e273eb00932271b36127f7ae2efac6e74ecab5e3b0b1561c5ddf83e}{Vertical}})}
+\DoxyCodeLine{124   \{}
+\DoxyCodeLine{125     eigen\_assert(CrossReturnType::RowsAtCompileTime==3 \&\& \textcolor{stringliteral}{"{}the matrix must have exactly 3 rows"{}});}
+\DoxyCodeLine{126     res.row(0) = (mat.row(1) * vec.coeff(2) -\/ mat.row(2) * vec.coeff(1)).conjugate();}
+\DoxyCodeLine{127     res.row(1) = (mat.row(2) * vec.coeff(0) -\/ mat.row(0) * vec.coeff(2)).conjugate();}
+\DoxyCodeLine{128     res.row(2) = (mat.row(0) * vec.coeff(1) -\/ mat.row(1) * vec.coeff(0)).conjugate();}
+\DoxyCodeLine{129   \}}
+\DoxyCodeLine{130   \textcolor{keywordflow}{else}}
+\DoxyCodeLine{131   \{}
+\DoxyCodeLine{132     eigen\_assert(CrossReturnType::ColsAtCompileTime==3 \&\& \textcolor{stringliteral}{"{}the matrix must have exactly 3 columns"{}});}
+\DoxyCodeLine{133     res.col(0) = (mat.col(1) * vec.coeff(2) -\/ mat.col(2) * vec.coeff(1)).conjugate();}
+\DoxyCodeLine{134     res.col(1) = (mat.col(2) * vec.coeff(0) -\/ mat.col(0) * vec.coeff(2)).conjugate();}
+\DoxyCodeLine{135     res.col(2) = (mat.col(0) * vec.coeff(1) -\/ mat.col(1) * vec.coeff(0)).conjugate();}
+\DoxyCodeLine{136   \}}
+\DoxyCodeLine{137   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{138 \}}
+\DoxyCodeLine{139 }
+\DoxyCodeLine{140 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{141 }
+\DoxyCodeLine{142 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived, \textcolor{keywordtype}{int} Size = Derived::SizeAtCompileTime>}
+\DoxyCodeLine{143 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unitOrthogonal__selector}{unitOrthogonal\_selector}}}
+\DoxyCodeLine{144 \{}
+\DoxyCodeLine{145   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1plain__matrix__type}{plain\_matrix\_type<Derived>::type}} VectorType;}
+\DoxyCodeLine{146   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<Derived>::Scalar}} Scalar;}
+\DoxyCodeLine{147   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}} RealScalar;}
+\DoxyCodeLine{148   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar,2,1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{Vector2}};}
+\DoxyCodeLine{149   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{150   \textcolor{keyword}{static} \textcolor{keyword}{inline} VectorType run(\textcolor{keyword}{const} Derived\& src)}
+\DoxyCodeLine{151   \{}
+\DoxyCodeLine{152     VectorType perp = VectorType::Zero(src.size());}
+\DoxyCodeLine{153     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} maxi = 0;}
+\DoxyCodeLine{154     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} sndi = 0;}
+\DoxyCodeLine{155     src.cwiseAbs().maxCoeff(\&maxi);}
+\DoxyCodeLine{156     \textcolor{keywordflow}{if} (maxi==0)}
+\DoxyCodeLine{157       sndi = 1;}
+\DoxyCodeLine{158     RealScalar invnm = RealScalar(1)/(\mbox{\hyperlink{classEigen_1_1Matrix}{Vector2}}() << src.coeff(sndi),src.coeff(maxi)).finished().norm();}
+\DoxyCodeLine{159     perp.coeffRef(maxi) = -\/numext::conj(src.coeff(sndi)) * invnm;}
+\DoxyCodeLine{160     perp.coeffRef(sndi) =  numext::conj(src.coeff(maxi)) * invnm;}
+\DoxyCodeLine{161 }
+\DoxyCodeLine{162     \textcolor{keywordflow}{return} perp;}
+\DoxyCodeLine{163    \}}
+\DoxyCodeLine{164 \};}
+\DoxyCodeLine{165 }
+\DoxyCodeLine{166 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{167 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unitOrthogonal__selector}{unitOrthogonal\_selector}}<Derived,3>}
+\DoxyCodeLine{168 \{}
+\DoxyCodeLine{169   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1plain__matrix__type}{plain\_matrix\_type<Derived>::type}} VectorType;}
+\DoxyCodeLine{170   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<Derived>::Scalar}} Scalar;}
+\DoxyCodeLine{171   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}} RealScalar;}
+\DoxyCodeLine{172   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{173   \textcolor{keyword}{static} \textcolor{keyword}{inline} VectorType run(\textcolor{keyword}{const} Derived\& src)}
+\DoxyCodeLine{174   \{}
+\DoxyCodeLine{175     VectorType perp;}
+\DoxyCodeLine{176     \textcolor{comment}{/* Let us compute the crossed product of *this with a vector}}
+\DoxyCodeLine{177 \textcolor{comment}{     * that is not too close to being colinear to *this.}}
+\DoxyCodeLine{178 \textcolor{comment}{     */}}
+\DoxyCodeLine{179 }
+\DoxyCodeLine{180     \textcolor{comment}{/* unless the x and y coords are both close to zero, we can}}
+\DoxyCodeLine{181 \textcolor{comment}{     * simply take ( -\/y, x, 0 ) and normalize it.}}
+\DoxyCodeLine{182 \textcolor{comment}{     */}}
+\DoxyCodeLine{183     \textcolor{keywordflow}{if}((!isMuchSmallerThan(src.x(), src.z()))}
+\DoxyCodeLine{184     || (!isMuchSmallerThan(src.y(), src.z())))}
+\DoxyCodeLine{185     \{}
+\DoxyCodeLine{186       RealScalar invnm = RealScalar(1)/src.template head<2>().norm();}
+\DoxyCodeLine{187       perp.coeffRef(0) = -\/numext::conj(src.y())*invnm;}
+\DoxyCodeLine{188       perp.coeffRef(1) = numext::conj(src.x())*invnm;}
+\DoxyCodeLine{189       perp.coeffRef(2) = 0;}
+\DoxyCodeLine{190     \}}
+\DoxyCodeLine{191     \textcolor{comment}{/* if both x and y are close to zero, then the vector is close}}
+\DoxyCodeLine{192 \textcolor{comment}{     * to the z-\/axis, so it's far from colinear to the x-\/axis for instance.}}
+\DoxyCodeLine{193 \textcolor{comment}{     * So we take the crossed product with (1,0,0) and normalize it.}}
+\DoxyCodeLine{194 \textcolor{comment}{     */}}
+\DoxyCodeLine{195     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{196     \{}
+\DoxyCodeLine{197       RealScalar invnm = RealScalar(1)/src.template tail<2>().norm();}
+\DoxyCodeLine{198       perp.coeffRef(0) = 0;}
+\DoxyCodeLine{199       perp.coeffRef(1) = -\/numext::conj(src.z())*invnm;}
+\DoxyCodeLine{200       perp.coeffRef(2) = numext::conj(src.y())*invnm;}
+\DoxyCodeLine{201     \}}
+\DoxyCodeLine{202 }
+\DoxyCodeLine{203     \textcolor{keywordflow}{return} perp;}
+\DoxyCodeLine{204    \}}
+\DoxyCodeLine{205 \};}
+\DoxyCodeLine{206 }
+\DoxyCodeLine{207 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{208 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unitOrthogonal__selector}{unitOrthogonal\_selector}}<Derived,2>}
+\DoxyCodeLine{209 \{}
+\DoxyCodeLine{210   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1plain__matrix__type}{plain\_matrix\_type<Derived>::type}} VectorType;}
+\DoxyCodeLine{211   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{212   \textcolor{keyword}{static} \textcolor{keyword}{inline} VectorType run(\textcolor{keyword}{const} Derived\& src)}
+\DoxyCodeLine{213   \{ \textcolor{keywordflow}{return} VectorType(-\/numext::conj(src.y()), numext::conj(src.x())).normalized(); \}}
+\DoxyCodeLine{214 \};}
+\DoxyCodeLine{215 }
+\DoxyCodeLine{216 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{217 }
+\DoxyCodeLine{227 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{228 EIGEN\_DEVICE\_FUNC \textcolor{keyword}{typename} MatrixBase<Derived>::PlainObject}
+\DoxyCodeLine{229 \mbox{\hyperlink{group__Geometry__Module_ga2fd7a02d7bc4c339f0e97f12c09acb25}{MatrixBase<Derived>::unitOrthogonal}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{230 \textcolor{keyword}{}\{}
+\DoxyCodeLine{231   EIGEN\_STATIC\_ASSERT\_VECTOR\_ONLY(Derived)}
+\DoxyCodeLine{232   \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1unitOrthogonal__selector}{internal::unitOrthogonal\_selector<Derived>::run}}(derived());}
+\DoxyCodeLine{233 \}}
+\DoxyCodeLine{234 }
+\DoxyCodeLine{235 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{236 }
+\DoxyCodeLine{237 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_ORTHOMETHODS\_H}}
+
+\end{DoxyCode}
