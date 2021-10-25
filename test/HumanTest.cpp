@@ -33,8 +33,3 @@ TEST(HumanTest2, testpixel_to_mm) {
   Human htest;
   EXPECT_DOUBLE_EQ(htest.pixel_to_mm(282), 50.8);
 }
-
-TEST(HumanTest3, testget_distance) {
-  Human htest;
-  EXPECT_DOUBLE_EQ(htest.get_distance(100), 118.93841441105928);
-}
