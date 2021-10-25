@@ -53,11 +53,11 @@ class Detection{
   // variable to hold the all the bounding boxes coordinates after detection
   std::vector<Box*> detections;
 
-  //Storage to store previous image's humans
+  // Storage to store previous image's humans
   std::vector<std::vector<int>> storage;
 
   // Store collection of boxes
-  std::vector<cv::Rect> Boxes ;
+  std::vector<cv::Rect> Boxes;
 
   // Store indices of bounding boxes after Non Max Suppression.
   std::vector<int> indices;
@@ -101,7 +101,7 @@ class Detection{
    * @param
    * @return
    */
-  bool is_same (int[2], int[2]);
+  bool is_same(int[2], int[2]);
 };
 
 

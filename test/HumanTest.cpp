@@ -21,7 +21,7 @@
 
 TEST(HumanTest1, testHumancalc_centre) {
   Human htest;
-  cv::Rect box(0,0,100,160);
+  cv::Rect box(0, 0, 100, 160);
   Box* hbox = new Box(0, 0, 100, 160, box);
 
   htest.calc_centre(hbox);

@@ -20,7 +20,7 @@
 #include <opencv2/dnn.hpp>
 
 TEST(BoxTest1, testboxparameterconstructor) {
-  cv::Rect ibox(0,0,100,180);
+  cv::Rect ibox(0, 0, 100, 180);
   Box* box = new Box(0, 0, 100, 180, ibox);
   EXPECT_EQ(box->coordinates[0], 0);
   EXPECT_EQ(box->coordinates[1], 0);
