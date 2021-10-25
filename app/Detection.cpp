@@ -151,12 +151,13 @@ bool Detection::is_same(int x[2], int y[2]) {
 void Detection::track(cv::Mat img) {
     try {
       std::cout << "Starting tracker\n";
+      int d_size = static_cast<int>(detections.size());
       if (!indices.empty()) {
         std::cout << "indices not empty works\n";
         // Condition 1: Check if storage is empty
        if (storage.empty()) {
           std::cout << "storage empty works\n";
-          for (auto i = 0 ; i < detections.size(); i++) {
+          for (int i = 0 ; i < d_size; i++) {
             Human sam;
             sam.calc_centre(detections[i]);
             std::cout << "Centre" <<
@@ -166,7 +167,7 @@ void Detection::track(cv::Mat img) {
           }
         }
        else {
-         for (auto j = 0 ; j < detections.size(); j++) {
+         for (int j = 0 ; j < d_size; j++) {
              Human sam;
              sam.calc_centre(detections[j]);
              auto temp = storage;
