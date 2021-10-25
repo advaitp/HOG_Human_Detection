@@ -1,0 +1,325 @@
+\hypertarget{TriangularMatrixMatrix__BLAS_8h_source}{}\doxysection{Triangular\+Matrix\+Matrix\+\_\+\+BLAS.\+h}
+\label{TriangularMatrixMatrix__BLAS_8h_source}\index{include/Eigen/src/Core/products/TriangularMatrixMatrix\_BLAS.h@{include/Eigen/src/Core/products/TriangularMatrixMatrix\_BLAS.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{/*}}
+\DoxyCodeLine{2 \textcolor{comment}{ Copyright (c) 2011, Intel Corporation. All rights reserved.}}
+\DoxyCodeLine{3 \textcolor{comment}{}}
+\DoxyCodeLine{4 \textcolor{comment}{ Redistribution and use in source and binary forms, with or without modification,}}
+\DoxyCodeLine{5 \textcolor{comment}{ are permitted provided that the following conditions are met:}}
+\DoxyCodeLine{6 \textcolor{comment}{}}
+\DoxyCodeLine{7 \textcolor{comment}{ * Redistributions of source code must retain the above copyright notice, this}}
+\DoxyCodeLine{8 \textcolor{comment}{   list of conditions and the following disclaimer.}}
+\DoxyCodeLine{9 \textcolor{comment}{ * Redistributions in binary form must reproduce the above copyright notice,}}
+\DoxyCodeLine{10 \textcolor{comment}{   this list of conditions and the following disclaimer in the documentation}}
+\DoxyCodeLine{11 \textcolor{comment}{   and/or other materials provided with the distribution.}}
+\DoxyCodeLine{12 \textcolor{comment}{ * Neither the name of Intel Corporation nor the names of its contributors may}}
+\DoxyCodeLine{13 \textcolor{comment}{   be used to endorse or promote products derived from this software without}}
+\DoxyCodeLine{14 \textcolor{comment}{   specific prior written permission.}}
+\DoxyCodeLine{15 \textcolor{comment}{}}
+\DoxyCodeLine{16 \textcolor{comment}{ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "{}AS IS"{} AND}}
+\DoxyCodeLine{17 \textcolor{comment}{ ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED}}
+\DoxyCodeLine{18 \textcolor{comment}{ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE}}
+\DoxyCodeLine{19 \textcolor{comment}{ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR}}
+\DoxyCodeLine{20 \textcolor{comment}{ ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES}}
+\DoxyCodeLine{21 \textcolor{comment}{ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;}}
+\DoxyCodeLine{22 \textcolor{comment}{ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON}}
+\DoxyCodeLine{23 \textcolor{comment}{ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT}}
+\DoxyCodeLine{24 \textcolor{comment}{ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS}}
+\DoxyCodeLine{25 \textcolor{comment}{ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.}}
+\DoxyCodeLine{26 \textcolor{comment}{}}
+\DoxyCodeLine{27 \textcolor{comment}{ ********************************************************************************}}
+\DoxyCodeLine{28 \textcolor{comment}{ *   Content : Eigen bindings to BLAS F77}}
+\DoxyCodeLine{29 \textcolor{comment}{ *   Triangular matrix * matrix product functionality based on ?TRMM.}}
+\DoxyCodeLine{30 \textcolor{comment}{ ********************************************************************************}}
+\DoxyCodeLine{31 \textcolor{comment}{*/}}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33 \textcolor{preprocessor}{\#ifndef EIGEN\_TRIANGULAR\_MATRIX\_MATRIX\_BLAS\_H}}
+\DoxyCodeLine{34 \textcolor{preprocessor}{\#define EIGEN\_TRIANGULAR\_MATRIX\_MATRIX\_BLAS\_H}}
+\DoxyCodeLine{35 }
+\DoxyCodeLine{36 \textcolor{preprocessor}{\#include "{}../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{37 }
+\DoxyCodeLine{38 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{39 }
+\DoxyCodeLine{40 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{41 }
+\DoxyCodeLine{42 }
+\DoxyCodeLine{43 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}},}
+\DoxyCodeLine{44           \textcolor{keywordtype}{int} Mode, \textcolor{keywordtype}{bool} LhsIsTriangular,}
+\DoxyCodeLine{45           \textcolor{keywordtype}{int} LhsStorageOrder, \textcolor{keywordtype}{bool} ConjugateLhs,}
+\DoxyCodeLine{46           \textcolor{keywordtype}{int} RhsStorageOrder, \textcolor{keywordtype}{bool} ConjugateRhs,}
+\DoxyCodeLine{47           \textcolor{keywordtype}{int} ResStorageOrder>}
+\DoxyCodeLine{48 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1product__triangular__matrix__matrix__trmm}{product\_triangular\_matrix\_matrix\_trmm}} :}
+\DoxyCodeLine{49        \mbox{\hyperlink{structEigen_1_1internal_1_1product__triangular__matrix__matrix}{product\_triangular\_matrix\_matrix}}<Scalar,Index,Mode,}
+\DoxyCodeLine{50           LhsIsTriangular,LhsStorageOrder,ConjugateLhs,}
+\DoxyCodeLine{51           RhsStorageOrder, ConjugateRhs, ResStorageOrder, 1, BuiltIn> \{\};}
+\DoxyCodeLine{52 }
+\DoxyCodeLine{53 }
+\DoxyCodeLine{54 \textcolor{comment}{// try to go to BLAS specialization}}
+\DoxyCodeLine{55 \textcolor{preprocessor}{\#define EIGEN\_BLAS\_TRMM\_SPECIALIZE(Scalar, LhsIsTriangular) \(\backslash\)}}
+\DoxyCodeLine{56 \textcolor{preprocessor}{template <typename Index, int Mode, \(\backslash\)}}
+\DoxyCodeLine{57 \textcolor{preprocessor}{          int LhsStorageOrder, bool ConjugateLhs, \(\backslash\)}}
+\DoxyCodeLine{58 \textcolor{preprocessor}{          int RhsStorageOrder, bool ConjugateRhs> \(\backslash\)}}
+\DoxyCodeLine{59 \textcolor{preprocessor}{struct product\_triangular\_matrix\_matrix<Scalar,Index, Mode, LhsIsTriangular, \(\backslash\)}}
+\DoxyCodeLine{60 \textcolor{preprocessor}{           LhsStorageOrder,ConjugateLhs, RhsStorageOrder,ConjugateRhs,ColMajor,1,Specialized> \{ \(\backslash\)}}
+\DoxyCodeLine{61 \textcolor{preprocessor}{  static inline void run(Index \_rows, Index \_cols, Index \_depth, const Scalar* \_lhs, Index lhsStride,\(\backslash\)}}
+\DoxyCodeLine{62 \textcolor{preprocessor}{    const Scalar* \_rhs, Index rhsStride, Scalar* res, Index resIncr, Index resStride, Scalar alpha, level3\_blocking<Scalar,Scalar>\& blocking) \{ \(\backslash\)}}
+\DoxyCodeLine{63 \textcolor{preprocessor}{      EIGEN\_ONLY\_USED\_FOR\_DEBUG(resIncr); \(\backslash\)}}
+\DoxyCodeLine{64 \textcolor{preprocessor}{      eigen\_assert(resIncr == 1); \(\backslash\)}}
+\DoxyCodeLine{65 \textcolor{preprocessor}{      product\_triangular\_matrix\_matrix\_trmm<Scalar,Index,Mode, \(\backslash\)}}
+\DoxyCodeLine{66 \textcolor{preprocessor}{        LhsIsTriangular,LhsStorageOrder,ConjugateLhs, \(\backslash\)}}
+\DoxyCodeLine{67 \textcolor{preprocessor}{        RhsStorageOrder, ConjugateRhs, ColMajor>::run( \(\backslash\)}}
+\DoxyCodeLine{68 \textcolor{preprocessor}{          \_rows, \_cols, \_depth, \_lhs, lhsStride, \_rhs, rhsStride, res, resStride, alpha, blocking); \(\backslash\)}}
+\DoxyCodeLine{69 \textcolor{preprocessor}{  \} \(\backslash\)}}
+\DoxyCodeLine{70 \textcolor{preprocessor}{\};}}
+\DoxyCodeLine{71 }
+\DoxyCodeLine{72 EIGEN\_BLAS\_TRMM\_SPECIALIZE(\textcolor{keywordtype}{double}, \textcolor{keyword}{true})}
+\DoxyCodeLine{73 EIGEN\_BLAS\_TRMM\_SPECIALIZE(\textcolor{keywordtype}{double}, false)}
+\DoxyCodeLine{74 EIGEN\_BLAS\_TRMM\_SPECIALIZE(dcomplex, true)}
+\DoxyCodeLine{75 EIGEN\_BLAS\_TRMM\_SPECIALIZE(dcomplex, false)}
+\DoxyCodeLine{76 EIGEN\_BLAS\_TRMM\_SPECIALIZE(\textcolor{keywordtype}{float}, true)}
+\DoxyCodeLine{77 EIGEN\_BLAS\_TRMM\_SPECIALIZE(\textcolor{keywordtype}{float}, false)}
+\DoxyCodeLine{78 EIGEN\_BLAS\_TRMM\_SPECIALIZE(scomplex, true)}
+\DoxyCodeLine{79 EIGEN\_BLAS\_TRMM\_SPECIALIZE(scomplex, false)}
+\DoxyCodeLine{80 }
+\DoxyCodeLine{81 \textcolor{comment}{// implements col-\/major += alpha * op(triangular) * op(general)}}
+\DoxyCodeLine{82 \textcolor{preprocessor}{\#define EIGEN\_BLAS\_TRMM\_L(EIGTYPE, BLASTYPE, EIGPREFIX, BLASFUNC) \(\backslash\)}}
+\DoxyCodeLine{83 \textcolor{preprocessor}{template <typename Index, int Mode, \(\backslash\)}}
+\DoxyCodeLine{84 \textcolor{preprocessor}{          int LhsStorageOrder, bool ConjugateLhs, \(\backslash\)}}
+\DoxyCodeLine{85 \textcolor{preprocessor}{          int RhsStorageOrder, bool ConjugateRhs> \(\backslash\)}}
+\DoxyCodeLine{86 \textcolor{preprocessor}{struct product\_triangular\_matrix\_matrix\_trmm<EIGTYPE,Index,Mode,true, \(\backslash\)}}
+\DoxyCodeLine{87 \textcolor{preprocessor}{         LhsStorageOrder,ConjugateLhs,RhsStorageOrder,ConjugateRhs,ColMajor> \(\backslash\)}}
+\DoxyCodeLine{88 \textcolor{preprocessor}{\{ \(\backslash\)}}
+\DoxyCodeLine{89 \textcolor{preprocessor}{  enum \{ \(\backslash\)}}
+\DoxyCodeLine{90 \textcolor{preprocessor}{    IsLower = (Mode\&Lower) == Lower, \(\backslash\)}}
+\DoxyCodeLine{91 \textcolor{preprocessor}{    SetDiag = (Mode\&(ZeroDiag|UnitDiag)) ? 0 : 1, \(\backslash\)}}
+\DoxyCodeLine{92 \textcolor{preprocessor}{    IsUnitDiag  = (Mode\&UnitDiag) ? 1 : 0, \(\backslash\)}}
+\DoxyCodeLine{93 \textcolor{preprocessor}{    IsZeroDiag  = (Mode\&ZeroDiag) ? 1 : 0, \(\backslash\)}}
+\DoxyCodeLine{94 \textcolor{preprocessor}{    LowUp = IsLower ? Lower : Upper, \(\backslash\)}}
+\DoxyCodeLine{95 \textcolor{preprocessor}{    conjA = ((LhsStorageOrder==ColMajor) \&\& ConjugateLhs) ? 1 : 0 \(\backslash\)}}
+\DoxyCodeLine{96 \textcolor{preprocessor}{  \}; \(\backslash\)}}
+\DoxyCodeLine{97 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{98 \textcolor{preprocessor}{  static void run( \(\backslash\)}}
+\DoxyCodeLine{99 \textcolor{preprocessor}{    Index \_rows, Index \_cols, Index \_depth, \(\backslash\)}}
+\DoxyCodeLine{100 \textcolor{preprocessor}{    const EIGTYPE* \_lhs, Index lhsStride, \(\backslash\)}}
+\DoxyCodeLine{101 \textcolor{preprocessor}{    const EIGTYPE* \_rhs, Index rhsStride, \(\backslash\)}}
+\DoxyCodeLine{102 \textcolor{preprocessor}{    EIGTYPE* res,        Index resStride, \(\backslash\)}}
+\DoxyCodeLine{103 \textcolor{preprocessor}{    EIGTYPE alpha, level3\_blocking<EIGTYPE,EIGTYPE>\& blocking) \(\backslash\)}}
+\DoxyCodeLine{104 \textcolor{preprocessor}{  \{ \(\backslash\)}}
+\DoxyCodeLine{105 \textcolor{preprocessor}{   Index diagSize  = (std::min)(\_rows,\_depth); \(\backslash\)}}
+\DoxyCodeLine{106 \textcolor{preprocessor}{   Index rows      = IsLower ? \_rows : diagSize; \(\backslash\)}}
+\DoxyCodeLine{107 \textcolor{preprocessor}{   Index depth     = IsLower ? diagSize : \_depth; \(\backslash\)}}
+\DoxyCodeLine{108 \textcolor{preprocessor}{   Index cols      = \_cols; \(\backslash\)}}
+\DoxyCodeLine{109 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{110 \textcolor{preprocessor}{   typedef Matrix<EIGTYPE, Dynamic, Dynamic, LhsStorageOrder> MatrixLhs; \(\backslash\)}}
+\DoxyCodeLine{111 \textcolor{preprocessor}{   typedef Matrix<EIGTYPE, Dynamic, Dynamic, RhsStorageOrder> MatrixRhs; \(\backslash\)}}
+\DoxyCodeLine{112 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{113 \textcolor{preprocessor}{}\textcolor{comment}{/* Non-\/square case -\/ doesn't fit to BLAS ?TRMM. Fall to default triangular product or call BLAS ?GEMM*/}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{114 \textcolor{preprocessor}{   if (rows != depth) \{ \(\backslash\)}}
+\DoxyCodeLine{115 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{116 \textcolor{preprocessor}{     }\textcolor{comment}{/* FIXME handle mkl\_domain\_get\_max\_threads */}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{117 \textcolor{preprocessor}{     }\textcolor{comment}{/*int nthr = mkl\_domain\_get\_max\_threads(EIGEN\_BLAS\_DOMAIN\_BLAS);*/}\textcolor{preprocessor}{ int nthr = 1;\(\backslash\)}}
+\DoxyCodeLine{118 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{119 \textcolor{preprocessor}{     if (((nthr==1) \&\& (((std::max)(rows,depth)-\/diagSize)/(double)diagSize < 0.5))) \{ \(\backslash\)}}
+\DoxyCodeLine{120 \textcolor{preprocessor}{     }\textcolor{comment}{/* Most likely no benefit to call TRMM or GEMM from BLAS */}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{121 \textcolor{preprocessor}{       product\_triangular\_matrix\_matrix<EIGTYPE,Index,Mode,true, \(\backslash\)}}
+\DoxyCodeLine{122 \textcolor{preprocessor}{       LhsStorageOrder,ConjugateLhs, RhsStorageOrder, ConjugateRhs, ColMajor, 1, BuiltIn>::run( \(\backslash\)}}
+\DoxyCodeLine{123 \textcolor{preprocessor}{           \_rows, \_cols, \_depth, \_lhs, lhsStride, \_rhs, rhsStride, res, 1, resStride, alpha, blocking); \(\backslash\)}}
+\DoxyCodeLine{124 \textcolor{preprocessor}{     }\textcolor{comment}{/*std::cout << "{}TRMM\_L: A is not square! Go to Eigen TRMM implementation!\(\backslash\)n"{};*/}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{125 \textcolor{preprocessor}{     \} else \{ \(\backslash\)}}
+\DoxyCodeLine{126 \textcolor{preprocessor}{     }\textcolor{comment}{/* Make sense to call GEMM */}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{127 \textcolor{preprocessor}{       Map<const MatrixLhs, 0, OuterStride<> > lhsMap(\_lhs,rows,depth,OuterStride<>(lhsStride)); \(\backslash\)}}
+\DoxyCodeLine{128 \textcolor{preprocessor}{       MatrixLhs aa\_tmp=lhsMap.template triangularView<Mode>(); \(\backslash\)}}
+\DoxyCodeLine{129 \textcolor{preprocessor}{       BlasIndex aStride = convert\_index<BlasIndex>(aa\_tmp.outerStride()); \(\backslash\)}}
+\DoxyCodeLine{130 \textcolor{preprocessor}{       gemm\_blocking\_space<ColMajor,EIGTYPE,EIGTYPE,Dynamic,Dynamic,Dynamic> gemm\_blocking(\_rows,\_cols,\_depth, 1, true); \(\backslash\)}}
+\DoxyCodeLine{131 \textcolor{preprocessor}{       general\_matrix\_matrix\_product<Index,EIGTYPE,LhsStorageOrder,ConjugateLhs,EIGTYPE,RhsStorageOrder,ConjugateRhs,ColMajor,1>::run( \(\backslash\)}}
+\DoxyCodeLine{132 \textcolor{preprocessor}{       rows, cols, depth, aa\_tmp.data(), aStride, \_rhs, rhsStride, res, 1, resStride, alpha, gemm\_blocking, 0); \(\backslash\)}}
+\DoxyCodeLine{133 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{134 \textcolor{preprocessor}{     }\textcolor{comment}{/*std::cout << "{}TRMM\_L: A is not square! Go to BLAS GEMM implementation! "{} << nthr<<"{} \(\backslash\)n"{};*/}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{135 \textcolor{preprocessor}{     \} \(\backslash\)}}
+\DoxyCodeLine{136 \textcolor{preprocessor}{     return; \(\backslash\)}}
+\DoxyCodeLine{137 \textcolor{preprocessor}{   \} \(\backslash\)}}
+\DoxyCodeLine{138 \textcolor{preprocessor}{   char side = 'L', transa, uplo, diag = 'N'; \(\backslash\)}}
+\DoxyCodeLine{139 \textcolor{preprocessor}{   EIGTYPE *b; \(\backslash\)}}
+\DoxyCodeLine{140 \textcolor{preprocessor}{   const EIGTYPE *a; \(\backslash\)}}
+\DoxyCodeLine{141 \textcolor{preprocessor}{   BlasIndex m, n, lda, ldb; \(\backslash\)}}
+\DoxyCodeLine{142 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{143 \textcolor{preprocessor}{}\textcolor{comment}{/* Set m, n */}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{144 \textcolor{preprocessor}{   m = convert\_index<BlasIndex>(diagSize); \(\backslash\)}}
+\DoxyCodeLine{145 \textcolor{preprocessor}{   n = convert\_index<BlasIndex>(cols); \(\backslash\)}}
+\DoxyCodeLine{146 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{147 \textcolor{preprocessor}{}\textcolor{comment}{/* Set trans */}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{148 \textcolor{preprocessor}{   transa = (LhsStorageOrder==RowMajor) ? ((ConjugateLhs) ? 'C' : 'T') : 'N'; \(\backslash\)}}
+\DoxyCodeLine{149 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{150 \textcolor{preprocessor}{}\textcolor{comment}{/* Set b, ldb */}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{151 \textcolor{preprocessor}{   Map<const MatrixRhs, 0, OuterStride<> > rhs(\_rhs,depth,cols,OuterStride<>(rhsStride)); \(\backslash\)}}
+\DoxyCodeLine{152 \textcolor{preprocessor}{   MatrixX\#\#EIGPREFIX b\_tmp; \(\backslash\)}}
+\DoxyCodeLine{153 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{154 \textcolor{preprocessor}{   if (ConjugateRhs) b\_tmp = rhs.conjugate(); else b\_tmp = rhs; \(\backslash\)}}
+\DoxyCodeLine{155 \textcolor{preprocessor}{   b = b\_tmp.data(); \(\backslash\)}}
+\DoxyCodeLine{156 \textcolor{preprocessor}{   ldb = convert\_index<BlasIndex>(b\_tmp.outerStride()); \(\backslash\)}}
+\DoxyCodeLine{157 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{158 \textcolor{preprocessor}{}\textcolor{comment}{/* Set uplo */}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{159 \textcolor{preprocessor}{   uplo = IsLower ? 'L' : 'U'; \(\backslash\)}}
+\DoxyCodeLine{160 \textcolor{preprocessor}{   if (LhsStorageOrder==RowMajor) uplo = (uplo == 'L') ? 'U' : 'L'; \(\backslash\)}}
+\DoxyCodeLine{161 \textcolor{preprocessor}{}\textcolor{comment}{/* Set a, lda */}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{162 \textcolor{preprocessor}{   Map<const MatrixLhs, 0, OuterStride<> > lhs(\_lhs,rows,depth,OuterStride<>(lhsStride)); \(\backslash\)}}
+\DoxyCodeLine{163 \textcolor{preprocessor}{   MatrixLhs a\_tmp; \(\backslash\)}}
+\DoxyCodeLine{164 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{165 \textcolor{preprocessor}{   if ((conjA!=0) || (SetDiag==0)) \{ \(\backslash\)}}
+\DoxyCodeLine{166 \textcolor{preprocessor}{     if (conjA) a\_tmp = lhs.conjugate(); else a\_tmp = lhs; \(\backslash\)}}
+\DoxyCodeLine{167 \textcolor{preprocessor}{     if (IsZeroDiag) \(\backslash\)}}
+\DoxyCodeLine{168 \textcolor{preprocessor}{       a\_tmp.diagonal().setZero(); \(\backslash\)}}
+\DoxyCodeLine{169 \textcolor{preprocessor}{     else if (IsUnitDiag) \(\backslash\)}}
+\DoxyCodeLine{170 \textcolor{preprocessor}{       a\_tmp.diagonal().setOnes();\(\backslash\)}}
+\DoxyCodeLine{171 \textcolor{preprocessor}{     a = a\_tmp.data(); \(\backslash\)}}
+\DoxyCodeLine{172 \textcolor{preprocessor}{     lda = convert\_index<BlasIndex>(a\_tmp.outerStride()); \(\backslash\)}}
+\DoxyCodeLine{173 \textcolor{preprocessor}{   \} else \{ \(\backslash\)}}
+\DoxyCodeLine{174 \textcolor{preprocessor}{     a = \_lhs; \(\backslash\)}}
+\DoxyCodeLine{175 \textcolor{preprocessor}{     lda = convert\_index<BlasIndex>(lhsStride); \(\backslash\)}}
+\DoxyCodeLine{176 \textcolor{preprocessor}{   \} \(\backslash\)}}
+\DoxyCodeLine{177 \textcolor{preprocessor}{   }\textcolor{comment}{/*std::cout << "{}TRMM\_L: A is square! Go to BLAS TRMM implementation! \(\backslash\)n"{};*/}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{178 \textcolor{preprocessor}{}\textcolor{comment}{/* call ?trmm*/}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{179 \textcolor{preprocessor}{   BLASFUNC(\&side, \&uplo, \&transa, \&diag, \&m, \&n, (const BLASTYPE*)\&numext::real\_ref(alpha), (const BLASTYPE*)a, \&lda, (BLASTYPE*)b, \&ldb); \(\backslash\)}}
+\DoxyCodeLine{180 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{181 \textcolor{preprocessor}{}\textcolor{comment}{/* Add op(a\_triangular)*b into res*/}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{182 \textcolor{preprocessor}{   Map<MatrixX\#\#EIGPREFIX, 0, OuterStride<> > res\_tmp(res,rows,cols,OuterStride<>(resStride)); \(\backslash\)}}
+\DoxyCodeLine{183 \textcolor{preprocessor}{   res\_tmp=res\_tmp+b\_tmp; \(\backslash\)}}
+\DoxyCodeLine{184 \textcolor{preprocessor}{  \} \(\backslash\)}}
+\DoxyCodeLine{185 \textcolor{preprocessor}{\};}}
+\DoxyCodeLine{186 }
+\DoxyCodeLine{187 \textcolor{preprocessor}{\#ifdef EIGEN\_USE\_MKL}}
+\DoxyCodeLine{188 EIGEN\_BLAS\_TRMM\_L(\textcolor{keywordtype}{double}, \textcolor{keywordtype}{double}, d, dtrmm)}
+\DoxyCodeLine{189 EIGEN\_BLAS\_TRMM\_L(dcomplex, MKL\_Complex16, cd, ztrmm)}
+\DoxyCodeLine{190 EIGEN\_BLAS\_TRMM\_L(\textcolor{keywordtype}{float}, \textcolor{keywordtype}{float}, f, strmm)}
+\DoxyCodeLine{191 EIGEN\_BLAS\_TRMM\_L(scomplex, MKL\_Complex8, cf, ctrmm)}
+\DoxyCodeLine{192 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{193 EIGEN\_BLAS\_TRMM\_L(\textcolor{keywordtype}{double}, \textcolor{keywordtype}{double}, d, dtrmm\_)}
+\DoxyCodeLine{194 EIGEN\_BLAS\_TRMM\_L(dcomplex, \textcolor{keywordtype}{double}, cd, ztrmm\_)}
+\DoxyCodeLine{195 EIGEN\_BLAS\_TRMM\_L(\textcolor{keywordtype}{float}, \textcolor{keywordtype}{float}, f, strmm\_)}
+\DoxyCodeLine{196 EIGEN\_BLAS\_TRMM\_L(scomplex, \textcolor{keywordtype}{float}, cf, ctrmm\_)}
+\DoxyCodeLine{197 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{198 }
+\DoxyCodeLine{199 \textcolor{comment}{// implements col-\/major += alpha * op(general) * op(triangular)}}
+\DoxyCodeLine{200 \textcolor{preprocessor}{\#define EIGEN\_BLAS\_TRMM\_R(EIGTYPE, BLASTYPE, EIGPREFIX, BLASFUNC) \(\backslash\)}}
+\DoxyCodeLine{201 \textcolor{preprocessor}{template <typename Index, int Mode, \(\backslash\)}}
+\DoxyCodeLine{202 \textcolor{preprocessor}{          int LhsStorageOrder, bool ConjugateLhs, \(\backslash\)}}
+\DoxyCodeLine{203 \textcolor{preprocessor}{          int RhsStorageOrder, bool ConjugateRhs> \(\backslash\)}}
+\DoxyCodeLine{204 \textcolor{preprocessor}{struct product\_triangular\_matrix\_matrix\_trmm<EIGTYPE,Index,Mode,false, \(\backslash\)}}
+\DoxyCodeLine{205 \textcolor{preprocessor}{         LhsStorageOrder,ConjugateLhs,RhsStorageOrder,ConjugateRhs,ColMajor> \(\backslash\)}}
+\DoxyCodeLine{206 \textcolor{preprocessor}{\{ \(\backslash\)}}
+\DoxyCodeLine{207 \textcolor{preprocessor}{  enum \{ \(\backslash\)}}
+\DoxyCodeLine{208 \textcolor{preprocessor}{    IsLower = (Mode\&Lower) == Lower, \(\backslash\)}}
+\DoxyCodeLine{209 \textcolor{preprocessor}{    SetDiag = (Mode\&(ZeroDiag|UnitDiag)) ? 0 : 1, \(\backslash\)}}
+\DoxyCodeLine{210 \textcolor{preprocessor}{    IsUnitDiag  = (Mode\&UnitDiag) ? 1 : 0, \(\backslash\)}}
+\DoxyCodeLine{211 \textcolor{preprocessor}{    IsZeroDiag  = (Mode\&ZeroDiag) ? 1 : 0, \(\backslash\)}}
+\DoxyCodeLine{212 \textcolor{preprocessor}{    LowUp = IsLower ? Lower : Upper, \(\backslash\)}}
+\DoxyCodeLine{213 \textcolor{preprocessor}{    conjA = ((RhsStorageOrder==ColMajor) \&\& ConjugateRhs) ? 1 : 0 \(\backslash\)}}
+\DoxyCodeLine{214 \textcolor{preprocessor}{  \}; \(\backslash\)}}
+\DoxyCodeLine{215 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{216 \textcolor{preprocessor}{  static void run( \(\backslash\)}}
+\DoxyCodeLine{217 \textcolor{preprocessor}{    Index \_rows, Index \_cols, Index \_depth, \(\backslash\)}}
+\DoxyCodeLine{218 \textcolor{preprocessor}{    const EIGTYPE* \_lhs, Index lhsStride, \(\backslash\)}}
+\DoxyCodeLine{219 \textcolor{preprocessor}{    const EIGTYPE* \_rhs, Index rhsStride, \(\backslash\)}}
+\DoxyCodeLine{220 \textcolor{preprocessor}{    EIGTYPE* res,        Index resStride, \(\backslash\)}}
+\DoxyCodeLine{221 \textcolor{preprocessor}{    EIGTYPE alpha, level3\_blocking<EIGTYPE,EIGTYPE>\& blocking) \(\backslash\)}}
+\DoxyCodeLine{222 \textcolor{preprocessor}{  \{ \(\backslash\)}}
+\DoxyCodeLine{223 \textcolor{preprocessor}{   Index diagSize  = (std::min)(\_cols,\_depth); \(\backslash\)}}
+\DoxyCodeLine{224 \textcolor{preprocessor}{   Index rows      = \_rows; \(\backslash\)}}
+\DoxyCodeLine{225 \textcolor{preprocessor}{   Index depth     = IsLower ? \_depth : diagSize; \(\backslash\)}}
+\DoxyCodeLine{226 \textcolor{preprocessor}{   Index cols      = IsLower ? diagSize : \_cols; \(\backslash\)}}
+\DoxyCodeLine{227 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{228 \textcolor{preprocessor}{   typedef Matrix<EIGTYPE, Dynamic, Dynamic, LhsStorageOrder> MatrixLhs; \(\backslash\)}}
+\DoxyCodeLine{229 \textcolor{preprocessor}{   typedef Matrix<EIGTYPE, Dynamic, Dynamic, RhsStorageOrder> MatrixRhs; \(\backslash\)}}
+\DoxyCodeLine{230 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{231 \textcolor{preprocessor}{}\textcolor{comment}{/* Non-\/square case -\/ doesn't fit to BLAS ?TRMM. Fall to default triangular product or call BLAS ?GEMM*/}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{232 \textcolor{preprocessor}{   if (cols != depth) \{ \(\backslash\)}}
+\DoxyCodeLine{233 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{234 \textcolor{preprocessor}{     int nthr = 1 }\textcolor{comment}{/*mkl\_domain\_get\_max\_threads(EIGEN\_BLAS\_DOMAIN\_BLAS)*/}\textcolor{preprocessor}{; \(\backslash\)}}
+\DoxyCodeLine{235 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{236 \textcolor{preprocessor}{     if ((nthr==1) \&\& (((std::max)(cols,depth)-\/diagSize)/(double)diagSize < 0.5)) \{ \(\backslash\)}}
+\DoxyCodeLine{237 \textcolor{preprocessor}{     }\textcolor{comment}{/* Most likely no benefit to call TRMM or GEMM from BLAS*/}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{238 \textcolor{preprocessor}{       product\_triangular\_matrix\_matrix<EIGTYPE,Index,Mode,false, \(\backslash\)}}
+\DoxyCodeLine{239 \textcolor{preprocessor}{       LhsStorageOrder,ConjugateLhs, RhsStorageOrder, ConjugateRhs, ColMajor, 1, BuiltIn>::run( \(\backslash\)}}
+\DoxyCodeLine{240 \textcolor{preprocessor}{           \_rows, \_cols, \_depth, \_lhs, lhsStride, \_rhs, rhsStride, res, 1, resStride, alpha, blocking); \(\backslash\)}}
+\DoxyCodeLine{241 \textcolor{preprocessor}{       }\textcolor{comment}{/*std::cout << "{}TRMM\_R: A is not square! Go to Eigen TRMM implementation!\(\backslash\)n"{};*/}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{242 \textcolor{preprocessor}{     \} else \{ \(\backslash\)}}
+\DoxyCodeLine{243 \textcolor{preprocessor}{     }\textcolor{comment}{/* Make sense to call GEMM */}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{244 \textcolor{preprocessor}{       Map<const MatrixRhs, 0, OuterStride<> > rhsMap(\_rhs,depth,cols, OuterStride<>(rhsStride)); \(\backslash\)}}
+\DoxyCodeLine{245 \textcolor{preprocessor}{       MatrixRhs aa\_tmp=rhsMap.template triangularView<Mode>(); \(\backslash\)}}
+\DoxyCodeLine{246 \textcolor{preprocessor}{       BlasIndex aStride = convert\_index<BlasIndex>(aa\_tmp.outerStride()); \(\backslash\)}}
+\DoxyCodeLine{247 \textcolor{preprocessor}{       gemm\_blocking\_space<ColMajor,EIGTYPE,EIGTYPE,Dynamic,Dynamic,Dynamic> gemm\_blocking(\_rows,\_cols,\_depth, 1, true); \(\backslash\)}}
+\DoxyCodeLine{248 \textcolor{preprocessor}{       general\_matrix\_matrix\_product<Index,EIGTYPE,LhsStorageOrder,ConjugateLhs,EIGTYPE,RhsStorageOrder,ConjugateRhs,ColMajor,1>::run( \(\backslash\)}}
+\DoxyCodeLine{249 \textcolor{preprocessor}{       rows, cols, depth, \_lhs, lhsStride, aa\_tmp.data(), aStride, res, 1, resStride, alpha, gemm\_blocking, 0); \(\backslash\)}}
+\DoxyCodeLine{250 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{251 \textcolor{preprocessor}{     }\textcolor{comment}{/*std::cout << "{}TRMM\_R: A is not square! Go to BLAS GEMM implementation! "{} << nthr<<"{} \(\backslash\)n"{};*/}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{252 \textcolor{preprocessor}{     \} \(\backslash\)}}
+\DoxyCodeLine{253 \textcolor{preprocessor}{     return; \(\backslash\)}}
+\DoxyCodeLine{254 \textcolor{preprocessor}{   \} \(\backslash\)}}
+\DoxyCodeLine{255 \textcolor{preprocessor}{   char side = 'R', transa, uplo, diag = 'N'; \(\backslash\)}}
+\DoxyCodeLine{256 \textcolor{preprocessor}{   EIGTYPE *b; \(\backslash\)}}
+\DoxyCodeLine{257 \textcolor{preprocessor}{   const EIGTYPE *a; \(\backslash\)}}
+\DoxyCodeLine{258 \textcolor{preprocessor}{   BlasIndex m, n, lda, ldb; \(\backslash\)}}
+\DoxyCodeLine{259 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{260 \textcolor{preprocessor}{}\textcolor{comment}{/* Set m, n */}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{261 \textcolor{preprocessor}{   m = convert\_index<BlasIndex>(rows); \(\backslash\)}}
+\DoxyCodeLine{262 \textcolor{preprocessor}{   n = convert\_index<BlasIndex>(diagSize); \(\backslash\)}}
+\DoxyCodeLine{263 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{264 \textcolor{preprocessor}{}\textcolor{comment}{/* Set trans */}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{265 \textcolor{preprocessor}{   transa = (RhsStorageOrder==RowMajor) ? ((ConjugateRhs) ? 'C' : 'T') : 'N'; \(\backslash\)}}
+\DoxyCodeLine{266 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{267 \textcolor{preprocessor}{}\textcolor{comment}{/* Set b, ldb */}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{268 \textcolor{preprocessor}{   Map<const MatrixLhs, 0, OuterStride<> > lhs(\_lhs,rows,depth,OuterStride<>(lhsStride)); \(\backslash\)}}
+\DoxyCodeLine{269 \textcolor{preprocessor}{   MatrixX\#\#EIGPREFIX b\_tmp; \(\backslash\)}}
+\DoxyCodeLine{270 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{271 \textcolor{preprocessor}{   if (ConjugateLhs) b\_tmp = lhs.conjugate(); else b\_tmp = lhs; \(\backslash\)}}
+\DoxyCodeLine{272 \textcolor{preprocessor}{   b = b\_tmp.data(); \(\backslash\)}}
+\DoxyCodeLine{273 \textcolor{preprocessor}{   ldb = convert\_index<BlasIndex>(b\_tmp.outerStride()); \(\backslash\)}}
+\DoxyCodeLine{274 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{275 \textcolor{preprocessor}{}\textcolor{comment}{/* Set uplo */}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{276 \textcolor{preprocessor}{   uplo = IsLower ? 'L' : 'U'; \(\backslash\)}}
+\DoxyCodeLine{277 \textcolor{preprocessor}{   if (RhsStorageOrder==RowMajor) uplo = (uplo == 'L') ? 'U' : 'L'; \(\backslash\)}}
+\DoxyCodeLine{278 \textcolor{preprocessor}{}\textcolor{comment}{/* Set a, lda */}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{279 \textcolor{preprocessor}{   Map<const MatrixRhs, 0, OuterStride<> > rhs(\_rhs,depth,cols, OuterStride<>(rhsStride)); \(\backslash\)}}
+\DoxyCodeLine{280 \textcolor{preprocessor}{   MatrixRhs a\_tmp; \(\backslash\)}}
+\DoxyCodeLine{281 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{282 \textcolor{preprocessor}{   if ((conjA!=0) || (SetDiag==0)) \{ \(\backslash\)}}
+\DoxyCodeLine{283 \textcolor{preprocessor}{     if (conjA) a\_tmp = rhs.conjugate(); else a\_tmp = rhs; \(\backslash\)}}
+\DoxyCodeLine{284 \textcolor{preprocessor}{     if (IsZeroDiag) \(\backslash\)}}
+\DoxyCodeLine{285 \textcolor{preprocessor}{       a\_tmp.diagonal().setZero(); \(\backslash\)}}
+\DoxyCodeLine{286 \textcolor{preprocessor}{     else if (IsUnitDiag) \(\backslash\)}}
+\DoxyCodeLine{287 \textcolor{preprocessor}{       a\_tmp.diagonal().setOnes();\(\backslash\)}}
+\DoxyCodeLine{288 \textcolor{preprocessor}{     a = a\_tmp.data(); \(\backslash\)}}
+\DoxyCodeLine{289 \textcolor{preprocessor}{     lda = convert\_index<BlasIndex>(a\_tmp.outerStride()); \(\backslash\)}}
+\DoxyCodeLine{290 \textcolor{preprocessor}{   \} else \{ \(\backslash\)}}
+\DoxyCodeLine{291 \textcolor{preprocessor}{     a = \_rhs; \(\backslash\)}}
+\DoxyCodeLine{292 \textcolor{preprocessor}{     lda = convert\_index<BlasIndex>(rhsStride); \(\backslash\)}}
+\DoxyCodeLine{293 \textcolor{preprocessor}{   \} \(\backslash\)}}
+\DoxyCodeLine{294 \textcolor{preprocessor}{   }\textcolor{comment}{/*std::cout << "{}TRMM\_R: A is square! Go to BLAS TRMM implementation! \(\backslash\)n"{};*/}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{295 \textcolor{preprocessor}{}\textcolor{comment}{/* call ?trmm*/}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{296 \textcolor{preprocessor}{   BLASFUNC(\&side, \&uplo, \&transa, \&diag, \&m, \&n, (const BLASTYPE*)\&numext::real\_ref(alpha), (const BLASTYPE*)a, \&lda, (BLASTYPE*)b, \&ldb); \(\backslash\)}}
+\DoxyCodeLine{297 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{298 \textcolor{preprocessor}{}\textcolor{comment}{/* Add op(a\_triangular)*b into res*/}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{299 \textcolor{preprocessor}{   Map<MatrixX\#\#EIGPREFIX, 0, OuterStride<> > res\_tmp(res,rows,cols,OuterStride<>(resStride)); \(\backslash\)}}
+\DoxyCodeLine{300 \textcolor{preprocessor}{   res\_tmp=res\_tmp+b\_tmp; \(\backslash\)}}
+\DoxyCodeLine{301 \textcolor{preprocessor}{  \} \(\backslash\)}}
+\DoxyCodeLine{302 \textcolor{preprocessor}{\};}}
+\DoxyCodeLine{303 }
+\DoxyCodeLine{304 \textcolor{preprocessor}{\#ifdef EIGEN\_USE\_MKL}}
+\DoxyCodeLine{305 EIGEN\_BLAS\_TRMM\_R(\textcolor{keywordtype}{double}, \textcolor{keywordtype}{double}, d, dtrmm)}
+\DoxyCodeLine{306 EIGEN\_BLAS\_TRMM\_R(dcomplex, MKL\_Complex16, cd, ztrmm)}
+\DoxyCodeLine{307 EIGEN\_BLAS\_TRMM\_R(\textcolor{keywordtype}{float}, \textcolor{keywordtype}{float}, f, strmm)}
+\DoxyCodeLine{308 EIGEN\_BLAS\_TRMM\_R(scomplex, MKL\_Complex8, cf, ctrmm)}
+\DoxyCodeLine{309 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{310 EIGEN\_BLAS\_TRMM\_R(\textcolor{keywordtype}{double}, \textcolor{keywordtype}{double}, d, dtrmm\_)}
+\DoxyCodeLine{311 EIGEN\_BLAS\_TRMM\_R(dcomplex, \textcolor{keywordtype}{double}, cd, ztrmm\_)}
+\DoxyCodeLine{312 EIGEN\_BLAS\_TRMM\_R(\textcolor{keywordtype}{float}, \textcolor{keywordtype}{float}, f, strmm\_)}
+\DoxyCodeLine{313 EIGEN\_BLAS\_TRMM\_R(scomplex, \textcolor{keywordtype}{float}, cf, ctrmm\_)}
+\DoxyCodeLine{314 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{315 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{316 }
+\DoxyCodeLine{317 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{318 }
+\DoxyCodeLine{319 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_TRIANGULAR\_MATRIX\_MATRIX\_BLAS\_H}}
+
+\end{DoxyCode}

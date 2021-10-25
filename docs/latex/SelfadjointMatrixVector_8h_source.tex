@@ -1,0 +1,270 @@
+\hypertarget{SelfadjointMatrixVector_8h_source}{}\doxysection{Selfadjoint\+Matrix\+Vector.\+h}
+\label{SelfadjointMatrixVector_8h_source}\index{include/Eigen/src/Core/products/SelfadjointMatrixVector.h@{include/Eigen/src/Core/products/SelfadjointMatrixVector.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2008-\/2009 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_SELFADJOINT\_MATRIX\_VECTOR\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_SELFADJOINT\_MATRIX\_VECTOR\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{comment}{/* Optimized selfadjoint matrix * vector product:}}
+\DoxyCodeLine{20 \textcolor{comment}{ * This algorithm processes 2 columns at once that allows to both reduce}}
+\DoxyCodeLine{21 \textcolor{comment}{ * the number of load/stores of the result by a factor 2 and to reduce}}
+\DoxyCodeLine{22 \textcolor{comment}{ * the instruction dependency.}}
+\DoxyCodeLine{23 \textcolor{comment}{ */}}
+\DoxyCodeLine{24 }
+\DoxyCodeLine{25 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Index, \textcolor{keywordtype}{int} StorageOrder, \textcolor{keywordtype}{int} UpLo, \textcolor{keywordtype}{bool} ConjugateLhs, \textcolor{keywordtype}{bool} ConjugateRhs, \textcolor{keywordtype}{int} Version=Specialized>}
+\DoxyCodeLine{26 \textcolor{keyword}{struct }selfadjoint\_matrix\_vector\_product;}
+\DoxyCodeLine{27 }
+\DoxyCodeLine{28 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Index, \textcolor{keywordtype}{int} StorageOrder, \textcolor{keywordtype}{int} UpLo, \textcolor{keywordtype}{bool} ConjugateLhs, \textcolor{keywordtype}{bool} ConjugateRhs, \textcolor{keywordtype}{int} Version>}
+\DoxyCodeLine{29 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1selfadjoint__matrix__vector__product}{selfadjoint\_matrix\_vector\_product}}}
+\DoxyCodeLine{30 }
+\DoxyCodeLine{31 \{}
+\DoxyCodeLine{32 \textcolor{keyword}{static} EIGEN\_DONT\_INLINE EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{33 \textcolor{keywordtype}{void} run(}
+\DoxyCodeLine{34   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size,}
+\DoxyCodeLine{35   \textcolor{keyword}{const} Scalar*  lhs, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} lhsStride,}
+\DoxyCodeLine{36   \textcolor{keyword}{const} Scalar*  rhs,}
+\DoxyCodeLine{37   Scalar* res,}
+\DoxyCodeLine{38   Scalar alpha);}
+\DoxyCodeLine{39 \};}
+\DoxyCodeLine{40 }
+\DoxyCodeLine{41 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Index, \textcolor{keywordtype}{int} StorageOrder, \textcolor{keywordtype}{int} UpLo, \textcolor{keywordtype}{bool} ConjugateLhs, \textcolor{keywordtype}{bool} ConjugateRhs, \textcolor{keywordtype}{int} Version>}
+\DoxyCodeLine{42 EIGEN\_DONT\_INLINE EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{43 \textcolor{keywordtype}{void} \mbox{\hyperlink{structEigen_1_1internal_1_1selfadjoint__matrix__vector__product}{selfadjoint\_matrix\_vector\_product<Scalar,Index,StorageOrder,UpLo,ConjugateLhs,ConjugateRhs,Version>::run}}(}
+\DoxyCodeLine{44   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size,}
+\DoxyCodeLine{45   \textcolor{keyword}{const} Scalar*  lhs, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} lhsStride,}
+\DoxyCodeLine{46   \textcolor{keyword}{const} Scalar*  rhs,}
+\DoxyCodeLine{47   Scalar* res,}
+\DoxyCodeLine{48   Scalar alpha)}
+\DoxyCodeLine{49 \{}
+\DoxyCodeLine{50   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} packet\_traits<Scalar>::type \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}};}
+\DoxyCodeLine{51   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}} RealScalar;}
+\DoxyCodeLine{52   \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} PacketSize = \textcolor{keyword}{sizeof}(\mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}})/\textcolor{keyword}{sizeof}(Scalar);}
+\DoxyCodeLine{53 }
+\DoxyCodeLine{54   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{55     IsRowMajor = StorageOrder==\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}} ? 1 : 0,}
+\DoxyCodeLine{56     IsLower = UpLo == \mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}} ? 1 : 0,}
+\DoxyCodeLine{57     FirstTriangular = IsRowMajor == IsLower}
+\DoxyCodeLine{58   \};}
+\DoxyCodeLine{59 }
+\DoxyCodeLine{60   conj\_helper<Scalar,Scalar,NumTraits<Scalar>::IsComplex \&\& EIGEN\_LOGICAL\_XOR(ConjugateLhs,  IsRowMajor), ConjugateRhs> cj0;}
+\DoxyCodeLine{61   conj\_helper<Scalar,Scalar,NumTraits<Scalar>::IsComplex \&\& EIGEN\_LOGICAL\_XOR(ConjugateLhs, !IsRowMajor), ConjugateRhs> cj1;}
+\DoxyCodeLine{62   conj\_helper<RealScalar,Scalar,false, ConjugateRhs> cjd;}
+\DoxyCodeLine{63 }
+\DoxyCodeLine{64   conj\_helper<Packet,Packet,NumTraits<Scalar>::IsComplex \&\& EIGEN\_LOGICAL\_XOR(ConjugateLhs,  IsRowMajor), ConjugateRhs> pcj0;}
+\DoxyCodeLine{65   conj\_helper<Packet,Packet,NumTraits<Scalar>::IsComplex \&\& EIGEN\_LOGICAL\_XOR(ConjugateLhs, !IsRowMajor), ConjugateRhs> pcj1;}
+\DoxyCodeLine{66 }
+\DoxyCodeLine{67   Scalar cjAlpha = ConjugateRhs ? numext::conj(alpha) : alpha;}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{69   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} bound = numext::maxi(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}(0), size-\/8) \& 0xfffffffe;}
+\DoxyCodeLine{70   \textcolor{keywordflow}{if} (FirstTriangular)}
+\DoxyCodeLine{71     bound = size -\/ bound;}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73   \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j=FirstTriangular ? bound : 0;}
+\DoxyCodeLine{74        j<(FirstTriangular ? size : bound);j+=2)}
+\DoxyCodeLine{75   \{}
+\DoxyCodeLine{76     \textcolor{keyword}{const} Scalar* EIGEN\_RESTRICT A0 = lhs + j*lhsStride;}
+\DoxyCodeLine{77     \textcolor{keyword}{const} Scalar* EIGEN\_RESTRICT A1 = lhs + (j+1)*lhsStride;}
+\DoxyCodeLine{78 }
+\DoxyCodeLine{79     Scalar t0 = cjAlpha * rhs[j];}
+\DoxyCodeLine{80     Packet ptmp0 = pset1<Packet>(t0);}
+\DoxyCodeLine{81     Scalar t1 = cjAlpha * rhs[j+1];}
+\DoxyCodeLine{82     Packet ptmp1 = pset1<Packet>(t1);}
+\DoxyCodeLine{83 }
+\DoxyCodeLine{84     Scalar t2(0);}
+\DoxyCodeLine{85     Packet ptmp2 = pset1<Packet>(t2);}
+\DoxyCodeLine{86     Scalar t3(0);}
+\DoxyCodeLine{87     Packet ptmp3 = pset1<Packet>(t3);}
+\DoxyCodeLine{88 }
+\DoxyCodeLine{89     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} starti = FirstTriangular ? 0 : j+2;}
+\DoxyCodeLine{90     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} endi   = FirstTriangular ? j : size;}
+\DoxyCodeLine{91     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} alignedStart = (starti) + internal::first\_default\_aligned(\&res[starti], endi-\/starti);}
+\DoxyCodeLine{92     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} alignedEnd = alignedStart + ((endi-\/alignedStart)/(PacketSize))*(PacketSize);}
+\DoxyCodeLine{93 }
+\DoxyCodeLine{94     res[j]   += cjd.pmul(numext::real(A0[j]), t0);}
+\DoxyCodeLine{95     res[j+1] += cjd.pmul(numext::real(A1[j+1]), t1);}
+\DoxyCodeLine{96     \textcolor{keywordflow}{if}(FirstTriangular)}
+\DoxyCodeLine{97     \{}
+\DoxyCodeLine{98       res[j]   += cj0.pmul(A1[j],   t1);}
+\DoxyCodeLine{99       t3       += cj1.pmul(A1[j],   rhs[j]);}
+\DoxyCodeLine{100     \}}
+\DoxyCodeLine{101     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{102     \{}
+\DoxyCodeLine{103       res[j+1] += cj0.pmul(A0[j+1],t0);}
+\DoxyCodeLine{104       t2 += cj1.pmul(A0[j+1], rhs[j+1]);}
+\DoxyCodeLine{105     \}}
+\DoxyCodeLine{106 }
+\DoxyCodeLine{107     \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i=starti; i<alignedStart; ++i)}
+\DoxyCodeLine{108     \{}
+\DoxyCodeLine{109       res[i] += cj0.pmul(A0[i], t0) + cj0.pmul(A1[i],t1);}
+\DoxyCodeLine{110       t2 += cj1.pmul(A0[i], rhs[i]);}
+\DoxyCodeLine{111       t3 += cj1.pmul(A1[i], rhs[i]);}
+\DoxyCodeLine{112     \}}
+\DoxyCodeLine{113     \textcolor{comment}{// Yes this an optimization for gcc 4.3 and 4.4 (=> huge speed up)}}
+\DoxyCodeLine{114     \textcolor{comment}{// gcc 4.2 does this optimization automatically.}}
+\DoxyCodeLine{115     \textcolor{keyword}{const} Scalar* EIGEN\_RESTRICT a0It  = A0  + alignedStart;}
+\DoxyCodeLine{116     \textcolor{keyword}{const} Scalar* EIGEN\_RESTRICT a1It  = A1  + alignedStart;}
+\DoxyCodeLine{117     \textcolor{keyword}{const} Scalar* EIGEN\_RESTRICT rhsIt = rhs + alignedStart;}
+\DoxyCodeLine{118           Scalar* EIGEN\_RESTRICT resIt = res + alignedStart;}
+\DoxyCodeLine{119     \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i=alignedStart; i<alignedEnd; i+=PacketSize)}
+\DoxyCodeLine{120     \{}
+\DoxyCodeLine{121       Packet A0i = ploadu<Packet>(a0It);  a0It  += PacketSize;}
+\DoxyCodeLine{122       Packet A1i = ploadu<Packet>(a1It);  a1It  += PacketSize;}
+\DoxyCodeLine{123       Packet Bi  = ploadu<Packet>(rhsIt); rhsIt += PacketSize; \textcolor{comment}{// FIXME should be aligned in most cases}}
+\DoxyCodeLine{124       Packet Xi  = pload <Packet>(resIt);}
+\DoxyCodeLine{125 }
+\DoxyCodeLine{126       Xi    = pcj0.pmadd(A0i,ptmp0, pcj0.pmadd(A1i,ptmp1,Xi));}
+\DoxyCodeLine{127       ptmp2 = pcj1.pmadd(A0i,  Bi, ptmp2);}
+\DoxyCodeLine{128       ptmp3 = pcj1.pmadd(A1i,  Bi, ptmp3);}
+\DoxyCodeLine{129       pstore(resIt,Xi); resIt += PacketSize;}
+\DoxyCodeLine{130     \}}
+\DoxyCodeLine{131     \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i=alignedEnd; i<endi; i++)}
+\DoxyCodeLine{132     \{}
+\DoxyCodeLine{133       res[i] += cj0.pmul(A0[i], t0) + cj0.pmul(A1[i],t1);}
+\DoxyCodeLine{134       t2 += cj1.pmul(A0[i], rhs[i]);}
+\DoxyCodeLine{135       t3 += cj1.pmul(A1[i], rhs[i]);}
+\DoxyCodeLine{136     \}}
+\DoxyCodeLine{137 }
+\DoxyCodeLine{138     res[j]   += alpha * (t2 + predux(ptmp2));}
+\DoxyCodeLine{139     res[j+1] += alpha * (t3 + predux(ptmp3));}
+\DoxyCodeLine{140   \}}
+\DoxyCodeLine{141   \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j=FirstTriangular ? 0 : bound;j<(FirstTriangular ? bound : size);j++)}
+\DoxyCodeLine{142   \{}
+\DoxyCodeLine{143     \textcolor{keyword}{const} Scalar* EIGEN\_RESTRICT A0 = lhs + j*lhsStride;}
+\DoxyCodeLine{144 }
+\DoxyCodeLine{145     Scalar t1 = cjAlpha * rhs[j];}
+\DoxyCodeLine{146     Scalar t2(0);}
+\DoxyCodeLine{147     res[j] += cjd.pmul(numext::real(A0[j]), t1);}
+\DoxyCodeLine{148     \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i=FirstTriangular ? 0 : j+1; i<(FirstTriangular ? j : size); i++)}
+\DoxyCodeLine{149     \{}
+\DoxyCodeLine{150       res[i] += cj0.pmul(A0[i], t1);}
+\DoxyCodeLine{151       t2 += cj1.pmul(A0[i], rhs[i]);}
+\DoxyCodeLine{152     \}}
+\DoxyCodeLine{153     res[j] += alpha * t2;}
+\DoxyCodeLine{154   \}}
+\DoxyCodeLine{155 \}}
+\DoxyCodeLine{156 }
+\DoxyCodeLine{157 \} \textcolor{comment}{// end namespace internal }}
+\DoxyCodeLine{158 }
+\DoxyCodeLine{159 \textcolor{comment}{/***************************************************************************}}
+\DoxyCodeLine{160 \textcolor{comment}{* Wrapper to product\_selfadjoint\_vector}}
+\DoxyCodeLine{161 \textcolor{comment}{***************************************************************************/}}
+\DoxyCodeLine{162 }
+\DoxyCodeLine{163 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{164 }
+\DoxyCodeLine{165 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keywordtype}{int} LhsMode, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{166 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1selfadjoint__product__impl}{selfadjoint\_product\_impl}}<Lhs,LhsMode,false,Rhs,0,true>}
+\DoxyCodeLine{167 \{}
+\DoxyCodeLine{168   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs,Rhs>::Scalar}} Scalar;}
+\DoxyCodeLine{169   }
+\DoxyCodeLine{170   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{internal::blas\_traits<Lhs>}} \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{LhsBlasTraits}};}
+\DoxyCodeLine{171   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{LhsBlasTraits::DirectLinearAccessType}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{ActualLhsType}};}
+\DoxyCodeLine{172   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<ActualLhsType>::type ActualLhsTypeCleaned;}
+\DoxyCodeLine{173   }
+\DoxyCodeLine{174   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{internal::blas\_traits<Rhs>}} \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{RhsBlasTraits}};}
+\DoxyCodeLine{175   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{RhsBlasTraits::DirectLinearAccessType}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{ActualRhsType}};}
+\DoxyCodeLine{176   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<ActualRhsType>::type ActualRhsTypeCleaned;}
+\DoxyCodeLine{177 }
+\DoxyCodeLine{178   \textcolor{keyword}{enum} \{ LhsUpLo = LhsMode\&(\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}}|\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}}) \};}
+\DoxyCodeLine{179 }
+\DoxyCodeLine{180   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{181   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{182   \textcolor{keywordtype}{void} run(Dest\& dest, \textcolor{keyword}{const} Lhs \&a\_lhs, \textcolor{keyword}{const} Rhs \&a\_rhs, \textcolor{keyword}{const} Scalar\& alpha)}
+\DoxyCodeLine{183   \{}
+\DoxyCodeLine{184     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Dest::Scalar ResScalar;}
+\DoxyCodeLine{185     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Rhs::Scalar RhsScalar;}
+\DoxyCodeLine{186     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Map}{Map<Matrix<ResScalar,Dynamic,1>}}, EIGEN\_PLAIN\_ENUM\_MIN(AlignedMax,\mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{internal::packet\_traits<ResScalar>::size}})> MappedDest;}
+\DoxyCodeLine{187     }
+\DoxyCodeLine{188     eigen\_assert(dest.rows()==a\_lhs.rows() \&\& dest.cols()==a\_rhs.cols());}
+\DoxyCodeLine{189 }
+\DoxyCodeLine{190     \textcolor{keyword}{typename} internal::add\_const\_on\_value\_type<ActualLhsType>::type lhs = LhsBlasTraits::extract(a\_lhs);}
+\DoxyCodeLine{191     \textcolor{keyword}{typename} internal::add\_const\_on\_value\_type<ActualRhsType>::type rhs = RhsBlasTraits::extract(a\_rhs);}
+\DoxyCodeLine{192 }
+\DoxyCodeLine{193     Scalar actualAlpha = alpha * LhsBlasTraits::extractScalarFactor(a\_lhs)}
+\DoxyCodeLine{194                                * RhsBlasTraits::extractScalarFactor(a\_rhs);}
+\DoxyCodeLine{195 }
+\DoxyCodeLine{196     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{197       EvalToDest = (Dest::InnerStrideAtCompileTime==1),}
+\DoxyCodeLine{198       UseRhs = (ActualRhsTypeCleaned::InnerStrideAtCompileTime==1)}
+\DoxyCodeLine{199     \};}
+\DoxyCodeLine{200     }
+\DoxyCodeLine{201     \mbox{\hyperlink{structEigen_1_1internal_1_1gemv__static__vector__if}{internal::gemv\_static\_vector\_if<ResScalar,Dest::SizeAtCompileTime,Dest::MaxSizeAtCompileTime,!EvalToDest>}} static\_dest;}
+\DoxyCodeLine{202     \mbox{\hyperlink{structEigen_1_1internal_1_1gemv__static__vector__if}{internal::gemv\_static\_vector\_if<RhsScalar,ActualRhsTypeCleaned::SizeAtCompileTime,ActualRhsTypeCleaned::MaxSizeAtCompileTime,!UseRhs>}} static\_rhs;}
+\DoxyCodeLine{203 }
+\DoxyCodeLine{204     ei\_declare\_aligned\_stack\_constructed\_variable(ResScalar,actualDestPtr,dest.size(),}
+\DoxyCodeLine{205                                                   EvalToDest ? dest.data() : static\_dest.data());}
+\DoxyCodeLine{206                                                   }
+\DoxyCodeLine{207     ei\_declare\_aligned\_stack\_constructed\_variable(RhsScalar,actualRhsPtr,rhs.size(),}
+\DoxyCodeLine{208         UseRhs ? \textcolor{keyword}{const\_cast<}RhsScalar*\textcolor{keyword}{>}(rhs.data()) : static\_rhs.data());}
+\DoxyCodeLine{209     }
+\DoxyCodeLine{210     \textcolor{keywordflow}{if}(!EvalToDest)}
+\DoxyCodeLine{211     \{}
+\DoxyCodeLine{212 \textcolor{preprocessor}{      \#ifdef EIGEN\_DENSE\_STORAGE\_CTOR\_PLUGIN}}
+\DoxyCodeLine{213       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size = dest.size();}
+\DoxyCodeLine{214       EIGEN\_DENSE\_STORAGE\_CTOR\_PLUGIN}
+\DoxyCodeLine{215 \textcolor{preprocessor}{      \#endif}}
+\DoxyCodeLine{216       MappedDest(actualDestPtr, dest.size()) = dest;}
+\DoxyCodeLine{217     \}}
+\DoxyCodeLine{218       }
+\DoxyCodeLine{219     \textcolor{keywordflow}{if}(!UseRhs)}
+\DoxyCodeLine{220     \{}
+\DoxyCodeLine{221 \textcolor{preprocessor}{      \#ifdef EIGEN\_DENSE\_STORAGE\_CTOR\_PLUGIN}}
+\DoxyCodeLine{222       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size = rhs.size();}
+\DoxyCodeLine{223       EIGEN\_DENSE\_STORAGE\_CTOR\_PLUGIN}
+\DoxyCodeLine{224 \textcolor{preprocessor}{      \#endif}}
+\DoxyCodeLine{225       \mbox{\hyperlink{classEigen_1_1Map}{Map<typename ActualRhsTypeCleaned::PlainObject>}}(actualRhsPtr, rhs.size()) = rhs;}
+\DoxyCodeLine{226     \}}
+\DoxyCodeLine{227       }
+\DoxyCodeLine{228       }
+\DoxyCodeLine{229     \mbox{\hyperlink{structEigen_1_1internal_1_1selfadjoint__matrix__vector__product}{internal::selfadjoint\_matrix\_vector\_product}}<Scalar, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}, (\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<ActualLhsTypeCleaned>::Flags}}\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) ? \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}} : \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}},}
+\DoxyCodeLine{230                                                 \textcolor{keywordtype}{int}(LhsUpLo), bool(LhsBlasTraits::NeedToConjugate), bool(RhsBlasTraits::NeedToConjugate)>::run}
+\DoxyCodeLine{231       (}
+\DoxyCodeLine{232         lhs.rows(),                             \textcolor{comment}{// size}}
+\DoxyCodeLine{233         \&lhs.coeffRef(0,0),  lhs.outerStride(), \textcolor{comment}{// lhs info}}
+\DoxyCodeLine{234         actualRhsPtr,                           \textcolor{comment}{// rhs info}}
+\DoxyCodeLine{235         actualDestPtr,                          \textcolor{comment}{// result info}}
+\DoxyCodeLine{236         actualAlpha                             \textcolor{comment}{// scale factor}}
+\DoxyCodeLine{237       );}
+\DoxyCodeLine{238     }
+\DoxyCodeLine{239     \textcolor{keywordflow}{if}(!EvalToDest)}
+\DoxyCodeLine{240       dest = MappedDest(actualDestPtr, dest.size());}
+\DoxyCodeLine{241   \}}
+\DoxyCodeLine{242 \};}
+\DoxyCodeLine{243 }
+\DoxyCodeLine{244 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} RhsMode>}
+\DoxyCodeLine{245 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1selfadjoint__product__impl}{selfadjoint\_product\_impl}}<Lhs,0,true,Rhs,RhsMode,false>}
+\DoxyCodeLine{246 \{}
+\DoxyCodeLine{247   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs,Rhs>::Scalar}} Scalar;}
+\DoxyCodeLine{248   \textcolor{keyword}{enum} \{ RhsUpLo = RhsMode\&(\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}}|\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}})  \};}
+\DoxyCodeLine{249 }
+\DoxyCodeLine{250   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{251   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(Dest\& dest, \textcolor{keyword}{const} Lhs \&a\_lhs, \textcolor{keyword}{const} Rhs \&a\_rhs, \textcolor{keyword}{const} Scalar\& alpha)}
+\DoxyCodeLine{252   \{}
+\DoxyCodeLine{253     \textcolor{comment}{// let's simply transpose the product}}
+\DoxyCodeLine{254     \mbox{\hyperlink{classEigen_1_1Transpose}{Transpose<Dest>}} destT(dest);}
+\DoxyCodeLine{255     \mbox{\hyperlink{structEigen_1_1internal_1_1selfadjoint__product__impl}{selfadjoint\_product\_impl<Transpose<const Rhs>}}, int(RhsUpLo)==\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}} ? \mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}} : \mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}}, \textcolor{keyword}{false},}
+\DoxyCodeLine{256                              \mbox{\hyperlink{classEigen_1_1Transpose}{Transpose<const Lhs>}}, 0, \textcolor{keyword}{true}>::run(destT, a\_rhs.transpose(), a\_lhs.transpose(), alpha);}
+\DoxyCodeLine{257   \}}
+\DoxyCodeLine{258 \};}
+\DoxyCodeLine{259 }
+\DoxyCodeLine{260 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{261 }
+\DoxyCodeLine{262 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{263 }
+\DoxyCodeLine{264 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_SELFADJOINT\_MATRIX\_VECTOR\_H}}
+
+\end{DoxyCode}

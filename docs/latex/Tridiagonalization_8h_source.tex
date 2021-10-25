@@ -1,0 +1,309 @@
+\hypertarget{Tridiagonalization_8h_source}{}\doxysection{Tridiagonalization.\+h}
+\label{Tridiagonalization_8h_source}\index{include/Eigen/src/Eigenvalues/Tridiagonalization.h@{include/Eigen/src/Eigenvalues/Tridiagonalization.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2010 Jitse Niesen <jitse@maths.leeds.ac.uk>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_TRIDIAGONALIZATION\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_TRIDIAGONALIZATION\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{19 }
+\DoxyCodeLine{20 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType> \textcolor{keyword}{struct }TridiagonalizationMatrixTReturnType;}
+\DoxyCodeLine{21 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{22 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1TridiagonalizationMatrixTReturnType}{TridiagonalizationMatrixTReturnType}}<MatrixType> >}
+\DoxyCodeLine{23   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<typename MatrixType::PlainObject>}
+\DoxyCodeLine{24 \{}
+\DoxyCodeLine{25   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::PlainObject ReturnType; \textcolor{comment}{// FIXME shall it be a BandMatrix?}}
+\DoxyCodeLine{26   \textcolor{keyword}{enum} \{ Flags = 0 \};}
+\DoxyCodeLine{27 \};}
+\DoxyCodeLine{28 }
+\DoxyCodeLine{29 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keyword}{typename} CoeffVectorType>}
+\DoxyCodeLine{30 EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{31 \textcolor{keywordtype}{void} tridiagonalization\_inplace(MatrixType\& matA, CoeffVectorType\& hCoeffs);}
+\DoxyCodeLine{32 \}}
+\DoxyCodeLine{33 }
+\DoxyCodeLine{66 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1Tridiagonalization}{Tridiagonalization}}}
+\DoxyCodeLine{67 \{}
+\DoxyCodeLine{68   \textcolor{keyword}{public}:}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{71     \textcolor{keyword}{typedef} MatrixType\_ \mbox{\hyperlink{classEigen_1_1Tridiagonalization_a3ee270966d18659018688662253dca23}{MatrixType}};}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar Scalar;}
+\DoxyCodeLine{74     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}} RealScalar;}
+\DoxyCodeLine{75     \textcolor{keyword}{typedef} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Eigen::Index}} \mbox{\hyperlink{classEigen_1_1Tridiagonalization_afd806a9be5363077e01028f952c786a8}{Index}}; }
+\DoxyCodeLine{76 }
+\DoxyCodeLine{77     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{78       Size = MatrixType::RowsAtCompileTime,}
+\DoxyCodeLine{79       SizeMinusOne = Size == \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} ? \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} : (Size > 1 ? Size -\/ 1 : 1),}
+\DoxyCodeLine{80       Options = MatrixType::Options,}
+\DoxyCodeLine{81       MaxSize = MatrixType::MaxRowsAtCompileTime,}
+\DoxyCodeLine{82       MaxSizeMinusOne = MaxSize == \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} ? \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} : (MaxSize > 1 ? MaxSize -\/ 1 : 1)}
+\DoxyCodeLine{83     \};}
+\DoxyCodeLine{84 }
+\DoxyCodeLine{85     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar, SizeMinusOne, 1, Options \& \string~RowMajor, MaxSizeMinusOne, 1>}} CoeffVectorType;}
+\DoxyCodeLine{86     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::plain\_col\_type<MatrixType, RealScalar>::type}} DiagonalType;}
+\DoxyCodeLine{87     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<RealScalar, SizeMinusOne, 1, Options \& \string~RowMajor, MaxSizeMinusOne, 1>}} SubDiagonalType;}
+\DoxyCodeLine{88     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<typename MatrixType::RealReturnType>::type MatrixTypeRealView;}
+\DoxyCodeLine{89     \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1TridiagonalizationMatrixTReturnType}{internal::TridiagonalizationMatrixTReturnType<MatrixTypeRealView>}} MatrixTReturnType;}
+\DoxyCodeLine{90 }
+\DoxyCodeLine{91     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1conditional}{internal::conditional<NumTraits<Scalar>::IsComplex}},}
+\DoxyCodeLine{92               \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1add__const__on__value__type}{internal::add\_const\_on\_value\_type<typename Diagonal<const MatrixType>::RealReturnType}}>::type,}
+\DoxyCodeLine{93               \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Diagonal}{Diagonal<const MatrixType>}}}
+\DoxyCodeLine{94             >::type DiagonalReturnType;}
+\DoxyCodeLine{95 }
+\DoxyCodeLine{96     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1conditional}{internal::conditional<NumTraits<Scalar>::IsComplex}},}
+\DoxyCodeLine{97               \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1add__const__on__value__type}{internal::add\_const\_on\_value\_type}}<\textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Diagonal}{Diagonal}}<\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Tridiagonalization_a3ee270966d18659018688662253dca23}{MatrixType}}, -\/1>::RealReturnType>::type,}
+\DoxyCodeLine{98               \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Diagonal}{Diagonal}}<\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Tridiagonalization_a3ee270966d18659018688662253dca23}{MatrixType}}, -\/1>}
+\DoxyCodeLine{99             >::type SubDiagonalReturnType;}
+\DoxyCodeLine{100 }
+\DoxyCodeLine{102     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1HouseholderSequence}{HouseholderSequence<MatrixType,typename internal::remove\_all<typename CoeffVectorType::ConjugateReturnType>::type}}> \mbox{\hyperlink{classEigen_1_1Tridiagonalization_ab4e2375cdaa7a902f45ff32c7c23adee}{HouseholderSequenceType}};}
+\DoxyCodeLine{103 }
+\DoxyCodeLine{116     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1Tridiagonalization_a009d14f8e6e964f35560b3f339aac87a}{Tridiagonalization}}(\mbox{\hyperlink{classEigen_1_1Tridiagonalization_afd806a9be5363077e01028f952c786a8}{Index}} size = Size==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} ? 2 : Size)}
+\DoxyCodeLine{117       : m\_matrix(size,size),}
+\DoxyCodeLine{118         m\_hCoeffs(size > 1 ? size-\/1 : 1),}
+\DoxyCodeLine{119         m\_isInitialized(false)}
+\DoxyCodeLine{120     \{\}}
+\DoxyCodeLine{121 }
+\DoxyCodeLine{132     \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputType>}
+\DoxyCodeLine{133     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1Tridiagonalization_aef97d3fd6892d66ba94ab83e206c1606}{Tridiagonalization}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<InputType>}}\& matrix)}
+\DoxyCodeLine{134       : m\_matrix(matrix.derived()),}
+\DoxyCodeLine{135         m\_hCoeffs(matrix.cols() > 1 ? matrix.cols()-\/1 : 1),}
+\DoxyCodeLine{136         m\_isInitialized(false)}
+\DoxyCodeLine{137     \{}
+\DoxyCodeLine{138       internal::tridiagonalization\_inplace(m\_matrix, m\_hCoeffs);}
+\DoxyCodeLine{139       m\_isInitialized = \textcolor{keyword}{true};}
+\DoxyCodeLine{140     \}}
+\DoxyCodeLine{141 }
+\DoxyCodeLine{159     \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputType>}
+\DoxyCodeLine{160     \mbox{\hyperlink{classEigen_1_1Tridiagonalization}{Tridiagonalization}}\& \mbox{\hyperlink{classEigen_1_1Tridiagonalization_af33948e708b67eb7cd853b81ebdf8e63}{compute}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<InputType>}}\& matrix)}
+\DoxyCodeLine{161     \{}
+\DoxyCodeLine{162       m\_matrix = matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}();}
+\DoxyCodeLine{163       m\_hCoeffs.resize(matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_af1d12fdb3361e150427e1fd94ebb1f14}{rows}}()-\/1, 1);}
+\DoxyCodeLine{164       internal::tridiagonalization\_inplace(m\_matrix, m\_hCoeffs);}
+\DoxyCodeLine{165       m\_isInitialized = \textcolor{keyword}{true};}
+\DoxyCodeLine{166       \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{167     \}}
+\DoxyCodeLine{168 }
+\DoxyCodeLine{185     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Matrix}{CoeffVectorType}} \mbox{\hyperlink{classEigen_1_1Tridiagonalization_a682d43187b558a33825bdaa7f2337b32}{householderCoefficients}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{186 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{187       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}Tridiagonalization is not initialized."{}});}
+\DoxyCodeLine{188       \textcolor{keywordflow}{return} m\_hCoeffs;}
+\DoxyCodeLine{189     \}}
+\DoxyCodeLine{190 }
+\DoxyCodeLine{222     \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Tridiagonalization_a3ee270966d18659018688662253dca23}{MatrixType}}\& \mbox{\hyperlink{classEigen_1_1Tridiagonalization_a60e8386430d074fd4f137ab5c54b37e7}{packedMatrix}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{223 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{224       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}Tridiagonalization is not initialized."{}});}
+\DoxyCodeLine{225       \textcolor{keywordflow}{return} m\_matrix;}
+\DoxyCodeLine{226     \}}
+\DoxyCodeLine{227 }
+\DoxyCodeLine{243     \mbox{\hyperlink{classEigen_1_1HouseholderSequence}{HouseholderSequenceType}} \mbox{\hyperlink{classEigen_1_1Tridiagonalization_ad5c279c97cee574215ba3f3037e9fbbc}{matrixQ}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{244 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{245       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}Tridiagonalization is not initialized."{}});}
+\DoxyCodeLine{246       \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Tridiagonalization_ab4e2375cdaa7a902f45ff32c7c23adee}{HouseholderSequenceType}}(m\_matrix, m\_hCoeffs.conjugate())}
+\DoxyCodeLine{247              .setLength(m\_matrix.rows() -\/ 1)}
+\DoxyCodeLine{248              .setShift(1);}
+\DoxyCodeLine{249     \}}
+\DoxyCodeLine{250 }
+\DoxyCodeLine{268     \mbox{\hyperlink{structEigen_1_1internal_1_1TridiagonalizationMatrixTReturnType}{MatrixTReturnType}} \mbox{\hyperlink{classEigen_1_1Tridiagonalization_aef08c38d78a60c3e8277081761a52345}{matrixT}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{269 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{270       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}Tridiagonalization is not initialized."{}});}
+\DoxyCodeLine{271       \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1TridiagonalizationMatrixTReturnType}{MatrixTReturnType}}(m\_matrix.real());}
+\DoxyCodeLine{272     \}}
+\DoxyCodeLine{273 }
+\DoxyCodeLine{287     DiagonalReturnType \mbox{\hyperlink{classEigen_1_1Tridiagonalization_a0b7ff4860aa6f7c0761b1059c012fd8e}{diagonal}}() \textcolor{keyword}{const};}
+\DoxyCodeLine{288 }
+\DoxyCodeLine{299     SubDiagonalReturnType \mbox{\hyperlink{classEigen_1_1Tridiagonalization_ac423dbb91157c159bdcb4b5a8371232e}{subDiagonal}}() \textcolor{keyword}{const};}
+\DoxyCodeLine{300 }
+\DoxyCodeLine{301   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{302 }
+\DoxyCodeLine{303     \mbox{\hyperlink{classEigen_1_1Tridiagonalization_a3ee270966d18659018688662253dca23}{MatrixType}} m\_matrix;}
+\DoxyCodeLine{304     CoeffVectorType m\_hCoeffs;}
+\DoxyCodeLine{305     \textcolor{keywordtype}{bool} m\_isInitialized;}
+\DoxyCodeLine{306 \};}
+\DoxyCodeLine{307 }
+\DoxyCodeLine{308 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{309 \textcolor{keyword}{typename} Tridiagonalization<MatrixType>::DiagonalReturnType}
+\DoxyCodeLine{310 \mbox{\hyperlink{classEigen_1_1Tridiagonalization_a0b7ff4860aa6f7c0761b1059c012fd8e}{Tridiagonalization<MatrixType>::diagonal}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{311 \textcolor{keyword}{}\{}
+\DoxyCodeLine{312   eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}Tridiagonalization is not initialized."{}});}
+\DoxyCodeLine{313   \textcolor{keywordflow}{return} m\_matrix.diagonal().real();}
+\DoxyCodeLine{314 \}}
+\DoxyCodeLine{315 }
+\DoxyCodeLine{316 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{317 \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{Tridiagonalization<MatrixType>::SubDiagonalReturnType}}}
+\DoxyCodeLine{318 \mbox{\hyperlink{classEigen_1_1Tridiagonalization_ac423dbb91157c159bdcb4b5a8371232e}{Tridiagonalization<MatrixType>::subDiagonal}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{319 \textcolor{keyword}{}\{}
+\DoxyCodeLine{320   eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}Tridiagonalization is not initialized."{}});}
+\DoxyCodeLine{321   \textcolor{keywordflow}{return} m\_matrix.template diagonal<-\/1>().real();}
+\DoxyCodeLine{322 \}}
+\DoxyCodeLine{323 }
+\DoxyCodeLine{324 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{325 }
+\DoxyCodeLine{349 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keyword}{typename} CoeffVectorType>}
+\DoxyCodeLine{350 EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{351 \textcolor{keywordtype}{void} tridiagonalization\_inplace(MatrixType\& matA, CoeffVectorType\& hCoeffs)}
+\DoxyCodeLine{352 \{}
+\DoxyCodeLine{353   \textcolor{keyword}{using} numext::conj;}
+\DoxyCodeLine{354   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar Scalar;}
+\DoxyCodeLine{355   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::RealScalar RealScalar;}
+\DoxyCodeLine{356   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} n = matA.rows();}
+\DoxyCodeLine{357   eigen\_assert(n==matA.cols());}
+\DoxyCodeLine{358   eigen\_assert(n==hCoeffs.size()+1 || n==1);}
+\DoxyCodeLine{359 }
+\DoxyCodeLine{360   \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = 0; i<n-\/1; ++i)}
+\DoxyCodeLine{361   \{}
+\DoxyCodeLine{362     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} remainingSize = n-\/i-\/1;}
+\DoxyCodeLine{363     RealScalar beta;}
+\DoxyCodeLine{364     Scalar h;}
+\DoxyCodeLine{365     matA.col(i).tail(remainingSize).makeHouseholderInPlace(h, beta);}
+\DoxyCodeLine{366 }
+\DoxyCodeLine{367     \textcolor{comment}{// Apply similarity transformation to remaining columns,}}
+\DoxyCodeLine{368     \textcolor{comment}{// i.e., A = H A H' where H = I -\/ h v v' and v = matA.col(i).tail(n-\/i-\/1)}}
+\DoxyCodeLine{369     matA.col(i).coeffRef(i+1) = 1;}
+\DoxyCodeLine{370 }
+\DoxyCodeLine{371     hCoeffs.tail(n-\/i-\/1).noalias() = (matA.bottomRightCorner(remainingSize,remainingSize).template selfadjointView<Lower>()}
+\DoxyCodeLine{372                                   * (conj(h) * matA.col(i).tail(remainingSize)));}
+\DoxyCodeLine{373 }
+\DoxyCodeLine{374     hCoeffs.tail(n-\/i-\/1) += (conj(h)*RealScalar(-\/0.5)*(hCoeffs.tail(remainingSize).dot(matA.col(i).tail(remainingSize)))) * matA.col(i).tail(n-\/i-\/1);}
+\DoxyCodeLine{375 }
+\DoxyCodeLine{376     matA.bottomRightCorner(remainingSize, remainingSize).template selfadjointView<Lower>()}
+\DoxyCodeLine{377       .rankUpdate(matA.col(i).tail(remainingSize), hCoeffs.tail(remainingSize), Scalar(-\/1));}
+\DoxyCodeLine{378 }
+\DoxyCodeLine{379     matA.col(i).coeffRef(i+1) = beta;}
+\DoxyCodeLine{380     hCoeffs.coeffRef(i) = h;}
+\DoxyCodeLine{381   \}}
+\DoxyCodeLine{382 \}}
+\DoxyCodeLine{383 }
+\DoxyCodeLine{384 \textcolor{comment}{// forward declaration, implementation at the end of this file}}
+\DoxyCodeLine{385 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType,}
+\DoxyCodeLine{386          \textcolor{keywordtype}{int} Size=MatrixType::ColsAtCompileTime,}
+\DoxyCodeLine{387          \textcolor{keywordtype}{bool} IsComplex=NumTraits<typename MatrixType::Scalar>::IsComplex>}
+\DoxyCodeLine{388 \textcolor{keyword}{struct }tridiagonalization\_inplace\_selector;}
+\DoxyCodeLine{389 }
+\DoxyCodeLine{430 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keyword}{typename} DiagonalType, \textcolor{keyword}{typename} SubDiagonalType, \textcolor{keyword}{typename} CoeffVectorType>}
+\DoxyCodeLine{431 EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{432 \textcolor{keywordtype}{void} tridiagonalization\_inplace(MatrixType\& mat, DiagonalType\& diag, SubDiagonalType\& subdiag,}
+\DoxyCodeLine{433                                 CoeffVectorType\& hcoeffs, \textcolor{keywordtype}{bool} extractQ)}
+\DoxyCodeLine{434 \{}
+\DoxyCodeLine{435   eigen\_assert(mat.cols()==mat.rows() \&\& diag.size()==mat.rows() \&\& subdiag.size()==mat.rows()-\/1);}
+\DoxyCodeLine{436   tridiagonalization\_inplace\_selector<MatrixType>::run(mat, diag, subdiag, hcoeffs, extractQ);}
+\DoxyCodeLine{437 \}}
+\DoxyCodeLine{438 }
+\DoxyCodeLine{442 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{int} Size, \textcolor{keywordtype}{bool} IsComplex>}
+\DoxyCodeLine{443 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1tridiagonalization__inplace__selector}{tridiagonalization\_inplace\_selector}}}
+\DoxyCodeLine{444 \{}
+\DoxyCodeLine{445   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1HouseholderSequence}{Tridiagonalization<MatrixType>::HouseholderSequenceType}} \mbox{\hyperlink{classEigen_1_1HouseholderSequence}{HouseholderSequenceType}};}
+\DoxyCodeLine{446   \textcolor{keyword}{template}<\textcolor{keyword}{typename} DiagonalType, \textcolor{keyword}{typename} SubDiagonalType, \textcolor{keyword}{typename} CoeffVectorType>}
+\DoxyCodeLine{447   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{448       \textcolor{keywordtype}{void} run(MatrixType\& mat, DiagonalType\& diag, SubDiagonalType\& subdiag, CoeffVectorType\& hCoeffs, \textcolor{keywordtype}{bool} extractQ)}
+\DoxyCodeLine{449   \{}
+\DoxyCodeLine{450     tridiagonalization\_inplace(mat, hCoeffs);}
+\DoxyCodeLine{451     diag = mat.diagonal().real();}
+\DoxyCodeLine{452     subdiag = mat.template diagonal<-\/1>().real();}
+\DoxyCodeLine{453     \textcolor{keywordflow}{if}(extractQ)}
+\DoxyCodeLine{454       mat = \mbox{\hyperlink{classEigen_1_1HouseholderSequence}{HouseholderSequenceType}}(mat, hCoeffs.conjugate())}
+\DoxyCodeLine{455             .\mbox{\hyperlink{classEigen_1_1HouseholderSequence_af34f776bdc7f1d20ac73c19ddb54d443}{setLength}}(mat.rows() -\/ 1)}
+\DoxyCodeLine{456             .\mbox{\hyperlink{classEigen_1_1HouseholderSequence_ae3b8d3583d98adbcad45403883ebbb74}{setShift}}(1);}
+\DoxyCodeLine{457   \}}
+\DoxyCodeLine{458 \};}
+\DoxyCodeLine{459 }
+\DoxyCodeLine{464 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{465 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1tridiagonalization__inplace__selector}{tridiagonalization\_inplace\_selector}}<MatrixType,3,false>}
+\DoxyCodeLine{466 \{}
+\DoxyCodeLine{467   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar Scalar;}
+\DoxyCodeLine{468   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::RealScalar RealScalar;}
+\DoxyCodeLine{469 }
+\DoxyCodeLine{470   \textcolor{keyword}{template}<\textcolor{keyword}{typename} DiagonalType, \textcolor{keyword}{typename} SubDiagonalType, \textcolor{keyword}{typename} CoeffVectorType>}
+\DoxyCodeLine{471   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(MatrixType\& mat, DiagonalType\& diag, SubDiagonalType\& subdiag, CoeffVectorType\&, \textcolor{keywordtype}{bool} extractQ)}
+\DoxyCodeLine{472   \{}
+\DoxyCodeLine{473     \textcolor{keyword}{using} std::sqrt;}
+\DoxyCodeLine{474     \textcolor{keyword}{const} RealScalar tol = (std::numeric\_limits<RealScalar>::min)();}
+\DoxyCodeLine{475     diag[0] = mat(0,0);}
+\DoxyCodeLine{476     RealScalar v1norm2 = numext::abs2(mat(2,0));}
+\DoxyCodeLine{477     \textcolor{keywordflow}{if}(v1norm2 <= tol)}
+\DoxyCodeLine{478     \{}
+\DoxyCodeLine{479       diag[1] = mat(1,1);}
+\DoxyCodeLine{480       diag[2] = mat(2,2);}
+\DoxyCodeLine{481       subdiag[0] = mat(1,0);}
+\DoxyCodeLine{482       subdiag[1] = mat(2,1);}
+\DoxyCodeLine{483       \textcolor{keywordflow}{if} (extractQ)}
+\DoxyCodeLine{484         mat.setIdentity();}
+\DoxyCodeLine{485     \}}
+\DoxyCodeLine{486     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{487     \{}
+\DoxyCodeLine{488       RealScalar beta = sqrt(numext::abs2(mat(1,0)) + v1norm2);}
+\DoxyCodeLine{489       RealScalar invBeta = RealScalar(1)/beta;}
+\DoxyCodeLine{490       Scalar m01 = mat(1,0) * invBeta;}
+\DoxyCodeLine{491       Scalar m02 = mat(2,0) * invBeta;}
+\DoxyCodeLine{492       Scalar q = RealScalar(2)*m01*mat(2,1) + m02*(mat(2,2) -\/ mat(1,1));}
+\DoxyCodeLine{493       diag[1] = mat(1,1) + m02*q;}
+\DoxyCodeLine{494       diag[2] = mat(2,2) -\/ m02*q;}
+\DoxyCodeLine{495       subdiag[0] = beta;}
+\DoxyCodeLine{496       subdiag[1] = mat(2,1) -\/ m01 * q;}
+\DoxyCodeLine{497       \textcolor{keywordflow}{if} (extractQ)}
+\DoxyCodeLine{498       \{}
+\DoxyCodeLine{499         mat << 1,   0,    0,}
+\DoxyCodeLine{500                0, m01,  m02,}
+\DoxyCodeLine{501                0, m02, -\/m01;}
+\DoxyCodeLine{502       \}}
+\DoxyCodeLine{503     \}}
+\DoxyCodeLine{504   \}}
+\DoxyCodeLine{505 \};}
+\DoxyCodeLine{506 }
+\DoxyCodeLine{510 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{bool} IsComplex>}
+\DoxyCodeLine{511 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1tridiagonalization__inplace__selector}{tridiagonalization\_inplace\_selector}}<MatrixType,1,IsComplex>}
+\DoxyCodeLine{512 \{}
+\DoxyCodeLine{513   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar Scalar;}
+\DoxyCodeLine{514 }
+\DoxyCodeLine{515   \textcolor{keyword}{template}<\textcolor{keyword}{typename} DiagonalType, \textcolor{keyword}{typename} SubDiagonalType, \textcolor{keyword}{typename} CoeffVectorType>}
+\DoxyCodeLine{516   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{517   \textcolor{keywordtype}{void} run(MatrixType\& mat, DiagonalType\& diag, SubDiagonalType\&, CoeffVectorType\&, \textcolor{keywordtype}{bool} extractQ)}
+\DoxyCodeLine{518   \{}
+\DoxyCodeLine{519     diag(0,0) = numext::real(mat(0,0));}
+\DoxyCodeLine{520     \textcolor{keywordflow}{if}(extractQ)}
+\DoxyCodeLine{521       mat(0,0) = Scalar(1);}
+\DoxyCodeLine{522   \}}
+\DoxyCodeLine{523 \};}
+\DoxyCodeLine{524 }
+\DoxyCodeLine{532 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1TridiagonalizationMatrixTReturnType}{TridiagonalizationMatrixTReturnType}}}
+\DoxyCodeLine{533 : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1ReturnByValue}{ReturnByValue}}<TridiagonalizationMatrixTReturnType<MatrixType> >}
+\DoxyCodeLine{534 \{}
+\DoxyCodeLine{535   \textcolor{keyword}{public}:}
+\DoxyCodeLine{540     \mbox{\hyperlink{structEigen_1_1internal_1_1TridiagonalizationMatrixTReturnType_ac49f3c4df8b40dfa002c6e04e3d1b97f}{TridiagonalizationMatrixTReturnType}}(\textcolor{keyword}{const} MatrixType\& mat) : m\_matrix(mat) \{ \}}
+\DoxyCodeLine{541 }
+\DoxyCodeLine{542     \textcolor{keyword}{template} <\textcolor{keyword}{typename} ResultType>}
+\DoxyCodeLine{543     \textcolor{keyword}{inline} \textcolor{keywordtype}{void} evalTo(ResultType\& result)\textcolor{keyword}{ const}}
+\DoxyCodeLine{544 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{545       result.setZero();}
+\DoxyCodeLine{546       result.template diagonal<1>() = m\_matrix.template diagonal<-\/1>().conjugate();}
+\DoxyCodeLine{547       result.diagonal() = m\_matrix.diagonal();}
+\DoxyCodeLine{548       result.template diagonal<-\/1>() = m\_matrix.template diagonal<-\/1>();}
+\DoxyCodeLine{549     \}}
+\DoxyCodeLine{550 }
+\DoxyCodeLine{551     EIGEN\_CONSTEXPR \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows() const EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_matrix.rows(); \}}
+\DoxyCodeLine{552     EIGEN\_CONSTEXPR \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols() const EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_matrix.cols(); \}}
+\DoxyCodeLine{553 }
+\DoxyCodeLine{554   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{555     \textcolor{keyword}{typename} MatrixType::Nested m\_matrix;}
+\DoxyCodeLine{556 \};}
+\DoxyCodeLine{557 }
+\DoxyCodeLine{558 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{559 }
+\DoxyCodeLine{560 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{561 }
+\DoxyCodeLine{562 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_TRIDIAGONALIZATION\_H}}
+
+\end{DoxyCode}

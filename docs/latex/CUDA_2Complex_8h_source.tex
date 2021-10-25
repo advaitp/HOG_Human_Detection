@@ -1,0 +1,277 @@
+\hypertarget{CUDA_2Complex_8h_source}{}\doxysection{Complex.\+h}
+\label{CUDA_2Complex_8h_source}\index{include/Eigen/src/Core/arch/CUDA/Complex.h@{include/Eigen/src/Core/arch/CUDA/Complex.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2014 Benoit Steiner <benoit.steiner.goog@gmail.com>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2021 C. Antonio Sanchez <cantonios@google.com>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_COMPLEX\_CUDA\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_COMPLEX\_CUDA\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{comment}{// Many std::complex methods such as operator+, operator-\/, operator* and}}
+\DoxyCodeLine{15 \textcolor{comment}{// operator/ are not constexpr. Due to this, GCC and older versions of clang do}}
+\DoxyCodeLine{16 \textcolor{comment}{// not treat them as device functions and thus Eigen functors making use of}}
+\DoxyCodeLine{17 \textcolor{comment}{// these operators fail to compile. Here, we manually specialize these}}
+\DoxyCodeLine{18 \textcolor{comment}{// operators and functors for complex types when building for CUDA to enable}}
+\DoxyCodeLine{19 \textcolor{comment}{// their use on-\/device.}}
+\DoxyCodeLine{20 \textcolor{comment}{//}}
+\DoxyCodeLine{21 \textcolor{comment}{// NOTES:}}
+\DoxyCodeLine{22 \textcolor{comment}{//  -\/ Compound assignment operators +=,-\/=,*=,/=(Scalar) will not work on device,}}
+\DoxyCodeLine{23 \textcolor{comment}{//    since they are already specialized in the standard. Using them will result}}
+\DoxyCodeLine{24 \textcolor{comment}{//    in silent kernel failures.}}
+\DoxyCodeLine{25 \textcolor{comment}{//  -\/ Compiling with MSVC and using +=,-\/=,*=,/=(std::complex<Scalar>) will lead}}
+\DoxyCodeLine{26 \textcolor{comment}{//    to duplicate definition errors, since these are already specialized in}}
+\DoxyCodeLine{27 \textcolor{comment}{//    Visual Studio's <complex> header (contrary to the standard).  This is}}
+\DoxyCodeLine{28 \textcolor{comment}{//    preferable to removing such definitions, which will lead to silent kernel}}
+\DoxyCodeLine{29 \textcolor{comment}{//    failures.}}
+\DoxyCodeLine{30 \textcolor{comment}{//  -\/ Compiling with ICC requires defining \_USE\_COMPLEX\_SPECIALIZATION\_ prior}}
+\DoxyCodeLine{31 \textcolor{comment}{//    to the first inclusion of <complex>.}}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33 \textcolor{preprocessor}{\#if defined(EIGEN\_CUDACC) \&\& defined(EIGEN\_GPU\_COMPILE\_PHASE)}}
+\DoxyCodeLine{34     }
+\DoxyCodeLine{35 \textcolor{comment}{// ICC already specializes std::complex<float> and std::complex<double>}}
+\DoxyCodeLine{36 \textcolor{comment}{// operators, preventing us from making them device functions here.}}
+\DoxyCodeLine{37 \textcolor{comment}{// This will lead to silent runtime errors if the operators are used on device.}}
+\DoxyCodeLine{38 \textcolor{comment}{//}}
+\DoxyCodeLine{39 \textcolor{comment}{// To allow std::complex operator use on device, define \_OVERRIDE\_COMPLEX\_SPECIALIZATION\_}}
+\DoxyCodeLine{40 \textcolor{comment}{// prior to first inclusion of <complex>.  This prevents ICC from adding}}
+\DoxyCodeLine{41 \textcolor{comment}{// its own specializations, so our custom ones below can be used instead.}}
+\DoxyCodeLine{42 \textcolor{preprocessor}{\#if !(defined(EIGEN\_COMP\_ICC) \&\& defined(\_USE\_COMPLEX\_SPECIALIZATION\_))}}
+\DoxyCodeLine{43 }
+\DoxyCodeLine{44 \textcolor{comment}{// Import Eigen's internal operator specializations.}}
+\DoxyCodeLine{45 \textcolor{preprocessor}{\#define EIGEN\_USING\_STD\_COMPLEX\_OPERATORS           \(\backslash\)}}
+\DoxyCodeLine{46 \textcolor{preprocessor}{  using Eigen::complex\_operator\_detail::operator+;  \(\backslash\)}}
+\DoxyCodeLine{47 \textcolor{preprocessor}{  using Eigen::complex\_operator\_detail::operator-\/;  \(\backslash\)}}
+\DoxyCodeLine{48 \textcolor{preprocessor}{  using Eigen::complex\_operator\_detail::operator*;  \(\backslash\)}}
+\DoxyCodeLine{49 \textcolor{preprocessor}{  using Eigen::complex\_operator\_detail::operator/;  \(\backslash\)}}
+\DoxyCodeLine{50 \textcolor{preprocessor}{  using Eigen::complex\_operator\_detail::operator+=; \(\backslash\)}}
+\DoxyCodeLine{51 \textcolor{preprocessor}{  using Eigen::complex\_operator\_detail::operator-\/=; \(\backslash\)}}
+\DoxyCodeLine{52 \textcolor{preprocessor}{  using Eigen::complex\_operator\_detail::operator*=; \(\backslash\)}}
+\DoxyCodeLine{53 \textcolor{preprocessor}{  using Eigen::complex\_operator\_detail::operator/=; \(\backslash\)}}
+\DoxyCodeLine{54 \textcolor{preprocessor}{  using Eigen::complex\_operator\_detail::operator==; \(\backslash\)}}
+\DoxyCodeLine{55 \textcolor{preprocessor}{  using Eigen::complex\_operator\_detail::operator!=;}}
+\DoxyCodeLine{56 }
+\DoxyCodeLine{57 \textcolor{preprocessor}{\#include "{}../../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{58 }
+\DoxyCodeLine{59 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{60 }
+\DoxyCodeLine{61 \textcolor{comment}{// Specialized std::complex overloads.}}
+\DoxyCodeLine{62 \textcolor{keyword}{namespace }complex\_operator\_detail \{}
+\DoxyCodeLine{63 }
+\DoxyCodeLine{64 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{65 EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{66 std::complex<T> complex\_multiply(\textcolor{keyword}{const} std::complex<T>\& a, \textcolor{keyword}{const} std::complex<T>\& b) \{}
+\DoxyCodeLine{67   \textcolor{keyword}{const} T a\_real = numext::real(a);}
+\DoxyCodeLine{68   \textcolor{keyword}{const} T a\_imag = numext::imag(a);}
+\DoxyCodeLine{69   \textcolor{keyword}{const} T b\_real = numext::real(b);}
+\DoxyCodeLine{70   \textcolor{keyword}{const} T b\_imag = numext::imag(b);}
+\DoxyCodeLine{71   \textcolor{keywordflow}{return} std::complex<T>(}
+\DoxyCodeLine{72       a\_real * b\_real -\/ a\_imag * b\_imag,}
+\DoxyCodeLine{73       a\_imag * b\_real + a\_real * b\_imag);}
+\DoxyCodeLine{74 \}}
+\DoxyCodeLine{75 }
+\DoxyCodeLine{76 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{77 EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{78 std::complex<T> complex\_divide\_fast(\textcolor{keyword}{const} std::complex<T>\& a, \textcolor{keyword}{const} std::complex<T>\& b) \{}
+\DoxyCodeLine{79   \textcolor{keyword}{const} T a\_real = numext::real(a);}
+\DoxyCodeLine{80   \textcolor{keyword}{const} T a\_imag = numext::imag(a);}
+\DoxyCodeLine{81   \textcolor{keyword}{const} T b\_real = numext::real(b);}
+\DoxyCodeLine{82   \textcolor{keyword}{const} T b\_imag = numext::imag(b);}
+\DoxyCodeLine{83   \textcolor{keyword}{const} T norm = (b\_real * b\_real + b\_imag * b\_imag);}
+\DoxyCodeLine{84   \textcolor{keywordflow}{return} std::complex<T>((a\_real * b\_real + a\_imag * b\_imag) / norm,}
+\DoxyCodeLine{85                           (a\_imag * b\_real -\/ a\_real * b\_imag) / norm);}
+\DoxyCodeLine{86 \}}
+\DoxyCodeLine{87 }
+\DoxyCodeLine{88 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{89 EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{90 std::complex<T> complex\_divide\_stable(\textcolor{keyword}{const} std::complex<T>\& a, \textcolor{keyword}{const} std::complex<T>\& b) \{}
+\DoxyCodeLine{91   \textcolor{keyword}{const} T a\_real = numext::real(a);}
+\DoxyCodeLine{92   \textcolor{keyword}{const} T a\_imag = numext::imag(a);}
+\DoxyCodeLine{93   \textcolor{keyword}{const} T b\_real = numext::real(b);}
+\DoxyCodeLine{94   \textcolor{keyword}{const} T b\_imag = numext::imag(b);}
+\DoxyCodeLine{95   \textcolor{comment}{// Smith's complex division (https://arxiv.org/pdf/1210.4539.pdf),}}
+\DoxyCodeLine{96   \textcolor{comment}{// guards against over/under-\/flow.}}
+\DoxyCodeLine{97   \textcolor{keyword}{const} \textcolor{keywordtype}{bool} scale\_imag = numext::abs(b\_imag) <= numext::abs(b\_real);}
+\DoxyCodeLine{98   \textcolor{keyword}{const} T rscale = scale\_imag ? T(1) : b\_real / b\_imag;}
+\DoxyCodeLine{99   \textcolor{keyword}{const} T iscale = scale\_imag ? b\_imag / b\_real : T(1);}
+\DoxyCodeLine{100   \textcolor{keyword}{const} T denominator = b\_real * rscale + b\_imag * iscale;}
+\DoxyCodeLine{101   \textcolor{keywordflow}{return} std::complex<T>((a\_real * rscale + a\_imag * iscale) / denominator, }
+\DoxyCodeLine{102                          (a\_imag * rscale -\/ a\_real * iscale) / denominator);}
+\DoxyCodeLine{103 \}}
+\DoxyCodeLine{104 }
+\DoxyCodeLine{105 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{106 EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{107 std::complex<T> complex\_divide(\textcolor{keyword}{const} std::complex<T>\& a, \textcolor{keyword}{const} std::complex<T>\& b) \{}
+\DoxyCodeLine{108 \textcolor{preprocessor}{\#if EIGEN\_FAST\_MATH}}
+\DoxyCodeLine{109   \textcolor{keywordflow}{return} complex\_divide\_fast(a, b);}
+\DoxyCodeLine{110 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{111   \textcolor{keywordflow}{return} complex\_divide\_stable(a, b);}
+\DoxyCodeLine{112 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{113 \}}
+\DoxyCodeLine{114 }
+\DoxyCodeLine{115 \textcolor{comment}{// NOTE: We cannot specialize compound assignment operators with Scalar T,}}
+\DoxyCodeLine{116 \textcolor{comment}{//         (i.e.  operator@=(const T\&), for @=+,-\/,*,/)}}
+\DoxyCodeLine{117 \textcolor{comment}{//       since they are already specialized for float/double/long double within}}
+\DoxyCodeLine{118 \textcolor{comment}{//       the standard <complex> header. We also do not specialize the stream}}
+\DoxyCodeLine{119 \textcolor{comment}{//       operators.}}
+\DoxyCodeLine{120 \textcolor{preprocessor}{\#define EIGEN\_CREATE\_STD\_COMPLEX\_OPERATOR\_SPECIALIZATIONS(T)                                    \(\backslash\)}}
+\DoxyCodeLine{121 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{122 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{123 \textcolor{preprocessor}{std::complex<T> operator+(const std::complex<T>\& a) \{ return a; \}                               \(\backslash\)}}
+\DoxyCodeLine{124 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{125 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{126 \textcolor{preprocessor}{std::complex<T> operator-\/(const std::complex<T>\& a) \{                                           \(\backslash\)}}
+\DoxyCodeLine{127 \textcolor{preprocessor}{  return std::complex<T>(-\/numext::real(a), -\/numext::imag(a));                                   \(\backslash\)}}
+\DoxyCodeLine{128 \textcolor{preprocessor}{\}                                                                                               \(\backslash\)}}
+\DoxyCodeLine{129 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{130 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{131 \textcolor{preprocessor}{std::complex<T> operator+(const std::complex<T>\& a, const std::complex<T>\& b) \{                 \(\backslash\)}}
+\DoxyCodeLine{132 \textcolor{preprocessor}{  return std::complex<T>(numext::real(a) + numext::real(b), numext::imag(a) + numext::imag(b)); \(\backslash\)}}
+\DoxyCodeLine{133 \textcolor{preprocessor}{\}                                                                                               \(\backslash\)}}
+\DoxyCodeLine{134 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{135 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{136 \textcolor{preprocessor}{std::complex<T> operator+(const std::complex<T>\& a, const T\& b) \{                               \(\backslash\)}}
+\DoxyCodeLine{137 \textcolor{preprocessor}{  return std::complex<T>(numext::real(a) + b, numext::imag(a));                                 \(\backslash\)}}
+\DoxyCodeLine{138 \textcolor{preprocessor}{\}                                                                                               \(\backslash\)}}
+\DoxyCodeLine{139 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{140 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{141 \textcolor{preprocessor}{std::complex<T> operator+(const T\& a, const std::complex<T>\& b) \{                               \(\backslash\)}}
+\DoxyCodeLine{142 \textcolor{preprocessor}{  return std::complex<T>(a + numext::real(b), numext::imag(b));                                 \(\backslash\)}}
+\DoxyCodeLine{143 \textcolor{preprocessor}{\}                                                                                               \(\backslash\)}}
+\DoxyCodeLine{144 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{145 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{146 \textcolor{preprocessor}{std::complex<T> operator-\/(const std::complex<T>\& a, const std::complex<T>\& b) \{                 \(\backslash\)}}
+\DoxyCodeLine{147 \textcolor{preprocessor}{  return std::complex<T>(numext::real(a) -\/ numext::real(b), numext::imag(a) -\/ numext::imag(b)); \(\backslash\)}}
+\DoxyCodeLine{148 \textcolor{preprocessor}{\}                                                                                               \(\backslash\)}}
+\DoxyCodeLine{149 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{150 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{151 \textcolor{preprocessor}{std::complex<T> operator-\/(const std::complex<T>\& a, const T\& b) \{                               \(\backslash\)}}
+\DoxyCodeLine{152 \textcolor{preprocessor}{  return std::complex<T>(numext::real(a) -\/ b, numext::imag(a));                                 \(\backslash\)}}
+\DoxyCodeLine{153 \textcolor{preprocessor}{\}                                                                                               \(\backslash\)}}
+\DoxyCodeLine{154 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{155 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{156 \textcolor{preprocessor}{std::complex<T> operator-\/(const T\& a, const std::complex<T>\& b) \{                               \(\backslash\)}}
+\DoxyCodeLine{157 \textcolor{preprocessor}{  return std::complex<T>(a -\/ numext::real(b), -\/numext::imag(b));                                \(\backslash\)}}
+\DoxyCodeLine{158 \textcolor{preprocessor}{\}                                                                                               \(\backslash\)}}
+\DoxyCodeLine{159 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{160 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{161 \textcolor{preprocessor}{std::complex<T> operator*(const std::complex<T>\& a, const std::complex<T>\& b) \{                 \(\backslash\)}}
+\DoxyCodeLine{162 \textcolor{preprocessor}{  return complex\_multiply(a, b);                                                                \(\backslash\)}}
+\DoxyCodeLine{163 \textcolor{preprocessor}{\}                                                                                               \(\backslash\)}}
+\DoxyCodeLine{164 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{165 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{166 \textcolor{preprocessor}{std::complex<T> operator*(const std::complex<T>\& a, const T\& b) \{                               \(\backslash\)}}
+\DoxyCodeLine{167 \textcolor{preprocessor}{  return std::complex<T>(numext::real(a) * b, numext::imag(a) * b);                             \(\backslash\)}}
+\DoxyCodeLine{168 \textcolor{preprocessor}{\}                                                                                               \(\backslash\)}}
+\DoxyCodeLine{169 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{170 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{171 \textcolor{preprocessor}{std::complex<T> operator*(const T\& a, const std::complex<T>\& b) \{                               \(\backslash\)}}
+\DoxyCodeLine{172 \textcolor{preprocessor}{  return std::complex<T>(a * numext::real(b), a * numext::imag(b));                             \(\backslash\)}}
+\DoxyCodeLine{173 \textcolor{preprocessor}{\}                                                                                               \(\backslash\)}}
+\DoxyCodeLine{174 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{175 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{176 \textcolor{preprocessor}{std::complex<T> operator/(const std::complex<T>\& a, const std::complex<T>\& b) \{                 \(\backslash\)}}
+\DoxyCodeLine{177 \textcolor{preprocessor}{  return complex\_divide(a, b);                                                                  \(\backslash\)}}
+\DoxyCodeLine{178 \textcolor{preprocessor}{\}                                                                                               \(\backslash\)}}
+\DoxyCodeLine{179 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{180 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{181 \textcolor{preprocessor}{std::complex<T> operator/(const std::complex<T>\& a, const T\& b) \{                               \(\backslash\)}}
+\DoxyCodeLine{182 \textcolor{preprocessor}{  return std::complex<T>(numext::real(a) / b, numext::imag(a) / b);                             \(\backslash\)}}
+\DoxyCodeLine{183 \textcolor{preprocessor}{\}                                                                                               \(\backslash\)}}
+\DoxyCodeLine{184 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{185 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{186 \textcolor{preprocessor}{std::complex<T> operator/(const T\& a, const std::complex<T>\& b) \{                               \(\backslash\)}}
+\DoxyCodeLine{187 \textcolor{preprocessor}{  return complex\_divide(std::complex<T>(a, 0), b);                                              \(\backslash\)}}
+\DoxyCodeLine{188 \textcolor{preprocessor}{\}                                                                                               \(\backslash\)}}
+\DoxyCodeLine{189 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{190 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{191 \textcolor{preprocessor}{std::complex<T>\& operator+=(std::complex<T>\& a, const std::complex<T>\& b) \{                     \(\backslash\)}}
+\DoxyCodeLine{192 \textcolor{preprocessor}{  numext::real\_ref(a) += numext::real(b);                                                       \(\backslash\)}}
+\DoxyCodeLine{193 \textcolor{preprocessor}{  numext::imag\_ref(a) += numext::imag(b);                                                       \(\backslash\)}}
+\DoxyCodeLine{194 \textcolor{preprocessor}{  return a;                                                                                     \(\backslash\)}}
+\DoxyCodeLine{195 \textcolor{preprocessor}{\}                                                                                               \(\backslash\)}}
+\DoxyCodeLine{196 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{197 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{198 \textcolor{preprocessor}{std::complex<T>\& operator-\/=(std::complex<T>\& a, const std::complex<T>\& b) \{                     \(\backslash\)}}
+\DoxyCodeLine{199 \textcolor{preprocessor}{  numext::real\_ref(a) -\/= numext::real(b);                                                       \(\backslash\)}}
+\DoxyCodeLine{200 \textcolor{preprocessor}{  numext::imag\_ref(a) -\/= numext::imag(b);                                                       \(\backslash\)}}
+\DoxyCodeLine{201 \textcolor{preprocessor}{  return a;                                                                                     \(\backslash\)}}
+\DoxyCodeLine{202 \textcolor{preprocessor}{\}                                                                                               \(\backslash\)}}
+\DoxyCodeLine{203 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{204 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{205 \textcolor{preprocessor}{std::complex<T>\& operator*=(std::complex<T>\& a, const std::complex<T>\& b) \{                     \(\backslash\)}}
+\DoxyCodeLine{206 \textcolor{preprocessor}{  a = complex\_multiply(a, b);                                                                   \(\backslash\)}}
+\DoxyCodeLine{207 \textcolor{preprocessor}{  return a;                                                                                     \(\backslash\)}}
+\DoxyCodeLine{208 \textcolor{preprocessor}{\}                                                                                               \(\backslash\)}}
+\DoxyCodeLine{209 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{210 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{211 \textcolor{preprocessor}{std::complex<T>\& operator/=(std::complex<T>\& a, const std::complex<T>\& b) \{                     \(\backslash\)}}
+\DoxyCodeLine{212 \textcolor{preprocessor}{  a = complex\_divide(a, b);                                                                     \(\backslash\)}}
+\DoxyCodeLine{213 \textcolor{preprocessor}{  return  a;                                                                                    \(\backslash\)}}
+\DoxyCodeLine{214 \textcolor{preprocessor}{\}                                                                                               \(\backslash\)}}
+\DoxyCodeLine{215 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{216 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{217 \textcolor{preprocessor}{bool operator==(const std::complex<T>\& a, const std::complex<T>\& b) \{                           \(\backslash\)}}
+\DoxyCodeLine{218 \textcolor{preprocessor}{  return numext::real(a) == numext::real(b) \&\& numext::imag(a) == numext::imag(b);              \(\backslash\)}}
+\DoxyCodeLine{219 \textcolor{preprocessor}{\}                                                                                               \(\backslash\)}}
+\DoxyCodeLine{220 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{221 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{222 \textcolor{preprocessor}{bool operator==(const std::complex<T>\& a, const T\& b) \{                                         \(\backslash\)}}
+\DoxyCodeLine{223 \textcolor{preprocessor}{  return numext::real(a) == b \&\& numext::imag(a) == 0;                                          \(\backslash\)}}
+\DoxyCodeLine{224 \textcolor{preprocessor}{\}                                                                                               \(\backslash\)}}
+\DoxyCodeLine{225 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{226 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{227 \textcolor{preprocessor}{bool operator==(const T\& a, const std::complex<T>\& b) \{                                         \(\backslash\)}}
+\DoxyCodeLine{228 \textcolor{preprocessor}{  return a  == numext::real(b) \&\& 0 == numext::imag(b);                                         \(\backslash\)}}
+\DoxyCodeLine{229 \textcolor{preprocessor}{\}                                                                                               \(\backslash\)}}
+\DoxyCodeLine{230 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{231 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{232 \textcolor{preprocessor}{bool operator!=(const std::complex<T>\& a, const std::complex<T>\& b) \{                           \(\backslash\)}}
+\DoxyCodeLine{233 \textcolor{preprocessor}{  return !(a == b);                                                                             \(\backslash\)}}
+\DoxyCodeLine{234 \textcolor{preprocessor}{\}                                                                                               \(\backslash\)}}
+\DoxyCodeLine{235 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{236 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{237 \textcolor{preprocessor}{bool operator!=(const std::complex<T>\& a, const T\& b) \{                                         \(\backslash\)}}
+\DoxyCodeLine{238 \textcolor{preprocessor}{  return !(a == b);                                                                             \(\backslash\)}}
+\DoxyCodeLine{239 \textcolor{preprocessor}{\}                                                                                               \(\backslash\)}}
+\DoxyCodeLine{240 \textcolor{preprocessor}{                                                                                                \(\backslash\)}}
+\DoxyCodeLine{241 \textcolor{preprocessor}{EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE                                                           \(\backslash\)}}
+\DoxyCodeLine{242 \textcolor{preprocessor}{bool operator!=(const T\& a, const std::complex<T>\& b) \{                                         \(\backslash\)}}
+\DoxyCodeLine{243 \textcolor{preprocessor}{  return !(a == b);                                                                             \(\backslash\)}}
+\DoxyCodeLine{244 \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{245 }
+\DoxyCodeLine{246 \textcolor{comment}{// Do not specialize for long double, since that reduces to double on device.}}
+\DoxyCodeLine{247 EIGEN\_CREATE\_STD\_COMPLEX\_OPERATOR\_SPECIALIZATIONS(\textcolor{keywordtype}{float})}
+\DoxyCodeLine{248 EIGEN\_CREATE\_STD\_COMPLEX\_OPERATOR\_SPECIALIZATIONS(\textcolor{keywordtype}{double})}
+\DoxyCodeLine{249 }
+\DoxyCodeLine{250 \textcolor{preprocessor}{\#undef EIGEN\_CREATE\_STD\_COMPLEX\_OPERATOR\_SPECIALIZATIONS}}
+\DoxyCodeLine{251 }
+\DoxyCodeLine{252   }
+\DoxyCodeLine{253 \}  \textcolor{comment}{// namespace complex\_operator\_detail}}
+\DoxyCodeLine{254 }
+\DoxyCodeLine{255 EIGEN\_USING\_STD\_COMPLEX\_OPERATORS}
+\DoxyCodeLine{256 }
+\DoxyCodeLine{257 \textcolor{keyword}{namespace }numext \{}
+\DoxyCodeLine{258 EIGEN\_USING\_STD\_COMPLEX\_OPERATORS}
+\DoxyCodeLine{259 \}  \textcolor{comment}{// namespace numext}}
+\DoxyCodeLine{260 }
+\DoxyCodeLine{261 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{262 EIGEN\_USING\_STD\_COMPLEX\_OPERATORS}
+\DoxyCodeLine{263 }
+\DoxyCodeLine{264 \}  \textcolor{comment}{// namespace internal}}
+\DoxyCodeLine{265 \}  \textcolor{comment}{// namespace Eigen}}
+\DoxyCodeLine{266 }
+\DoxyCodeLine{267 \textcolor{preprocessor}{\#endif  }\textcolor{comment}{// !(EIGEN\_COMP\_ICC \&\& \_USE\_COMPLEX\_SPECIALIZATION\_)}}
+\DoxyCodeLine{268 }
+\DoxyCodeLine{269 \textcolor{preprocessor}{\#endif  }\textcolor{comment}{// EIGEN\_CUDACC \&\& EIGEN\_GPU\_COMPILE\_PHASE}}
+\DoxyCodeLine{270 }
+\DoxyCodeLine{271 \textcolor{preprocessor}{\#endif  }\textcolor{comment}{// EIGEN\_COMPLEX\_CUDA\_H}}
+
+\end{DoxyCode}

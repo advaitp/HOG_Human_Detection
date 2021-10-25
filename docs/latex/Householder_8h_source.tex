@@ -1,0 +1,123 @@
+\hypertarget{Householder_8h_source}{}\doxysection{Householder.\+h}
+\label{Householder_8h_source}\index{include/Eigen/src/Householder/Householder.h@{include/Eigen/src/Householder/Householder.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2010 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_HOUSEHOLDER\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_HOUSEHOLDER\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{19 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} n> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1decrement__size}{decrement\_size}}}
+\DoxyCodeLine{20 \{}
+\DoxyCodeLine{21   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{22     ret = n==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} ? n : n-\/1}
+\DoxyCodeLine{23   \};}
+\DoxyCodeLine{24 \};}
+\DoxyCodeLine{25 \}}
+\DoxyCodeLine{26 }
+\DoxyCodeLine{43 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{44 EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{45 \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1MatrixBase_a0cc21daad8d10938c9db48c556a24003}{MatrixBase<Derived>::makeHouseholderInPlace}}(\mbox{\hyperlink{classEigen_1_1DenseBase_a5feed465b3a8e60c47e73ecce83e39a2}{Scalar}}\& tau, RealScalar\& beta)}
+\DoxyCodeLine{46 \{}
+\DoxyCodeLine{47   \mbox{\hyperlink{classEigen_1_1VectorBlock}{VectorBlock<Derived, internal::decrement\_size<Base::SizeAtCompileTime>::ret}}> essentialPart(derived(), 1, size()-\/1);}
+\DoxyCodeLine{48   makeHouseholder(essentialPart, tau, beta);}
+\DoxyCodeLine{49 \}}
+\DoxyCodeLine{50 }
+\DoxyCodeLine{66 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{67 \textcolor{keyword}{template}<\textcolor{keyword}{typename} EssentialPart>}
+\DoxyCodeLine{68 EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{69 \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1MatrixBase_aab69fd96f049bb0028af5cdbeca1572a}{MatrixBase<Derived>::makeHouseholder}}(}
+\DoxyCodeLine{70   EssentialPart\& essential,}
+\DoxyCodeLine{71   \mbox{\hyperlink{classEigen_1_1DenseBase_a5feed465b3a8e60c47e73ecce83e39a2}{Scalar}}\& tau,}
+\DoxyCodeLine{72   RealScalar\& beta)\textcolor{keyword}{ const}}
+\DoxyCodeLine{73 \textcolor{keyword}{}\{}
+\DoxyCodeLine{74   \textcolor{keyword}{using} std::sqrt;}
+\DoxyCodeLine{75   \textcolor{keyword}{using} numext::conj;}
+\DoxyCodeLine{76   }
+\DoxyCodeLine{77   EIGEN\_STATIC\_ASSERT\_VECTOR\_ONLY(EssentialPart)}
+\DoxyCodeLine{78   \mbox{\hyperlink{classEigen_1_1VectorBlock}{VectorBlock<const Derived, EssentialPart::SizeAtCompileTime>}} tail(derived(), 1, size()-\/1);}
+\DoxyCodeLine{79   }
+\DoxyCodeLine{80   RealScalar tailSqNorm = size()==1 ? RealScalar(0) : tail.squaredNorm();}
+\DoxyCodeLine{81   \mbox{\hyperlink{classEigen_1_1DenseBase_a5feed465b3a8e60c47e73ecce83e39a2}{Scalar}} c0 = coeff(0);}
+\DoxyCodeLine{82   \textcolor{keyword}{const} RealScalar tol = (std::numeric\_limits<RealScalar>::min)();}
+\DoxyCodeLine{83 }
+\DoxyCodeLine{84   \textcolor{keywordflow}{if}(tailSqNorm <= tol \&\& numext::abs2(numext::imag(c0))<=tol)}
+\DoxyCodeLine{85   \{}
+\DoxyCodeLine{86     tau = RealScalar(0);}
+\DoxyCodeLine{87     beta = numext::real(c0);}
+\DoxyCodeLine{88     essential.setZero();}
+\DoxyCodeLine{89   \}}
+\DoxyCodeLine{90   \textcolor{keywordflow}{else}}
+\DoxyCodeLine{91   \{}
+\DoxyCodeLine{92     beta = sqrt(numext::abs2(c0) + tailSqNorm);}
+\DoxyCodeLine{93     \textcolor{keywordflow}{if} (numext::real(c0)>=RealScalar(0))}
+\DoxyCodeLine{94       beta = -\/beta;}
+\DoxyCodeLine{95     essential = tail / (c0 -\/ beta);}
+\DoxyCodeLine{96     tau = conj((beta -\/ c0) / beta);}
+\DoxyCodeLine{97   \}}
+\DoxyCodeLine{98 \}}
+\DoxyCodeLine{99 }
+\DoxyCodeLine{115 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{116 \textcolor{keyword}{template}<\textcolor{keyword}{typename} EssentialPart>}
+\DoxyCodeLine{117 EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{118 \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1MatrixBase_a9d156c1e239110e7af8d120a51470e03}{MatrixBase<Derived>::applyHouseholderOnTheLeft}}(}
+\DoxyCodeLine{119   \textcolor{keyword}{const} EssentialPart\& essential,}
+\DoxyCodeLine{120   \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1DenseBase_a5feed465b3a8e60c47e73ecce83e39a2}{Scalar}}\& tau,}
+\DoxyCodeLine{121   \mbox{\hyperlink{classEigen_1_1DenseBase_a5feed465b3a8e60c47e73ecce83e39a2}{Scalar}}* workspace)}
+\DoxyCodeLine{122 \{}
+\DoxyCodeLine{123   \textcolor{keywordflow}{if}(rows() == 1)}
+\DoxyCodeLine{124   \{}
+\DoxyCodeLine{125     *\textcolor{keyword}{this} *= \mbox{\hyperlink{classEigen_1_1DenseBase_a5feed465b3a8e60c47e73ecce83e39a2}{Scalar}}(1)-\/tau;}
+\DoxyCodeLine{126   \}}
+\DoxyCodeLine{127   \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(tau!=\mbox{\hyperlink{classEigen_1_1DenseBase_a5feed465b3a8e60c47e73ecce83e39a2}{Scalar}}(0))}
+\DoxyCodeLine{128   \{}
+\DoxyCodeLine{129     \mbox{\hyperlink{classEigen_1_1Map}{Map<typename internal::plain\_row\_type<PlainObject>::type}}> tmp(workspace,cols());}
+\DoxyCodeLine{130     \mbox{\hyperlink{classEigen_1_1Block}{Block<Derived, EssentialPart::SizeAtCompileTime, Derived::ColsAtCompileTime>}} bottom(derived(), 1, 0, rows()-\/1, cols());}
+\DoxyCodeLine{131     tmp.noalias() = essential.adjoint() * bottom;}
+\DoxyCodeLine{132     tmp += this-\/>row(0);}
+\DoxyCodeLine{133     this-\/>row(0) -\/= tau * tmp;}
+\DoxyCodeLine{134     bottom.noalias() -\/= tau * essential * tmp;}
+\DoxyCodeLine{135   \}}
+\DoxyCodeLine{136 \}}
+\DoxyCodeLine{137 }
+\DoxyCodeLine{153 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{154 \textcolor{keyword}{template}<\textcolor{keyword}{typename} EssentialPart>}
+\DoxyCodeLine{155 EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{156 \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1MatrixBase_adab847f7a3a4329e2caa3f49763ac993}{MatrixBase<Derived>::applyHouseholderOnTheRight}}(}
+\DoxyCodeLine{157   \textcolor{keyword}{const} EssentialPart\& essential,}
+\DoxyCodeLine{158   \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1DenseBase_a5feed465b3a8e60c47e73ecce83e39a2}{Scalar}}\& tau,}
+\DoxyCodeLine{159   \mbox{\hyperlink{classEigen_1_1DenseBase_a5feed465b3a8e60c47e73ecce83e39a2}{Scalar}}* workspace)}
+\DoxyCodeLine{160 \{}
+\DoxyCodeLine{161   \textcolor{keywordflow}{if}(cols() == 1)}
+\DoxyCodeLine{162   \{}
+\DoxyCodeLine{163     *\textcolor{keyword}{this} *= \mbox{\hyperlink{classEigen_1_1DenseBase_a5feed465b3a8e60c47e73ecce83e39a2}{Scalar}}(1)-\/tau;}
+\DoxyCodeLine{164   \}}
+\DoxyCodeLine{165   \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(tau!=\mbox{\hyperlink{classEigen_1_1DenseBase_a5feed465b3a8e60c47e73ecce83e39a2}{Scalar}}(0))}
+\DoxyCodeLine{166   \{}
+\DoxyCodeLine{167     \mbox{\hyperlink{classEigen_1_1Map}{Map<typename internal::plain\_col\_type<PlainObject>::type}}> tmp(workspace,rows());}
+\DoxyCodeLine{168     \mbox{\hyperlink{classEigen_1_1Block}{Block<Derived, Derived::RowsAtCompileTime, EssentialPart::SizeAtCompileTime>}} right(derived(), 0, 1, rows(), cols()-\/1);}
+\DoxyCodeLine{169     tmp.noalias() = right * essential;}
+\DoxyCodeLine{170     tmp += this-\/>col(0);}
+\DoxyCodeLine{171     this-\/>col(0) -\/= tau * tmp;}
+\DoxyCodeLine{172     right.noalias() -\/= tau * tmp * essential.adjoint();}
+\DoxyCodeLine{173   \}}
+\DoxyCodeLine{174 \}}
+\DoxyCodeLine{175 }
+\DoxyCodeLine{176 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{177 }
+\DoxyCodeLine{178 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_HOUSEHOLDER\_H}}
+
+\end{DoxyCode}

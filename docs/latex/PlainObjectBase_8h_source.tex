@@ -1,0 +1,921 @@
+\hypertarget{PlainObjectBase_8h_source}{}\doxysection{Plain\+Object\+Base.\+h}
+\label{PlainObjectBase_8h_source}\index{include/Eigen/src/Core/PlainObjectBase.h@{include/Eigen/src/Core/PlainObjectBase.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2008-\/2009 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2006-\/2008 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_DENSESTORAGEBASE\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_DENSESTORAGEBASE\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#if defined(EIGEN\_INITIALIZE\_MATRICES\_BY\_ZERO)}}
+\DoxyCodeLine{15 \textcolor{preprocessor}{\# define EIGEN\_INITIALIZE\_COEFFS}}
+\DoxyCodeLine{16 \textcolor{preprocessor}{\# define EIGEN\_INITIALIZE\_COEFFS\_IF\_THAT\_OPTION\_IS\_ENABLED for(Index i=0;i<base().size();++i) coeffRef(i)=Scalar(0);}}
+\DoxyCodeLine{17 \textcolor{preprocessor}{\#elif defined(EIGEN\_INITIALIZE\_MATRICES\_BY\_NAN)}}
+\DoxyCodeLine{18 \textcolor{preprocessor}{\# define EIGEN\_INITIALIZE\_COEFFS}}
+\DoxyCodeLine{19 \textcolor{preprocessor}{\# define EIGEN\_INITIALIZE\_COEFFS\_IF\_THAT\_OPTION\_IS\_ENABLED for(Index i=0;i<base().size();++i) coeffRef(i)=std::numeric\_limits<Scalar>::quiet\_NaN();}}
+\DoxyCodeLine{20 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{21 \textcolor{preprocessor}{\# undef EIGEN\_INITIALIZE\_COEFFS}}
+\DoxyCodeLine{22 \textcolor{preprocessor}{\# define EIGEN\_INITIALIZE\_COEFFS\_IF\_THAT\_OPTION\_IS\_ENABLED}}
+\DoxyCodeLine{23 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{24 }
+\DoxyCodeLine{25 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{26 }
+\DoxyCodeLine{27 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{28 }
+\DoxyCodeLine{29 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{30 }
+\DoxyCodeLine{31 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} MaxSizeAtCompileTime> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1check__rows__cols__for__overflow}{check\_rows\_cols\_for\_overflow}} \{}
+\DoxyCodeLine{32   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Index>}
+\DoxyCodeLine{33   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{34   \textcolor{keyword}{static} EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} run(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}})}
+\DoxyCodeLine{35   \{}
+\DoxyCodeLine{36   \}}
+\DoxyCodeLine{37 \};}
+\DoxyCodeLine{38 }
+\DoxyCodeLine{39 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1check__rows__cols__for__overflow}{check\_rows\_cols\_for\_overflow}}<\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}> \{}
+\DoxyCodeLine{40   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Index>}
+\DoxyCodeLine{41   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{42   \textcolor{keyword}{static} EIGEN\_ALWAYS\_INLINE \textcolor{keywordtype}{void} run(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols)}
+\DoxyCodeLine{43   \{}
+\DoxyCodeLine{44     \textcolor{comment}{// http://hg.mozilla.org/mozilla-\/central/file/6c8a909977d3/xpcom/ds/CheckedInt.h\#l242}}
+\DoxyCodeLine{45     \textcolor{comment}{// we assume Index is signed}}
+\DoxyCodeLine{46     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} max\_index = (std::size\_t(1) << (8 * \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}) -\/ 1)) -\/ 1; \textcolor{comment}{// assume Index is signed}}
+\DoxyCodeLine{47     \textcolor{keywordtype}{bool} error = (rows == 0 || cols == 0) ? \textcolor{keyword}{false}}
+\DoxyCodeLine{48                : (rows > max\_index / cols);}
+\DoxyCodeLine{49     \textcolor{keywordflow}{if} (error)}
+\DoxyCodeLine{50       throw\_std\_bad\_alloc();}
+\DoxyCodeLine{51   \}}
+\DoxyCodeLine{52 \};}
+\DoxyCodeLine{53 }
+\DoxyCodeLine{54 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Derived,}
+\DoxyCodeLine{55           \textcolor{keyword}{typename} OtherDerived = Derived,}
+\DoxyCodeLine{56           \textcolor{keywordtype}{bool} IsVector = bool(Derived::IsVectorAtCompileTime) \&\& bool(OtherDerived::IsVectorAtCompileTime)>}
+\DoxyCodeLine{57 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1conservative__resize__like__impl}{conservative\_resize\_like\_impl}};}
+\DoxyCodeLine{58 }
+\DoxyCodeLine{59 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixTypeA, \textcolor{keyword}{typename} MatrixTypeB, \textcolor{keywordtype}{bool} SwapPo\textcolor{keywordtype}{int}ers> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1matrix__swap__impl}{matrix\_swap\_impl}};}
+\DoxyCodeLine{60 }
+\DoxyCodeLine{61 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{62 }
+\DoxyCodeLine{63 \textcolor{preprocessor}{\#ifdef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{64 \textcolor{keyword}{namespace }doxygen \{}
+\DoxyCodeLine{65 }
+\DoxyCodeLine{66 \textcolor{comment}{// This is a workaround to doxygen not being able to understand the inheritance logic}}
+\DoxyCodeLine{67 \textcolor{comment}{// when it is hidden by the dense\_xpr\_base helper struct.}}
+\DoxyCodeLine{68 \textcolor{comment}{// Moreover, doxygen fails to include members that are not documented in the declaration body of}}
+\DoxyCodeLine{69 \textcolor{comment}{// MatrixBase if we inherits MatrixBase<Matrix<Scalar\_, Rows\_, Cols\_, Options\_, MaxRows\_, MaxCols\_> >,}}
+\DoxyCodeLine{70 \textcolor{comment}{// this is why we simply inherits MatrixBase, though this does not make sense.}}
+\DoxyCodeLine{71 }
+\DoxyCodeLine{73 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived> \textcolor{keyword}{struct }dense\_xpr\_base\_dispatcher;}
+\DoxyCodeLine{75 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar\_, \textcolor{keywordtype}{int} Rows\_, \textcolor{keywordtype}{int} Cols\_, \textcolor{keywordtype}{int} Options\_, \textcolor{keywordtype}{int} MaxRows\_, \textcolor{keywordtype}{int} MaxCols\_>}
+\DoxyCodeLine{76 \textcolor{keyword}{struct }dense\_xpr\_base\_dispatcher<\mbox{\hyperlink{classEigen_1_1Matrix}{Matrix}}<Scalar\_, Rows\_, Cols\_, Options\_, MaxRows\_, MaxCols\_> >}
+\DoxyCodeLine{77     : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase}} \{\};}
+\DoxyCodeLine{79 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar\_, \textcolor{keywordtype}{int} Rows\_, \textcolor{keywordtype}{int} Cols\_, \textcolor{keywordtype}{int} Options\_, \textcolor{keywordtype}{int} MaxRows\_, \textcolor{keywordtype}{int} MaxCols\_>}
+\DoxyCodeLine{80 \textcolor{keyword}{struct }dense\_xpr\_base\_dispatcher<Array<Scalar\_, Rows\_, Cols\_, Options\_, MaxRows\_, MaxCols\_> >}
+\DoxyCodeLine{81     : \textcolor{keyword}{public} ArrayBase \{\};}
+\DoxyCodeLine{82 }
+\DoxyCodeLine{83 \} \textcolor{comment}{// namespace doxygen}}
+\DoxyCodeLine{84 }
+\DoxyCodeLine{96 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{97 \textcolor{keyword}{class }PlainObjectBase : \textcolor{keyword}{public} doxygen::dense\_xpr\_base\_dispatcher<Derived>}
+\DoxyCodeLine{98 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{99 template<typename Derived>}
+\DoxyCodeLine{100 class \mbox{\hyperlink{classEigen_1_1PlainObjectBase}{PlainObjectBase}} : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1dense__xpr__base}{internal::dense\_xpr\_base}}<Derived>::type}
+\DoxyCodeLine{101 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{102 \{}
+\DoxyCodeLine{103   \textcolor{keyword}{public}:}
+\DoxyCodeLine{104     \textcolor{keyword}{enum} \{ Options = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::Options}} \};}
+\DoxyCodeLine{105     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1dense__xpr__base}{internal::dense\_xpr\_base<Derived>::type}} \mbox{\hyperlink{classBase}{Base}};}
+\DoxyCodeLine{106 }
+\DoxyCodeLine{107     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::StorageKind}} StorageKind;}
+\DoxyCodeLine{108     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::Scalar}} Scalar;}
+\DoxyCodeLine{109 }
+\DoxyCodeLine{110     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::packet\_traits<Scalar>::type PacketScalar;}
+\DoxyCodeLine{111     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}} RealScalar;}
+\DoxyCodeLine{112     \textcolor{keyword}{typedef} Derived DenseType;}
+\DoxyCodeLine{113 }
+\DoxyCodeLine{114     \textcolor{keyword}{using} Base::RowsAtCompileTime;}
+\DoxyCodeLine{115     \textcolor{keyword}{using} Base::ColsAtCompileTime;}
+\DoxyCodeLine{116     \textcolor{keyword}{using} Base::SizeAtCompileTime;}
+\DoxyCodeLine{117     \textcolor{keyword}{using} Base::MaxRowsAtCompileTime;}
+\DoxyCodeLine{118     \textcolor{keyword}{using} Base::MaxColsAtCompileTime;}
+\DoxyCodeLine{119     \textcolor{keyword}{using} Base::MaxSizeAtCompileTime;}
+\DoxyCodeLine{120     \textcolor{keyword}{using} Base::IsVectorAtCompileTime;}
+\DoxyCodeLine{121     \textcolor{keyword}{using} Base::Flags;}
+\DoxyCodeLine{122 }
+\DoxyCodeLine{123     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Map}{Eigen::Map<Derived, Unaligned>}}  \mbox{\hyperlink{classEigen_1_1Map}{MapType}};}
+\DoxyCodeLine{124     \textcolor{keyword}{typedef} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Map}{Eigen::Map<const Derived, Unaligned>}} \mbox{\hyperlink{classEigen_1_1Map}{ConstMapType}};}
+\DoxyCodeLine{125     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Map}{Eigen::Map<Derived, AlignedMax>}} \mbox{\hyperlink{classEigen_1_1Map}{AlignedMapType}};}
+\DoxyCodeLine{126     \textcolor{keyword}{typedef} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Map}{Eigen::Map<const Derived, AlignedMax>}} \mbox{\hyperlink{classEigen_1_1Map}{ConstAlignedMapType}};}
+\DoxyCodeLine{127     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Str\textcolor{keywordtype}{id}eType> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1PlainObjectBase_1_1StridedMapType}{StridedMapType}} \{ \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Map}{Eigen::Map<Derived, Unaligned, StrideType>}} \mbox{\hyperlink{classEigen_1_1Map}{type}}; \};}
+\DoxyCodeLine{128     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Str\textcolor{keywordtype}{id}eType> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1PlainObjectBase_1_1StridedConstMapType}{StridedConstMapType}} \{ \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Map}{Eigen::Map<const Derived, Unaligned, StrideType>}} \mbox{\hyperlink{classEigen_1_1Map}{type}}; \};}
+\DoxyCodeLine{129     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Str\textcolor{keywordtype}{id}eType> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1PlainObjectBase_1_1StridedAlignedMapType}{StridedAlignedMapType}} \{ \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Map}{Eigen::Map<Derived, AlignedMax, StrideType>}} \mbox{\hyperlink{classEigen_1_1Map}{type}}; \};}
+\DoxyCodeLine{130     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Str\textcolor{keywordtype}{id}eType> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1PlainObjectBase_1_1StridedConstAlignedMapType}{StridedConstAlignedMapType}} \{ \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Map}{Eigen::Map<const Derived, AlignedMax, StrideType>}} \mbox{\hyperlink{classEigen_1_1Map}{type}}; \};}
+\DoxyCodeLine{131 }
+\DoxyCodeLine{132   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{133     \mbox{\hyperlink{classEigen_1_1DenseStorage}{DenseStorage<Scalar, Base::MaxSizeAtCompileTime, Base::RowsAtCompileTime, Base::ColsAtCompileTime, Options>}} m\_storage;}
+\DoxyCodeLine{134 }
+\DoxyCodeLine{135   \textcolor{keyword}{public}:}
+\DoxyCodeLine{136     \textcolor{keyword}{enum} \{ NeedsToAlign = (SizeAtCompileTime != \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}) \&\& (\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::Alignment}}>0) \};}
+\DoxyCodeLine{137     EIGEN\_MAKE\_ALIGNED\_OPERATOR\_NEW\_IF(NeedsToAlign)}
+\DoxyCodeLine{138 }
+\DoxyCodeLine{139     EIGEN\_STATIC\_ASSERT(EIGEN\_IMPLIES(MaxRowsAtCompileTime==1 \&\& MaxColsAtCompileTime!=1, (\textcolor{keywordtype}{int}(Options)\&\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}})==\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}}), INVALID\_MATRIX\_TEMPLATE\_PARAMETERS)}
+\DoxyCodeLine{140     EIGEN\_STATIC\_ASSERT(EIGEN\_IMPLIES(MaxColsAtCompileTime==1 \&\& MaxRowsAtCompileTime!=1, (\textcolor{keywordtype}{int}(Options)\&\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}})==0), INVALID\_MATRIX\_TEMPLATE\_PARAMETERS)}
+\DoxyCodeLine{141     EIGEN\_STATIC\_ASSERT((RowsAtCompileTime == \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}) || (RowsAtCompileTime >= 0), INVALID\_MATRIX\_TEMPLATE\_PARAMETERS)}
+\DoxyCodeLine{142     EIGEN\_STATIC\_ASSERT((ColsAtCompileTime == \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}) || (ColsAtCompileTime >= 0), INVALID\_MATRIX\_TEMPLATE\_PARAMETERS)}
+\DoxyCodeLine{143     EIGEN\_STATIC\_ASSERT((MaxRowsAtCompileTime == \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}) || (MaxRowsAtCompileTime >= 0), INVALID\_MATRIX\_TEMPLATE\_PARAMETERS)}
+\DoxyCodeLine{144     EIGEN\_STATIC\_ASSERT((MaxColsAtCompileTime == \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}) || (MaxColsAtCompileTime >= 0), INVALID\_MATRIX\_TEMPLATE\_PARAMETERS)}
+\DoxyCodeLine{145     EIGEN\_STATIC\_ASSERT((MaxRowsAtCompileTime == RowsAtCompileTime || RowsAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}), INVALID\_MATRIX\_TEMPLATE\_PARAMETERS)}
+\DoxyCodeLine{146     EIGEN\_STATIC\_ASSERT((MaxColsAtCompileTime == ColsAtCompileTime || ColsAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}), INVALID\_MATRIX\_TEMPLATE\_PARAMETERS)}
+\DoxyCodeLine{147     EIGEN\_STATIC\_ASSERT(((Options \& (\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a56908522e51443a0aa0567f879c2e78a}{DontAlign}}|\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}})) == Options), INVALID\_MATRIX\_TEMPLATE\_PARAMETERS)}
+\DoxyCodeLine{148 }
+\DoxyCodeLine{149     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{150     Base\& base() \{ \textcolor{keywordflow}{return} *\textcolor{keyword}{static\_cast<}Base*\textcolor{keyword}{>}(\textcolor{keyword}{this}); \}}
+\DoxyCodeLine{151     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{152     \textcolor{keyword}{const} Base\& base()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} *\textcolor{keyword}{static\_cast<}\textcolor{keyword}{const }Base*\textcolor{keyword}{>}(\textcolor{keyword}{this}); \}}
+\DoxyCodeLine{153 }
+\DoxyCodeLine{154     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE EIGEN\_CONSTEXPR}
+\DoxyCodeLine{155     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows() const EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_storage.rows(); \}}
+\DoxyCodeLine{156     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE EIGEN\_CONSTEXPR}
+\DoxyCodeLine{157     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols() const EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_storage.cols(); \}}
+\DoxyCodeLine{158 }
+\DoxyCodeLine{163     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{164     EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} Scalar\& coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rowId, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} colId)\textcolor{keyword}{ const}}
+\DoxyCodeLine{165 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{166       \textcolor{keywordflow}{if}(Flags \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})}
+\DoxyCodeLine{167         \textcolor{keywordflow}{return} m\_storage.data()[colId + rowId * m\_storage.cols()];}
+\DoxyCodeLine{168       \textcolor{keywordflow}{else} \textcolor{comment}{// column-\/major}}
+\DoxyCodeLine{169         \textcolor{keywordflow}{return} m\_storage.data()[rowId + colId * m\_storage.rows()];}
+\DoxyCodeLine{170     \}}
+\DoxyCodeLine{171 }
+\DoxyCodeLine{176     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{177     EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} Scalar\& coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{178 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{179       \textcolor{keywordflow}{return} m\_storage.data()[index];}
+\DoxyCodeLine{180     \}}
+\DoxyCodeLine{181 }
+\DoxyCodeLine{186     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{187     EIGEN\_STRONG\_INLINE Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rowId, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} colId)}
+\DoxyCodeLine{188     \{}
+\DoxyCodeLine{189       \textcolor{keywordflow}{if}(Flags \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})}
+\DoxyCodeLine{190         \textcolor{keywordflow}{return} m\_storage.data()[colId + rowId * m\_storage.cols()];}
+\DoxyCodeLine{191       \textcolor{keywordflow}{else} \textcolor{comment}{// column-\/major}}
+\DoxyCodeLine{192         \textcolor{keywordflow}{return} m\_storage.data()[rowId + colId * m\_storage.rows()];}
+\DoxyCodeLine{193     \}}
+\DoxyCodeLine{194 }
+\DoxyCodeLine{199     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{200     EIGEN\_STRONG\_INLINE Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)}
+\DoxyCodeLine{201     \{}
+\DoxyCodeLine{202       \textcolor{keywordflow}{return} m\_storage.data()[index];}
+\DoxyCodeLine{203     \}}
+\DoxyCodeLine{204 }
+\DoxyCodeLine{207     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{208     EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rowId, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} colId)\textcolor{keyword}{ const}}
+\DoxyCodeLine{209 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{210       \textcolor{keywordflow}{if}(Flags \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})}
+\DoxyCodeLine{211         \textcolor{keywordflow}{return} m\_storage.data()[colId + rowId * m\_storage.cols()];}
+\DoxyCodeLine{212       \textcolor{keywordflow}{else} \textcolor{comment}{// column-\/major}}
+\DoxyCodeLine{213         \textcolor{keywordflow}{return} m\_storage.data()[rowId + colId * m\_storage.rows()];}
+\DoxyCodeLine{214     \}}
+\DoxyCodeLine{215 }
+\DoxyCodeLine{218     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{219     EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{220 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{221       \textcolor{keywordflow}{return} m\_storage.data()[index];}
+\DoxyCodeLine{222     \}}
+\DoxyCodeLine{223 }
+\DoxyCodeLine{225     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode>}
+\DoxyCodeLine{226     EIGEN\_STRONG\_INLINE PacketScalar packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rowId, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} colId)\textcolor{keyword}{ const}}
+\DoxyCodeLine{227 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{228       \textcolor{keywordflow}{return} internal::ploadt<PacketScalar, LoadMode>}
+\DoxyCodeLine{229                (m\_storage.data() + (Flags \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}}
+\DoxyCodeLine{230                                    ? colId + rowId * m\_storage.cols()}
+\DoxyCodeLine{231                                    : rowId + colId * m\_storage.rows()));}
+\DoxyCodeLine{232     \}}
+\DoxyCodeLine{233 }
+\DoxyCodeLine{235     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode>}
+\DoxyCodeLine{236     EIGEN\_STRONG\_INLINE PacketScalar packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{237 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{238       \textcolor{keywordflow}{return} internal::ploadt<PacketScalar, LoadMode>(m\_storage.data() + index);}
+\DoxyCodeLine{239     \}}
+\DoxyCodeLine{240 }
+\DoxyCodeLine{242     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} StoreMode>}
+\DoxyCodeLine{243     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} writePacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rowId, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} colId, \textcolor{keyword}{const} PacketScalar\& val)}
+\DoxyCodeLine{244     \{}
+\DoxyCodeLine{245       internal::pstoret<Scalar, PacketScalar, StoreMode>}
+\DoxyCodeLine{246               (m\_storage.data() + (Flags \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}}
+\DoxyCodeLine{247                                    ? colId + rowId * m\_storage.cols()}
+\DoxyCodeLine{248                                    : rowId + colId * m\_storage.rows()), val);}
+\DoxyCodeLine{249     \}}
+\DoxyCodeLine{250 }
+\DoxyCodeLine{252     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} StoreMode>}
+\DoxyCodeLine{253     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} writePacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index, \textcolor{keyword}{const} PacketScalar\& val)}
+\DoxyCodeLine{254     \{}
+\DoxyCodeLine{255       internal::pstoret<Scalar, PacketScalar, StoreMode>(m\_storage.data() + index, val);}
+\DoxyCodeLine{256     \}}
+\DoxyCodeLine{257 }
+\DoxyCodeLine{259     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} Scalar *data()\textcolor{keyword}{ const}}
+\DoxyCodeLine{260 \textcolor{keyword}{    }\{ \textcolor{keywordflow}{return} m\_storage.data(); \}}
+\DoxyCodeLine{261 }
+\DoxyCodeLine{263     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE Scalar *data()}
+\DoxyCodeLine{264     \{ \textcolor{keywordflow}{return} m\_storage.data(); \}}
+\DoxyCodeLine{265 }
+\DoxyCodeLine{282     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{283     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} resize(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols)}
+\DoxyCodeLine{284     \{}
+\DoxyCodeLine{285       eigen\_assert(EIGEN\_IMPLIES(RowsAtCompileTime!=\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}},rows==RowsAtCompileTime)}
+\DoxyCodeLine{286                    \&\& EIGEN\_IMPLIES(ColsAtCompileTime!=\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}},cols==ColsAtCompileTime)}
+\DoxyCodeLine{287                    \&\& EIGEN\_IMPLIES(RowsAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} \&\& MaxRowsAtCompileTime!=\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}},rows<=MaxRowsAtCompileTime)}
+\DoxyCodeLine{288                    \&\& EIGEN\_IMPLIES(ColsAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} \&\& MaxColsAtCompileTime!=\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}},cols<=MaxColsAtCompileTime)}
+\DoxyCodeLine{289                    \&\& rows>=0 \&\& cols>=0 \&\& \textcolor{stringliteral}{"{}Invalid sizes when resizing a matrix or array."{}});}
+\DoxyCodeLine{290       internal::check\_rows\_cols\_for\_overflow<MaxSizeAtCompileTime>::run(rows, cols);}
+\DoxyCodeLine{291 \textcolor{preprocessor}{      \#ifdef EIGEN\_INITIALIZE\_COEFFS}}
+\DoxyCodeLine{292         \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size = rows*cols;}
+\DoxyCodeLine{293         \textcolor{keywordtype}{bool} size\_changed = size != this-\/>size();}
+\DoxyCodeLine{294         m\_storage.resize(size, rows, cols);}
+\DoxyCodeLine{295         \textcolor{keywordflow}{if}(size\_changed) EIGEN\_INITIALIZE\_COEFFS\_IF\_THAT\_OPTION\_IS\_ENABLED}
+\DoxyCodeLine{296 \textcolor{preprocessor}{      \#else}}
+\DoxyCodeLine{297         m\_storage.resize(rows*cols, rows, cols);}
+\DoxyCodeLine{298 \textcolor{preprocessor}{      \#endif}}
+\DoxyCodeLine{299     \}}
+\DoxyCodeLine{300 }
+\DoxyCodeLine{312     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{313     \textcolor{keyword}{inline} \textcolor{keywordtype}{void} resize(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size)}
+\DoxyCodeLine{314     \{}
+\DoxyCodeLine{315       EIGEN\_STATIC\_ASSERT\_VECTOR\_ONLY(PlainObjectBase)}
+\DoxyCodeLine{316       eigen\_assert(((SizeAtCompileTime == \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} \&\& (MaxSizeAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} || size<=MaxSizeAtCompileTime)) || SizeAtCompileTime == size) \&\& size>=0);}
+\DoxyCodeLine{317 \textcolor{preprocessor}{      \#ifdef EIGEN\_INITIALIZE\_COEFFS}}
+\DoxyCodeLine{318         \textcolor{keywordtype}{bool} size\_changed = size != this-\/>size();}
+\DoxyCodeLine{319 \textcolor{preprocessor}{      \#endif}}
+\DoxyCodeLine{320       \textcolor{keywordflow}{if}(RowsAtCompileTime == 1)}
+\DoxyCodeLine{321         m\_storage.resize(size, 1, size);}
+\DoxyCodeLine{322       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{323         m\_storage.resize(size, size, 1);}
+\DoxyCodeLine{324 \textcolor{preprocessor}{      \#ifdef EIGEN\_INITIALIZE\_COEFFS}}
+\DoxyCodeLine{325         \textcolor{keywordflow}{if}(size\_changed) EIGEN\_INITIALIZE\_COEFFS\_IF\_THAT\_OPTION\_IS\_ENABLED}
+\DoxyCodeLine{326 \textcolor{preprocessor}{      \#endif}}
+\DoxyCodeLine{327     \}}
+\DoxyCodeLine{328 }
+\DoxyCodeLine{337     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{338     \textcolor{keyword}{inline} \textcolor{keywordtype}{void} resize(NoChange\_t, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols)}
+\DoxyCodeLine{339     \{}
+\DoxyCodeLine{340       resize(rows(), cols);}
+\DoxyCodeLine{341     \}}
+\DoxyCodeLine{342 }
+\DoxyCodeLine{351     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{352     \textcolor{keyword}{inline} \textcolor{keywordtype}{void} resize(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, NoChange\_t)}
+\DoxyCodeLine{353     \{}
+\DoxyCodeLine{354       resize(rows, cols());}
+\DoxyCodeLine{355     \}}
+\DoxyCodeLine{356 }
+\DoxyCodeLine{364     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{365     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{366     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} resizeLike(\textcolor{keyword}{const} EigenBase<OtherDerived>\& \_other)}
+\DoxyCodeLine{367     \{}
+\DoxyCodeLine{368       \textcolor{keyword}{const} OtherDerived\& other = \_other.derived();}
+\DoxyCodeLine{369       internal::check\_rows\_cols\_for\_overflow<MaxSizeAtCompileTime>::run(other.rows(), other.cols());}
+\DoxyCodeLine{370       \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} othersize = other.rows()*other.cols();}
+\DoxyCodeLine{371       \textcolor{keywordflow}{if}(RowsAtCompileTime == 1)}
+\DoxyCodeLine{372       \{}
+\DoxyCodeLine{373         eigen\_assert(other.rows() == 1 || other.cols() == 1);}
+\DoxyCodeLine{374         resize(1, othersize);}
+\DoxyCodeLine{375       \}}
+\DoxyCodeLine{376       \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(ColsAtCompileTime == 1)}
+\DoxyCodeLine{377       \{}
+\DoxyCodeLine{378         eigen\_assert(other.rows() == 1 || other.cols() == 1);}
+\DoxyCodeLine{379         resize(othersize, 1);}
+\DoxyCodeLine{380       \}}
+\DoxyCodeLine{381       \textcolor{keywordflow}{else} resize(other.rows(), other.cols());}
+\DoxyCodeLine{382     \}}
+\DoxyCodeLine{383 }
+\DoxyCodeLine{393     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{394     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} conservativeResize(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols)}
+\DoxyCodeLine{395     \{}
+\DoxyCodeLine{396       internal::conservative\_resize\_like\_impl<Derived>::run(*\textcolor{keyword}{this}, rows, cols);}
+\DoxyCodeLine{397     \}}
+\DoxyCodeLine{398 }
+\DoxyCodeLine{406     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{407     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} conservativeResize(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, NoChange\_t)}
+\DoxyCodeLine{408     \{}
+\DoxyCodeLine{409       \textcolor{comment}{// Note: see the comment in conservativeResize(Index,Index)}}
+\DoxyCodeLine{410       conservativeResize(rows, cols());}
+\DoxyCodeLine{411     \}}
+\DoxyCodeLine{412 }
+\DoxyCodeLine{420     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{421     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} conservativeResize(NoChange\_t, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols)}
+\DoxyCodeLine{422     \{}
+\DoxyCodeLine{423       \textcolor{comment}{// Note: see the comment in conservativeResize(Index,Index)}}
+\DoxyCodeLine{424       conservativeResize(rows(), cols);}
+\DoxyCodeLine{425     \}}
+\DoxyCodeLine{426 }
+\DoxyCodeLine{435     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{436     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} conservativeResize(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size)}
+\DoxyCodeLine{437     \{}
+\DoxyCodeLine{438       internal::conservative\_resize\_like\_impl<Derived>::run(*\textcolor{keyword}{this}, size);}
+\DoxyCodeLine{439     \}}
+\DoxyCodeLine{440 }
+\DoxyCodeLine{450     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{451     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{452     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} conservativeResizeLike(\textcolor{keyword}{const} DenseBase<OtherDerived>\& other)}
+\DoxyCodeLine{453     \{}
+\DoxyCodeLine{454       internal::conservative\_resize\_like\_impl<Derived,OtherDerived>::run(*\textcolor{keyword}{this}, other);}
+\DoxyCodeLine{455     \}}
+\DoxyCodeLine{456 }
+\DoxyCodeLine{460     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{461     EIGEN\_STRONG\_INLINE Derived\& operator=(\textcolor{keyword}{const} PlainObjectBase\& other)}
+\DoxyCodeLine{462     \{}
+\DoxyCodeLine{463       \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1PlainObjectBase_ae6ea682fcdd15f8d93913c7b8b88557a}{\_set}}(other);}
+\DoxyCodeLine{464     \}}
+\DoxyCodeLine{465 }
+\DoxyCodeLine{467     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{468     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{469     EIGEN\_STRONG\_INLINE Derived\& lazyAssign(\textcolor{keyword}{const} DenseBase<OtherDerived>\& other)}
+\DoxyCodeLine{470     \{}
+\DoxyCodeLine{471       \_resize\_to\_match(other);}
+\DoxyCodeLine{472       \textcolor{keywordflow}{return} Base::lazyAssign(other.derived());}
+\DoxyCodeLine{473     \}}
+\DoxyCodeLine{474 }
+\DoxyCodeLine{475     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{476     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{477     EIGEN\_STRONG\_INLINE Derived\& operator=(\textcolor{keyword}{const} ReturnByValue<OtherDerived>\& func)}
+\DoxyCodeLine{478     \{}
+\DoxyCodeLine{479       resize(func.rows(), func.cols());}
+\DoxyCodeLine{480       \textcolor{keywordflow}{return} Base::operator=(func);}
+\DoxyCodeLine{481     \}}
+\DoxyCodeLine{482 }
+\DoxyCodeLine{483     \textcolor{comment}{// Prevent user from trying to instantiate PlainObjectBase objects}}
+\DoxyCodeLine{484     \textcolor{comment}{// by making all its constructor protected. See bug 1074.}}
+\DoxyCodeLine{485   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{486 }
+\DoxyCodeLine{487     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{488     EIGEN\_STRONG\_INLINE PlainObjectBase() : m\_storage()}
+\DoxyCodeLine{489     \{}
+\DoxyCodeLine{490 \textcolor{comment}{//       EIGEN\_INITIALIZE\_COEFFS\_IF\_THAT\_OPTION\_IS\_ENABLED}}
+\DoxyCodeLine{491     \}}
+\DoxyCodeLine{492 }
+\DoxyCodeLine{493 \textcolor{preprocessor}{\#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{494     \textcolor{comment}{// FIXME is it still needed ?}}
+\DoxyCodeLine{496 \textcolor{comment}{}    EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{497     \textcolor{keyword}{explicit} PlainObjectBase(internal::constructor\_without\_unaligned\_array\_assert)}
+\DoxyCodeLine{498       : m\_storage(internal::constructor\_without\_unaligned\_array\_assert())}
+\DoxyCodeLine{499     \{}
+\DoxyCodeLine{500       \textcolor{comment}{// EIGEN\_INITIALIZE\_COEFFS\_IF\_THAT\_OPTION\_IS\_ENABLED}}
+\DoxyCodeLine{501     \}}
+\DoxyCodeLine{502 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{503 }
+\DoxyCodeLine{504 \textcolor{preprocessor}{\#if EIGEN\_HAS\_RVALUE\_REFERENCES}}
+\DoxyCodeLine{505     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{506     PlainObjectBase(PlainObjectBase\&\& other) EIGEN\_NOEXCEPT}
+\DoxyCodeLine{507       : m\_storage( std::move(other.m\_storage) )}
+\DoxyCodeLine{508     \{}
+\DoxyCodeLine{509     \}}
+\DoxyCodeLine{510 }
+\DoxyCodeLine{511     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{512     PlainObjectBase\& operator=(PlainObjectBase\&\& other) EIGEN\_NOEXCEPT}
+\DoxyCodeLine{513     \{}
+\DoxyCodeLine{514       m\_storage = std::move(other.m\_storage);}
+\DoxyCodeLine{515       \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{516     \}}
+\DoxyCodeLine{517 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{518 }
+\DoxyCodeLine{520     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{521     EIGEN\_STRONG\_INLINE PlainObjectBase(\textcolor{keyword}{const} PlainObjectBase\& other)}
+\DoxyCodeLine{522       : Base(), m\_storage(other.m\_storage) \{ \}}
+\DoxyCodeLine{523     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{524     EIGEN\_STRONG\_INLINE PlainObjectBase(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols)}
+\DoxyCodeLine{525       : m\_storage(size, rows, cols)}
+\DoxyCodeLine{526     \{}
+\DoxyCodeLine{527 \textcolor{comment}{//       EIGEN\_INITIALIZE\_COEFFS\_IF\_THAT\_OPTION\_IS\_ENABLED}}
+\DoxyCodeLine{528     \}}
+\DoxyCodeLine{529 }
+\DoxyCodeLine{530 \textcolor{preprocessor}{    \#if EIGEN\_HAS\_CXX11}}
+\DoxyCodeLine{541     \textcolor{keyword}{template} <\textcolor{keyword}{typename}... ArgTypes>}
+\DoxyCodeLine{542     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{543     PlainObjectBase(\textcolor{keyword}{const} Scalar\& a0, \textcolor{keyword}{const} Scalar\& a1, \textcolor{keyword}{const} Scalar\& a2,  \textcolor{keyword}{const} Scalar\& a3, \textcolor{keyword}{const} ArgTypes\&... args)}
+\DoxyCodeLine{544       : m\_storage()}
+\DoxyCodeLine{545     \{}
+\DoxyCodeLine{546       EIGEN\_STATIC\_ASSERT\_VECTOR\_SPECIFIC\_SIZE(PlainObjectBase, \textcolor{keyword}{sizeof}...(args) + 4);}
+\DoxyCodeLine{547       m\_storage.data()[0] = a0;}
+\DoxyCodeLine{548       m\_storage.data()[1] = a1;}
+\DoxyCodeLine{549       m\_storage.data()[2] = a2;}
+\DoxyCodeLine{550       m\_storage.data()[3] = a3;}
+\DoxyCodeLine{551       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = 4;}
+\DoxyCodeLine{552       \textcolor{keyword}{auto} x = \{(m\_storage.data()[i++] = args, 0)...\};}
+\DoxyCodeLine{553       \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{void}\textcolor{keyword}{>}(x);}
+\DoxyCodeLine{554     \}}
+\DoxyCodeLine{555 }
+\DoxyCodeLine{559     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{560     \textcolor{keyword}{explicit} EIGEN\_STRONG\_INLINE PlainObjectBase(\textcolor{keyword}{const} std::initializer\_list<std::initializer\_list<Scalar>>\& list)}
+\DoxyCodeLine{561       : m\_storage()}
+\DoxyCodeLine{562     \{}
+\DoxyCodeLine{563       \textcolor{keywordtype}{size\_t} list\_size = 0;}
+\DoxyCodeLine{564       \textcolor{keywordflow}{if} (list.begin() != list.end()) \{}
+\DoxyCodeLine{565         list\_size = list.begin()-\/>size();}
+\DoxyCodeLine{566       \}}
+\DoxyCodeLine{567 }
+\DoxyCodeLine{568       \textcolor{comment}{// This is to allow syntax like VectorXi \{\{1, 2, 3, 4\}\}}}
+\DoxyCodeLine{569       \textcolor{keywordflow}{if} (ColsAtCompileTime == 1 \&\& list.size() == 1) \{}
+\DoxyCodeLine{570         eigen\_assert(list\_size == \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(RowsAtCompileTime) || RowsAtCompileTime == \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}});}
+\DoxyCodeLine{571         resize(list\_size, ColsAtCompileTime);}
+\DoxyCodeLine{572         std::copy(list.begin()-\/>begin(), list.begin()-\/>end(), m\_storage.data());}
+\DoxyCodeLine{573       \} \textcolor{keywordflow}{else} \{}
+\DoxyCodeLine{574         eigen\_assert(list.size() == \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(RowsAtCompileTime) || RowsAtCompileTime == \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}});}
+\DoxyCodeLine{575         eigen\_assert(list\_size == \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(ColsAtCompileTime) || ColsAtCompileTime == \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}});}
+\DoxyCodeLine{576         resize(list.size(), list\_size);}
+\DoxyCodeLine{577 }
+\DoxyCodeLine{578         \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row\_index = 0;}
+\DoxyCodeLine{579         \textcolor{keywordflow}{for} (\textcolor{keyword}{const} std::initializer\_list<Scalar>\& row : list) \{}
+\DoxyCodeLine{580           eigen\_assert(list\_size == row.size());}
+\DoxyCodeLine{581           \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col\_index = 0;}
+\DoxyCodeLine{582           \textcolor{keywordflow}{for} (\textcolor{keyword}{const} Scalar\& e : row) \{}
+\DoxyCodeLine{583             coeffRef(row\_index, col\_index) = e;}
+\DoxyCodeLine{584             ++col\_index;}
+\DoxyCodeLine{585           \}}
+\DoxyCodeLine{586           ++row\_index;}
+\DoxyCodeLine{587         \}}
+\DoxyCodeLine{588       \}}
+\DoxyCodeLine{589     \}}
+\DoxyCodeLine{590 \textcolor{preprocessor}{    \#endif  }\textcolor{comment}{// end EIGEN\_HAS\_CXX11}}
+\DoxyCodeLine{591 }
+\DoxyCodeLine{593     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{594     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{595     EIGEN\_STRONG\_INLINE PlainObjectBase(\textcolor{keyword}{const} DenseBase<OtherDerived> \&other)}
+\DoxyCodeLine{596       : m\_storage()}
+\DoxyCodeLine{597     \{}
+\DoxyCodeLine{598       resizeLike(other);}
+\DoxyCodeLine{599       \_set\_noalias(other);}
+\DoxyCodeLine{600     \}}
+\DoxyCodeLine{601 }
+\DoxyCodeLine{603     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{604     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{605     EIGEN\_STRONG\_INLINE PlainObjectBase(\textcolor{keyword}{const} EigenBase<OtherDerived> \&other)}
+\DoxyCodeLine{606       : m\_storage()}
+\DoxyCodeLine{607     \{}
+\DoxyCodeLine{608       resizeLike(other);}
+\DoxyCodeLine{609       *\textcolor{keyword}{this} = other.derived();}
+\DoxyCodeLine{610     \}}
+\DoxyCodeLine{612     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{613     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{614     EIGEN\_STRONG\_INLINE PlainObjectBase(\textcolor{keyword}{const} ReturnByValue<OtherDerived>\& other)}
+\DoxyCodeLine{615     \{}
+\DoxyCodeLine{616       \textcolor{comment}{// FIXME this does not automatically transpose vectors if necessary}}
+\DoxyCodeLine{617       resize(other.rows(), other.cols());}
+\DoxyCodeLine{618       other.evalTo(this-\/>derived());}
+\DoxyCodeLine{619     \}}
+\DoxyCodeLine{620 }
+\DoxyCodeLine{621   \textcolor{keyword}{public}:}
+\DoxyCodeLine{622 }
+\DoxyCodeLine{626     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{627     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{628     EIGEN\_STRONG\_INLINE Derived\& operator=(\textcolor{keyword}{const} EigenBase<OtherDerived> \&other)}
+\DoxyCodeLine{629     \{}
+\DoxyCodeLine{630       \_resize\_to\_match(other);}
+\DoxyCodeLine{631       Base::operator=(other.derived());}
+\DoxyCodeLine{632       \textcolor{keywordflow}{return} this-\/>derived();}
+\DoxyCodeLine{633     \}}
+\DoxyCodeLine{634 }
+\DoxyCodeLine{647     \textcolor{keyword}{static} \textcolor{keyword}{inline} ConstMapType Map(\textcolor{keyword}{const} Scalar* data)}
+\DoxyCodeLine{648     \{ \textcolor{keywordflow}{return} ConstMapType(data); \}}
+\DoxyCodeLine{649     \textcolor{keyword}{static} \textcolor{keyword}{inline} MapType Map(Scalar* data)}
+\DoxyCodeLine{650     \{ \textcolor{keywordflow}{return} MapType(data); \}}
+\DoxyCodeLine{651     \textcolor{keyword}{static} \textcolor{keyword}{inline} ConstMapType Map(\textcolor{keyword}{const} Scalar* data, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size)}
+\DoxyCodeLine{652     \{ \textcolor{keywordflow}{return} ConstMapType(data, size); \}}
+\DoxyCodeLine{653     \textcolor{keyword}{static} \textcolor{keyword}{inline} MapType Map(Scalar* data, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size)}
+\DoxyCodeLine{654     \{ \textcolor{keywordflow}{return} MapType(data, size); \}}
+\DoxyCodeLine{655     \textcolor{keyword}{static} \textcolor{keyword}{inline} ConstMapType Map(\textcolor{keyword}{const} Scalar* data, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols)}
+\DoxyCodeLine{656     \{ \textcolor{keywordflow}{return} ConstMapType(data, rows, cols); \}}
+\DoxyCodeLine{657     \textcolor{keyword}{static} \textcolor{keyword}{inline} MapType Map(Scalar* data, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols)}
+\DoxyCodeLine{658     \{ \textcolor{keywordflow}{return} MapType(data, rows, cols); \}}
+\DoxyCodeLine{659 }
+\DoxyCodeLine{660     \textcolor{keyword}{static} \textcolor{keyword}{inline} ConstAlignedMapType MapAligned(\textcolor{keyword}{const} Scalar* data)}
+\DoxyCodeLine{661     \{ \textcolor{keywordflow}{return} ConstAlignedMapType(data); \}}
+\DoxyCodeLine{662     \textcolor{keyword}{static} \textcolor{keyword}{inline} AlignedMapType MapAligned(Scalar* data)}
+\DoxyCodeLine{663     \{ \textcolor{keywordflow}{return} AlignedMapType(data); \}}
+\DoxyCodeLine{664     \textcolor{keyword}{static} \textcolor{keyword}{inline} ConstAlignedMapType MapAligned(\textcolor{keyword}{const} Scalar* data, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size)}
+\DoxyCodeLine{665     \{ \textcolor{keywordflow}{return} ConstAlignedMapType(data, size); \}}
+\DoxyCodeLine{666     \textcolor{keyword}{static} \textcolor{keyword}{inline} AlignedMapType MapAligned(Scalar* data, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size)}
+\DoxyCodeLine{667     \{ \textcolor{keywordflow}{return} AlignedMapType(data, size); \}}
+\DoxyCodeLine{668     \textcolor{keyword}{static} \textcolor{keyword}{inline} ConstAlignedMapType MapAligned(\textcolor{keyword}{const} Scalar* data, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols)}
+\DoxyCodeLine{669     \{ \textcolor{keywordflow}{return} ConstAlignedMapType(data, rows, cols); \}}
+\DoxyCodeLine{670     \textcolor{keyword}{static} \textcolor{keyword}{inline} AlignedMapType MapAligned(Scalar* data, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols)}
+\DoxyCodeLine{671     \{ \textcolor{keywordflow}{return} AlignedMapType(data, rows, cols); \}}
+\DoxyCodeLine{672 }
+\DoxyCodeLine{673     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Outer, \textcolor{keywordtype}{int} Inner>}
+\DoxyCodeLine{674     \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keyword}{typename} StridedConstMapType<Stride<Outer, Inner> >::type Map(\textcolor{keyword}{const} Scalar* data, \textcolor{keyword}{const} Stride<Outer, Inner>\& stride)}
+\DoxyCodeLine{675     \{ \textcolor{keywordflow}{return} \textcolor{keyword}{typename} StridedConstMapType<Stride<Outer, Inner> >::type(data, stride); \}}
+\DoxyCodeLine{676     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Outer, \textcolor{keywordtype}{int} Inner>}
+\DoxyCodeLine{677     \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keyword}{typename} StridedMapType<Stride<Outer, Inner> >::type Map(Scalar* data, \textcolor{keyword}{const} Stride<Outer, Inner>\& stride)}
+\DoxyCodeLine{678     \{ \textcolor{keywordflow}{return} \textcolor{keyword}{typename} StridedMapType<Stride<Outer, Inner> >::type(data, stride); \}}
+\DoxyCodeLine{679     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Outer, \textcolor{keywordtype}{int} Inner>}
+\DoxyCodeLine{680     \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keyword}{typename} StridedConstMapType<Stride<Outer, Inner> >::type Map(\textcolor{keyword}{const} Scalar* data, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size, \textcolor{keyword}{const} Stride<Outer, Inner>\& stride)}
+\DoxyCodeLine{681     \{ \textcolor{keywordflow}{return} \textcolor{keyword}{typename} StridedConstMapType<Stride<Outer, Inner> >::type(data, size, stride); \}}
+\DoxyCodeLine{682     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Outer, \textcolor{keywordtype}{int} Inner>}
+\DoxyCodeLine{683     \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keyword}{typename} StridedMapType<Stride<Outer, Inner> >::type Map(Scalar* data, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size, \textcolor{keyword}{const} Stride<Outer, Inner>\& stride)}
+\DoxyCodeLine{684     \{ \textcolor{keywordflow}{return} \textcolor{keyword}{typename} StridedMapType<Stride<Outer, Inner> >::type(data, size, stride); \}}
+\DoxyCodeLine{685     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Outer, \textcolor{keywordtype}{int} Inner>}
+\DoxyCodeLine{686     \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keyword}{typename} StridedConstMapType<Stride<Outer, Inner> >::type Map(\textcolor{keyword}{const} Scalar* data, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols, \textcolor{keyword}{const} Stride<Outer, Inner>\& stride)}
+\DoxyCodeLine{687     \{ \textcolor{keywordflow}{return} \textcolor{keyword}{typename} StridedConstMapType<Stride<Outer, Inner> >::type(data, rows, cols, stride); \}}
+\DoxyCodeLine{688     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Outer, \textcolor{keywordtype}{int} Inner>}
+\DoxyCodeLine{689     \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keyword}{typename} StridedMapType<Stride<Outer, Inner> >::type Map(Scalar* data, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols, \textcolor{keyword}{const} Stride<Outer, Inner>\& stride)}
+\DoxyCodeLine{690     \{ \textcolor{keywordflow}{return} \textcolor{keyword}{typename} StridedMapType<Stride<Outer, Inner> >::type(data, rows, cols, stride); \}}
+\DoxyCodeLine{691 }
+\DoxyCodeLine{692     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Outer, \textcolor{keywordtype}{int} Inner>}
+\DoxyCodeLine{693     \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keyword}{typename} StridedConstAlignedMapType<Stride<Outer, Inner> >::type MapAligned(\textcolor{keyword}{const} Scalar* data, \textcolor{keyword}{const} Stride<Outer, Inner>\& stride)}
+\DoxyCodeLine{694     \{ \textcolor{keywordflow}{return} \textcolor{keyword}{typename} StridedConstAlignedMapType<Stride<Outer, Inner> >::type(data, stride); \}}
+\DoxyCodeLine{695     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Outer, \textcolor{keywordtype}{int} Inner>}
+\DoxyCodeLine{696     \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keyword}{typename} StridedAlignedMapType<Stride<Outer, Inner> >::type MapAligned(Scalar* data, \textcolor{keyword}{const} Stride<Outer, Inner>\& stride)}
+\DoxyCodeLine{697     \{ \textcolor{keywordflow}{return} \textcolor{keyword}{typename} StridedAlignedMapType<Stride<Outer, Inner> >::type(data, stride); \}}
+\DoxyCodeLine{698     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Outer, \textcolor{keywordtype}{int} Inner>}
+\DoxyCodeLine{699     \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keyword}{typename} StridedConstAlignedMapType<Stride<Outer, Inner> >::type MapAligned(\textcolor{keyword}{const} Scalar* data, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size, \textcolor{keyword}{const} Stride<Outer, Inner>\& stride)}
+\DoxyCodeLine{700     \{ \textcolor{keywordflow}{return} \textcolor{keyword}{typename} StridedConstAlignedMapType<Stride<Outer, Inner> >::type(data, size, stride); \}}
+\DoxyCodeLine{701     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Outer, \textcolor{keywordtype}{int} Inner>}
+\DoxyCodeLine{702     \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keyword}{typename} StridedAlignedMapType<Stride<Outer, Inner> >::type MapAligned(Scalar* data, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size, \textcolor{keyword}{const} Stride<Outer, Inner>\& stride)}
+\DoxyCodeLine{703     \{ \textcolor{keywordflow}{return} \textcolor{keyword}{typename} StridedAlignedMapType<Stride<Outer, Inner> >::type(data, size, stride); \}}
+\DoxyCodeLine{704     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Outer, \textcolor{keywordtype}{int} Inner>}
+\DoxyCodeLine{705     \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keyword}{typename} StridedConstAlignedMapType<Stride<Outer, Inner> >::type MapAligned(\textcolor{keyword}{const} Scalar* data, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols, \textcolor{keyword}{const} Stride<Outer, Inner>\& stride)}
+\DoxyCodeLine{706     \{ \textcolor{keywordflow}{return} \textcolor{keyword}{typename} StridedConstAlignedMapType<Stride<Outer, Inner> >::type(data, rows, cols, stride); \}}
+\DoxyCodeLine{707     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Outer, \textcolor{keywordtype}{int} Inner>}
+\DoxyCodeLine{708     \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keyword}{typename} StridedAlignedMapType<Stride<Outer, Inner> >::type MapAligned(Scalar* data, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols, \textcolor{keyword}{const} Stride<Outer, Inner>\& stride)}
+\DoxyCodeLine{709     \{ \textcolor{keywordflow}{return} \textcolor{keyword}{typename} StridedAlignedMapType<Stride<Outer, Inner> >::type(data, rows, cols, stride); \}}
+\DoxyCodeLine{711 }
+\DoxyCodeLine{712     \textcolor{keyword}{using} Base::setConstant;}
+\DoxyCodeLine{713     EIGEN\_DEVICE\_FUNC Derived\& \mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac8dea1df3d92b752cc683ff42abf6f9b}{setConstant}}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size, \textcolor{keyword}{const} Scalar\& val);}
+\DoxyCodeLine{714     EIGEN\_DEVICE\_FUNC Derived\& \mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac8dea1df3d92b752cc683ff42abf6f9b}{setConstant}}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols, \textcolor{keyword}{const} Scalar\& val);}
+\DoxyCodeLine{715     EIGEN\_DEVICE\_FUNC Derived\& \mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac8dea1df3d92b752cc683ff42abf6f9b}{setConstant}}(NoChange\_t, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols, \textcolor{keyword}{const} Scalar\& val);}
+\DoxyCodeLine{716     EIGEN\_DEVICE\_FUNC Derived\& \mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac8dea1df3d92b752cc683ff42abf6f9b}{setConstant}}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, NoChange\_t, \textcolor{keyword}{const} Scalar\& val);}
+\DoxyCodeLine{717 }
+\DoxyCodeLine{718     \textcolor{keyword}{using} Base::setZero;}
+\DoxyCodeLine{719     EIGEN\_DEVICE\_FUNC Derived\& \mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac21ad5f989f320e46958b75ac8d9a1da}{setZero}}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size);}
+\DoxyCodeLine{720     EIGEN\_DEVICE\_FUNC Derived\& \mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac21ad5f989f320e46958b75ac8d9a1da}{setZero}}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols);}
+\DoxyCodeLine{721     EIGEN\_DEVICE\_FUNC Derived\& \mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac21ad5f989f320e46958b75ac8d9a1da}{setZero}}(NoChange\_t, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols);}
+\DoxyCodeLine{722     EIGEN\_DEVICE\_FUNC Derived\& \mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac21ad5f989f320e46958b75ac8d9a1da}{setZero}}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, NoChange\_t);}
+\DoxyCodeLine{723 }
+\DoxyCodeLine{724     \textcolor{keyword}{using} Base::setOnes;}
+\DoxyCodeLine{725     EIGEN\_DEVICE\_FUNC Derived\& \mbox{\hyperlink{classEigen_1_1PlainObjectBase_a2871e88e1feb1cc665fa1f1cc800078b}{setOnes}}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size);}
+\DoxyCodeLine{726     EIGEN\_DEVICE\_FUNC Derived\& \mbox{\hyperlink{classEigen_1_1PlainObjectBase_a2871e88e1feb1cc665fa1f1cc800078b}{setOnes}}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols);}
+\DoxyCodeLine{727     EIGEN\_DEVICE\_FUNC Derived\& \mbox{\hyperlink{classEigen_1_1PlainObjectBase_a2871e88e1feb1cc665fa1f1cc800078b}{setOnes}}(NoChange\_t, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols);}
+\DoxyCodeLine{728     EIGEN\_DEVICE\_FUNC Derived\& \mbox{\hyperlink{classEigen_1_1PlainObjectBase_a2871e88e1feb1cc665fa1f1cc800078b}{setOnes}}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, NoChange\_t);}
+\DoxyCodeLine{729 }
+\DoxyCodeLine{730     \textcolor{keyword}{using} Base::setRandom;}
+\DoxyCodeLine{731     Derived\& \mbox{\hyperlink{classEigen_1_1PlainObjectBase_af0e576a0e1aefc9ee346de44cc352ba3}{setRandom}}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size);}
+\DoxyCodeLine{732     Derived\& \mbox{\hyperlink{classEigen_1_1PlainObjectBase_af0e576a0e1aefc9ee346de44cc352ba3}{setRandom}}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols);}
+\DoxyCodeLine{733     Derived\& \mbox{\hyperlink{classEigen_1_1PlainObjectBase_af0e576a0e1aefc9ee346de44cc352ba3}{setRandom}}(NoChange\_t, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols);}
+\DoxyCodeLine{734     Derived\& \mbox{\hyperlink{classEigen_1_1PlainObjectBase_af0e576a0e1aefc9ee346de44cc352ba3}{setRandom}}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, NoChange\_t);}
+\DoxyCodeLine{735 }
+\DoxyCodeLine{736 \textcolor{preprocessor}{    \#ifdef EIGEN\_PLAINOBJECTBASE\_PLUGIN}}
+\DoxyCodeLine{737 \textcolor{preprocessor}{    \#include EIGEN\_PLAINOBJECTBASE\_PLUGIN}}
+\DoxyCodeLine{738 \textcolor{preprocessor}{    \#endif}}
+\DoxyCodeLine{739 }
+\DoxyCodeLine{740   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{748     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{749     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{750     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} \_resize\_to\_match(\textcolor{keyword}{const} EigenBase<OtherDerived>\& other)}
+\DoxyCodeLine{751     \{}
+\DoxyCodeLine{752 \textcolor{preprocessor}{      \#ifdef EIGEN\_NO\_AUTOMATIC\_RESIZING}}
+\DoxyCodeLine{753       eigen\_assert((this-\/>size()==0 || (IsVectorAtCompileTime ? (this-\/>size() == other.size())}
+\DoxyCodeLine{754                  : (rows() == other.rows() \&\& cols() == other.cols())))}
+\DoxyCodeLine{755         \&\& \textcolor{stringliteral}{"{}Size mismatch. Automatic resizing is disabled because EIGEN\_NO\_AUTOMATIC\_RESIZING is defined"{}});}
+\DoxyCodeLine{756       EIGEN\_ONLY\_USED\_FOR\_DEBUG(other);}
+\DoxyCodeLine{757 \textcolor{preprocessor}{      \#else}}
+\DoxyCodeLine{758       resizeLike(other);}
+\DoxyCodeLine{759 \textcolor{preprocessor}{      \#endif}}
+\DoxyCodeLine{760     \}}
+\DoxyCodeLine{761 }
+\DoxyCodeLine{776     \textcolor{comment}{// aliasing is dealt once in internal::call\_assignment}}
+\DoxyCodeLine{777     \textcolor{comment}{// so at this stage we have to assume aliasing... and resising has to be done later.}}
+\DoxyCodeLine{778     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{779     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{780     EIGEN\_STRONG\_INLINE Derived\& \mbox{\hyperlink{classEigen_1_1PlainObjectBase_ae6ea682fcdd15f8d93913c7b8b88557a}{\_set}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1DenseBase}{DenseBase<OtherDerived>}}\& other)}
+\DoxyCodeLine{781     \{}
+\DoxyCodeLine{782       internal::call\_assignment(this-\/>derived(), other.derived());}
+\DoxyCodeLine{783       \textcolor{keywordflow}{return} this-\/>derived();}
+\DoxyCodeLine{784     \}}
+\DoxyCodeLine{785 }
+\DoxyCodeLine{791     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{792     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{793     EIGEN\_STRONG\_INLINE Derived\& \_set\_noalias(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1DenseBase}{DenseBase<OtherDerived>}}\& other)}
+\DoxyCodeLine{794     \{}
+\DoxyCodeLine{795       \textcolor{comment}{// I don't think we need this resize call since the lazyAssign will anyways resize}}
+\DoxyCodeLine{796       \textcolor{comment}{// and lazyAssign will be called by the assign selector.}}
+\DoxyCodeLine{797       \textcolor{comment}{//\_resize\_to\_match(other);}}
+\DoxyCodeLine{798       \textcolor{comment}{// the 'false' below means to enforce lazy evaluation. We don't use lazyAssign() because}}
+\DoxyCodeLine{799       \textcolor{comment}{// it wouldn't allow to copy a row-\/vector into a column-\/vector.}}
+\DoxyCodeLine{800       internal::call\_assignment\_no\_alias(this-\/>derived(), other.derived(), \mbox{\hyperlink{structEigen_1_1internal_1_1assign__op}{internal::assign\_op<Scalar,typename OtherDerived::Scalar>}}());}
+\DoxyCodeLine{801       \textcolor{keywordflow}{return} this-\/>derived();}
+\DoxyCodeLine{802     \}}
+\DoxyCodeLine{803 }
+\DoxyCodeLine{804     \textcolor{keyword}{template}<\textcolor{keyword}{typename} T0, \textcolor{keyword}{typename} T1>}
+\DoxyCodeLine{805     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{806     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} \_init2(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols, \textcolor{keyword}{typename} internal::enable\_if<Base::SizeAtCompileTime!=2,T0>::type* = 0)}
+\DoxyCodeLine{807     \{}
+\DoxyCodeLine{808       \textcolor{keyword}{const} \textcolor{keywordtype}{bool} t0\_is\_integer\_alike = internal::is\_valid\_index\_type<T0>::value;}
+\DoxyCodeLine{809       \textcolor{keyword}{const} \textcolor{keywordtype}{bool} t1\_is\_integer\_alike = internal::is\_valid\_index\_type<T1>::value;}
+\DoxyCodeLine{810       EIGEN\_STATIC\_ASSERT(t0\_is\_integer\_alike \&\&}
+\DoxyCodeLine{811                           t1\_is\_integer\_alike,}
+\DoxyCodeLine{812                           FLOATING\_POINT\_ARGUMENT\_PASSED\_\_INTEGER\_WAS\_EXPECTED)}
+\DoxyCodeLine{813       resize(rows,cols);}
+\DoxyCodeLine{814     \}}
+\DoxyCodeLine{815 }
+\DoxyCodeLine{816     \textcolor{keyword}{template}<\textcolor{keyword}{typename} T0, \textcolor{keyword}{typename} T1>}
+\DoxyCodeLine{817     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{818     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} \_init2(\textcolor{keyword}{const} T0\& val0, \textcolor{keyword}{const} T1\& val1, \textcolor{keyword}{typename} internal::enable\_if<Base::SizeAtCompileTime==2,T0>::type* = 0)}
+\DoxyCodeLine{819     \{}
+\DoxyCodeLine{820       EIGEN\_STATIC\_ASSERT\_VECTOR\_SPECIFIC\_SIZE(PlainObjectBase, 2)}
+\DoxyCodeLine{821       m\_storage.data()[0] = Scalar(val0);}
+\DoxyCodeLine{822       m\_storage.data()[1] = Scalar(val1);}
+\DoxyCodeLine{823     \}}
+\DoxyCodeLine{824 }
+\DoxyCodeLine{825     template<typename T0, typename T1>}
+\DoxyCodeLine{826     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{827     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} \_init2(const \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}\& val0, const \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}\& val1,}
+\DoxyCodeLine{828                                     typename internal::enable\_if<    (!internal::is\_same<\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}},Scalar>::value)}
+\DoxyCodeLine{829                                                                   \&\& (internal::is\_same<T0,\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}>::value)}
+\DoxyCodeLine{830                                                                   \&\& (internal::is\_same<T1,\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}>::value)}
+\DoxyCodeLine{831                                                                   \&\& Base::SizeAtCompileTime==2,T1>::type* = 0)}
+\DoxyCodeLine{832     \{}
+\DoxyCodeLine{833       EIGEN\_STATIC\_ASSERT\_VECTOR\_SPECIFIC\_SIZE(PlainObjectBase, 2)}
+\DoxyCodeLine{834       m\_storage.data()[0] = Scalar(val0);}
+\DoxyCodeLine{835       m\_storage.data()[1] = Scalar(val1);}
+\DoxyCodeLine{836     \}}
+\DoxyCodeLine{837 }
+\DoxyCodeLine{838     \textcolor{comment}{// The argument is convertible to the Index type and we either have a non 1x1 Matrix, or a dynamic-\/sized Array,}}
+\DoxyCodeLine{839     \textcolor{comment}{// then the argument is meant to be the size of the object.}}
+\DoxyCodeLine{840     template<typename T>}
+\DoxyCodeLine{841     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{842     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} \_init1(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size, typename internal::enable\_if<    (Base::SizeAtCompileTime!=1 || !internal::is\_convertible<T, Scalar>::value)}
+\DoxyCodeLine{843                                                                               \&\& ((!internal::is\_same<typename internal::traits<Derived>::XprKind,ArrayXpr>::value || Base::SizeAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}})),T>::type* = 0)}
+\DoxyCodeLine{844     \{}
+\DoxyCodeLine{845       \textcolor{comment}{// NOTE MSVC 2008 complains if we directly put bool(NumTraits<T>::IsInteger) as the EIGEN\_STATIC\_ASSERT argument.}}
+\DoxyCodeLine{846       \textcolor{keyword}{const} \textcolor{keywordtype}{bool} is\_integer\_alike = internal::is\_valid\_index\_type<T>::value;}
+\DoxyCodeLine{847       EIGEN\_UNUSED\_VARIABLE(is\_integer\_alike);}
+\DoxyCodeLine{848       EIGEN\_STATIC\_ASSERT(is\_integer\_alike,}
+\DoxyCodeLine{849                           FLOATING\_POINT\_ARGUMENT\_PASSED\_\_INTEGER\_WAS\_EXPECTED)}
+\DoxyCodeLine{850       resize(size);}
+\DoxyCodeLine{851     \}}
+\DoxyCodeLine{852 }
+\DoxyCodeLine{853     \textcolor{comment}{// We have a 1x1 matrix/array => the argument is interpreted as the value of the unique coefficient (case where scalar type can be implicitly converted)}}
+\DoxyCodeLine{854     \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{855     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{856     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} \_init1(\textcolor{keyword}{const} Scalar\& val0, \textcolor{keyword}{typename} internal::enable\_if<Base::SizeAtCompileTime==1 \&\& internal::is\_convertible<T, Scalar>::value,T>::type* = 0)}
+\DoxyCodeLine{857     \{}
+\DoxyCodeLine{858       EIGEN\_STATIC\_ASSERT\_VECTOR\_SPECIFIC\_SIZE(PlainObjectBase, 1)}
+\DoxyCodeLine{859       m\_storage.data()[0] = val0;}
+\DoxyCodeLine{860     \}}
+\DoxyCodeLine{861 }
+\DoxyCodeLine{862     \textcolor{comment}{// We have a 1x1 matrix/array => the argument is interpreted as the value of the unique coefficient (case where scalar type match the index type)}}
+\DoxyCodeLine{863     template<typename T>}
+\DoxyCodeLine{864     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{865     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} \_init1(const \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}\& val0,}
+\DoxyCodeLine{866                                     typename internal::enable\_if<    (!internal::is\_same<\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}},Scalar>::value)}
+\DoxyCodeLine{867                                                                   \&\& (internal::is\_same<\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}},T>::value)}
+\DoxyCodeLine{868                                                                   \&\& Base::SizeAtCompileTime==1}
+\DoxyCodeLine{869                                                                   \&\& internal::is\_convertible<T, Scalar>::value,T*>::type* = 0)}
+\DoxyCodeLine{870     \{}
+\DoxyCodeLine{871       EIGEN\_STATIC\_ASSERT\_VECTOR\_SPECIFIC\_SIZE(PlainObjectBase, 1)}
+\DoxyCodeLine{872       m\_storage.data()[0] = Scalar(val0);}
+\DoxyCodeLine{873     \}}
+\DoxyCodeLine{874 }
+\DoxyCodeLine{875     \textcolor{comment}{// Initialize a fixed size matrix from a pointer to raw data}}
+\DoxyCodeLine{876     template<typename T>}
+\DoxyCodeLine{877     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{878     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} \_init1(const Scalar* data)\{}
+\DoxyCodeLine{879       this-\/>\_set\_noalias(ConstMapType(data));}
+\DoxyCodeLine{880     \}}
+\DoxyCodeLine{881 }
+\DoxyCodeLine{882     \textcolor{comment}{// Initialize an arbitrary matrix from a dense expression}}
+\DoxyCodeLine{883     \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{884     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{885     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} \_init1(\textcolor{keyword}{const} DenseBase<OtherDerived>\& other)\{}
+\DoxyCodeLine{886       this-\/>\_set\_noalias(other);}
+\DoxyCodeLine{887     \}}
+\DoxyCodeLine{888 }
+\DoxyCodeLine{889     \textcolor{comment}{// Initialize an arbitrary matrix from an object convertible to the Derived type.}}
+\DoxyCodeLine{890     \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{891     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{892     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} \_init1(\textcolor{keyword}{const} Derived\& other)\{}
+\DoxyCodeLine{893       this-\/>\_set\_noalias(other);}
+\DoxyCodeLine{894     \}}
+\DoxyCodeLine{895 }
+\DoxyCodeLine{896     \textcolor{comment}{// Initialize an arbitrary matrix from a generic Eigen expression}}
+\DoxyCodeLine{897     \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{898     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{899     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} \_init1(\textcolor{keyword}{const} EigenBase<OtherDerived>\& other)\{}
+\DoxyCodeLine{900       this-\/>derived() = other;}
+\DoxyCodeLine{901     \}}
+\DoxyCodeLine{902 }
+\DoxyCodeLine{903     \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{904     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{905     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} \_init1(\textcolor{keyword}{const} ReturnByValue<OtherDerived>\& other)}
+\DoxyCodeLine{906     \{}
+\DoxyCodeLine{907       resize(other.rows(), other.cols());}
+\DoxyCodeLine{908       other.evalTo(this-\/>derived());}
+\DoxyCodeLine{909     \}}
+\DoxyCodeLine{910 }
+\DoxyCodeLine{911     \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} OtherDerived, \textcolor{keywordtype}{int} ColsAtCompileTime>}
+\DoxyCodeLine{912     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{913     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} \_init1(\textcolor{keyword}{const} RotationBase<OtherDerived,ColsAtCompileTime>\& r)}
+\DoxyCodeLine{914     \{}
+\DoxyCodeLine{915       this-\/>derived() = r;}
+\DoxyCodeLine{916     \}}
+\DoxyCodeLine{917 }
+\DoxyCodeLine{918     \textcolor{comment}{// For fixed-\/size Array<Scalar,...>}}
+\DoxyCodeLine{919     \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{920     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{921     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} \_init1(\textcolor{keyword}{const} Scalar\& val0,}
+\DoxyCodeLine{922                                     \textcolor{keyword}{typename} internal::enable\_if<    Base::SizeAtCompileTime!=\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}}
+\DoxyCodeLine{923                                                                   \&\& Base::SizeAtCompileTime!=1}
+\DoxyCodeLine{924                                                                   \&\& internal::is\_convertible<T, Scalar>::value}
+\DoxyCodeLine{925                                                                   \&\& internal::is\_same<\textcolor{keyword}{typename} internal::traits<Derived>::XprKind,ArrayXpr>::value,T>::type* = 0)}
+\DoxyCodeLine{926     \{}
+\DoxyCodeLine{927       Base::setConstant(val0);}
+\DoxyCodeLine{928     \}}
+\DoxyCodeLine{929 }
+\DoxyCodeLine{930     \textcolor{comment}{// For fixed-\/size Array<Index,...>}}
+\DoxyCodeLine{931     \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{932     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{933     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} \_init1(\textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}\& val0,}
+\DoxyCodeLine{934                                     \textcolor{keyword}{typename} internal::enable\_if<    (!internal::is\_same<Index,Scalar>::value)}
+\DoxyCodeLine{935                                                                   \&\& (internal::is\_same<Index,T>::value)}
+\DoxyCodeLine{936                                                                   \&\& Base::SizeAtCompileTime!=\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}}
+\DoxyCodeLine{937                                                                   \&\& Base::SizeAtCompileTime!=1}
+\DoxyCodeLine{938                                                                   \&\& internal::is\_convertible<T, Scalar>::value}
+\DoxyCodeLine{939                                                                   \&\& internal::is\_same<\textcolor{keyword}{typename} internal::traits<Derived>::XprKind,ArrayXpr>::value,T*>::type* = 0)}
+\DoxyCodeLine{940     \{}
+\DoxyCodeLine{941       Base::setConstant(val0);}
+\DoxyCodeLine{942     \}}
+\DoxyCodeLine{943 }
+\DoxyCodeLine{944     \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixTypeA, \textcolor{keyword}{typename} MatrixTypeB, \textcolor{keywordtype}{bool} SwapPo\textcolor{keywordtype}{int}ers>}
+\DoxyCodeLine{945     \textcolor{keyword}{friend} \textcolor{keyword}{struct }internal::matrix\_swap\_impl;}
+\DoxyCodeLine{946 }
+\DoxyCodeLine{947   \textcolor{keyword}{public}:}
+\DoxyCodeLine{948 }
+\DoxyCodeLine{949 \textcolor{preprocessor}{\#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{954     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{955     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{956     \textcolor{keywordtype}{void} swap(DenseBase<OtherDerived> \& other)}
+\DoxyCodeLine{957     \{}
+\DoxyCodeLine{958       \textcolor{keyword}{enum} \{ SwapPointers = internal::is\_same<Derived, OtherDerived>::value \&\& Base::SizeAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} \};}
+\DoxyCodeLine{959       internal::matrix\_swap\_impl<Derived, OtherDerived, bool(SwapPointers)>::run(this-\/>derived(), other.derived());}
+\DoxyCodeLine{960     \}}
+\DoxyCodeLine{961 }
+\DoxyCodeLine{965     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{966     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{967     \textcolor{keywordtype}{void} swap(DenseBase<OtherDerived> \textcolor{keyword}{const} \& other)}
+\DoxyCodeLine{968     \{ Base::swap(other.derived()); \}}
+\DoxyCodeLine{969 }
+\DoxyCodeLine{970     \textcolor{keyword}{enum} \{ IsPlainObjectBase = 1 \};}
+\DoxyCodeLine{971 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{972   \textcolor{keyword}{public}:}
+\DoxyCodeLine{973     \textcolor{comment}{// These apparently need to be down here for nvcc+icc to prevent duplicate}}
+\DoxyCodeLine{974     \textcolor{comment}{// Map symbol.}}
+\DoxyCodeLine{975     \textcolor{keyword}{template}<\textcolor{keyword}{typename} PlainObjectType, \textcolor{keywordtype}{int} MapOptions, \textcolor{keyword}{typename} Str\textcolor{keywordtype}{id}eType> \textcolor{keyword}{friend} \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1Map}{Eigen::Map}};}
+\DoxyCodeLine{976     \textcolor{keyword}{friend} \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1Map}{Eigen::Map}}<Derived, \mbox{\hyperlink{group__enums_gga45fe06e29902b7a2773de05ba27b47a1a4e19dd09d5ff42295ba1d72d12a46686}{Unaligned}}>;}
+\DoxyCodeLine{977     \textcolor{keyword}{friend} \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1Map}{Eigen::Map}}<const Derived, \mbox{\hyperlink{group__enums_gga45fe06e29902b7a2773de05ba27b47a1a4e19dd09d5ff42295ba1d72d12a46686}{Unaligned}}>;}
+\DoxyCodeLine{978 \textcolor{preprocessor}{\#if EIGEN\_MAX\_ALIGN\_BYTES>0}}
+\DoxyCodeLine{979     \textcolor{comment}{// for EIGEN\_MAX\_ALIGN\_BYTES==0, AlignedMax==Unaligned, and many compilers generate warnings for friend-\/ing a class twice.}}
+\DoxyCodeLine{980     \textcolor{keyword}{friend} \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1Map}{Eigen::Map}}<Derived, AlignedMax>;}
+\DoxyCodeLine{981     \textcolor{keyword}{friend} \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1Map}{Eigen::Map}}<const Derived, AlignedMax>;}
+\DoxyCodeLine{982 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{983 \};}
+\DoxyCodeLine{984 }
+\DoxyCodeLine{985 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{986 }
+\DoxyCodeLine{987 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Derived, \textcolor{keyword}{typename} OtherDerived, \textcolor{keywordtype}{bool} IsVector>}
+\DoxyCodeLine{988 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1conservative__resize__like__impl}{conservative\_resize\_like\_impl}}}
+\DoxyCodeLine{989 \{}
+\DoxyCodeLine{990 \textcolor{preprocessor}{  \#if EIGEN\_HAS\_TYPE\_TRAITS}}
+\DoxyCodeLine{991   \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{bool} IsRelocatable = std::is\_trivially\_copyable<typename Derived::Scalar>::value;}
+\DoxyCodeLine{992 \textcolor{preprocessor}{  \#else}}
+\DoxyCodeLine{993   \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{bool} IsRelocatable = !\mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<typename Derived::Scalar>::RequireInitialization}};}
+\DoxyCodeLine{994 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{995   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(\mbox{\hyperlink{classEigen_1_1DenseBase}{DenseBase<Derived>}}\& \_this, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols)}
+\DoxyCodeLine{996   \{}
+\DoxyCodeLine{997     \textcolor{keywordflow}{if} (\_this.rows() == rows \&\& \_this.cols() == cols) \textcolor{keywordflow}{return};}
+\DoxyCodeLine{998     EIGEN\_STATIC\_ASSERT\_DYNAMIC\_SIZE(Derived)}
+\DoxyCodeLine{999 }
+\DoxyCodeLine{1000     \textcolor{keywordflow}{if} ( IsRelocatable}
+\DoxyCodeLine{1001           \&\& (( Derived::IsRowMajor \&\& \_this.cols() == cols) ||  \textcolor{comment}{// row-\/major and we change only the number of rows}}
+\DoxyCodeLine{1002               (!Derived::IsRowMajor \&\& \_this.rows() == rows) ))  \textcolor{comment}{// column-\/major and we change only the number of columns}}
+\DoxyCodeLine{1003     \{}
+\DoxyCodeLine{1004       \mbox{\hyperlink{structEigen_1_1internal_1_1check__rows__cols__for__overflow}{internal::check\_rows\_cols\_for\_overflow<Derived::MaxSizeAtCompileTime>::run}}(rows, cols);}
+\DoxyCodeLine{1005       \_this.derived().m\_storage.conservativeResize(rows*cols,rows,cols);}
+\DoxyCodeLine{1006     \}}
+\DoxyCodeLine{1007     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{1008     \{}
+\DoxyCodeLine{1009       \textcolor{comment}{// The storage order does not allow us to use reallocation.}}
+\DoxyCodeLine{1010       Derived tmp(rows,cols);}
+\DoxyCodeLine{1011       \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} common\_rows = numext::mini(rows, \_this.rows());}
+\DoxyCodeLine{1012       \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} common\_cols = numext::mini(cols, \_this.cols());}
+\DoxyCodeLine{1013       tmp.block(0,0,common\_rows,common\_cols) = \_this.block(0,0,common\_rows,common\_cols);}
+\DoxyCodeLine{1014       \_this.derived().\mbox{\hyperlink{classEigen_1_1DenseBase_a40aa938e7e7fecafb3178ef37dc977ec}{swap}}(tmp);}
+\DoxyCodeLine{1015     \}}
+\DoxyCodeLine{1016   \}}
+\DoxyCodeLine{1017 }
+\DoxyCodeLine{1018   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(\mbox{\hyperlink{classEigen_1_1DenseBase}{DenseBase<Derived>}}\& \_this, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1DenseBase}{DenseBase<OtherDerived>}}\& other)}
+\DoxyCodeLine{1019   \{}
+\DoxyCodeLine{1020     \textcolor{keywordflow}{if} (\_this.rows() == other.rows() \&\& \_this.cols() == other.cols()) \textcolor{keywordflow}{return};}
+\DoxyCodeLine{1021 }
+\DoxyCodeLine{1022     \textcolor{comment}{// Note: Here is space for improvement. Basically, for conservativeResize(Index,Index),}}
+\DoxyCodeLine{1023     \textcolor{comment}{// neither RowsAtCompileTime or ColsAtCompileTime must be Dynamic. If only one of the}}
+\DoxyCodeLine{1024     \textcolor{comment}{// dimensions is dynamic, one could use either conservativeResize(Index rows, NoChange\_t) or}}
+\DoxyCodeLine{1025     \textcolor{comment}{// conservativeResize(NoChange\_t, Index cols). For these methods new static asserts like}}
+\DoxyCodeLine{1026     \textcolor{comment}{// EIGEN\_STATIC\_ASSERT\_DYNAMIC\_ROWS and EIGEN\_STATIC\_ASSERT\_DYNAMIC\_COLS would be good.}}
+\DoxyCodeLine{1027     EIGEN\_STATIC\_ASSERT\_DYNAMIC\_SIZE(Derived)}
+\DoxyCodeLine{1028     EIGEN\_STATIC\_ASSERT\_DYNAMIC\_SIZE(OtherDerived)}
+\DoxyCodeLine{1029 }
+\DoxyCodeLine{1030     \textcolor{keywordflow}{if} ( IsRelocatable \&\&}
+\DoxyCodeLine{1031           (( Derived::IsRowMajor \&\& \_this.cols() == other.cols()) ||  \textcolor{comment}{// row-\/major and we change only the number of rows}}
+\DoxyCodeLine{1032            (!Derived::IsRowMajor \&\& \_this.rows() == other.rows()) ))  \textcolor{comment}{// column-\/major and we change only the number of columns}}
+\DoxyCodeLine{1033     \{}
+\DoxyCodeLine{1034       \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} new\_rows = other.rows() -\/ \_this.rows();}
+\DoxyCodeLine{1035       \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} new\_cols = other.cols() -\/ \_this.cols();}
+\DoxyCodeLine{1036       \_this.derived().m\_storage.conservativeResize(other.size(),other.rows(),other.cols());}
+\DoxyCodeLine{1037       \textcolor{keywordflow}{if} (new\_rows>0)}
+\DoxyCodeLine{1038         \_this.bottomRightCorner(new\_rows, other.cols()) = other.bottomRows(new\_rows);}
+\DoxyCodeLine{1039       \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (new\_cols>0)}
+\DoxyCodeLine{1040         \_this.bottomRightCorner(other.rows(), new\_cols) = other.rightCols(new\_cols);}
+\DoxyCodeLine{1041     \}}
+\DoxyCodeLine{1042     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{1043     \{}
+\DoxyCodeLine{1044       \textcolor{comment}{// The storage order does not allow us to use reallocation.}}
+\DoxyCodeLine{1045       Derived tmp(other);}
+\DoxyCodeLine{1046       \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} common\_rows = numext::mini(tmp.rows(), \_this.rows());}
+\DoxyCodeLine{1047       \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} common\_cols = numext::mini(tmp.cols(), \_this.cols());}
+\DoxyCodeLine{1048       tmp.block(0,0,common\_rows,common\_cols) = \_this.block(0,0,common\_rows,common\_cols);}
+\DoxyCodeLine{1049       \_this.derived().\mbox{\hyperlink{classEigen_1_1DenseBase_a40aa938e7e7fecafb3178ef37dc977ec}{swap}}(tmp);}
+\DoxyCodeLine{1050     \}}
+\DoxyCodeLine{1051   \}}
+\DoxyCodeLine{1052 \};}
+\DoxyCodeLine{1053 }
+\DoxyCodeLine{1054 \textcolor{comment}{// Here, the specialization for vectors inherits from the general matrix case}}
+\DoxyCodeLine{1055 \textcolor{comment}{// to allow calling .conservativeResize(rows,cols) on vectors.}}
+\DoxyCodeLine{1056 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Derived, \textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{1057 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1conservative__resize__like__impl}{conservative\_resize\_like\_impl}}<Derived,OtherDerived,true>}
+\DoxyCodeLine{1058   : \mbox{\hyperlink{structEigen_1_1internal_1_1conservative__resize__like__impl}{conservative\_resize\_like\_impl}}<Derived,OtherDerived,false>}
+\DoxyCodeLine{1059 \{}
+\DoxyCodeLine{1060   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1conservative__resize__like__impl}{conservative\_resize\_like\_impl<Derived,OtherDerived,false>}} \mbox{\hyperlink{structEigen_1_1internal_1_1conservative__resize__like__impl}{Base}};}
+\DoxyCodeLine{1061   \textcolor{keyword}{using} Base::run;}
+\DoxyCodeLine{1062   \textcolor{keyword}{using} Base::IsRelocatable;}
+\DoxyCodeLine{1063 }
+\DoxyCodeLine{1064   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(\mbox{\hyperlink{classEigen_1_1DenseBase}{DenseBase<Derived>}}\& \_this, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size)}
+\DoxyCodeLine{1065   \{}
+\DoxyCodeLine{1066     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} new\_rows = Derived::RowsAtCompileTime==1 ? 1 : size;}
+\DoxyCodeLine{1067     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} new\_cols = Derived::RowsAtCompileTime==1 ? size : 1;}
+\DoxyCodeLine{1068     \textcolor{keywordflow}{if}(IsRelocatable)}
+\DoxyCodeLine{1069       \_this.derived().m\_storage.conservativeResize(size,new\_rows,new\_cols);}
+\DoxyCodeLine{1070     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{1071       Base::run(\_this.derived(), new\_rows, new\_cols);}
+\DoxyCodeLine{1072   \}}
+\DoxyCodeLine{1073 }
+\DoxyCodeLine{1074   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(\mbox{\hyperlink{classEigen_1_1DenseBase}{DenseBase<Derived>}}\& \_this, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1DenseBase}{DenseBase<OtherDerived>}}\& other)}
+\DoxyCodeLine{1075   \{}
+\DoxyCodeLine{1076     \textcolor{keywordflow}{if} (\_this.rows() == other.rows() \&\& \_this.cols() == other.cols()) \textcolor{keywordflow}{return};}
+\DoxyCodeLine{1077 }
+\DoxyCodeLine{1078     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} num\_new\_elements = other.size() -\/ \_this.size();}
+\DoxyCodeLine{1079 }
+\DoxyCodeLine{1080     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} new\_rows = Derived::RowsAtCompileTime==1 ? 1 : other.rows();}
+\DoxyCodeLine{1081     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} new\_cols = Derived::RowsAtCompileTime==1 ? other.cols() : 1;}
+\DoxyCodeLine{1082     \textcolor{keywordflow}{if}(IsRelocatable)}
+\DoxyCodeLine{1083       \_this.derived().m\_storage.conservativeResize(other.size(),new\_rows,new\_cols);}
+\DoxyCodeLine{1084     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{1085       Base::run(\_this.derived(), new\_rows, new\_cols);}
+\DoxyCodeLine{1086 }
+\DoxyCodeLine{1087     \textcolor{keywordflow}{if} (num\_new\_elements > 0)}
+\DoxyCodeLine{1088       \_this.tail(num\_new\_elements) = other.tail(num\_new\_elements);}
+\DoxyCodeLine{1089   \}}
+\DoxyCodeLine{1090 \};}
+\DoxyCodeLine{1091 }
+\DoxyCodeLine{1092 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixTypeA, \textcolor{keyword}{typename} MatrixTypeB, \textcolor{keywordtype}{bool} SwapPo\textcolor{keywordtype}{int}ers>}
+\DoxyCodeLine{1093 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1matrix__swap__impl}{matrix\_swap\_impl}}}
+\DoxyCodeLine{1094 \{}
+\DoxyCodeLine{1095   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{1096   \textcolor{keyword}{static} EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} run(MatrixTypeA\& a, MatrixTypeB\& b)}
+\DoxyCodeLine{1097   \{}
+\DoxyCodeLine{1098     a.base().swap(b);}
+\DoxyCodeLine{1099   \}}
+\DoxyCodeLine{1100 \};}
+\DoxyCodeLine{1101 }
+\DoxyCodeLine{1102 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixTypeA, \textcolor{keyword}{typename} MatrixTypeB>}
+\DoxyCodeLine{1103 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1matrix__swap__impl}{matrix\_swap\_impl}}<MatrixTypeA, MatrixTypeB, true>}
+\DoxyCodeLine{1104 \{}
+\DoxyCodeLine{1105   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{1106   \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{void} run(MatrixTypeA\& a, MatrixTypeB\& b)}
+\DoxyCodeLine{1107   \{}
+\DoxyCodeLine{1108     \textcolor{keyword}{static\_cast<}typename MatrixTypeA::Base\&\textcolor{keyword}{>}(a).m\_storage.swap(\textcolor{keyword}{static\_cast<}typename MatrixTypeB::Base\&\textcolor{keyword}{>}(b).m\_storage);}
+\DoxyCodeLine{1109   \}}
+\DoxyCodeLine{1110 \};}
+\DoxyCodeLine{1111 }
+\DoxyCodeLine{1112 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{1113 }
+\DoxyCodeLine{1114 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{1115 }
+\DoxyCodeLine{1116 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_DENSESTORAGEBASE\_H}}
+
+\end{DoxyCode}

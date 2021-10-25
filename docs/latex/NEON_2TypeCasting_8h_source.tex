@@ -1,0 +1,1427 @@
+\hypertarget{NEON_2TypeCasting_8h_source}{}\doxysection{Type\+Casting.\+h}
+\label{NEON_2TypeCasting_8h_source}\index{include/Eigen/src/Core/arch/NEON/TypeCasting.h@{include/Eigen/src/Core/arch/NEON/TypeCasting.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2018 Rasmus Munk Larsen <rmlarsen@google.com>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2020 Antonio Sanchez <cantonios@google.com>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_TYPE\_CASTING\_NEON\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_TYPE\_CASTING\_NEON\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}../../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{19 }
+\DoxyCodeLine{20 \textcolor{comment}{//==============================================================================}}
+\DoxyCodeLine{21 \textcolor{comment}{// pcast, SrcType = float}}
+\DoxyCodeLine{22 \textcolor{comment}{//==============================================================================}}
+\DoxyCodeLine{23 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{24 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<float, float> \{}
+\DoxyCodeLine{25   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{26 \};}
+\DoxyCodeLine{27 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{28 EIGEN\_STRONG\_INLINE Packet4f pcast<Packet4f, Packet4f>(\textcolor{keyword}{const} Packet4f\& a) \{}
+\DoxyCodeLine{29   \textcolor{keywordflow}{return} a;}
+\DoxyCodeLine{30 \}}
+\DoxyCodeLine{31 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{32 EIGEN\_STRONG\_INLINE Packet2f pcast<Packet2f, Packet2f>(\textcolor{keyword}{const} Packet2f\& a) \{}
+\DoxyCodeLine{33   \textcolor{keywordflow}{return} a;}
+\DoxyCodeLine{34 \}}
+\DoxyCodeLine{35 }
+\DoxyCodeLine{36 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{37 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<float, numext::int64\_t> \{}
+\DoxyCodeLine{38   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 2 \};}
+\DoxyCodeLine{39 \};}
+\DoxyCodeLine{40 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{41 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<float, numext::uint64\_t> \{}
+\DoxyCodeLine{42   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 2 \};}
+\DoxyCodeLine{43 \};}
+\DoxyCodeLine{44 \textcolor{comment}{// If float64 exists, first convert to that to keep as much precision as possible.}}
+\DoxyCodeLine{45 \textcolor{preprocessor}{\#if EIGEN\_ARCH\_ARM64}}
+\DoxyCodeLine{46 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{47 EIGEN\_STRONG\_INLINE Packet2l pcast<Packet4f, Packet2l>(\textcolor{keyword}{const} Packet4f\& a) \{}
+\DoxyCodeLine{48   \textcolor{comment}{// Discard second half of input.}}
+\DoxyCodeLine{49   \textcolor{keywordflow}{return} vcvtq\_s64\_f64(vcvt\_f64\_f32(vget\_low\_f32(a)));}
+\DoxyCodeLine{50 \}}
+\DoxyCodeLine{51 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{52 EIGEN\_STRONG\_INLINE Packet2ul pcast<Packet4f, Packet2ul>(\textcolor{keyword}{const} Packet4f\& a) \{}
+\DoxyCodeLine{53   \textcolor{comment}{// Discard second half of input.}}
+\DoxyCodeLine{54   \textcolor{keywordflow}{return} vcvtq\_u64\_f64(vcvt\_f64\_f32(vget\_low\_f32(a)));}
+\DoxyCodeLine{55 \}}
+\DoxyCodeLine{56 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{57 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{58 EIGEN\_STRONG\_INLINE Packet2l pcast<Packet4f, Packet2l>(\textcolor{keyword}{const} Packet4f\& a) \{}
+\DoxyCodeLine{59   \textcolor{comment}{// Discard second half of input.}}
+\DoxyCodeLine{60   \textcolor{keywordflow}{return} vmovl\_s32(vget\_low\_s32(vcvtq\_s32\_f32(a)));}
+\DoxyCodeLine{61 \}}
+\DoxyCodeLine{62 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{63 EIGEN\_STRONG\_INLINE Packet2ul pcast<Packet4f, Packet2ul>(\textcolor{keyword}{const} Packet4f\& a) \{}
+\DoxyCodeLine{64   \textcolor{comment}{// Discard second half of input.}}
+\DoxyCodeLine{65   \textcolor{keywordflow}{return} vmovl\_u32(vget\_low\_u32(vcvtq\_u32\_f32(a)));}
+\DoxyCodeLine{66 \}}
+\DoxyCodeLine{67 \textcolor{preprocessor}{\#endif  }\textcolor{comment}{// EIGEN\_ARCH\_ARM64}}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{69 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{70 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<float, numext::int32\_t> \{}
+\DoxyCodeLine{71   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{72 \};}
+\DoxyCodeLine{73 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{74 EIGEN\_STRONG\_INLINE Packet4i pcast<Packet4f, Packet4i>(\textcolor{keyword}{const} Packet4f\& a) \{}
+\DoxyCodeLine{75   \textcolor{keywordflow}{return} vcvtq\_s32\_f32(a);}
+\DoxyCodeLine{76 \}}
+\DoxyCodeLine{77 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{78 EIGEN\_STRONG\_INLINE Packet2i pcast<Packet2f, Packet2i>(\textcolor{keyword}{const} Packet2f\& a) \{}
+\DoxyCodeLine{79   \textcolor{keywordflow}{return} vcvt\_s32\_f32(a);}
+\DoxyCodeLine{80 \}}
+\DoxyCodeLine{81 }
+\DoxyCodeLine{82 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{83 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<float, numext::uint32\_t> \{}
+\DoxyCodeLine{84   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{85 \};}
+\DoxyCodeLine{86 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{87 EIGEN\_STRONG\_INLINE Packet4ui pcast<Packet4f, Packet4ui>(\textcolor{keyword}{const} Packet4f\& a) \{}
+\DoxyCodeLine{88   \textcolor{keywordflow}{return} vcvtq\_u32\_f32(a);}
+\DoxyCodeLine{89 \}}
+\DoxyCodeLine{90 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{91 EIGEN\_STRONG\_INLINE Packet2ui pcast<Packet2f, Packet2ui>(\textcolor{keyword}{const} Packet2f\& a) \{}
+\DoxyCodeLine{92   \textcolor{keywordflow}{return} vcvt\_u32\_f32(a);}
+\DoxyCodeLine{93 \}}
+\DoxyCodeLine{94 }
+\DoxyCodeLine{95 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{96 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<float, numext::int16\_t> \{}
+\DoxyCodeLine{97   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 2, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{98 \};}
+\DoxyCodeLine{99 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{100 EIGEN\_STRONG\_INLINE Packet8s pcast<Packet4f, Packet8s>(\textcolor{keyword}{const} Packet4f\& a, \textcolor{keyword}{const} Packet4f\& b) \{}
+\DoxyCodeLine{101   \textcolor{keywordflow}{return} vcombine\_s16(vmovn\_s32(vcvtq\_s32\_f32(a)), vmovn\_s32(vcvtq\_s32\_f32(b)));}
+\DoxyCodeLine{102 \}}
+\DoxyCodeLine{103 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{104 EIGEN\_STRONG\_INLINE Packet4s pcast<Packet2f, Packet4s>(\textcolor{keyword}{const} Packet2f\& a, \textcolor{keyword}{const} Packet2f\& b) \{}
+\DoxyCodeLine{105   \textcolor{keywordflow}{return} vmovn\_s32(vcombine\_s32(vcvt\_s32\_f32(a), vcvt\_s32\_f32(b)));}
+\DoxyCodeLine{106 \}}
+\DoxyCodeLine{107 }
+\DoxyCodeLine{108 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{109 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<float, numext::uint16\_t> \{}
+\DoxyCodeLine{110   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 2, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{111 \};}
+\DoxyCodeLine{112 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{113 EIGEN\_STRONG\_INLINE Packet8us pcast<Packet4f, Packet8us>(\textcolor{keyword}{const} Packet4f\& a, \textcolor{keyword}{const} Packet4f\& b) \{}
+\DoxyCodeLine{114   \textcolor{keywordflow}{return} vcombine\_u16(vmovn\_u32(vcvtq\_u32\_f32(a)), vmovn\_u32(vcvtq\_u32\_f32(b)));}
+\DoxyCodeLine{115 \}}
+\DoxyCodeLine{116 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{117 EIGEN\_STRONG\_INLINE Packet4us pcast<Packet2f, Packet4us>(\textcolor{keyword}{const} Packet2f\& a, \textcolor{keyword}{const} Packet2f\& b) \{}
+\DoxyCodeLine{118   \textcolor{keywordflow}{return} vmovn\_u32(vcombine\_u32(vcvt\_u32\_f32(a), vcvt\_u32\_f32(b)));}
+\DoxyCodeLine{119 \}}
+\DoxyCodeLine{120 }
+\DoxyCodeLine{121 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{122 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<float, numext::int8\_t> \{}
+\DoxyCodeLine{123   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 4, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{124 \};}
+\DoxyCodeLine{125 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{126 EIGEN\_STRONG\_INLINE Packet16c pcast<Packet4f, Packet16c>(\textcolor{keyword}{const} Packet4f\& a, \textcolor{keyword}{const} Packet4f\& b, \textcolor{keyword}{const} Packet4f\& c,}
+\DoxyCodeLine{127                                                          \textcolor{keyword}{const} Packet4f\& d) \{}
+\DoxyCodeLine{128   \textcolor{keyword}{const} int16x8\_t ab\_s16 = pcast<Packet4f, Packet8s>(a, b);}
+\DoxyCodeLine{129   \textcolor{keyword}{const} int16x8\_t cd\_s16 = pcast<Packet4f, Packet8s>(c, d);}
+\DoxyCodeLine{130   \textcolor{keywordflow}{return} vcombine\_s8(vmovn\_s16(ab\_s16), vmovn\_s16(cd\_s16));}
+\DoxyCodeLine{131 \}}
+\DoxyCodeLine{132 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{133 EIGEN\_STRONG\_INLINE Packet8c pcast<Packet2f, Packet8c>(\textcolor{keyword}{const} Packet2f\& a, \textcolor{keyword}{const} Packet2f\& b, \textcolor{keyword}{const} Packet2f\& c,}
+\DoxyCodeLine{134                                                        \textcolor{keyword}{const} Packet2f\& d) \{}
+\DoxyCodeLine{135   \textcolor{keyword}{const} int16x4\_t ab\_s16 = pcast<Packet2f, Packet4s>(a, b);}
+\DoxyCodeLine{136   \textcolor{keyword}{const} int16x4\_t cd\_s16 = pcast<Packet2f, Packet4s>(c, d);}
+\DoxyCodeLine{137   \textcolor{keywordflow}{return} vmovn\_s16(vcombine\_s16(ab\_s16, cd\_s16));}
+\DoxyCodeLine{138 \}}
+\DoxyCodeLine{139 }
+\DoxyCodeLine{140 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{141 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<float, numext::uint8\_t> \{}
+\DoxyCodeLine{142   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 4, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{143 \};}
+\DoxyCodeLine{144 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{145 EIGEN\_STRONG\_INLINE Packet16uc pcast<Packet4f, Packet16uc>(\textcolor{keyword}{const} Packet4f\& a, \textcolor{keyword}{const} Packet4f\& b, \textcolor{keyword}{const} Packet4f\& c,}
+\DoxyCodeLine{146                                                            \textcolor{keyword}{const} Packet4f\& d) \{}
+\DoxyCodeLine{147   \textcolor{keyword}{const} uint16x8\_t ab\_u16 = pcast<Packet4f, Packet8us>(a, b);}
+\DoxyCodeLine{148   \textcolor{keyword}{const} uint16x8\_t cd\_u16 = pcast<Packet4f, Packet8us>(c, d);}
+\DoxyCodeLine{149   \textcolor{keywordflow}{return} vcombine\_u8(vmovn\_u16(ab\_u16), vmovn\_u16(cd\_u16));}
+\DoxyCodeLine{150 \}}
+\DoxyCodeLine{151 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{152 EIGEN\_STRONG\_INLINE Packet8uc pcast<Packet2f, Packet8uc>(\textcolor{keyword}{const} Packet2f\& a, \textcolor{keyword}{const} Packet2f\& b, \textcolor{keyword}{const} Packet2f\& c,}
+\DoxyCodeLine{153                                                          \textcolor{keyword}{const} Packet2f\& d) \{}
+\DoxyCodeLine{154   \textcolor{keyword}{const} uint16x4\_t ab\_u16 = pcast<Packet2f, Packet4us>(a, b);}
+\DoxyCodeLine{155   \textcolor{keyword}{const} uint16x4\_t cd\_u16 = pcast<Packet2f, Packet4us>(c, d);}
+\DoxyCodeLine{156   \textcolor{keywordflow}{return} vmovn\_u16(vcombine\_u16(ab\_u16, cd\_u16));}
+\DoxyCodeLine{157 \}}
+\DoxyCodeLine{158 }
+\DoxyCodeLine{159 \textcolor{comment}{//==============================================================================}}
+\DoxyCodeLine{160 \textcolor{comment}{// pcast, SrcType = int8\_t}}
+\DoxyCodeLine{161 \textcolor{comment}{//==============================================================================}}
+\DoxyCodeLine{162 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{163 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int8\_t, float> \{}
+\DoxyCodeLine{164   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 4 \};}
+\DoxyCodeLine{165 \};}
+\DoxyCodeLine{166 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{167 EIGEN\_STRONG\_INLINE Packet4f pcast<Packet16c, Packet4f>(\textcolor{keyword}{const} Packet16c\& a) \{}
+\DoxyCodeLine{168   \textcolor{comment}{// Discard all but first 4 bytes.}}
+\DoxyCodeLine{169   \textcolor{keywordflow}{return} vcvtq\_f32\_s32(vmovl\_s16(vget\_low\_s16(vmovl\_s8(vget\_low\_s8(a)))));}
+\DoxyCodeLine{170 \}}
+\DoxyCodeLine{171 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{172 EIGEN\_STRONG\_INLINE Packet2f pcast<Packet8c, Packet2f>(\textcolor{keyword}{const} Packet8c\& a) \{}
+\DoxyCodeLine{173   \textcolor{comment}{// Discard all but first 2 bytes.}}
+\DoxyCodeLine{174   \textcolor{keywordflow}{return} vcvt\_f32\_s32(vget\_low\_s32(vmovl\_s16(vget\_low\_s16(vmovl\_s8(a)))));}
+\DoxyCodeLine{175 \}}
+\DoxyCodeLine{176 }
+\DoxyCodeLine{177 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{178 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int8\_t, numext::int64\_t> \{}
+\DoxyCodeLine{179   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 8 \};}
+\DoxyCodeLine{180 \};}
+\DoxyCodeLine{181 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{182 EIGEN\_STRONG\_INLINE Packet2l pcast<Packet16c, Packet2l>(\textcolor{keyword}{const} Packet16c\& a) \{}
+\DoxyCodeLine{183   \textcolor{comment}{// Discard all but first two bytes.}}
+\DoxyCodeLine{184   \textcolor{keywordflow}{return} vmovl\_s32(vget\_low\_s32(vmovl\_s16(vget\_low\_s16(vmovl\_s8(vget\_low\_s8(a))))));}
+\DoxyCodeLine{185 \}}
+\DoxyCodeLine{186 }
+\DoxyCodeLine{187 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{188 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int8\_t, numext::uint64\_t> \{}
+\DoxyCodeLine{189   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 8 \};}
+\DoxyCodeLine{190 \};}
+\DoxyCodeLine{191 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{192 EIGEN\_STRONG\_INLINE Packet2ul pcast<Packet16c, Packet2ul>(\textcolor{keyword}{const} Packet16c\& a) \{}
+\DoxyCodeLine{193   \textcolor{keywordflow}{return} vreinterpretq\_u64\_s64(pcast<Packet16c, Packet2l>(a));}
+\DoxyCodeLine{194 \}}
+\DoxyCodeLine{195 }
+\DoxyCodeLine{196 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{197 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int8\_t, numext::int32\_t> \{}
+\DoxyCodeLine{198   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 4 \};}
+\DoxyCodeLine{199 \};}
+\DoxyCodeLine{200 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{201 EIGEN\_STRONG\_INLINE Packet4i pcast<Packet16c, Packet4i>(\textcolor{keyword}{const} Packet16c\& a) \{}
+\DoxyCodeLine{202   \textcolor{comment}{// Discard all but first 4 bytes.}}
+\DoxyCodeLine{203   \textcolor{keywordflow}{return} vmovl\_s16(vget\_low\_s16(vmovl\_s8(vget\_low\_s8(a))));}
+\DoxyCodeLine{204 \}}
+\DoxyCodeLine{205 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{206 EIGEN\_STRONG\_INLINE Packet2i pcast<Packet8c, Packet2i>(\textcolor{keyword}{const} Packet8c\& a) \{}
+\DoxyCodeLine{207   \textcolor{comment}{// Discard all but first 2 bytes.}}
+\DoxyCodeLine{208   \textcolor{keywordflow}{return} vget\_low\_s32(vmovl\_s16(vget\_low\_s16(vmovl\_s8(a))));}
+\DoxyCodeLine{209 \}}
+\DoxyCodeLine{210 }
+\DoxyCodeLine{211 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{212 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int8\_t, numext::uint32\_t> \{}
+\DoxyCodeLine{213   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 4 \};}
+\DoxyCodeLine{214 \};}
+\DoxyCodeLine{215 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{216 EIGEN\_STRONG\_INLINE Packet4ui pcast<Packet16c, Packet4ui>(\textcolor{keyword}{const} Packet16c\& a) \{}
+\DoxyCodeLine{217   \textcolor{keywordflow}{return} vreinterpretq\_u32\_s32(pcast<Packet16c, Packet4i>(a));}
+\DoxyCodeLine{218 \}}
+\DoxyCodeLine{219 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{220 EIGEN\_STRONG\_INLINE Packet2ui pcast<Packet8c, Packet2ui>(\textcolor{keyword}{const} Packet8c\& a) \{}
+\DoxyCodeLine{221   \textcolor{keywordflow}{return} vreinterpret\_u32\_s32(pcast<Packet8c, Packet2i>(a));}
+\DoxyCodeLine{222 \}}
+\DoxyCodeLine{223 }
+\DoxyCodeLine{224 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{225 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int8\_t, numext::int16\_t> \{}
+\DoxyCodeLine{226   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 2 \};}
+\DoxyCodeLine{227 \};}
+\DoxyCodeLine{228 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{229 EIGEN\_STRONG\_INLINE Packet8s pcast<Packet16c, Packet8s>(\textcolor{keyword}{const} Packet16c\& a) \{}
+\DoxyCodeLine{230   \textcolor{comment}{// Discard second half of input.}}
+\DoxyCodeLine{231   \textcolor{keywordflow}{return} vmovl\_s8(vget\_low\_s8(a));}
+\DoxyCodeLine{232 \}}
+\DoxyCodeLine{233 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{234 EIGEN\_STRONG\_INLINE Packet4s pcast<Packet8c, Packet4s>(\textcolor{keyword}{const} Packet8c\& a) \{}
+\DoxyCodeLine{235   \textcolor{comment}{// Discard second half of input.}}
+\DoxyCodeLine{236   \textcolor{keywordflow}{return} vget\_low\_s16(vmovl\_s8(a));}
+\DoxyCodeLine{237 \}}
+\DoxyCodeLine{238 }
+\DoxyCodeLine{239 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{240 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int8\_t, numext::uint16\_t> \{}
+\DoxyCodeLine{241   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 2 \};}
+\DoxyCodeLine{242 \};}
+\DoxyCodeLine{243 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{244 EIGEN\_STRONG\_INLINE Packet8us pcast<Packet16c, Packet8us>(\textcolor{keyword}{const} Packet16c\& a) \{}
+\DoxyCodeLine{245   \textcolor{keywordflow}{return} vreinterpretq\_u16\_s16(pcast<Packet16c, Packet8s>(a));}
+\DoxyCodeLine{246 \}}
+\DoxyCodeLine{247 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{248 EIGEN\_STRONG\_INLINE Packet4us pcast<Packet8c, Packet4us>(\textcolor{keyword}{const} Packet8c\& a) \{}
+\DoxyCodeLine{249   \textcolor{keywordflow}{return} vreinterpret\_u16\_s16(pcast<Packet8c, Packet4s>(a));}
+\DoxyCodeLine{250 \}}
+\DoxyCodeLine{251 }
+\DoxyCodeLine{252 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{253 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int8\_t, numext::int8\_t> \{}
+\DoxyCodeLine{254   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{255 \};}
+\DoxyCodeLine{256 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{257 EIGEN\_STRONG\_INLINE Packet16c pcast<Packet16c, Packet16c>(\textcolor{keyword}{const} Packet16c\& a) \{}
+\DoxyCodeLine{258   \textcolor{keywordflow}{return} a;}
+\DoxyCodeLine{259 \}}
+\DoxyCodeLine{260 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{261 EIGEN\_STRONG\_INLINE Packet8c pcast<Packet8c, Packet8c>(\textcolor{keyword}{const} Packet8c\& a) \{}
+\DoxyCodeLine{262   \textcolor{keywordflow}{return} a;}
+\DoxyCodeLine{263 \}}
+\DoxyCodeLine{264 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{265 EIGEN\_STRONG\_INLINE Packet4c pcast<Packet4c, Packet4c>(\textcolor{keyword}{const} Packet4c\& a) \{}
+\DoxyCodeLine{266   \textcolor{keywordflow}{return} a;}
+\DoxyCodeLine{267 \}}
+\DoxyCodeLine{268 }
+\DoxyCodeLine{269 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{270 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int8\_t, numext::uint8\_t> \{}
+\DoxyCodeLine{271   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{272 \};}
+\DoxyCodeLine{273 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{274 EIGEN\_STRONG\_INLINE Packet16uc pcast<Packet16c, Packet16uc>(\textcolor{keyword}{const} Packet16c\& a) \{}
+\DoxyCodeLine{275   \textcolor{keywordflow}{return} vreinterpretq\_u8\_s8(a);}
+\DoxyCodeLine{276 \}}
+\DoxyCodeLine{277 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{278 EIGEN\_STRONG\_INLINE Packet8uc pcast<Packet8c, Packet8uc>(\textcolor{keyword}{const} Packet8c\& a) \{}
+\DoxyCodeLine{279   \textcolor{keywordflow}{return} vreinterpret\_u8\_s8(a);}
+\DoxyCodeLine{280 \}}
+\DoxyCodeLine{281 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{282 EIGEN\_STRONG\_INLINE Packet4uc pcast<Packet4c, Packet4uc>(\textcolor{keyword}{const} Packet4c\& a) \{}
+\DoxyCodeLine{283   \textcolor{keywordflow}{return} \textcolor{keyword}{static\_cast<}Packet4uc\textcolor{keyword}{>}(a);}
+\DoxyCodeLine{284 \}}
+\DoxyCodeLine{285 }
+\DoxyCodeLine{286 \textcolor{comment}{//==============================================================================}}
+\DoxyCodeLine{287 \textcolor{comment}{// pcast, SrcType = uint8\_t}}
+\DoxyCodeLine{288 \textcolor{comment}{//==============================================================================}}
+\DoxyCodeLine{289 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{290 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint8\_t, float> \{}
+\DoxyCodeLine{291   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 4 \};}
+\DoxyCodeLine{292 \};}
+\DoxyCodeLine{293 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{294 EIGEN\_STRONG\_INLINE Packet4f pcast<Packet16uc, Packet4f>(\textcolor{keyword}{const} Packet16uc\& a) \{}
+\DoxyCodeLine{295   \textcolor{comment}{// Discard all but first 4 bytes.}}
+\DoxyCodeLine{296   \textcolor{keywordflow}{return} vcvtq\_f32\_u32(vmovl\_u16(vget\_low\_u16(vmovl\_u8(vget\_low\_u8(a)))));}
+\DoxyCodeLine{297 \}}
+\DoxyCodeLine{298 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{299 EIGEN\_STRONG\_INLINE Packet2f pcast<Packet8uc, Packet2f>(\textcolor{keyword}{const} Packet8uc\& a) \{}
+\DoxyCodeLine{300   \textcolor{comment}{// Discard all but first 2 bytes.}}
+\DoxyCodeLine{301   \textcolor{keywordflow}{return} vcvt\_f32\_u32(vget\_low\_u32(vmovl\_u16(vget\_low\_u16(vmovl\_u8(a)))));}
+\DoxyCodeLine{302 \}}
+\DoxyCodeLine{303 }
+\DoxyCodeLine{304 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{305 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint8\_t, numext::uint64\_t> \{}
+\DoxyCodeLine{306   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 8 \};}
+\DoxyCodeLine{307 \};}
+\DoxyCodeLine{308 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{309 EIGEN\_STRONG\_INLINE Packet2ul pcast<Packet16uc, Packet2ul>(\textcolor{keyword}{const} Packet16uc\& a) \{}
+\DoxyCodeLine{310   \textcolor{comment}{// Discard all but first two bytes.}}
+\DoxyCodeLine{311   \textcolor{keywordflow}{return} vmovl\_u32(vget\_low\_u32(vmovl\_u16(vget\_low\_u16(vmovl\_u8(vget\_low\_u8(a))))));}
+\DoxyCodeLine{312 \}}
+\DoxyCodeLine{313 }
+\DoxyCodeLine{314 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{315 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint8\_t, numext::int64\_t> \{}
+\DoxyCodeLine{316   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 8 \};}
+\DoxyCodeLine{317 \};}
+\DoxyCodeLine{318 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{319 EIGEN\_STRONG\_INLINE Packet2l pcast<Packet16uc, Packet2l>(\textcolor{keyword}{const} Packet16uc\& a) \{}
+\DoxyCodeLine{320   \textcolor{keywordflow}{return} vreinterpretq\_s64\_u64(pcast<Packet16uc, Packet2ul>(a));}
+\DoxyCodeLine{321 \}}
+\DoxyCodeLine{322 }
+\DoxyCodeLine{323 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{324 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint8\_t, numext::uint32\_t> \{}
+\DoxyCodeLine{325   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 4 \};}
+\DoxyCodeLine{326 \};}
+\DoxyCodeLine{327 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{328 EIGEN\_STRONG\_INLINE Packet4ui pcast<Packet16uc, Packet4ui>(\textcolor{keyword}{const} Packet16uc\& a) \{}
+\DoxyCodeLine{329   \textcolor{comment}{// Discard all but first 4 bytes.}}
+\DoxyCodeLine{330   \textcolor{keywordflow}{return} vmovl\_u16(vget\_low\_u16(vmovl\_u8(vget\_low\_u8(a))));}
+\DoxyCodeLine{331 \}}
+\DoxyCodeLine{332 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{333 EIGEN\_STRONG\_INLINE Packet2ui pcast<Packet8uc, Packet2ui>(\textcolor{keyword}{const} Packet8uc\& a) \{}
+\DoxyCodeLine{334   \textcolor{comment}{// Discard all but first 2 bytes.}}
+\DoxyCodeLine{335   \textcolor{keywordflow}{return} vget\_low\_u32(vmovl\_u16(vget\_low\_u16(vmovl\_u8(a))));}
+\DoxyCodeLine{336 \}}
+\DoxyCodeLine{337 }
+\DoxyCodeLine{338 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{339 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint8\_t, numext::int32\_t> \{}
+\DoxyCodeLine{340   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 4 \};}
+\DoxyCodeLine{341 \};}
+\DoxyCodeLine{342 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{343 EIGEN\_STRONG\_INLINE Packet4i pcast<Packet16uc, Packet4i>(\textcolor{keyword}{const} Packet16uc\& a) \{}
+\DoxyCodeLine{344   \textcolor{keywordflow}{return} vreinterpretq\_s32\_u32(pcast<Packet16uc, Packet4ui>(a));}
+\DoxyCodeLine{345 \}}
+\DoxyCodeLine{346 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{347 EIGEN\_STRONG\_INLINE Packet2i pcast<Packet8uc, Packet2i>(\textcolor{keyword}{const} Packet8uc\& a) \{}
+\DoxyCodeLine{348   \textcolor{keywordflow}{return} vreinterpret\_s32\_u32(pcast<Packet8uc, Packet2ui>(a));}
+\DoxyCodeLine{349 \}}
+\DoxyCodeLine{350 }
+\DoxyCodeLine{351 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{352 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint8\_t, numext::uint16\_t> \{}
+\DoxyCodeLine{353   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 2 \};}
+\DoxyCodeLine{354 \};}
+\DoxyCodeLine{355 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{356 EIGEN\_STRONG\_INLINE Packet8us pcast<Packet16uc, Packet8us>(\textcolor{keyword}{const} Packet16uc\& a) \{}
+\DoxyCodeLine{357   \textcolor{comment}{// Discard second half of input.}}
+\DoxyCodeLine{358   \textcolor{keywordflow}{return} vmovl\_u8(vget\_low\_u8(a));}
+\DoxyCodeLine{359 \}}
+\DoxyCodeLine{360 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{361 EIGEN\_STRONG\_INLINE Packet4us pcast<Packet8uc, Packet4us>(\textcolor{keyword}{const} Packet8uc\& a) \{}
+\DoxyCodeLine{362   \textcolor{comment}{// Discard second half of input.}}
+\DoxyCodeLine{363   \textcolor{keywordflow}{return} vget\_low\_u16(vmovl\_u8(a));}
+\DoxyCodeLine{364 \}}
+\DoxyCodeLine{365 }
+\DoxyCodeLine{366 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{367 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint8\_t, numext::int16\_t> \{}
+\DoxyCodeLine{368   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 2 \};}
+\DoxyCodeLine{369 \};}
+\DoxyCodeLine{370 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{371 EIGEN\_STRONG\_INLINE Packet8s pcast<Packet16uc, Packet8s>(\textcolor{keyword}{const} Packet16uc\& a) \{}
+\DoxyCodeLine{372   \textcolor{keywordflow}{return} vreinterpretq\_s16\_u16(pcast<Packet16uc, Packet8us>(a));}
+\DoxyCodeLine{373 \}}
+\DoxyCodeLine{374 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{375 EIGEN\_STRONG\_INLINE Packet4s pcast<Packet8uc, Packet4s>(\textcolor{keyword}{const} Packet8uc\& a) \{}
+\DoxyCodeLine{376   \textcolor{keywordflow}{return} vreinterpret\_s16\_u16(pcast<Packet8uc, Packet4us>(a));}
+\DoxyCodeLine{377 \}}
+\DoxyCodeLine{378 }
+\DoxyCodeLine{379 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{380 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint8\_t, numext::uint8\_t> \{}
+\DoxyCodeLine{381   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{382 \};}
+\DoxyCodeLine{383 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{384 EIGEN\_STRONG\_INLINE Packet16uc pcast<Packet16uc, Packet16uc>(\textcolor{keyword}{const} Packet16uc\& a) \{}
+\DoxyCodeLine{385   \textcolor{keywordflow}{return} a;}
+\DoxyCodeLine{386 \}}
+\DoxyCodeLine{387 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{388 EIGEN\_STRONG\_INLINE Packet8uc pcast<Packet8uc, Packet8uc>(\textcolor{keyword}{const} Packet8uc\& a) \{}
+\DoxyCodeLine{389   \textcolor{keywordflow}{return} a;}
+\DoxyCodeLine{390 \}}
+\DoxyCodeLine{391 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{392 EIGEN\_STRONG\_INLINE Packet4uc pcast<Packet4uc, Packet4uc>(\textcolor{keyword}{const} Packet4uc\& a) \{}
+\DoxyCodeLine{393   \textcolor{keywordflow}{return} a;}
+\DoxyCodeLine{394 \}}
+\DoxyCodeLine{395 }
+\DoxyCodeLine{396 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{397 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint8\_t, numext::int8\_t> \{}
+\DoxyCodeLine{398   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{399 \};}
+\DoxyCodeLine{400 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{401 EIGEN\_STRONG\_INLINE Packet16c pcast<Packet16uc, Packet16c>(\textcolor{keyword}{const} Packet16uc\& a) \{}
+\DoxyCodeLine{402   \textcolor{keywordflow}{return} vreinterpretq\_s8\_u8(a);}
+\DoxyCodeLine{403 \}}
+\DoxyCodeLine{404 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{405 EIGEN\_STRONG\_INLINE Packet8c pcast<Packet8uc, Packet8c>(\textcolor{keyword}{const} Packet8uc\& a) \{}
+\DoxyCodeLine{406   \textcolor{keywordflow}{return} vreinterpret\_s8\_u8(a);}
+\DoxyCodeLine{407 \}}
+\DoxyCodeLine{408 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{409 EIGEN\_STRONG\_INLINE Packet4c pcast<Packet4uc, Packet4c>(\textcolor{keyword}{const} Packet4uc\& a) \{}
+\DoxyCodeLine{410   \textcolor{keywordflow}{return} \textcolor{keyword}{static\_cast<}Packet4c\textcolor{keyword}{>}(a);}
+\DoxyCodeLine{411 \}}
+\DoxyCodeLine{412 }
+\DoxyCodeLine{413 \textcolor{comment}{//==============================================================================}}
+\DoxyCodeLine{414 \textcolor{comment}{// pcast, SrcType = int16\_t}}
+\DoxyCodeLine{415 \textcolor{comment}{//==============================================================================}}
+\DoxyCodeLine{416 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{417 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int16\_t, float> \{}
+\DoxyCodeLine{418   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 2 \};}
+\DoxyCodeLine{419 \};}
+\DoxyCodeLine{420 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{421 EIGEN\_STRONG\_INLINE Packet4f pcast<Packet8s, Packet4f>(\textcolor{keyword}{const} Packet8s\& a) \{}
+\DoxyCodeLine{422   \textcolor{comment}{// Discard second half of input.}}
+\DoxyCodeLine{423   \textcolor{keywordflow}{return} vcvtq\_f32\_s32(vmovl\_s16(vget\_low\_s16(a)));}
+\DoxyCodeLine{424 \}}
+\DoxyCodeLine{425 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{426 EIGEN\_STRONG\_INLINE Packet2f pcast<Packet4s, Packet2f>(\textcolor{keyword}{const} Packet4s\& a) \{}
+\DoxyCodeLine{427   \textcolor{comment}{// Discard second half of input.}}
+\DoxyCodeLine{428   \textcolor{keywordflow}{return} vcvt\_f32\_s32(vget\_low\_s32(vmovl\_s16(a)));}
+\DoxyCodeLine{429 \}}
+\DoxyCodeLine{430 }
+\DoxyCodeLine{431 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{432 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int16\_t, numext::int64\_t> \{}
+\DoxyCodeLine{433   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 4 \};}
+\DoxyCodeLine{434 \};}
+\DoxyCodeLine{435 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{436 EIGEN\_STRONG\_INLINE Packet2l pcast<Packet8s, Packet2l>(\textcolor{keyword}{const} Packet8s\& a) \{}
+\DoxyCodeLine{437   \textcolor{comment}{// Discard all but first two values.}}
+\DoxyCodeLine{438   \textcolor{keywordflow}{return} vmovl\_s32(vget\_low\_s32(vmovl\_s16(vget\_low\_s16(a))));}
+\DoxyCodeLine{439 \}}
+\DoxyCodeLine{440 }
+\DoxyCodeLine{441 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{442 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int16\_t, numext::uint64\_t> \{}
+\DoxyCodeLine{443   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 4 \};}
+\DoxyCodeLine{444 \};}
+\DoxyCodeLine{445 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{446 EIGEN\_STRONG\_INLINE Packet2ul pcast<Packet8s, Packet2ul>(\textcolor{keyword}{const} Packet8s\& a) \{}
+\DoxyCodeLine{447   \textcolor{keywordflow}{return} vreinterpretq\_u64\_s64(pcast<Packet8s, Packet2l>(a));}
+\DoxyCodeLine{448 \}}
+\DoxyCodeLine{449 }
+\DoxyCodeLine{450 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{451 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int16\_t, numext::int32\_t> \{}
+\DoxyCodeLine{452   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 2 \};}
+\DoxyCodeLine{453 \};}
+\DoxyCodeLine{454 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{455 EIGEN\_STRONG\_INLINE Packet4i pcast<Packet8s, Packet4i>(\textcolor{keyword}{const} Packet8s\& a) \{}
+\DoxyCodeLine{456   \textcolor{comment}{// Discard second half of input.}}
+\DoxyCodeLine{457   \textcolor{keywordflow}{return} vmovl\_s16(vget\_low\_s16(a));}
+\DoxyCodeLine{458 \}}
+\DoxyCodeLine{459 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{460 EIGEN\_STRONG\_INLINE Packet2i pcast<Packet4s, Packet2i>(\textcolor{keyword}{const} Packet4s\& a) \{}
+\DoxyCodeLine{461   \textcolor{comment}{// Discard second half of input.}}
+\DoxyCodeLine{462   \textcolor{keywordflow}{return} vget\_low\_s32(vmovl\_s16(a));}
+\DoxyCodeLine{463 \}}
+\DoxyCodeLine{464 }
+\DoxyCodeLine{465 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{466 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int16\_t, numext::uint32\_t> \{}
+\DoxyCodeLine{467   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 2 \};}
+\DoxyCodeLine{468 \};}
+\DoxyCodeLine{469 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{470 EIGEN\_STRONG\_INLINE Packet4ui pcast<Packet8s, Packet4ui>(\textcolor{keyword}{const} Packet8s\& a) \{}
+\DoxyCodeLine{471   \textcolor{keywordflow}{return} vreinterpretq\_u32\_s32(pcast<Packet8s, Packet4i>(a));}
+\DoxyCodeLine{472 \}}
+\DoxyCodeLine{473 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{474 EIGEN\_STRONG\_INLINE Packet2ui pcast<Packet4s, Packet2ui>(\textcolor{keyword}{const} Packet4s\& a) \{}
+\DoxyCodeLine{475   \textcolor{keywordflow}{return} vreinterpret\_u32\_s32(pcast<Packet4s, Packet2i>(a));}
+\DoxyCodeLine{476 \}}
+\DoxyCodeLine{477 }
+\DoxyCodeLine{478 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{479 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int16\_t, numext::int16\_t> \{}
+\DoxyCodeLine{480   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{481 \};}
+\DoxyCodeLine{482 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{483 EIGEN\_STRONG\_INLINE Packet8s pcast<Packet8s, Packet8s>(\textcolor{keyword}{const} Packet8s\& a) \{}
+\DoxyCodeLine{484   \textcolor{keywordflow}{return} a;}
+\DoxyCodeLine{485 \}}
+\DoxyCodeLine{486 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{487 EIGEN\_STRONG\_INLINE Packet4s pcast<Packet4s, Packet4s>(\textcolor{keyword}{const} Packet4s\& a) \{}
+\DoxyCodeLine{488   \textcolor{keywordflow}{return} a;}
+\DoxyCodeLine{489 \}}
+\DoxyCodeLine{490 }
+\DoxyCodeLine{491 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{492 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int16\_t, numext::uint16\_t> \{}
+\DoxyCodeLine{493   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{494 \};}
+\DoxyCodeLine{495 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{496 EIGEN\_STRONG\_INLINE Packet8us pcast<Packet8s, Packet8us>(\textcolor{keyword}{const} Packet8s\& a) \{}
+\DoxyCodeLine{497   \textcolor{keywordflow}{return} vreinterpretq\_u16\_s16(a);}
+\DoxyCodeLine{498 \}}
+\DoxyCodeLine{499 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{500 EIGEN\_STRONG\_INLINE Packet4us pcast<Packet4s, Packet4us>(\textcolor{keyword}{const} Packet4s\& a) \{}
+\DoxyCodeLine{501   \textcolor{keywordflow}{return} vreinterpret\_u16\_s16(a);}
+\DoxyCodeLine{502 \}}
+\DoxyCodeLine{503 }
+\DoxyCodeLine{504 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{505 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int16\_t, numext::int8\_t> \{}
+\DoxyCodeLine{506   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 2, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{507 \};}
+\DoxyCodeLine{508 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{509 EIGEN\_STRONG\_INLINE Packet16c pcast<Packet8s, Packet16c>(\textcolor{keyword}{const} Packet8s\& a, \textcolor{keyword}{const} Packet8s\& b) \{}
+\DoxyCodeLine{510   \textcolor{keywordflow}{return} vcombine\_s8(vmovn\_s16(a), vmovn\_s16(b));}
+\DoxyCodeLine{511 \}}
+\DoxyCodeLine{512 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{513 EIGEN\_STRONG\_INLINE Packet8c pcast<Packet4s, Packet8c>(\textcolor{keyword}{const} Packet4s\& a, \textcolor{keyword}{const} Packet4s\& b) \{}
+\DoxyCodeLine{514   \textcolor{keywordflow}{return} vmovn\_s16(vcombine\_s16(a, b));}
+\DoxyCodeLine{515 \}}
+\DoxyCodeLine{516 }
+\DoxyCodeLine{517 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{518 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int16\_t, numext::uint8\_t> \{}
+\DoxyCodeLine{519   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 2, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{520 \};}
+\DoxyCodeLine{521 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{522 EIGEN\_STRONG\_INLINE Packet16uc pcast<Packet8s, Packet16uc>(\textcolor{keyword}{const} Packet8s\& a, \textcolor{keyword}{const} Packet8s\& b) \{}
+\DoxyCodeLine{523   \textcolor{keywordflow}{return} vcombine\_u8(vmovn\_u16(vreinterpretq\_u16\_s16(a)), vmovn\_u16(vreinterpretq\_u16\_s16(b)));}
+\DoxyCodeLine{524 \}}
+\DoxyCodeLine{525 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{526 EIGEN\_STRONG\_INLINE Packet8uc pcast<Packet4s, Packet8uc>(\textcolor{keyword}{const} Packet4s\& a, \textcolor{keyword}{const} Packet4s\& b) \{}
+\DoxyCodeLine{527   \textcolor{keywordflow}{return} vmovn\_u16(vcombine\_u16(vreinterpret\_u16\_s16(a), vreinterpret\_u16\_s16(b)));}
+\DoxyCodeLine{528 \}}
+\DoxyCodeLine{529 }
+\DoxyCodeLine{530 \textcolor{comment}{//==============================================================================}}
+\DoxyCodeLine{531 \textcolor{comment}{// pcast, SrcType = uint16\_t}}
+\DoxyCodeLine{532 \textcolor{comment}{//==============================================================================}}
+\DoxyCodeLine{533 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{534 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint16\_t, float> \{}
+\DoxyCodeLine{535   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 2 \};}
+\DoxyCodeLine{536 \};}
+\DoxyCodeLine{537 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{538 EIGEN\_STRONG\_INLINE Packet4f pcast<Packet8us, Packet4f>(\textcolor{keyword}{const} Packet8us\& a) \{}
+\DoxyCodeLine{539   \textcolor{comment}{// Discard second half of input.}}
+\DoxyCodeLine{540   \textcolor{keywordflow}{return} vcvtq\_f32\_u32(vmovl\_u16(vget\_low\_u16(a)));}
+\DoxyCodeLine{541 \}}
+\DoxyCodeLine{542 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{543 EIGEN\_STRONG\_INLINE Packet2f pcast<Packet4us, Packet2f>(\textcolor{keyword}{const} Packet4us\& a) \{}
+\DoxyCodeLine{544   \textcolor{comment}{// Discard second half of input.}}
+\DoxyCodeLine{545   \textcolor{keywordflow}{return} vcvt\_f32\_u32(vget\_low\_u32(vmovl\_u16(a)));}
+\DoxyCodeLine{546 \}}
+\DoxyCodeLine{547 }
+\DoxyCodeLine{548 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{549 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint16\_t, numext::uint64\_t> \{}
+\DoxyCodeLine{550   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 4 \};}
+\DoxyCodeLine{551 \};}
+\DoxyCodeLine{552 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{553 EIGEN\_STRONG\_INLINE Packet2ul pcast<Packet8us, Packet2ul>(\textcolor{keyword}{const} Packet8us\& a) \{}
+\DoxyCodeLine{554   \textcolor{comment}{// Discard all but first two values.}}
+\DoxyCodeLine{555   \textcolor{keywordflow}{return} vmovl\_u32(vget\_low\_u32(vmovl\_u16(vget\_low\_u16(a))));}
+\DoxyCodeLine{556 \}}
+\DoxyCodeLine{557 }
+\DoxyCodeLine{558 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{559 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint16\_t, numext::int64\_t> \{}
+\DoxyCodeLine{560   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 4 \};}
+\DoxyCodeLine{561 \};}
+\DoxyCodeLine{562 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{563 EIGEN\_STRONG\_INLINE Packet2l pcast<Packet8us, Packet2l>(\textcolor{keyword}{const} Packet8us\& a) \{}
+\DoxyCodeLine{564   \textcolor{keywordflow}{return} vreinterpretq\_s64\_u64(pcast<Packet8us, Packet2ul>(a));}
+\DoxyCodeLine{565 \}}
+\DoxyCodeLine{566 }
+\DoxyCodeLine{567 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{568 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint16\_t, numext::uint32\_t> \{}
+\DoxyCodeLine{569   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 2 \};}
+\DoxyCodeLine{570 \};}
+\DoxyCodeLine{571 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{572 EIGEN\_STRONG\_INLINE Packet4ui pcast<Packet8us, Packet4ui>(\textcolor{keyword}{const} Packet8us\& a) \{}
+\DoxyCodeLine{573   \textcolor{comment}{// Discard second half of input.}}
+\DoxyCodeLine{574   \textcolor{keywordflow}{return} vmovl\_u16(vget\_low\_u16(a));}
+\DoxyCodeLine{575 \}}
+\DoxyCodeLine{576 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{577 EIGEN\_STRONG\_INLINE Packet2ui pcast<Packet4us, Packet2ui>(\textcolor{keyword}{const} Packet4us\& a) \{}
+\DoxyCodeLine{578   \textcolor{comment}{// Discard second half of input.}}
+\DoxyCodeLine{579   \textcolor{keywordflow}{return} vget\_low\_u32(vmovl\_u16(a));}
+\DoxyCodeLine{580 \}}
+\DoxyCodeLine{581 }
+\DoxyCodeLine{582 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{583 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint16\_t, numext::int32\_t> \{}
+\DoxyCodeLine{584   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 2 \};}
+\DoxyCodeLine{585 \};}
+\DoxyCodeLine{586 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{587 EIGEN\_STRONG\_INLINE Packet4i pcast<Packet8us, Packet4i>(\textcolor{keyword}{const} Packet8us\& a) \{}
+\DoxyCodeLine{588   \textcolor{keywordflow}{return} vreinterpretq\_s32\_u32(pcast<Packet8us, Packet4ui>(a));}
+\DoxyCodeLine{589 \}}
+\DoxyCodeLine{590 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{591 EIGEN\_STRONG\_INLINE Packet2i pcast<Packet4us, Packet2i>(\textcolor{keyword}{const} Packet4us\& a) \{}
+\DoxyCodeLine{592   \textcolor{keywordflow}{return} vreinterpret\_s32\_u32(pcast<Packet4us, Packet2ui>(a));}
+\DoxyCodeLine{593 \}}
+\DoxyCodeLine{594 }
+\DoxyCodeLine{595 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{596 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint16\_t, numext::uint16\_t> \{}
+\DoxyCodeLine{597   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{598 \};}
+\DoxyCodeLine{599 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{600 EIGEN\_STRONG\_INLINE Packet8us pcast<Packet8us, Packet8us>(\textcolor{keyword}{const} Packet8us\& a) \{}
+\DoxyCodeLine{601   \textcolor{keywordflow}{return} a;}
+\DoxyCodeLine{602 \}}
+\DoxyCodeLine{603 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{604 EIGEN\_STRONG\_INLINE Packet4us pcast<Packet4us, Packet4us>(\textcolor{keyword}{const} Packet4us\& a) \{}
+\DoxyCodeLine{605   \textcolor{keywordflow}{return} a;}
+\DoxyCodeLine{606 \}}
+\DoxyCodeLine{607 }
+\DoxyCodeLine{608 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{609 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint16\_t, numext::int16\_t> \{}
+\DoxyCodeLine{610   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{611 \};}
+\DoxyCodeLine{612 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{613 EIGEN\_STRONG\_INLINE Packet8s pcast<Packet8us, Packet8s>(\textcolor{keyword}{const} Packet8us\& a) \{}
+\DoxyCodeLine{614   \textcolor{keywordflow}{return} vreinterpretq\_s16\_u16(a);}
+\DoxyCodeLine{615 \}}
+\DoxyCodeLine{616 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{617 EIGEN\_STRONG\_INLINE Packet4s pcast<Packet4us, Packet4s>(\textcolor{keyword}{const} Packet4us\& a) \{}
+\DoxyCodeLine{618   \textcolor{keywordflow}{return} vreinterpret\_s16\_u16(a);}
+\DoxyCodeLine{619 \}}
+\DoxyCodeLine{620 }
+\DoxyCodeLine{621 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{622 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint16\_t, numext::uint8\_t> \{}
+\DoxyCodeLine{623   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 2, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{624 \};}
+\DoxyCodeLine{625 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{626 EIGEN\_STRONG\_INLINE Packet16uc pcast<Packet8us, Packet16uc>(\textcolor{keyword}{const} Packet8us\& a, \textcolor{keyword}{const} Packet8us\& b) \{}
+\DoxyCodeLine{627   \textcolor{keywordflow}{return} vcombine\_u8(vmovn\_u16(a), vmovn\_u16(b));}
+\DoxyCodeLine{628 \}}
+\DoxyCodeLine{629 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{630 EIGEN\_STRONG\_INLINE Packet8uc pcast<Packet4us, Packet8uc>(\textcolor{keyword}{const} Packet4us\& a, \textcolor{keyword}{const} Packet4us\& b) \{}
+\DoxyCodeLine{631   \textcolor{keywordflow}{return} vmovn\_u16(vcombine\_u16(a, b));}
+\DoxyCodeLine{632 \}}
+\DoxyCodeLine{633 }
+\DoxyCodeLine{634 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{635 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint16\_t, numext::int8\_t> \{}
+\DoxyCodeLine{636   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 2, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{637 \};}
+\DoxyCodeLine{638 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{639 EIGEN\_STRONG\_INLINE Packet16c pcast<Packet8us, Packet16c>(\textcolor{keyword}{const} Packet8us\& a, \textcolor{keyword}{const} Packet8us\& b) \{}
+\DoxyCodeLine{640   \textcolor{keywordflow}{return} vreinterpretq\_s8\_u8(pcast<Packet8us, Packet16uc>(a, b));}
+\DoxyCodeLine{641 \}}
+\DoxyCodeLine{642 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{643 EIGEN\_STRONG\_INLINE Packet8c pcast<Packet4us, Packet8c>(\textcolor{keyword}{const} Packet4us\& a, \textcolor{keyword}{const} Packet4us\& b) \{}
+\DoxyCodeLine{644   \textcolor{keywordflow}{return} vreinterpret\_s8\_u8(pcast<Packet4us, Packet8uc>(a, b));}
+\DoxyCodeLine{645 \}}
+\DoxyCodeLine{646 }
+\DoxyCodeLine{647 \textcolor{comment}{//==============================================================================}}
+\DoxyCodeLine{648 \textcolor{comment}{// pcast, SrcType = int32\_t}}
+\DoxyCodeLine{649 \textcolor{comment}{//==============================================================================}}
+\DoxyCodeLine{650 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{651 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int32\_t, float> \{}
+\DoxyCodeLine{652   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{653 \};}
+\DoxyCodeLine{654 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{655 EIGEN\_STRONG\_INLINE Packet4f pcast<Packet4i, Packet4f>(\textcolor{keyword}{const} Packet4i\& a) \{}
+\DoxyCodeLine{656   \textcolor{keywordflow}{return} vcvtq\_f32\_s32(a);}
+\DoxyCodeLine{657 \}}
+\DoxyCodeLine{658 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{659 EIGEN\_STRONG\_INLINE Packet2f pcast<Packet2i, Packet2f>(\textcolor{keyword}{const} Packet2i\& a) \{}
+\DoxyCodeLine{660   \textcolor{keywordflow}{return} vcvt\_f32\_s32(a);}
+\DoxyCodeLine{661 \}}
+\DoxyCodeLine{662 }
+\DoxyCodeLine{663 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{664 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int32\_t, numext::int64\_t> \{}
+\DoxyCodeLine{665   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 2 \};}
+\DoxyCodeLine{666 \};}
+\DoxyCodeLine{667 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{668 EIGEN\_STRONG\_INLINE Packet2l pcast<Packet4i, Packet2l>(\textcolor{keyword}{const} Packet4i\& a) \{}
+\DoxyCodeLine{669   \textcolor{comment}{// Discard second half of input.}}
+\DoxyCodeLine{670   \textcolor{keywordflow}{return} vmovl\_s32(vget\_low\_s32(a));}
+\DoxyCodeLine{671 \}}
+\DoxyCodeLine{672 }
+\DoxyCodeLine{673 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{674 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int32\_t, numext::uint64\_t> \{}
+\DoxyCodeLine{675   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 2 \};}
+\DoxyCodeLine{676 \};}
+\DoxyCodeLine{677 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{678 EIGEN\_STRONG\_INLINE Packet2ul pcast<Packet4i, Packet2ul>(\textcolor{keyword}{const} Packet4i\& a) \{}
+\DoxyCodeLine{679   \textcolor{keywordflow}{return} vreinterpretq\_u64\_s64(pcast<Packet4i, Packet2l>(a));}
+\DoxyCodeLine{680 \}}
+\DoxyCodeLine{681 }
+\DoxyCodeLine{682 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{683 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int32\_t, numext::int32\_t> \{}
+\DoxyCodeLine{684   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{685 \};}
+\DoxyCodeLine{686 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{687 EIGEN\_STRONG\_INLINE Packet4i pcast<Packet4i, Packet4i>(\textcolor{keyword}{const} Packet4i\& a) \{}
+\DoxyCodeLine{688   \textcolor{keywordflow}{return} a;}
+\DoxyCodeLine{689 \}}
+\DoxyCodeLine{690 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{691 EIGEN\_STRONG\_INLINE Packet2i pcast<Packet2i, Packet2i>(\textcolor{keyword}{const} Packet2i\& a) \{}
+\DoxyCodeLine{692   \textcolor{keywordflow}{return} a;}
+\DoxyCodeLine{693 \}}
+\DoxyCodeLine{694 }
+\DoxyCodeLine{695 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{696 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int32\_t, numext::uint32\_t> \{}
+\DoxyCodeLine{697   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{698 \};}
+\DoxyCodeLine{699 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{700 EIGEN\_STRONG\_INLINE Packet4ui pcast<Packet4i, Packet4ui>(\textcolor{keyword}{const} Packet4i\& a) \{}
+\DoxyCodeLine{701   \textcolor{keywordflow}{return} vreinterpretq\_u32\_s32(a);}
+\DoxyCodeLine{702 \}}
+\DoxyCodeLine{703 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{704 EIGEN\_STRONG\_INLINE Packet2ui pcast<Packet2i, Packet2ui>(\textcolor{keyword}{const} Packet2i\& a) \{}
+\DoxyCodeLine{705   \textcolor{keywordflow}{return} vreinterpret\_u32\_s32(a);}
+\DoxyCodeLine{706 \}}
+\DoxyCodeLine{707 }
+\DoxyCodeLine{708 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{709 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int32\_t, numext::int16\_t> \{}
+\DoxyCodeLine{710   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 2, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{711 \};}
+\DoxyCodeLine{712 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{713 EIGEN\_STRONG\_INLINE Packet8s pcast<Packet4i, Packet8s>(\textcolor{keyword}{const} Packet4i\& a, \textcolor{keyword}{const} Packet4i\& b) \{}
+\DoxyCodeLine{714   \textcolor{keywordflow}{return} vcombine\_s16(vmovn\_s32(a), vmovn\_s32(b));}
+\DoxyCodeLine{715 \}}
+\DoxyCodeLine{716 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{717 EIGEN\_STRONG\_INLINE Packet4s pcast<Packet2i, Packet4s>(\textcolor{keyword}{const} Packet2i\& a, \textcolor{keyword}{const} Packet2i\& b) \{}
+\DoxyCodeLine{718   \textcolor{keywordflow}{return} vmovn\_s32(vcombine\_s32(a, b));}
+\DoxyCodeLine{719 \}}
+\DoxyCodeLine{720 }
+\DoxyCodeLine{721 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{722 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int32\_t, numext::uint16\_t> \{}
+\DoxyCodeLine{723   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 2, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{724 \};}
+\DoxyCodeLine{725 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{726 EIGEN\_STRONG\_INLINE Packet8us pcast<Packet4i, Packet8us>(\textcolor{keyword}{const} Packet4i\& a, \textcolor{keyword}{const} Packet4i\& b) \{}
+\DoxyCodeLine{727   \textcolor{keywordflow}{return} vcombine\_u16(vmovn\_u32(vreinterpretq\_u32\_s32(a)), vmovn\_u32(vreinterpretq\_u32\_s32(b)));}
+\DoxyCodeLine{728 \}}
+\DoxyCodeLine{729 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{730 EIGEN\_STRONG\_INLINE Packet4us pcast<Packet2i, Packet4us>(\textcolor{keyword}{const} Packet2i\& a, \textcolor{keyword}{const} Packet2i\& b) \{}
+\DoxyCodeLine{731   \textcolor{keywordflow}{return} vmovn\_u32(vreinterpretq\_u32\_s32(vcombine\_s32(a, b)));}
+\DoxyCodeLine{732 \}}
+\DoxyCodeLine{733 }
+\DoxyCodeLine{734 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{735 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int32\_t, numext::int8\_t> \{}
+\DoxyCodeLine{736   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 4, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{737 \};}
+\DoxyCodeLine{738 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{739 EIGEN\_STRONG\_INLINE Packet16c pcast<Packet4i, Packet16c>(\textcolor{keyword}{const} Packet4i\& a, \textcolor{keyword}{const} Packet4i\& b, \textcolor{keyword}{const} Packet4i\& c,}
+\DoxyCodeLine{740                                                          \textcolor{keyword}{const} Packet4i\& d) \{}
+\DoxyCodeLine{741   \textcolor{keyword}{const} int16x8\_t ab\_s16 = pcast<Packet4i, Packet8s>(a, b);}
+\DoxyCodeLine{742   \textcolor{keyword}{const} int16x8\_t cd\_s16 = pcast<Packet4i, Packet8s>(c, d);}
+\DoxyCodeLine{743   \textcolor{keywordflow}{return} vcombine\_s8(vmovn\_s16(ab\_s16), vmovn\_s16(cd\_s16));}
+\DoxyCodeLine{744 \}}
+\DoxyCodeLine{745 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{746 EIGEN\_STRONG\_INLINE Packet8c pcast<Packet2i, Packet8c>(\textcolor{keyword}{const} Packet2i\& a, \textcolor{keyword}{const} Packet2i\& b, \textcolor{keyword}{const} Packet2i\& c,}
+\DoxyCodeLine{747                                                        \textcolor{keyword}{const} Packet2i\& d) \{}
+\DoxyCodeLine{748   \textcolor{keyword}{const} int16x4\_t ab\_s16 = vmovn\_s32(vcombine\_s32(a, b));}
+\DoxyCodeLine{749   \textcolor{keyword}{const} int16x4\_t cd\_s16 = vmovn\_s32(vcombine\_s32(c, d));}
+\DoxyCodeLine{750   \textcolor{keywordflow}{return} vmovn\_s16(vcombine\_s16(ab\_s16, cd\_s16));}
+\DoxyCodeLine{751 \}}
+\DoxyCodeLine{752 }
+\DoxyCodeLine{753 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{754 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int32\_t, numext::uint8\_t> \{}
+\DoxyCodeLine{755   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 4, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{756 \};}
+\DoxyCodeLine{757 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{758 EIGEN\_STRONG\_INLINE Packet16uc pcast<Packet4i, Packet16uc>(\textcolor{keyword}{const} Packet4i\& a, \textcolor{keyword}{const} Packet4i\& b, \textcolor{keyword}{const} Packet4i\& c,}
+\DoxyCodeLine{759                                                            \textcolor{keyword}{const} Packet4i\& d) \{}
+\DoxyCodeLine{760   \textcolor{keyword}{const} uint16x8\_t ab\_u16 = pcast<Packet4i, Packet8us>(a, b);}
+\DoxyCodeLine{761   \textcolor{keyword}{const} uint16x8\_t cd\_u16 = pcast<Packet4i, Packet8us>(c, d);}
+\DoxyCodeLine{762   \textcolor{keywordflow}{return} vcombine\_u8(vmovn\_u16(ab\_u16), vmovn\_u16(cd\_u16));}
+\DoxyCodeLine{763 \}}
+\DoxyCodeLine{764 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{765 EIGEN\_STRONG\_INLINE Packet8uc pcast<Packet2i, Packet8uc>(\textcolor{keyword}{const} Packet2i\& a, \textcolor{keyword}{const} Packet2i\& b, \textcolor{keyword}{const} Packet2i\& c,}
+\DoxyCodeLine{766                                                          \textcolor{keyword}{const} Packet2i\& d) \{}
+\DoxyCodeLine{767   \textcolor{keyword}{const} uint16x4\_t ab\_u16 = pcast<Packet2i, Packet4us>(a, b);}
+\DoxyCodeLine{768   \textcolor{keyword}{const} uint16x4\_t cd\_u16 = pcast<Packet2i, Packet4us>(c, d);}
+\DoxyCodeLine{769   \textcolor{keywordflow}{return} vmovn\_u16(vcombine\_u16(ab\_u16, cd\_u16));}
+\DoxyCodeLine{770 \}}
+\DoxyCodeLine{771 }
+\DoxyCodeLine{772 \textcolor{comment}{//==============================================================================}}
+\DoxyCodeLine{773 \textcolor{comment}{// pcast, SrcType = uint32\_t}}
+\DoxyCodeLine{774 \textcolor{comment}{//==============================================================================}}
+\DoxyCodeLine{775 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{776 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint32\_t, float> \{}
+\DoxyCodeLine{777   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{778 \};}
+\DoxyCodeLine{779 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{780 EIGEN\_STRONG\_INLINE Packet4f pcast<Packet4ui, Packet4f>(\textcolor{keyword}{const} Packet4ui\& a) \{}
+\DoxyCodeLine{781   \textcolor{keywordflow}{return} vcvtq\_f32\_u32(a);}
+\DoxyCodeLine{782 \}}
+\DoxyCodeLine{783 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{784 EIGEN\_STRONG\_INLINE Packet2f pcast<Packet2ui, Packet2f>(\textcolor{keyword}{const} Packet2ui\& a) \{}
+\DoxyCodeLine{785   \textcolor{keywordflow}{return} vcvt\_f32\_u32(a);}
+\DoxyCodeLine{786 \}}
+\DoxyCodeLine{787 }
+\DoxyCodeLine{788 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{789 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint32\_t, numext::uint64\_t> \{}
+\DoxyCodeLine{790   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 2 \};}
+\DoxyCodeLine{791 \};}
+\DoxyCodeLine{792 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{793 EIGEN\_STRONG\_INLINE Packet2ul pcast<Packet4ui, Packet2ul>(\textcolor{keyword}{const} Packet4ui\& a) \{}
+\DoxyCodeLine{794   \textcolor{comment}{// Discard second half of input.}}
+\DoxyCodeLine{795   \textcolor{keywordflow}{return} vmovl\_u32(vget\_low\_u32(a));}
+\DoxyCodeLine{796 \}}
+\DoxyCodeLine{797 }
+\DoxyCodeLine{798 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{799 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint32\_t, numext::int64\_t> \{}
+\DoxyCodeLine{800   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 2 \};}
+\DoxyCodeLine{801 \};}
+\DoxyCodeLine{802 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{803 EIGEN\_STRONG\_INLINE Packet2l pcast<Packet4ui, Packet2l>(\textcolor{keyword}{const} Packet4ui\& a) \{}
+\DoxyCodeLine{804   \textcolor{keywordflow}{return} vreinterpretq\_s64\_u64(pcast<Packet4ui, Packet2ul>(a));}
+\DoxyCodeLine{805 \}}
+\DoxyCodeLine{806 }
+\DoxyCodeLine{807 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{808 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint32\_t, numext::uint32\_t> \{}
+\DoxyCodeLine{809   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{810 \};}
+\DoxyCodeLine{811 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{812 EIGEN\_STRONG\_INLINE Packet4ui pcast<Packet4ui, Packet4ui>(\textcolor{keyword}{const} Packet4ui\& a) \{}
+\DoxyCodeLine{813   \textcolor{keywordflow}{return} a;}
+\DoxyCodeLine{814 \}}
+\DoxyCodeLine{815 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{816 EIGEN\_STRONG\_INLINE Packet2ui pcast<Packet2ui, Packet2ui>(\textcolor{keyword}{const} Packet2ui\& a) \{}
+\DoxyCodeLine{817   \textcolor{keywordflow}{return} a;}
+\DoxyCodeLine{818 \}}
+\DoxyCodeLine{819 }
+\DoxyCodeLine{820 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{821 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint32\_t, numext::int32\_t> \{}
+\DoxyCodeLine{822   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{823 \};}
+\DoxyCodeLine{824 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{825 EIGEN\_STRONG\_INLINE Packet4i pcast<Packet4ui, Packet4i>(\textcolor{keyword}{const} Packet4ui\& a) \{}
+\DoxyCodeLine{826   \textcolor{keywordflow}{return} vreinterpretq\_s32\_u32(a);}
+\DoxyCodeLine{827 \}}
+\DoxyCodeLine{828 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{829 EIGEN\_STRONG\_INLINE Packet2i pcast<Packet2ui, Packet2i>(\textcolor{keyword}{const} Packet2ui\& a) \{}
+\DoxyCodeLine{830   \textcolor{keywordflow}{return} vreinterpret\_s32\_u32(a);}
+\DoxyCodeLine{831 \}}
+\DoxyCodeLine{832 }
+\DoxyCodeLine{833 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{834 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint32\_t, numext::uint16\_t> \{}
+\DoxyCodeLine{835   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 2, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{836 \};}
+\DoxyCodeLine{837 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{838 EIGEN\_STRONG\_INLINE Packet8us pcast<Packet4ui, Packet8us>(\textcolor{keyword}{const} Packet4ui\& a, \textcolor{keyword}{const} Packet4ui\& b) \{}
+\DoxyCodeLine{839   \textcolor{keywordflow}{return} vcombine\_u16(vmovn\_u32(a), vmovn\_u32(b));}
+\DoxyCodeLine{840 \}}
+\DoxyCodeLine{841 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{842 EIGEN\_STRONG\_INLINE Packet4us pcast<Packet2ui, Packet4us>(\textcolor{keyword}{const} Packet2ui\& a, \textcolor{keyword}{const} Packet2ui\& b) \{}
+\DoxyCodeLine{843   \textcolor{keywordflow}{return} vmovn\_u32(vcombine\_u32(a, b));}
+\DoxyCodeLine{844 \}}
+\DoxyCodeLine{845 }
+\DoxyCodeLine{846 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{847 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint32\_t, numext::int16\_t> \{}
+\DoxyCodeLine{848   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 2, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{849 \};}
+\DoxyCodeLine{850 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{851 EIGEN\_STRONG\_INLINE Packet8s pcast<Packet4ui, Packet8s>(\textcolor{keyword}{const} Packet4ui\& a, \textcolor{keyword}{const} Packet4ui\& b) \{}
+\DoxyCodeLine{852   \textcolor{keywordflow}{return} vreinterpretq\_s16\_u16(pcast<Packet4ui, Packet8us>(a, b));}
+\DoxyCodeLine{853 \}}
+\DoxyCodeLine{854 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{855 EIGEN\_STRONG\_INLINE Packet4s pcast<Packet2ui, Packet4s>(\textcolor{keyword}{const} Packet2ui\& a, \textcolor{keyword}{const} Packet2ui\& b) \{}
+\DoxyCodeLine{856   \textcolor{keywordflow}{return} vreinterpret\_s16\_u16(pcast<Packet2ui, Packet4us>(a, b));}
+\DoxyCodeLine{857 \}}
+\DoxyCodeLine{858 }
+\DoxyCodeLine{859 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{860 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint32\_t, numext::uint8\_t> \{}
+\DoxyCodeLine{861   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 4, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{862 \};}
+\DoxyCodeLine{863 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{864 EIGEN\_STRONG\_INLINE Packet16uc pcast<Packet4ui, Packet16uc>(\textcolor{keyword}{const} Packet4ui\& a, \textcolor{keyword}{const} Packet4ui\& b, \textcolor{keyword}{const} Packet4ui\& c,}
+\DoxyCodeLine{865                                                             \textcolor{keyword}{const} Packet4ui\& d) \{}
+\DoxyCodeLine{866   \textcolor{keyword}{const} uint16x8\_t ab\_u16 = vcombine\_u16(vmovn\_u32(a), vmovn\_u32(b));}
+\DoxyCodeLine{867   \textcolor{keyword}{const} uint16x8\_t cd\_u16 = vcombine\_u16(vmovn\_u32(c), vmovn\_u32(d));}
+\DoxyCodeLine{868   \textcolor{keywordflow}{return} vcombine\_u8(vmovn\_u16(ab\_u16), vmovn\_u16(cd\_u16));}
+\DoxyCodeLine{869 \}}
+\DoxyCodeLine{870 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{871 EIGEN\_STRONG\_INLINE Packet8uc pcast<Packet2ui, Packet8uc>(\textcolor{keyword}{const} Packet2ui\& a, \textcolor{keyword}{const} Packet2ui\& b, \textcolor{keyword}{const} Packet2ui\& c,}
+\DoxyCodeLine{872                                                           \textcolor{keyword}{const} Packet2ui\& d) \{}
+\DoxyCodeLine{873   \textcolor{keyword}{const} uint16x4\_t ab\_u16 = vmovn\_u32(vcombine\_u32(a, b));}
+\DoxyCodeLine{874   \textcolor{keyword}{const} uint16x4\_t cd\_u16 = vmovn\_u32(vcombine\_u32(c, d));}
+\DoxyCodeLine{875   \textcolor{keywordflow}{return} vmovn\_u16(vcombine\_u16(ab\_u16, cd\_u16));}
+\DoxyCodeLine{876 \}}
+\DoxyCodeLine{877 }
+\DoxyCodeLine{878 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{879 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint32\_t, numext::int8\_t> \{}
+\DoxyCodeLine{880   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 4, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{881 \};}
+\DoxyCodeLine{882 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{883 EIGEN\_STRONG\_INLINE Packet16c pcast<Packet4ui, Packet16c>(\textcolor{keyword}{const} Packet4ui\& a, \textcolor{keyword}{const} Packet4ui\& b, \textcolor{keyword}{const} Packet4ui\& c,}
+\DoxyCodeLine{884                                                           \textcolor{keyword}{const} Packet4ui\& d) \{}
+\DoxyCodeLine{885   \textcolor{keywordflow}{return} vreinterpretq\_s8\_u8(pcast<Packet4ui, Packet16uc>(a, b, c, d));}
+\DoxyCodeLine{886 \}}
+\DoxyCodeLine{887 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{888 EIGEN\_STRONG\_INLINE Packet8c pcast<Packet2ui, Packet8c>(\textcolor{keyword}{const} Packet2ui\& a, \textcolor{keyword}{const} Packet2ui\& b, \textcolor{keyword}{const} Packet2ui\& c,}
+\DoxyCodeLine{889                                                         \textcolor{keyword}{const} Packet2ui\& d) \{}
+\DoxyCodeLine{890   \textcolor{keywordflow}{return} vreinterpret\_s8\_u8(pcast<Packet2ui, Packet8uc>(a, b, c, d));}
+\DoxyCodeLine{891 \}}
+\DoxyCodeLine{892 }
+\DoxyCodeLine{893 \textcolor{comment}{//==============================================================================}}
+\DoxyCodeLine{894 \textcolor{comment}{// pcast, SrcType = int64\_t}}
+\DoxyCodeLine{895 \textcolor{comment}{//==============================================================================}}
+\DoxyCodeLine{896 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{897 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int64\_t, float> \{}
+\DoxyCodeLine{898   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 2, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{899 \};}
+\DoxyCodeLine{900 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{901 EIGEN\_STRONG\_INLINE Packet4f pcast<Packet2l, Packet4f>(\textcolor{keyword}{const} Packet2l\& a, \textcolor{keyword}{const} Packet2l\& b) \{}
+\DoxyCodeLine{902   \textcolor{keywordflow}{return} vcvtq\_f32\_s32(vcombine\_s32(vmovn\_s64(a), vmovn\_s64(b)));}
+\DoxyCodeLine{903 \}}
+\DoxyCodeLine{904 }
+\DoxyCodeLine{905 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{906 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int64\_t, numext::int64\_t> \{}
+\DoxyCodeLine{907   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{908 \};}
+\DoxyCodeLine{909 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{910 EIGEN\_STRONG\_INLINE Packet2l pcast<Packet2l, Packet2l>(\textcolor{keyword}{const} Packet2l\& a) \{}
+\DoxyCodeLine{911   \textcolor{keywordflow}{return} a;}
+\DoxyCodeLine{912 \}}
+\DoxyCodeLine{913 }
+\DoxyCodeLine{914 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{915 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int64\_t, numext::uint64\_t> \{}
+\DoxyCodeLine{916   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{917 \};}
+\DoxyCodeLine{918 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{919 EIGEN\_STRONG\_INLINE Packet2ul pcast<Packet2l, Packet2ul>(\textcolor{keyword}{const} Packet2l\& a) \{}
+\DoxyCodeLine{920   \textcolor{keywordflow}{return} vreinterpretq\_u64\_s64(a);}
+\DoxyCodeLine{921 \}}
+\DoxyCodeLine{922 }
+\DoxyCodeLine{923 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{924 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int64\_t, numext::int32\_t> \{}
+\DoxyCodeLine{925   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 2, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{926 \};}
+\DoxyCodeLine{927 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{928 EIGEN\_STRONG\_INLINE Packet4i pcast<Packet2l, Packet4i>(\textcolor{keyword}{const} Packet2l\& a, \textcolor{keyword}{const} Packet2l\& b) \{}
+\DoxyCodeLine{929   \textcolor{keywordflow}{return} vcombine\_s32(vmovn\_s64(a), vmovn\_s64(b));}
+\DoxyCodeLine{930 \}}
+\DoxyCodeLine{931 }
+\DoxyCodeLine{932 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{933 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int64\_t, numext::uint32\_t> \{}
+\DoxyCodeLine{934   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 2, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{935 \};}
+\DoxyCodeLine{936 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{937 EIGEN\_STRONG\_INLINE Packet4ui pcast<Packet2l, Packet4ui>(\textcolor{keyword}{const} Packet2l\& a, \textcolor{keyword}{const} Packet2l\& b) \{}
+\DoxyCodeLine{938   \textcolor{keywordflow}{return} vcombine\_u32(vmovn\_u64(vreinterpretq\_u64\_s64(a)), vmovn\_u64(vreinterpretq\_u64\_s64(b)));}
+\DoxyCodeLine{939 \}}
+\DoxyCodeLine{940 }
+\DoxyCodeLine{941 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{942 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int64\_t, numext::int16\_t> \{}
+\DoxyCodeLine{943   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 4, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{944 \};}
+\DoxyCodeLine{945 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{946 EIGEN\_STRONG\_INLINE Packet8s pcast<Packet2l, Packet8s>(\textcolor{keyword}{const} Packet2l\& a, \textcolor{keyword}{const} Packet2l\& b, \textcolor{keyword}{const} Packet2l\& c,}
+\DoxyCodeLine{947                                                        \textcolor{keyword}{const} Packet2l\& d) \{}
+\DoxyCodeLine{948   \textcolor{keyword}{const} int32x4\_t ab\_s32 = pcast<Packet2l, Packet4i>(a, b);}
+\DoxyCodeLine{949   \textcolor{keyword}{const} int32x4\_t cd\_s32 = pcast<Packet2l, Packet4i>(c, d);}
+\DoxyCodeLine{950   \textcolor{keywordflow}{return} vcombine\_s16(vmovn\_s32(ab\_s32), vmovn\_s32(cd\_s32));}
+\DoxyCodeLine{951 \}}
+\DoxyCodeLine{952 }
+\DoxyCodeLine{953 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{954 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int64\_t, numext::uint16\_t> \{}
+\DoxyCodeLine{955   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 4, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{956 \};}
+\DoxyCodeLine{957 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{958 EIGEN\_STRONG\_INLINE Packet8us pcast<Packet2l, Packet8us>(\textcolor{keyword}{const} Packet2l\& a, \textcolor{keyword}{const} Packet2l\& b, \textcolor{keyword}{const} Packet2l\& c,}
+\DoxyCodeLine{959                                                          \textcolor{keyword}{const} Packet2l\& d) \{}
+\DoxyCodeLine{960   \textcolor{keyword}{const} uint32x4\_t ab\_u32 = pcast<Packet2l, Packet4ui>(a, b);}
+\DoxyCodeLine{961   \textcolor{keyword}{const} uint32x4\_t cd\_u32 = pcast<Packet2l, Packet4ui>(c, d);}
+\DoxyCodeLine{962   \textcolor{keywordflow}{return} vcombine\_u16(vmovn\_u32(ab\_u32), vmovn\_u32(cd\_u32));}
+\DoxyCodeLine{963 \}}
+\DoxyCodeLine{964 }
+\DoxyCodeLine{965 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{966 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int64\_t, numext::int8\_t> \{}
+\DoxyCodeLine{967   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 8, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{968 \};}
+\DoxyCodeLine{969 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{970 EIGEN\_STRONG\_INLINE Packet16c pcast<Packet2l, Packet16c>(\textcolor{keyword}{const} Packet2l\& a, \textcolor{keyword}{const} Packet2l\& b, \textcolor{keyword}{const} Packet2l\& c,}
+\DoxyCodeLine{971                                                          \textcolor{keyword}{const} Packet2l\& d, \textcolor{keyword}{const} Packet2l\& e, \textcolor{keyword}{const} Packet2l\& f,}
+\DoxyCodeLine{972                                                          \textcolor{keyword}{const} Packet2l\& g, \textcolor{keyword}{const} Packet2l\& h) \{}
+\DoxyCodeLine{973   \textcolor{keyword}{const} int16x8\_t abcd\_s16 = pcast<Packet2l, Packet8s>(a, b, c, d);}
+\DoxyCodeLine{974   \textcolor{keyword}{const} int16x8\_t efgh\_s16 = pcast<Packet2l, Packet8s>(e, f, g, h);}
+\DoxyCodeLine{975   \textcolor{keywordflow}{return} vcombine\_s8(vmovn\_s16(abcd\_s16), vmovn\_s16(efgh\_s16));}
+\DoxyCodeLine{976 \}}
+\DoxyCodeLine{977 }
+\DoxyCodeLine{978 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{979 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::int64\_t, numext::uint8\_t> \{}
+\DoxyCodeLine{980   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 8, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{981 \};}
+\DoxyCodeLine{982 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{983 EIGEN\_STRONG\_INLINE Packet16uc pcast<Packet2l, Packet16uc>(\textcolor{keyword}{const} Packet2l\& a, \textcolor{keyword}{const} Packet2l\& b, \textcolor{keyword}{const} Packet2l\& c,}
+\DoxyCodeLine{984                                                            \textcolor{keyword}{const} Packet2l\& d, \textcolor{keyword}{const} Packet2l\& e, \textcolor{keyword}{const} Packet2l\& f,}
+\DoxyCodeLine{985                                                            \textcolor{keyword}{const} Packet2l\& g, \textcolor{keyword}{const} Packet2l\& h) \{}
+\DoxyCodeLine{986   \textcolor{keyword}{const} uint16x8\_t abcd\_u16 = pcast<Packet2l, Packet8us>(a, b, c, d);}
+\DoxyCodeLine{987   \textcolor{keyword}{const} uint16x8\_t efgh\_u16 = pcast<Packet2l, Packet8us>(e, f, g, h);}
+\DoxyCodeLine{988   \textcolor{keywordflow}{return} vcombine\_u8(vmovn\_u16(abcd\_u16), vmovn\_u16(efgh\_u16));}
+\DoxyCodeLine{989 \}}
+\DoxyCodeLine{990 }
+\DoxyCodeLine{991 \textcolor{comment}{//==============================================================================}}
+\DoxyCodeLine{992 \textcolor{comment}{// pcast, SrcType = uint64\_t}}
+\DoxyCodeLine{993 \textcolor{comment}{//==============================================================================}}
+\DoxyCodeLine{994 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{995 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint64\_t, float> \{}
+\DoxyCodeLine{996   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 2, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{997 \};}
+\DoxyCodeLine{998 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{999 EIGEN\_STRONG\_INLINE Packet4f pcast<Packet2ul, Packet4f>(\textcolor{keyword}{const} Packet2ul\& a, \textcolor{keyword}{const} Packet2ul\& b) \{}
+\DoxyCodeLine{1000   \textcolor{keywordflow}{return} vcvtq\_f32\_u32(vcombine\_u32(vmovn\_u64(a), vmovn\_u64(b)));}
+\DoxyCodeLine{1001 \}}
+\DoxyCodeLine{1002 }
+\DoxyCodeLine{1003 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1004 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint64\_t, numext::uint64\_t> \{}
+\DoxyCodeLine{1005   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{1006 \};}
+\DoxyCodeLine{1007 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1008 EIGEN\_STRONG\_INLINE Packet2ul pcast<Packet2ul, Packet2ul>(\textcolor{keyword}{const} Packet2ul\& a) \{}
+\DoxyCodeLine{1009   \textcolor{keywordflow}{return} a;}
+\DoxyCodeLine{1010 \}}
+\DoxyCodeLine{1011 }
+\DoxyCodeLine{1012 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1013 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint64\_t, numext::int64\_t> \{}
+\DoxyCodeLine{1014   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{1015 \};}
+\DoxyCodeLine{1016 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1017 EIGEN\_STRONG\_INLINE Packet2l pcast<Packet2ul, Packet2l>(\textcolor{keyword}{const} Packet2ul\& a) \{}
+\DoxyCodeLine{1018   \textcolor{keywordflow}{return} vreinterpretq\_s64\_u64(a);}
+\DoxyCodeLine{1019 \}}
+\DoxyCodeLine{1020 }
+\DoxyCodeLine{1021 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1022 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint64\_t, numext::uint32\_t> \{}
+\DoxyCodeLine{1023   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 2, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{1024 \};}
+\DoxyCodeLine{1025 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1026 EIGEN\_STRONG\_INLINE Packet4ui pcast<Packet2ul, Packet4ui>(\textcolor{keyword}{const} Packet2ul\& a, \textcolor{keyword}{const} Packet2ul\& b) \{}
+\DoxyCodeLine{1027   \textcolor{keywordflow}{return} vcombine\_u32(vmovn\_u64(a), vmovn\_u64(b));}
+\DoxyCodeLine{1028 \}}
+\DoxyCodeLine{1029 }
+\DoxyCodeLine{1030 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1031 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint64\_t, numext::int32\_t> \{}
+\DoxyCodeLine{1032   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 2, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{1033 \};}
+\DoxyCodeLine{1034 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1035 EIGEN\_STRONG\_INLINE Packet4i pcast<Packet2ul, Packet4i>(\textcolor{keyword}{const} Packet2ul\& a, \textcolor{keyword}{const} Packet2ul\& b) \{}
+\DoxyCodeLine{1036   \textcolor{keywordflow}{return} vreinterpretq\_s32\_u32(pcast<Packet2ul, Packet4ui>(a, b));}
+\DoxyCodeLine{1037 \}}
+\DoxyCodeLine{1038 }
+\DoxyCodeLine{1039 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1040 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint64\_t, numext::uint16\_t> \{}
+\DoxyCodeLine{1041   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 4, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{1042 \};}
+\DoxyCodeLine{1043 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1044 EIGEN\_STRONG\_INLINE Packet8us pcast<Packet2ul, Packet8us>(\textcolor{keyword}{const} Packet2ul\& a, \textcolor{keyword}{const} Packet2ul\& b, \textcolor{keyword}{const} Packet2ul\& c,}
+\DoxyCodeLine{1045                                                           \textcolor{keyword}{const} Packet2ul\& d) \{}
+\DoxyCodeLine{1046   \textcolor{keyword}{const} uint16x4\_t ab\_u16 = vmovn\_u32(vcombine\_u32(vmovn\_u64(a), vmovn\_u64(b)));}
+\DoxyCodeLine{1047   \textcolor{keyword}{const} uint16x4\_t cd\_u16 = vmovn\_u32(vcombine\_u32(vmovn\_u64(c), vmovn\_u64(d)));}
+\DoxyCodeLine{1048   \textcolor{keywordflow}{return} vcombine\_u16(ab\_u16, cd\_u16);}
+\DoxyCodeLine{1049 \}}
+\DoxyCodeLine{1050 }
+\DoxyCodeLine{1051 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1052 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint64\_t, numext::int16\_t> \{}
+\DoxyCodeLine{1053   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 4, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{1054 \};}
+\DoxyCodeLine{1055 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1056 EIGEN\_STRONG\_INLINE Packet8s pcast<Packet2ul, Packet8s>(\textcolor{keyword}{const} Packet2ul\& a, \textcolor{keyword}{const} Packet2ul\& b, \textcolor{keyword}{const} Packet2ul\& c,}
+\DoxyCodeLine{1057                                                         \textcolor{keyword}{const} Packet2ul\& d) \{}
+\DoxyCodeLine{1058   \textcolor{keywordflow}{return} vreinterpretq\_s16\_u16(pcast<Packet2ul, Packet8us>(a, b, c, d));}
+\DoxyCodeLine{1059 \}}
+\DoxyCodeLine{1060 }
+\DoxyCodeLine{1061 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1062 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint64\_t, numext::uint8\_t> \{}
+\DoxyCodeLine{1063   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 8, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{1064 \};}
+\DoxyCodeLine{1065 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1066 EIGEN\_STRONG\_INLINE Packet16uc pcast<Packet2ul, Packet16uc>(\textcolor{keyword}{const} Packet2ul\& a, \textcolor{keyword}{const} Packet2ul\& b, \textcolor{keyword}{const} Packet2ul\& c,}
+\DoxyCodeLine{1067                                                             \textcolor{keyword}{const} Packet2ul\& d, \textcolor{keyword}{const} Packet2ul\& e, \textcolor{keyword}{const} Packet2ul\& f,}
+\DoxyCodeLine{1068                                                             \textcolor{keyword}{const} Packet2ul\& g, \textcolor{keyword}{const} Packet2ul\& h) \{}
+\DoxyCodeLine{1069   \textcolor{keyword}{const} uint16x8\_t abcd\_u16 = pcast<Packet2ul, Packet8us>(a, b, c, d);}
+\DoxyCodeLine{1070   \textcolor{keyword}{const} uint16x8\_t efgh\_u16 = pcast<Packet2ul, Packet8us>(e, f, g, h);}
+\DoxyCodeLine{1071   \textcolor{keywordflow}{return} vcombine\_u8(vmovn\_u16(abcd\_u16), vmovn\_u16(efgh\_u16));}
+\DoxyCodeLine{1072 \}}
+\DoxyCodeLine{1073 }
+\DoxyCodeLine{1074 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1075 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<numext::uint64\_t, numext::int8\_t> \{}
+\DoxyCodeLine{1076   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 8, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{1077 \};}
+\DoxyCodeLine{1078 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1079 EIGEN\_STRONG\_INLINE Packet16c pcast<Packet2ul, Packet16c>(\textcolor{keyword}{const} Packet2ul\& a, \textcolor{keyword}{const} Packet2ul\& b, \textcolor{keyword}{const} Packet2ul\& c,}
+\DoxyCodeLine{1080                                                           \textcolor{keyword}{const} Packet2ul\& d, \textcolor{keyword}{const} Packet2ul\& e, \textcolor{keyword}{const} Packet2ul\& f,}
+\DoxyCodeLine{1081                                                           \textcolor{keyword}{const} Packet2ul\& g, \textcolor{keyword}{const} Packet2ul\& h) \{}
+\DoxyCodeLine{1082   \textcolor{keywordflow}{return} vreinterpretq\_s8\_u8(pcast<Packet2ul, Packet16uc>(a, b, c, d, e, f, g, h));}
+\DoxyCodeLine{1083 \}}
+\DoxyCodeLine{1084 }
+\DoxyCodeLine{1085 \textcolor{comment}{//==============================================================================}}
+\DoxyCodeLine{1086 \textcolor{comment}{// preinterpret}}
+\DoxyCodeLine{1087 \textcolor{comment}{//==============================================================================}}
+\DoxyCodeLine{1088 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1089 EIGEN\_STRONG\_INLINE Packet2f preinterpret<Packet2f, Packet2i>(\textcolor{keyword}{const} Packet2i\& a) \{}
+\DoxyCodeLine{1090   \textcolor{keywordflow}{return} vreinterpret\_f32\_s32(a);}
+\DoxyCodeLine{1091 \}}
+\DoxyCodeLine{1092 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1093 EIGEN\_STRONG\_INLINE Packet2f preinterpret<Packet2f, Packet2ui>(\textcolor{keyword}{const} Packet2ui\& a) \{}
+\DoxyCodeLine{1094   \textcolor{keywordflow}{return} vreinterpret\_f32\_u32(a);}
+\DoxyCodeLine{1095 \}}
+\DoxyCodeLine{1096 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1097 EIGEN\_STRONG\_INLINE Packet4f preinterpret<Packet4f, Packet4i>(\textcolor{keyword}{const} Packet4i\& a) \{}
+\DoxyCodeLine{1098   \textcolor{keywordflow}{return} vreinterpretq\_f32\_s32(a);}
+\DoxyCodeLine{1099 \}}
+\DoxyCodeLine{1100 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1101 EIGEN\_STRONG\_INLINE Packet4f preinterpret<Packet4f, Packet4ui>(\textcolor{keyword}{const} Packet4ui\& a) \{}
+\DoxyCodeLine{1102   \textcolor{keywordflow}{return} vreinterpretq\_f32\_u32(a);}
+\DoxyCodeLine{1103 \}}
+\DoxyCodeLine{1104 }
+\DoxyCodeLine{1105 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1106 EIGEN\_STRONG\_INLINE Packet4c preinterpret<Packet4c, Packet4uc>(\textcolor{keyword}{const} Packet4uc\& a) \{}
+\DoxyCodeLine{1107   \textcolor{keywordflow}{return} \textcolor{keyword}{static\_cast<}Packet4c\textcolor{keyword}{>}(a);}
+\DoxyCodeLine{1108 \}}
+\DoxyCodeLine{1109 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1110 EIGEN\_STRONG\_INLINE Packet8c preinterpret<Packet8c, Packet8uc>(\textcolor{keyword}{const} Packet8uc\& a) \{}
+\DoxyCodeLine{1111   \textcolor{keywordflow}{return} vreinterpret\_s8\_u8(a);}
+\DoxyCodeLine{1112 \}}
+\DoxyCodeLine{1113 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1114 EIGEN\_STRONG\_INLINE Packet16c preinterpret<Packet16c, Packet16uc>(\textcolor{keyword}{const} Packet16uc\& a) \{}
+\DoxyCodeLine{1115   \textcolor{keywordflow}{return} vreinterpretq\_s8\_u8(a);}
+\DoxyCodeLine{1116 \}}
+\DoxyCodeLine{1117 }
+\DoxyCodeLine{1118 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1119 EIGEN\_STRONG\_INLINE Packet4uc preinterpret<Packet4uc, Packet4c>(\textcolor{keyword}{const} Packet4c\& a) \{}
+\DoxyCodeLine{1120   \textcolor{keywordflow}{return} \textcolor{keyword}{static\_cast<}Packet4uc\textcolor{keyword}{>}(a);}
+\DoxyCodeLine{1121 \}}
+\DoxyCodeLine{1122 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1123 EIGEN\_STRONG\_INLINE Packet8uc preinterpret<Packet8uc, Packet8c>(\textcolor{keyword}{const} Packet8c\& a) \{}
+\DoxyCodeLine{1124   \textcolor{keywordflow}{return} vreinterpret\_u8\_s8(a);}
+\DoxyCodeLine{1125 \}}
+\DoxyCodeLine{1126 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1127 EIGEN\_STRONG\_INLINE Packet16uc preinterpret<Packet16uc, Packet16c>(\textcolor{keyword}{const} Packet16c\& a) \{}
+\DoxyCodeLine{1128   \textcolor{keywordflow}{return} vreinterpretq\_u8\_s8(a);}
+\DoxyCodeLine{1129 \}}
+\DoxyCodeLine{1130 }
+\DoxyCodeLine{1131 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1132 EIGEN\_STRONG\_INLINE Packet4s preinterpret<Packet4s, Packet4us>(\textcolor{keyword}{const} Packet4us\& a) \{}
+\DoxyCodeLine{1133   \textcolor{keywordflow}{return} vreinterpret\_s16\_u16(a);}
+\DoxyCodeLine{1134 \}}
+\DoxyCodeLine{1135 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1136 EIGEN\_STRONG\_INLINE Packet8s preinterpret<Packet8s, Packet8us>(\textcolor{keyword}{const} Packet8us\& a) \{}
+\DoxyCodeLine{1137   \textcolor{keywordflow}{return} vreinterpretq\_s16\_u16(a);}
+\DoxyCodeLine{1138 \}}
+\DoxyCodeLine{1139 }
+\DoxyCodeLine{1140 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1141 EIGEN\_STRONG\_INLINE Packet4us preinterpret<Packet4us, Packet4s>(\textcolor{keyword}{const} Packet4s\& a) \{}
+\DoxyCodeLine{1142   \textcolor{keywordflow}{return} vreinterpret\_u16\_s16(a);}
+\DoxyCodeLine{1143 \}}
+\DoxyCodeLine{1144 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1145 EIGEN\_STRONG\_INLINE Packet8us preinterpret<Packet8us, Packet8s>(\textcolor{keyword}{const} Packet8s\& a) \{}
+\DoxyCodeLine{1146   \textcolor{keywordflow}{return} vreinterpretq\_u16\_s16(a);}
+\DoxyCodeLine{1147 \}}
+\DoxyCodeLine{1148 }
+\DoxyCodeLine{1149 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1150 EIGEN\_STRONG\_INLINE Packet2i preinterpret<Packet2i, Packet2f>(\textcolor{keyword}{const} Packet2f\& a) \{}
+\DoxyCodeLine{1151   \textcolor{keywordflow}{return} vreinterpret\_s32\_f32(a);}
+\DoxyCodeLine{1152 \}}
+\DoxyCodeLine{1153 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1154 EIGEN\_STRONG\_INLINE Packet2i preinterpret<Packet2i, Packet2ui>(\textcolor{keyword}{const} Packet2ui\& a) \{}
+\DoxyCodeLine{1155   \textcolor{keywordflow}{return} vreinterpret\_s32\_u32(a);}
+\DoxyCodeLine{1156 \}}
+\DoxyCodeLine{1157 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1158 EIGEN\_STRONG\_INLINE Packet4i preinterpret<Packet4i, Packet4f>(\textcolor{keyword}{const} Packet4f\& a) \{}
+\DoxyCodeLine{1159   \textcolor{keywordflow}{return} vreinterpretq\_s32\_f32(a);}
+\DoxyCodeLine{1160 \}}
+\DoxyCodeLine{1161 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1162 EIGEN\_STRONG\_INLINE Packet4i preinterpret<Packet4i, Packet4ui>(\textcolor{keyword}{const} Packet4ui\& a) \{}
+\DoxyCodeLine{1163   \textcolor{keywordflow}{return} vreinterpretq\_s32\_u32(a);}
+\DoxyCodeLine{1164 \}}
+\DoxyCodeLine{1165 }
+\DoxyCodeLine{1166 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1167 EIGEN\_STRONG\_INLINE Packet2ui preinterpret<Packet2ui, Packet2f>(\textcolor{keyword}{const} Packet2f\& a) \{}
+\DoxyCodeLine{1168   \textcolor{keywordflow}{return} vreinterpret\_u32\_f32(a);}
+\DoxyCodeLine{1169 \}}
+\DoxyCodeLine{1170 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1171 EIGEN\_STRONG\_INLINE Packet2ui preinterpret<Packet2ui, Packet2i>(\textcolor{keyword}{const} Packet2i\& a) \{}
+\DoxyCodeLine{1172   \textcolor{keywordflow}{return} vreinterpret\_u32\_s32(a);}
+\DoxyCodeLine{1173 \}}
+\DoxyCodeLine{1174 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1175 EIGEN\_STRONG\_INLINE Packet4ui preinterpret<Packet4ui, Packet4f>(\textcolor{keyword}{const} Packet4f\& a) \{}
+\DoxyCodeLine{1176   \textcolor{keywordflow}{return} vreinterpretq\_u32\_f32(a);}
+\DoxyCodeLine{1177 \}}
+\DoxyCodeLine{1178 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1179 EIGEN\_STRONG\_INLINE Packet4ui preinterpret<Packet4ui, Packet4i>(\textcolor{keyword}{const} Packet4i\& a) \{}
+\DoxyCodeLine{1180   \textcolor{keywordflow}{return} vreinterpretq\_u32\_s32(a);}
+\DoxyCodeLine{1181 \}}
+\DoxyCodeLine{1182 }
+\DoxyCodeLine{1183 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1184 EIGEN\_STRONG\_INLINE Packet2l preinterpret<Packet2l, Packet2ul>(\textcolor{keyword}{const} Packet2ul\& a) \{}
+\DoxyCodeLine{1185   \textcolor{keywordflow}{return} vreinterpretq\_s64\_u64(a);}
+\DoxyCodeLine{1186 \}}
+\DoxyCodeLine{1187 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1188 EIGEN\_STRONG\_INLINE Packet2ul preinterpret<Packet2ul, Packet2l>(\textcolor{keyword}{const} Packet2l\& a) \{}
+\DoxyCodeLine{1189   \textcolor{keywordflow}{return} vreinterpretq\_u64\_s64(a);}
+\DoxyCodeLine{1190 \}}
+\DoxyCodeLine{1191 }
+\DoxyCodeLine{1192 \textcolor{preprocessor}{\#if EIGEN\_ARCH\_ARM64}}
+\DoxyCodeLine{1193 }
+\DoxyCodeLine{1194 \textcolor{comment}{//==============================================================================}}
+\DoxyCodeLine{1195 \textcolor{comment}{// pcast/preinterpret, Double}}
+\DoxyCodeLine{1196 \textcolor{comment}{//==============================================================================}}
+\DoxyCodeLine{1197 }
+\DoxyCodeLine{1198 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1199 \textcolor{keyword}{struct }type\_casting\_traits<double, double> \{}
+\DoxyCodeLine{1200   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{1201 \};}
+\DoxyCodeLine{1202 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1203 EIGEN\_STRONG\_INLINE Packet2d pcast<Packet2d, Packet2d>(\textcolor{keyword}{const} Packet2d\& a) \{}
+\DoxyCodeLine{1204   \textcolor{keywordflow}{return} a;}
+\DoxyCodeLine{1205 \}}
+\DoxyCodeLine{1206 }
+\DoxyCodeLine{1207 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1208 \textcolor{keyword}{struct }type\_casting\_traits<double, float> \{}
+\DoxyCodeLine{1209   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 2, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{1210 \};}
+\DoxyCodeLine{1211 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1212 EIGEN\_STRONG\_INLINE Packet4f pcast<Packet2d, Packet4f>(\textcolor{keyword}{const} Packet2d\& a, \textcolor{keyword}{const} Packet2d\& b) \{}
+\DoxyCodeLine{1213   \textcolor{keywordflow}{return} vcombine\_f32(vcvt\_f32\_f64(a), vcvt\_f32\_f64(b));}
+\DoxyCodeLine{1214 \}}
+\DoxyCodeLine{1215 }
+\DoxyCodeLine{1216 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1217 \textcolor{keyword}{struct }type\_casting\_traits<double, numext::int64\_t> \{}
+\DoxyCodeLine{1218   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{1219 \};}
+\DoxyCodeLine{1220 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1221 EIGEN\_STRONG\_INLINE Packet2l pcast<Packet2d, Packet2l>(\textcolor{keyword}{const} Packet2d\& a) \{}
+\DoxyCodeLine{1222   \textcolor{keywordflow}{return} vcvtq\_s64\_f64(a);}
+\DoxyCodeLine{1223 \}}
+\DoxyCodeLine{1224 }
+\DoxyCodeLine{1225 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1226 \textcolor{keyword}{struct }type\_casting\_traits<double, numext::uint64\_t> \{}
+\DoxyCodeLine{1227   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{1228 \};}
+\DoxyCodeLine{1229 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1230 EIGEN\_STRONG\_INLINE Packet2ul pcast<Packet2d, Packet2ul>(\textcolor{keyword}{const} Packet2d\& a) \{}
+\DoxyCodeLine{1231   \textcolor{keywordflow}{return} vcvtq\_u64\_f64(a);}
+\DoxyCodeLine{1232 \}}
+\DoxyCodeLine{1233 }
+\DoxyCodeLine{1234 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1235 \textcolor{keyword}{struct }type\_casting\_traits<double, numext::int32\_t> \{}
+\DoxyCodeLine{1236   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 2, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{1237 \};}
+\DoxyCodeLine{1238 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1239 EIGEN\_STRONG\_INLINE Packet4i pcast<Packet2d, Packet4i>(\textcolor{keyword}{const} Packet2d\& a, \textcolor{keyword}{const} Packet2d\& b) \{}
+\DoxyCodeLine{1240   \textcolor{keywordflow}{return} vcombine\_s32(vmovn\_s64(vcvtq\_s64\_f64(a)), vmovn\_s64(vcvtq\_s64\_f64(b)));}
+\DoxyCodeLine{1241 \}}
+\DoxyCodeLine{1242 }
+\DoxyCodeLine{1243 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1244 \textcolor{keyword}{struct }type\_casting\_traits<double, numext::uint32\_t> \{}
+\DoxyCodeLine{1245   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 2, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{1246 \};}
+\DoxyCodeLine{1247 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1248 EIGEN\_STRONG\_INLINE Packet4ui pcast<Packet2d, Packet4ui>(\textcolor{keyword}{const} Packet2d\& a, \textcolor{keyword}{const} Packet2d\& b) \{}
+\DoxyCodeLine{1249   \textcolor{keywordflow}{return} vcombine\_u32(vmovn\_u64(vcvtq\_u64\_f64(a)), vmovn\_u64(vcvtq\_u64\_f64(b)));}
+\DoxyCodeLine{1250 \}}
+\DoxyCodeLine{1251 }
+\DoxyCodeLine{1252 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1253 \textcolor{keyword}{struct }type\_casting\_traits<double, numext::int16\_t> \{}
+\DoxyCodeLine{1254   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 4, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{1255 \};}
+\DoxyCodeLine{1256 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1257 EIGEN\_STRONG\_INLINE Packet8s pcast<Packet2d, Packet8s>(\textcolor{keyword}{const} Packet2d\& a, \textcolor{keyword}{const} Packet2d\& b, \textcolor{keyword}{const} Packet2d\& c,}
+\DoxyCodeLine{1258                                                        \textcolor{keyword}{const} Packet2d\& d) \{}
+\DoxyCodeLine{1259   \textcolor{keyword}{const} int32x4\_t ab\_s32 = pcast<Packet2d, Packet4i>(a, b);}
+\DoxyCodeLine{1260   \textcolor{keyword}{const} int32x4\_t cd\_s32 = pcast<Packet2d, Packet4i>(c, d);}
+\DoxyCodeLine{1261   \textcolor{keywordflow}{return} vcombine\_s16(vmovn\_s32(ab\_s32), vmovn\_s32(cd\_s32));}
+\DoxyCodeLine{1262 \}}
+\DoxyCodeLine{1263 }
+\DoxyCodeLine{1264 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1265 \textcolor{keyword}{struct }type\_casting\_traits<double, numext::uint16\_t> \{}
+\DoxyCodeLine{1266   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 4, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{1267 \};}
+\DoxyCodeLine{1268 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1269 EIGEN\_STRONG\_INLINE Packet8us pcast<Packet2d, Packet8us>(\textcolor{keyword}{const} Packet2d\& a, \textcolor{keyword}{const} Packet2d\& b, \textcolor{keyword}{const} Packet2d\& c,}
+\DoxyCodeLine{1270                                                          \textcolor{keyword}{const} Packet2d\& d) \{}
+\DoxyCodeLine{1271   \textcolor{keyword}{const} uint32x4\_t ab\_u32 = pcast<Packet2d, Packet4ui>(a, b);}
+\DoxyCodeLine{1272   \textcolor{keyword}{const} uint32x4\_t cd\_u32 = pcast<Packet2d, Packet4ui>(c, d);}
+\DoxyCodeLine{1273   \textcolor{keywordflow}{return} vcombine\_u16(vmovn\_u32(ab\_u32), vmovn\_u32(cd\_u32));}
+\DoxyCodeLine{1274 \}}
+\DoxyCodeLine{1275 }
+\DoxyCodeLine{1276 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1277 \textcolor{keyword}{struct }type\_casting\_traits<double, numext::int8\_t> \{}
+\DoxyCodeLine{1278   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 8, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{1279 \};}
+\DoxyCodeLine{1280 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1281 EIGEN\_STRONG\_INLINE Packet16c pcast<Packet2d, Packet16c>(\textcolor{keyword}{const} Packet2d\& a, \textcolor{keyword}{const} Packet2d\& b, \textcolor{keyword}{const} Packet2d\& c,}
+\DoxyCodeLine{1282                                                          \textcolor{keyword}{const} Packet2d\& d, \textcolor{keyword}{const} Packet2d\& e, \textcolor{keyword}{const} Packet2d\& f,}
+\DoxyCodeLine{1283                                                          \textcolor{keyword}{const} Packet2d\& g, \textcolor{keyword}{const} Packet2d\& h) \{}
+\DoxyCodeLine{1284   \textcolor{keyword}{const} int16x8\_t abcd\_s16 = pcast<Packet2d, Packet8s>(a, b, c, d);}
+\DoxyCodeLine{1285   \textcolor{keyword}{const} int16x8\_t efgh\_s16 = pcast<Packet2d, Packet8s>(e, f, g, h);}
+\DoxyCodeLine{1286   \textcolor{keywordflow}{return} vcombine\_s8(vmovn\_s16(abcd\_s16), vmovn\_s16(efgh\_s16));}
+\DoxyCodeLine{1287 \}}
+\DoxyCodeLine{1288 }
+\DoxyCodeLine{1289 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1290 \textcolor{keyword}{struct }type\_casting\_traits<double, numext::uint8\_t> \{}
+\DoxyCodeLine{1291   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 8, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{1292 \};}
+\DoxyCodeLine{1293 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1294 EIGEN\_STRONG\_INLINE Packet16uc pcast<Packet2d, Packet16uc>(\textcolor{keyword}{const} Packet2d\& a, \textcolor{keyword}{const} Packet2d\& b, \textcolor{keyword}{const} Packet2d\& c,}
+\DoxyCodeLine{1295                                                            \textcolor{keyword}{const} Packet2d\& d, \textcolor{keyword}{const} Packet2d\& e, \textcolor{keyword}{const} Packet2d\& f,}
+\DoxyCodeLine{1296                                                            \textcolor{keyword}{const} Packet2d\& g, \textcolor{keyword}{const} Packet2d\& h) \{}
+\DoxyCodeLine{1297   \textcolor{keyword}{const} uint16x8\_t abcd\_u16 = pcast<Packet2d, Packet8us>(a, b, c, d);}
+\DoxyCodeLine{1298   \textcolor{keyword}{const} uint16x8\_t efgh\_u16 = pcast<Packet2d, Packet8us>(e, f, g, h);}
+\DoxyCodeLine{1299   \textcolor{keywordflow}{return} vcombine\_u8(vmovn\_u16(abcd\_u16), vmovn\_u16(efgh\_u16));}
+\DoxyCodeLine{1300 \}}
+\DoxyCodeLine{1301 }
+\DoxyCodeLine{1302 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1303 \textcolor{keyword}{struct }type\_casting\_traits<float, double> \{}
+\DoxyCodeLine{1304   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 2 \};}
+\DoxyCodeLine{1305 \};}
+\DoxyCodeLine{1306 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1307 EIGEN\_STRONG\_INLINE Packet2d pcast<Packet4f, Packet2d>(\textcolor{keyword}{const} Packet4f\& a) \{}
+\DoxyCodeLine{1308   \textcolor{comment}{// Discard second-\/half of input.}}
+\DoxyCodeLine{1309   \textcolor{keywordflow}{return} vcvt\_f64\_f32(vget\_low\_f32(a));}
+\DoxyCodeLine{1310 \}}
+\DoxyCodeLine{1311 }
+\DoxyCodeLine{1312 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1313 \textcolor{keyword}{struct }type\_casting\_traits<numext::int8\_t, double> \{}
+\DoxyCodeLine{1314   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 8 \};}
+\DoxyCodeLine{1315 \};}
+\DoxyCodeLine{1316 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1317 EIGEN\_STRONG\_INLINE Packet2d pcast<Packet16c, Packet2d>(\textcolor{keyword}{const} Packet16c\& a) \{}
+\DoxyCodeLine{1318   \textcolor{comment}{// Discard all but first two values.}}
+\DoxyCodeLine{1319   \textcolor{keywordflow}{return} vcvt\_f64\_f32(pcast<Packet8c, Packet2f>(vget\_low\_s8(a)));}
+\DoxyCodeLine{1320 \}}
+\DoxyCodeLine{1321 }
+\DoxyCodeLine{1322 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1323 \textcolor{keyword}{struct }type\_casting\_traits<numext::uint8\_t, double> \{}
+\DoxyCodeLine{1324   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 8 \};}
+\DoxyCodeLine{1325 \};}
+\DoxyCodeLine{1326 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1327 EIGEN\_STRONG\_INLINE Packet2d pcast<Packet16uc, Packet2d>(\textcolor{keyword}{const} Packet16uc\& a) \{}
+\DoxyCodeLine{1328   \textcolor{comment}{// Discard all but first two values.}}
+\DoxyCodeLine{1329   \textcolor{keywordflow}{return} vcvt\_f64\_f32(pcast<Packet8uc, Packet2f>(vget\_low\_u8(a)));}
+\DoxyCodeLine{1330 \}}
+\DoxyCodeLine{1331 }
+\DoxyCodeLine{1332 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1333 \textcolor{keyword}{struct }type\_casting\_traits<numext::int16\_t, double> \{}
+\DoxyCodeLine{1334   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 4 \};}
+\DoxyCodeLine{1335 \};}
+\DoxyCodeLine{1336 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1337 EIGEN\_STRONG\_INLINE Packet2d pcast<Packet8s, Packet2d>(\textcolor{keyword}{const} Packet8s\& a) \{}
+\DoxyCodeLine{1338   \textcolor{comment}{// Discard all but first two values.}}
+\DoxyCodeLine{1339   \textcolor{keywordflow}{return} vcvt\_f64\_f32(pcast<Packet4s, Packet2f>(vget\_low\_s16(a)));}
+\DoxyCodeLine{1340 \}}
+\DoxyCodeLine{1341 }
+\DoxyCodeLine{1342 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1343 \textcolor{keyword}{struct }type\_casting\_traits<numext::uint16\_t, double> \{}
+\DoxyCodeLine{1344   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 4 \};}
+\DoxyCodeLine{1345 \};}
+\DoxyCodeLine{1346 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1347 EIGEN\_STRONG\_INLINE Packet2d pcast<Packet8us, Packet2d>(\textcolor{keyword}{const} Packet8us\& a) \{}
+\DoxyCodeLine{1348   \textcolor{comment}{// Discard all but first two values.}}
+\DoxyCodeLine{1349   \textcolor{keywordflow}{return} vcvt\_f64\_f32(pcast<Packet4us, Packet2f>(vget\_low\_u16(a)));}
+\DoxyCodeLine{1350 \}}
+\DoxyCodeLine{1351 }
+\DoxyCodeLine{1352 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1353 \textcolor{keyword}{struct }type\_casting\_traits<numext::int32\_t, double> \{}
+\DoxyCodeLine{1354   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 2 \};}
+\DoxyCodeLine{1355 \};}
+\DoxyCodeLine{1356 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1357 EIGEN\_STRONG\_INLINE Packet2d pcast<Packet4i, Packet2d>(\textcolor{keyword}{const} Packet4i\& a) \{}
+\DoxyCodeLine{1358   \textcolor{comment}{// Discard second half of input.}}
+\DoxyCodeLine{1359   \textcolor{keywordflow}{return} vcvtq\_f64\_s64(vmovl\_s32(vget\_low\_s32(a)));}
+\DoxyCodeLine{1360 \}}
+\DoxyCodeLine{1361 }
+\DoxyCodeLine{1362 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1363 \textcolor{keyword}{struct }type\_casting\_traits<numext::uint32\_t, double> \{}
+\DoxyCodeLine{1364   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 2 \};}
+\DoxyCodeLine{1365 \};}
+\DoxyCodeLine{1366 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1367 EIGEN\_STRONG\_INLINE Packet2d pcast<Packet4ui, Packet2d>(\textcolor{keyword}{const} Packet4ui\& a) \{}
+\DoxyCodeLine{1368   \textcolor{comment}{// Discard second half of input.}}
+\DoxyCodeLine{1369   \textcolor{keywordflow}{return} vcvtq\_f64\_u64(vmovl\_u32(vget\_low\_u32(a)));}
+\DoxyCodeLine{1370 \}}
+\DoxyCodeLine{1371 }
+\DoxyCodeLine{1372 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1373 \textcolor{keyword}{struct }type\_casting\_traits<numext::int64\_t, double> \{}
+\DoxyCodeLine{1374   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{1375 \};}
+\DoxyCodeLine{1376 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1377 EIGEN\_STRONG\_INLINE Packet2d pcast<Packet2l, Packet2d>(\textcolor{keyword}{const} Packet2l\& a) \{}
+\DoxyCodeLine{1378   \textcolor{keywordflow}{return} vcvtq\_f64\_s64(a);}
+\DoxyCodeLine{1379 \}}
+\DoxyCodeLine{1380 }
+\DoxyCodeLine{1381 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1382 \textcolor{keyword}{struct }type\_casting\_traits<numext::uint64\_t, double> \{}
+\DoxyCodeLine{1383   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{1384 \};}
+\DoxyCodeLine{1385 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1386 EIGEN\_STRONG\_INLINE Packet2d pcast<Packet2ul, Packet2d>(\textcolor{keyword}{const} Packet2ul\& a) \{}
+\DoxyCodeLine{1387   \textcolor{keywordflow}{return} vcvtq\_f64\_u64(a);}
+\DoxyCodeLine{1388 \}}
+\DoxyCodeLine{1389 }
+\DoxyCodeLine{1390 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1391 EIGEN\_STRONG\_INLINE Packet2d preinterpret<Packet2d, Packet2l>(\textcolor{keyword}{const} Packet2l\& a) \{}
+\DoxyCodeLine{1392   \textcolor{keywordflow}{return} vreinterpretq\_f64\_s64(a);}
+\DoxyCodeLine{1393 \}}
+\DoxyCodeLine{1394 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1395 EIGEN\_STRONG\_INLINE Packet2d preinterpret<Packet2d, Packet2ul>(\textcolor{keyword}{const} Packet2ul\& a) \{}
+\DoxyCodeLine{1396   \textcolor{keywordflow}{return} vreinterpretq\_f64\_u64(a);}
+\DoxyCodeLine{1397 \}}
+\DoxyCodeLine{1398 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1399 EIGEN\_STRONG\_INLINE Packet2l preinterpret<Packet2l, Packet2d>(\textcolor{keyword}{const} Packet2d\& a) \{}
+\DoxyCodeLine{1400   \textcolor{keywordflow}{return} vreinterpretq\_s64\_f64(a);}
+\DoxyCodeLine{1401 \}}
+\DoxyCodeLine{1402 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1403 EIGEN\_STRONG\_INLINE Packet2ul preinterpret<Packet2ul, Packet2d>(\textcolor{keyword}{const} Packet2d\& a) \{}
+\DoxyCodeLine{1404   \textcolor{keywordflow}{return} vreinterpretq\_u64\_f64(a);}
+\DoxyCodeLine{1405 \}}
+\DoxyCodeLine{1406 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1407 EIGEN\_STRONG\_INLINE Packet2d preinterpret<Packet2d, Packet4i>(\textcolor{keyword}{const} Packet4i\& a) \{}
+\DoxyCodeLine{1408   \textcolor{keywordflow}{return} vreinterpretq\_f64\_s32(a);}
+\DoxyCodeLine{1409 \}}
+\DoxyCodeLine{1410 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1411 EIGEN\_STRONG\_INLINE Packet4i preinterpret<Packet4i, Packet2d>(\textcolor{keyword}{const} Packet2d\& a) \{}
+\DoxyCodeLine{1412   \textcolor{keywordflow}{return} vreinterpretq\_s32\_f64(a);}
+\DoxyCodeLine{1413 \}}
+\DoxyCodeLine{1414 }
+\DoxyCodeLine{1415 \textcolor{preprocessor}{\#endif  }\textcolor{comment}{// EIGEN\_ARCH\_ARM64}}
+\DoxyCodeLine{1416 }
+\DoxyCodeLine{1417 \}  \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{1418 }
+\DoxyCodeLine{1419 \}  \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{1420 }
+\DoxyCodeLine{1421 \textcolor{preprocessor}{\#endif  }\textcolor{comment}{// EIGEN\_TYPE\_CASTING\_NEON\_H}}
+
+\end{DoxyCode}

@@ -1,0 +1,317 @@
+\hypertarget{KLUSupport_8h_source}{}\doxysection{KLUSupport.\+h}
+\label{KLUSupport_8h_source}\index{include/Eigen/src/KLUSupport/KLUSupport.h@{include/Eigen/src/KLUSupport/KLUSupport.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2017 Kyle Macfarlan <kyle.macfarlan@gmail.com>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_KLUSUPPORT\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_KLUSUPPORT\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{comment}{/* TODO extract L, extract U, compute det, etc... */}}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{36 \textcolor{keyword}{inline} \textcolor{keywordtype}{int} \mbox{\hyperlink{namespaceEigen_ad6d0ed07a6ee97fcef4fe3bce6a674d4}{klu\_solve}}(klu\_symbolic *Symbolic, klu\_numeric *Numeric, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} ldim, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nrhs, \textcolor{keywordtype}{double} B [ ], klu\_common *Common, \textcolor{keywordtype}{double}) \{}
+\DoxyCodeLine{37    \textcolor{keywordflow}{return} \mbox{\hyperlink{namespaceEigen_ad6d0ed07a6ee97fcef4fe3bce6a674d4}{klu\_solve}}(Symbolic, Numeric, internal::convert\_index<int>(ldim), internal::convert\_index<int>(nrhs), B, Common);}
+\DoxyCodeLine{38 \}}
+\DoxyCodeLine{39 }
+\DoxyCodeLine{40 \textcolor{keyword}{inline} \textcolor{keywordtype}{int} \mbox{\hyperlink{namespaceEigen_ad6d0ed07a6ee97fcef4fe3bce6a674d4}{klu\_solve}}(klu\_symbolic *Symbolic, klu\_numeric *Numeric, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} ldim, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nrhs, std::complex<double>B[], klu\_common *Common, std::complex<double>) \{}
+\DoxyCodeLine{41    \textcolor{keywordflow}{return} klu\_z\_solve(Symbolic, Numeric, internal::convert\_index<int>(ldim), internal::convert\_index<int>(nrhs), \&numext::real\_ref(B[0]), Common);}
+\DoxyCodeLine{42 \}}
+\DoxyCodeLine{43 }
+\DoxyCodeLine{44 \textcolor{keyword}{inline} \textcolor{keywordtype}{int} klu\_tsolve(klu\_symbolic *Symbolic, klu\_numeric *Numeric, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} ldim, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nrhs, \textcolor{keywordtype}{double} B[], klu\_common *Common, \textcolor{keywordtype}{double}) \{}
+\DoxyCodeLine{45    \textcolor{keywordflow}{return} klu\_tsolve(Symbolic, Numeric, internal::convert\_index<int>(ldim), internal::convert\_index<int>(nrhs), B, Common);}
+\DoxyCodeLine{46 \}}
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48 \textcolor{keyword}{inline} \textcolor{keywordtype}{int} klu\_tsolve(klu\_symbolic *Symbolic, klu\_numeric *Numeric, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} ldim, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nrhs, std::complex<double>B[], klu\_common *Common, std::complex<double>) \{}
+\DoxyCodeLine{49    \textcolor{keywordflow}{return} klu\_z\_tsolve(Symbolic, Numeric, internal::convert\_index<int>(ldim), internal::convert\_index<int>(nrhs), \&numext::real\_ref(B[0]), 0, Common);}
+\DoxyCodeLine{50 \}}
+\DoxyCodeLine{51 }
+\DoxyCodeLine{52 \textcolor{keyword}{inline} klu\_numeric* klu\_factor(\textcolor{keywordtype}{int} Ap [ ], \textcolor{keywordtype}{int} Ai [ ], \textcolor{keywordtype}{double} Ax [ ], klu\_symbolic *Symbolic, klu\_common *Common, \textcolor{keywordtype}{double}) \{}
+\DoxyCodeLine{53    \textcolor{keywordflow}{return} klu\_factor(Ap, Ai, Ax, Symbolic, Common);}
+\DoxyCodeLine{54 \}}
+\DoxyCodeLine{55 }
+\DoxyCodeLine{56 \textcolor{keyword}{inline} klu\_numeric* klu\_factor(\textcolor{keywordtype}{int} Ap[], \textcolor{keywordtype}{int} Ai[], std::complex<double> Ax[], klu\_symbolic *Symbolic, klu\_common *Common, std::complex<double>) \{}
+\DoxyCodeLine{57    \textcolor{keywordflow}{return} klu\_z\_factor(Ap, Ai, \&numext::real\_ref(Ax[0]), Symbolic, Common);}
+\DoxyCodeLine{58 \}}
+\DoxyCodeLine{59 }
+\DoxyCodeLine{60 }
+\DoxyCodeLine{61 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_>}
+\DoxyCodeLine{62 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1KLU}{KLU}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{SparseSolverBase}}<KLU<MatrixType\_> >}
+\DoxyCodeLine{63 \{}
+\DoxyCodeLine{64   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{65     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{SparseSolverBase<KLU<MatrixType\_>}} > \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{Base}};}
+\DoxyCodeLine{66     \textcolor{keyword}{using} Base::m\_isInitialized;}
+\DoxyCodeLine{67   \textcolor{keyword}{public}:}
+\DoxyCodeLine{68     \textcolor{keyword}{using} Base::\_solve\_impl;}
+\DoxyCodeLine{69     \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{70     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar Scalar;}
+\DoxyCodeLine{71     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::RealScalar RealScalar;}
+\DoxyCodeLine{72     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::StorageIndex StorageIndex;}
+\DoxyCodeLine{73     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar,Dynamic,1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{Vector}};}
+\DoxyCodeLine{74     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<int, 1, MatrixType::ColsAtCompileTime>}} \mbox{\hyperlink{classEigen_1_1Matrix}{IntRowVectorType}};}
+\DoxyCodeLine{75     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<int, MatrixType::RowsAtCompileTime, 1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{IntColVectorType}};}
+\DoxyCodeLine{76     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<Scalar>}} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{LUMatrixType}};}
+\DoxyCodeLine{77     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<Scalar,ColMajor,int>}} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{KLUMatrixType}};}
+\DoxyCodeLine{78     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Ref}{Ref<const KLUMatrixType, StandardCompressedFormat>}} \mbox{\hyperlink{classEigen_1_1Ref}{KLUMatrixRef}};}
+\DoxyCodeLine{79     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{80       ColsAtCompileTime = MatrixType::ColsAtCompileTime,}
+\DoxyCodeLine{81       MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime}
+\DoxyCodeLine{82     \};}
+\DoxyCodeLine{83 }
+\DoxyCodeLine{84   \textcolor{keyword}{public}:}
+\DoxyCodeLine{85 }
+\DoxyCodeLine{86     \mbox{\hyperlink{classEigen_1_1KLU}{KLU}}()}
+\DoxyCodeLine{87       : m\_dummy(0,0), mp\_matrix(m\_dummy)}
+\DoxyCodeLine{88     \{}
+\DoxyCodeLine{89       init();}
+\DoxyCodeLine{90     \}}
+\DoxyCodeLine{91 }
+\DoxyCodeLine{92     \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputMatrixType>}
+\DoxyCodeLine{93     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1KLU}{KLU}}(\textcolor{keyword}{const} InputMatrixType\& matrix)}
+\DoxyCodeLine{94       : mp\_matrix(matrix)}
+\DoxyCodeLine{95     \{}
+\DoxyCodeLine{96       init();}
+\DoxyCodeLine{97       \mbox{\hyperlink{classEigen_1_1KLU_a1b7cfd2180db0abc63a2f557a54a1bb0}{compute}}(matrix);}
+\DoxyCodeLine{98     \}}
+\DoxyCodeLine{99 }
+\DoxyCodeLine{100     \mbox{\hyperlink{classEigen_1_1KLU}{\string~KLU}}()}
+\DoxyCodeLine{101     \{}
+\DoxyCodeLine{102       \textcolor{keywordflow}{if}(m\_symbolic) klu\_free\_symbolic(\&m\_symbolic,\&m\_common);}
+\DoxyCodeLine{103       \textcolor{keywordflow}{if}(m\_numeric)  klu\_free\_numeric(\&m\_numeric,\&m\_common);}
+\DoxyCodeLine{104     \}}
+\DoxyCodeLine{105 }
+\DoxyCodeLine{106     EIGEN\_CONSTEXPR \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} mp\_matrix.rows(); \}}
+\DoxyCodeLine{107     EIGEN\_CONSTEXPR \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} mp\_matrix.cols(); \}}
+\DoxyCodeLine{108 }
+\DoxyCodeLine{114     \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} \mbox{\hyperlink{classEigen_1_1KLU_a7787e77db109b4341ffd755ab9499940}{info}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{115 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{116       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}Decomposition is not initialized."{}});}
+\DoxyCodeLine{117       \textcolor{keywordflow}{return} m\_info;}
+\DoxyCodeLine{118     \}}
+\DoxyCodeLine{119 \textcolor{preprocessor}{\#if 0 }\textcolor{comment}{// not implemented yet}}
+\DoxyCodeLine{120     \textcolor{keyword}{inline} \textcolor{keyword}{const} LUMatrixType\& matrixL()\textcolor{keyword}{ const}}
+\DoxyCodeLine{121 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{122       \textcolor{keywordflow}{if} (m\_extractedDataAreDirty) extractData();}
+\DoxyCodeLine{123       \textcolor{keywordflow}{return} m\_l;}
+\DoxyCodeLine{124     \}}
+\DoxyCodeLine{125 }
+\DoxyCodeLine{126     \textcolor{keyword}{inline} \textcolor{keyword}{const} LUMatrixType\& matrixU()\textcolor{keyword}{ const}}
+\DoxyCodeLine{127 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{128       \textcolor{keywordflow}{if} (m\_extractedDataAreDirty) extractData();}
+\DoxyCodeLine{129       \textcolor{keywordflow}{return} m\_u;}
+\DoxyCodeLine{130     \}}
+\DoxyCodeLine{131 }
+\DoxyCodeLine{132     \textcolor{keyword}{inline} \textcolor{keyword}{const} IntColVectorType\& permutationP()\textcolor{keyword}{ const}}
+\DoxyCodeLine{133 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{134       \textcolor{keywordflow}{if} (m\_extractedDataAreDirty) extractData();}
+\DoxyCodeLine{135       \textcolor{keywordflow}{return} m\_p;}
+\DoxyCodeLine{136     \}}
+\DoxyCodeLine{137 }
+\DoxyCodeLine{138     \textcolor{keyword}{inline} \textcolor{keyword}{const} IntRowVectorType\& permutationQ()\textcolor{keyword}{ const}}
+\DoxyCodeLine{139 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{140       \textcolor{keywordflow}{if} (m\_extractedDataAreDirty) extractData();}
+\DoxyCodeLine{141       \textcolor{keywordflow}{return} m\_q;}
+\DoxyCodeLine{142     \}}
+\DoxyCodeLine{143 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{148     \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputMatrixType>}
+\DoxyCodeLine{149     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1KLU_a1b7cfd2180db0abc63a2f557a54a1bb0}{compute}}(\textcolor{keyword}{const} InputMatrixType\& matrix)}
+\DoxyCodeLine{150     \{}
+\DoxyCodeLine{151       \textcolor{keywordflow}{if}(m\_symbolic) klu\_free\_symbolic(\&m\_symbolic, \&m\_common);}
+\DoxyCodeLine{152       \textcolor{keywordflow}{if}(m\_numeric)  klu\_free\_numeric(\&m\_numeric, \&m\_common);}
+\DoxyCodeLine{153       grab(matrix.derived());}
+\DoxyCodeLine{154       analyzePattern\_impl();}
+\DoxyCodeLine{155       factorize\_impl();}
+\DoxyCodeLine{156     \}}
+\DoxyCodeLine{157 }
+\DoxyCodeLine{164     \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputMatrixType>}
+\DoxyCodeLine{165     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1KLU_afdfcea1e99a4fbcb4ff11d8c89442a05}{analyzePattern}}(\textcolor{keyword}{const} InputMatrixType\& matrix)}
+\DoxyCodeLine{166     \{}
+\DoxyCodeLine{167       \textcolor{keywordflow}{if}(m\_symbolic) klu\_free\_symbolic(\&m\_symbolic, \&m\_common);}
+\DoxyCodeLine{168       \textcolor{keywordflow}{if}(m\_numeric)  klu\_free\_numeric(\&m\_numeric, \&m\_common);}
+\DoxyCodeLine{169 }
+\DoxyCodeLine{170       grab(matrix.derived());}
+\DoxyCodeLine{171 }
+\DoxyCodeLine{172       analyzePattern\_impl();}
+\DoxyCodeLine{173     \}}
+\DoxyCodeLine{174 }
+\DoxyCodeLine{175 }
+\DoxyCodeLine{180     \textcolor{keyword}{inline} \textcolor{keyword}{const} klu\_common\& \mbox{\hyperlink{classEigen_1_1KLU_aa83bd6c8e7c27df212974d292146f491}{kluCommon}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{181 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{182       \textcolor{keywordflow}{return} m\_common;}
+\DoxyCodeLine{183     \}}
+\DoxyCodeLine{184 }
+\DoxyCodeLine{191     \textcolor{keyword}{inline} klu\_common\& \mbox{\hyperlink{classEigen_1_1KLU_a4c5f45193378e1371adfd19696c88602}{kluCommon}}()}
+\DoxyCodeLine{192     \{}
+\DoxyCodeLine{193       \textcolor{keywordflow}{return} m\_common;}
+\DoxyCodeLine{194     \}}
+\DoxyCodeLine{195 }
+\DoxyCodeLine{202     \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputMatrixType>}
+\DoxyCodeLine{203     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1KLU_a25cf262a8204e7ab461c505b13c2a3a8}{factorize}}(\textcolor{keyword}{const} InputMatrixType\& matrix)}
+\DoxyCodeLine{204     \{}
+\DoxyCodeLine{205       eigen\_assert(m\_analysisIsOk \&\& \textcolor{stringliteral}{"{}KLU: you must first call analyzePattern()"{}});}
+\DoxyCodeLine{206       \textcolor{keywordflow}{if}(m\_numeric)}
+\DoxyCodeLine{207         klu\_free\_numeric(\&m\_numeric,\&m\_common);}
+\DoxyCodeLine{208 }
+\DoxyCodeLine{209       grab(matrix.derived());}
+\DoxyCodeLine{210 }
+\DoxyCodeLine{211       factorize\_impl();}
+\DoxyCodeLine{212     \}}
+\DoxyCodeLine{213 }
+\DoxyCodeLine{215     \textcolor{keyword}{template}<\textcolor{keyword}{typename} BDerived,\textcolor{keyword}{typename} XDerived>}
+\DoxyCodeLine{216     \textcolor{keywordtype}{bool} \_solve\_impl(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<BDerived>}} \&b, \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<XDerived>}} \&x) \textcolor{keyword}{const};}
+\DoxyCodeLine{217 }
+\DoxyCodeLine{218 \textcolor{preprocessor}{\#if 0 }\textcolor{comment}{// not implemented yet}}
+\DoxyCodeLine{219     Scalar determinant() \textcolor{keyword}{const};}
+\DoxyCodeLine{220 }
+\DoxyCodeLine{221     \textcolor{keywordtype}{void} extractData() \textcolor{keyword}{const};}
+\DoxyCodeLine{222 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{223 }
+\DoxyCodeLine{224   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{225 }
+\DoxyCodeLine{226     \textcolor{keywordtype}{void} init()}
+\DoxyCodeLine{227     \{}
+\DoxyCodeLine{228       m\_info                  = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea580b2a3cafe585691e789f768fb729bf}{InvalidInput}};}
+\DoxyCodeLine{229       m\_isInitialized         = \textcolor{keyword}{false};}
+\DoxyCodeLine{230       m\_numeric               = 0;}
+\DoxyCodeLine{231       m\_symbolic              = 0;}
+\DoxyCodeLine{232       m\_extractedDataAreDirty = \textcolor{keyword}{true};}
+\DoxyCodeLine{233 }
+\DoxyCodeLine{234       klu\_defaults(\&m\_common);}
+\DoxyCodeLine{235     \}}
+\DoxyCodeLine{236 }
+\DoxyCodeLine{237     \textcolor{keywordtype}{void} analyzePattern\_impl()}
+\DoxyCodeLine{238     \{}
+\DoxyCodeLine{239       m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea580b2a3cafe585691e789f768fb729bf}{InvalidInput}};}
+\DoxyCodeLine{240       m\_analysisIsOk = \textcolor{keyword}{false};}
+\DoxyCodeLine{241       m\_factorizationIsOk = \textcolor{keyword}{false};}
+\DoxyCodeLine{242       m\_symbolic = klu\_analyze(internal::convert\_index<int>(mp\_matrix.rows()),}
+\DoxyCodeLine{243                                      \textcolor{keyword}{const\_cast<}StorageIndex*\textcolor{keyword}{>}(mp\_matrix.outerIndexPtr()), \textcolor{keyword}{const\_cast<}StorageIndex*\textcolor{keyword}{>}(mp\_matrix.innerIndexPtr()),}
+\DoxyCodeLine{244                                      \&m\_common);}
+\DoxyCodeLine{245       \textcolor{keywordflow}{if} (m\_symbolic) \{}
+\DoxyCodeLine{246          m\_isInitialized = \textcolor{keyword}{true};}
+\DoxyCodeLine{247          m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}};}
+\DoxyCodeLine{248          m\_analysisIsOk = \textcolor{keyword}{true};}
+\DoxyCodeLine{249          m\_extractedDataAreDirty = \textcolor{keyword}{true};}
+\DoxyCodeLine{250       \}}
+\DoxyCodeLine{251     \}}
+\DoxyCodeLine{252 }
+\DoxyCodeLine{253     \textcolor{keywordtype}{void} factorize\_impl()}
+\DoxyCodeLine{254     \{}
+\DoxyCodeLine{255 }
+\DoxyCodeLine{256       m\_numeric = klu\_factor(\textcolor{keyword}{const\_cast<}StorageIndex*\textcolor{keyword}{>}(mp\_matrix.outerIndexPtr()), \textcolor{keyword}{const\_cast<}StorageIndex*\textcolor{keyword}{>}(mp\_matrix.innerIndexPtr()), \textcolor{keyword}{const\_cast<}Scalar*\textcolor{keyword}{>}(mp\_matrix.valuePtr()),}
+\DoxyCodeLine{257                                     m\_symbolic, \&m\_common, Scalar());}
+\DoxyCodeLine{258 }
+\DoxyCodeLine{259 }
+\DoxyCodeLine{260       m\_info = m\_numeric ? \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}} : \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea1c6e20706575a629b27a105f07f1883b}{NumericalIssue}};}
+\DoxyCodeLine{261       m\_factorizationIsOk = m\_numeric ? 1 : 0;}
+\DoxyCodeLine{262       m\_extractedDataAreDirty = \textcolor{keyword}{true};}
+\DoxyCodeLine{263     \}}
+\DoxyCodeLine{264 }
+\DoxyCodeLine{265     \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixDerived>}
+\DoxyCodeLine{266     \textcolor{keywordtype}{void} grab(\textcolor{keyword}{const} EigenBase<MatrixDerived> \&A)}
+\DoxyCodeLine{267     \{}
+\DoxyCodeLine{268       mp\_matrix.\string~KLUMatrixRef();}
+\DoxyCodeLine{269       ::new (\&mp\_matrix) KLUMatrixRef(A.derived());}
+\DoxyCodeLine{270     \}}
+\DoxyCodeLine{271 }
+\DoxyCodeLine{272     \textcolor{keywordtype}{void} grab(\textcolor{keyword}{const} KLUMatrixRef \&A)}
+\DoxyCodeLine{273     \{}
+\DoxyCodeLine{274       \textcolor{keywordflow}{if}(\&(A.derived()) != \&mp\_matrix)}
+\DoxyCodeLine{275       \{}
+\DoxyCodeLine{276         mp\_matrix.\string~KLUMatrixRef();}
+\DoxyCodeLine{277         ::new (\&mp\_matrix) KLUMatrixRef(A);}
+\DoxyCodeLine{278       \}}
+\DoxyCodeLine{279     \}}
+\DoxyCodeLine{280 }
+\DoxyCodeLine{281     \textcolor{comment}{// cached data to reduce reallocation, etc.}}
+\DoxyCodeLine{282 \textcolor{preprocessor}{\#if 0 }\textcolor{comment}{// not implemented yet}}
+\DoxyCodeLine{283     \textcolor{keyword}{mutable} LUMatrixType m\_l;}
+\DoxyCodeLine{284     \textcolor{keyword}{mutable} LUMatrixType m\_u;}
+\DoxyCodeLine{285     \textcolor{keyword}{mutable} IntColVectorType m\_p;}
+\DoxyCodeLine{286     \textcolor{keyword}{mutable} IntRowVectorType m\_q;}
+\DoxyCodeLine{287 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{288 }
+\DoxyCodeLine{289     KLUMatrixType m\_dummy;}
+\DoxyCodeLine{290     KLUMatrixRef mp\_matrix;}
+\DoxyCodeLine{291 }
+\DoxyCodeLine{292     klu\_numeric* m\_numeric;}
+\DoxyCodeLine{293     klu\_symbolic* m\_symbolic;}
+\DoxyCodeLine{294     klu\_common m\_common;}
+\DoxyCodeLine{295     \textcolor{keyword}{mutable} \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} m\_info;}
+\DoxyCodeLine{296     \textcolor{keywordtype}{int} m\_factorizationIsOk;}
+\DoxyCodeLine{297     \textcolor{keywordtype}{int} m\_analysisIsOk;}
+\DoxyCodeLine{298     \textcolor{keyword}{mutable} \textcolor{keywordtype}{bool} m\_extractedDataAreDirty;}
+\DoxyCodeLine{299 }
+\DoxyCodeLine{300   \textcolor{keyword}{private}:}
+\DoxyCodeLine{301     KLU(\textcolor{keyword}{const} KLU\& ) \{ \}}
+\DoxyCodeLine{302 \};}
+\DoxyCodeLine{303 }
+\DoxyCodeLine{304 \textcolor{preprocessor}{\#if 0 }\textcolor{comment}{// not implemented yet}}
+\DoxyCodeLine{305 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{306 \textcolor{keywordtype}{void} KLU<MatrixType>::extractData()\textcolor{keyword}{ const}}
+\DoxyCodeLine{307 \textcolor{keyword}{}\{}
+\DoxyCodeLine{308   \textcolor{keywordflow}{if} (m\_extractedDataAreDirty)}
+\DoxyCodeLine{309   \{}
+\DoxyCodeLine{310      eigen\_assert(\textcolor{keyword}{false} \&\& \textcolor{stringliteral}{"{}KLU: extractData Not Yet Implemented"{}});}
+\DoxyCodeLine{311 }
+\DoxyCodeLine{312     \textcolor{comment}{// get size of the data}}
+\DoxyCodeLine{313     \textcolor{keywordtype}{int} lnz, unz, rows, cols, nz\_udiag;}
+\DoxyCodeLine{314     umfpack\_get\_lunz(\&lnz, \&unz, \&rows, \&cols, \&nz\_udiag, m\_numeric, Scalar());}
+\DoxyCodeLine{315 }
+\DoxyCodeLine{316     \textcolor{comment}{// allocate data}}
+\DoxyCodeLine{317     m\_l.resize(rows,(std::min)(rows,cols));}
+\DoxyCodeLine{318     m\_l.resizeNonZeros(lnz);}
+\DoxyCodeLine{319 }
+\DoxyCodeLine{320     m\_u.resize((std::min)(rows,cols),cols);}
+\DoxyCodeLine{321     m\_u.resizeNonZeros(unz);}
+\DoxyCodeLine{322 }
+\DoxyCodeLine{323     m\_p.resize(rows);}
+\DoxyCodeLine{324     m\_q.resize(cols);}
+\DoxyCodeLine{325 }
+\DoxyCodeLine{326     \textcolor{comment}{// extract}}
+\DoxyCodeLine{327     umfpack\_get\_numeric(m\_l.outerIndexPtr(), m\_l.innerIndexPtr(), m\_l.valuePtr(),}
+\DoxyCodeLine{328                         m\_u.outerIndexPtr(), m\_u.innerIndexPtr(), m\_u.valuePtr(),}
+\DoxyCodeLine{329                         m\_p.data(), m\_q.data(), 0, 0, 0, m\_numeric);}
+\DoxyCodeLine{330 }
+\DoxyCodeLine{331     m\_extractedDataAreDirty = \textcolor{keyword}{false};}
+\DoxyCodeLine{332   \}}
+\DoxyCodeLine{333 \}}
+\DoxyCodeLine{334 }
+\DoxyCodeLine{335 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{336 \textcolor{keyword}{typename} KLU<MatrixType>::Scalar KLU<MatrixType>::determinant()\textcolor{keyword}{ const}}
+\DoxyCodeLine{337 \textcolor{keyword}{}\{}
+\DoxyCodeLine{338   eigen\_assert(\textcolor{keyword}{false} \&\& \textcolor{stringliteral}{"{}KLU: extractData Not Yet Implemented"{}});}
+\DoxyCodeLine{339   \textcolor{keywordflow}{return} Scalar();}
+\DoxyCodeLine{340 \}}
+\DoxyCodeLine{341 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{342 }
+\DoxyCodeLine{343 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{344 \textcolor{keyword}{template}<\textcolor{keyword}{typename} BDerived,\textcolor{keyword}{typename} XDerived>}
+\DoxyCodeLine{345 \textcolor{keywordtype}{bool} KLU<MatrixType>::\_solve\_impl(\textcolor{keyword}{const} MatrixBase<BDerived> \&b, MatrixBase<XDerived> \&x)\textcolor{keyword}{ const}}
+\DoxyCodeLine{346 \textcolor{keyword}{}\{}
+\DoxyCodeLine{347   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rhsCols = b.cols();}
+\DoxyCodeLine{348   EIGEN\_STATIC\_ASSERT((XDerived::Flags\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})==0, THIS\_METHOD\_IS\_ONLY\_FOR\_COLUMN\_MAJOR\_MATRICES);}
+\DoxyCodeLine{349   eigen\_assert(m\_factorizationIsOk \&\& \textcolor{stringliteral}{"{}The decomposition is not in a valid state for solving, you must first call either compute() or analyzePattern()/factorize()"{}});}
+\DoxyCodeLine{350 }
+\DoxyCodeLine{351   x = b;}
+\DoxyCodeLine{352   \textcolor{keywordtype}{int} info = \mbox{\hyperlink{namespaceEigen_ad6d0ed07a6ee97fcef4fe3bce6a674d4}{klu\_solve}}(m\_symbolic, m\_numeric, b.rows(), rhsCols, x.const\_cast\_derived().data(), \textcolor{keyword}{const\_cast<}klu\_common*\textcolor{keyword}{>}(\&m\_common), Scalar());}
+\DoxyCodeLine{353 }
+\DoxyCodeLine{354   m\_info = info!=0 ? \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}} : \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea1c6e20706575a629b27a105f07f1883b}{NumericalIssue}};}
+\DoxyCodeLine{355   \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
+\DoxyCodeLine{356 \}}
+\DoxyCodeLine{357 }
+\DoxyCodeLine{358 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{359 }
+\DoxyCodeLine{360 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_KLUSUPPORT\_H}}
+
+\end{DoxyCode}

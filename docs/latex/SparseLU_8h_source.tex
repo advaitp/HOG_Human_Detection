@@ -1,0 +1,760 @@
+\hypertarget{SparseLU_8h_source}{}\doxysection{Sparse\+LU.\+h}
+\label{SparseLU_8h_source}\index{include/Eigen/src/SparseLU/SparseLU.h@{include/Eigen/src/SparseLU/SparseLU.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2012 Désiré Nuentsa-\/Wakam <desire.nuentsa\_wakam@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2012-\/2014 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 }
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#ifndef EIGEN\_SPARSE\_LU\_H}}
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#define EIGEN\_SPARSE\_LU\_H}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixType\_, \textcolor{keyword}{typename} OrderingType\_ = COLAMDOrdering<\textcolor{keyword}{typename} MatrixType\_::StorageIndex> > \textcolor{keyword}{class }SparseLU;}
+\DoxyCodeLine{20 \textcolor{keyword}{template} <\textcolor{keyword}{typename} MappedSparseMatrixType> \textcolor{keyword}{struct }SparseLUMatrixLReturnType;}
+\DoxyCodeLine{21 \textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixLType, \textcolor{keyword}{typename} MatrixUType> \textcolor{keyword}{struct }SparseLUMatrixUReturnType;}
+\DoxyCodeLine{22 }
+\DoxyCodeLine{23 \textcolor{keyword}{template} <\textcolor{keywordtype}{bool} Conjugate,\textcolor{keyword}{class} SparseLUType>}
+\DoxyCodeLine{24 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1SparseLUTransposeView}{SparseLUTransposeView}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{SparseSolverBase}}<SparseLUTransposeView<Conjugate,SparseLUType> >}
+\DoxyCodeLine{25 \{}
+\DoxyCodeLine{26 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{27   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{SparseSolverBase<SparseLUTransposeView<Conjugate,SparseLUType>}} > \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{APIBase}};}
+\DoxyCodeLine{28   \textcolor{keyword}{using} APIBase::m\_isInitialized;}
+\DoxyCodeLine{29 \textcolor{keyword}{public}:}
+\DoxyCodeLine{30   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} SparseLUType::Scalar Scalar;}
+\DoxyCodeLine{31   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} SparseLUType::StorageIndex StorageIndex;}
+\DoxyCodeLine{32   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} SparseLUType::MatrixType MatrixType;}
+\DoxyCodeLine{33   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} SparseLUType::OrderingType OrderingType;}
+\DoxyCodeLine{34 }
+\DoxyCodeLine{35   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{36     ColsAtCompileTime = MatrixType::ColsAtCompileTime,}
+\DoxyCodeLine{37     MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime}
+\DoxyCodeLine{38   \};}
+\DoxyCodeLine{39 }
+\DoxyCodeLine{40   \mbox{\hyperlink{classEigen_1_1SparseLUTransposeView}{SparseLUTransposeView}}() : m\_sparseLU(NULL) \{\}}
+\DoxyCodeLine{41   \mbox{\hyperlink{classEigen_1_1SparseLUTransposeView}{SparseLUTransposeView}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SparseLUTransposeView}{SparseLUTransposeView}}\& view) \{}
+\DoxyCodeLine{42     this-\/>m\_sparseLU = view.m\_sparseLU;}
+\DoxyCodeLine{43   \}}
+\DoxyCodeLine{44   \textcolor{keywordtype}{void} setIsInitialized(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} isInitialized) \{this-\/>m\_isInitialized = isInitialized;\}}
+\DoxyCodeLine{45   \textcolor{keywordtype}{void} setSparseLU(SparseLUType* sparseLU) \{m\_sparseLU = sparseLU;\}}
+\DoxyCodeLine{46   \textcolor{keyword}{using} APIBase::\_solve\_impl;}
+\DoxyCodeLine{47   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{48   \textcolor{keywordtype}{bool} \_solve\_impl(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Rhs>}} \&B, \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Dest>}} \&X\_base)\textcolor{keyword}{ const}}
+\DoxyCodeLine{49 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{50     Dest\& X(X\_base.derived());}
+\DoxyCodeLine{51     eigen\_assert(m\_sparseLU-\/>info() == \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}} \&\& \textcolor{stringliteral}{"{}The matrix should be factorized first"{}});}
+\DoxyCodeLine{52     EIGEN\_STATIC\_ASSERT((Dest::Flags\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})==0,}
+\DoxyCodeLine{53                         THIS\_METHOD\_IS\_ONLY\_FOR\_COLUMN\_MAJOR\_MATRICES);}
+\DoxyCodeLine{54 }
+\DoxyCodeLine{55 }
+\DoxyCodeLine{56     \textcolor{comment}{// this ugly const\_cast\_derived() helps to detect aliasing when applying the permutations}}
+\DoxyCodeLine{57     \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < B.cols(); ++j)\{}
+\DoxyCodeLine{58       X.col(j) = m\_sparseLU-\/>colsPermutation() * B.const\_cast\_derived().col(j);}
+\DoxyCodeLine{59     \}}
+\DoxyCodeLine{60     \textcolor{comment}{//Forward substitution with transposed or adjoint of U}}
+\DoxyCodeLine{61     m\_sparseLU-\/>matrixU().template solveTransposedInPlace<Conjugate>(X);}
+\DoxyCodeLine{62 }
+\DoxyCodeLine{63     \textcolor{comment}{//Backward substitution with transposed or adjoint of L}}
+\DoxyCodeLine{64     m\_sparseLU-\/>matrixL().template solveTransposedInPlace<Conjugate>(X);}
+\DoxyCodeLine{65 }
+\DoxyCodeLine{66     \textcolor{comment}{// Permute back the solution}}
+\DoxyCodeLine{67     \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < B.cols(); ++j)}
+\DoxyCodeLine{68       X.col(j) = m\_sparseLU-\/>rowsPermutation().transpose() * X.col(j);}
+\DoxyCodeLine{69     \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
+\DoxyCodeLine{70   \}}
+\DoxyCodeLine{71   \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_sparseLU-\/>rows(); \}}
+\DoxyCodeLine{72   \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_sparseLU-\/>cols(); \}}
+\DoxyCodeLine{73 }
+\DoxyCodeLine{74 \textcolor{keyword}{private}:}
+\DoxyCodeLine{75   SparseLUType *m\_sparseLU;}
+\DoxyCodeLine{76   \mbox{\hyperlink{classEigen_1_1SparseLUTransposeView}{SparseLUTransposeView}}\& operator=(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SparseLUTransposeView}{SparseLUTransposeView}}\&);}
+\DoxyCodeLine{77 \};}
+\DoxyCodeLine{78 }
+\DoxyCodeLine{79 }
+\DoxyCodeLine{132 \textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixType\_, \textcolor{keyword}{typename} OrderingType\_>}
+\DoxyCodeLine{133 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1SparseLU}{SparseLU}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{SparseSolverBase}}<SparseLU<MatrixType\_,OrderingType\_> >, \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1internal_1_1SparseLUImpl}{internal::SparseLUImpl}}<typename MatrixType\_::Scalar, typename MatrixType\_::StorageIndex>}
+\DoxyCodeLine{134 \{}
+\DoxyCodeLine{135   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{136     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{SparseSolverBase<SparseLU<MatrixType\_,OrderingType\_>}} > \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{APIBase}};}
+\DoxyCodeLine{137     \textcolor{keyword}{using} APIBase::m\_isInitialized;}
+\DoxyCodeLine{138   \textcolor{keyword}{public}:}
+\DoxyCodeLine{139     \textcolor{keyword}{using} APIBase::\_solve\_impl;}
+\DoxyCodeLine{140     }
+\DoxyCodeLine{141     \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{142     \textcolor{keyword}{typedef} OrderingType\_ OrderingType;}
+\DoxyCodeLine{143     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar Scalar; }
+\DoxyCodeLine{144     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::RealScalar RealScalar; }
+\DoxyCodeLine{145     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::StorageIndex StorageIndex;}
+\DoxyCodeLine{146     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<Scalar,ColMajor,StorageIndex>}} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{NCMatrix}};}
+\DoxyCodeLine{147     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1internal_1_1MappedSuperNodalMatrix}{internal::MappedSuperNodalMatrix<Scalar, StorageIndex>}} \mbox{\hyperlink{classEigen_1_1internal_1_1MappedSuperNodalMatrix}{SCMatrix}};}
+\DoxyCodeLine{148     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar,Dynamic,1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{ScalarVector}};}
+\DoxyCodeLine{149     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<StorageIndex,Dynamic,1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}};}
+\DoxyCodeLine{150     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationMatrix<Dynamic, Dynamic, StorageIndex>}} \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationType}};}
+\DoxyCodeLine{151     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1internal_1_1SparseLUImpl}{internal::SparseLUImpl<Scalar, StorageIndex>}} \mbox{\hyperlink{classEigen_1_1internal_1_1SparseLUImpl}{Base}};}
+\DoxyCodeLine{152 }
+\DoxyCodeLine{153     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{154       ColsAtCompileTime = MatrixType::ColsAtCompileTime,}
+\DoxyCodeLine{155       MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime}
+\DoxyCodeLine{156     \};}
+\DoxyCodeLine{157     }
+\DoxyCodeLine{158   \textcolor{keyword}{public}:}
+\DoxyCodeLine{159 }
+\DoxyCodeLine{160     \mbox{\hyperlink{classEigen_1_1SparseLU}{SparseLU}}():m\_lastError(\textcolor{stringliteral}{"{}"{}}),m\_Ustore(0,0,0,0,0,0),m\_symmetricmode(\textcolor{keyword}{false}),m\_diagpivotthresh(1.0),m\_detPermR(1)}
+\DoxyCodeLine{161     \{}
+\DoxyCodeLine{162       initperfvalues(); }
+\DoxyCodeLine{163     \}}
+\DoxyCodeLine{164     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1SparseLU}{SparseLU}}(\textcolor{keyword}{const} MatrixType\& matrix)}
+\DoxyCodeLine{165       : m\_lastError(\textcolor{stringliteral}{"{}"{}}),m\_Ustore(0,0,0,0,0,0),m\_symmetricmode(\textcolor{keyword}{false}),m\_diagpivotthresh(1.0),m\_detPermR(1)}
+\DoxyCodeLine{166     \{}
+\DoxyCodeLine{167       initperfvalues(); }
+\DoxyCodeLine{168       \mbox{\hyperlink{classEigen_1_1SparseLU_a5b509284ea760c16df0a199a02222706}{compute}}(matrix);}
+\DoxyCodeLine{169     \}}
+\DoxyCodeLine{170     }
+\DoxyCodeLine{171     \mbox{\hyperlink{classEigen_1_1SparseLU}{\string~SparseLU}}()}
+\DoxyCodeLine{172     \{}
+\DoxyCodeLine{173       \textcolor{comment}{// Free all explicit dynamic pointers }}
+\DoxyCodeLine{174     \}}
+\DoxyCodeLine{175     }
+\DoxyCodeLine{176     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1SparseLU_aa907ff958c4f4855145091d2686f3a8a}{analyzePattern}} (\textcolor{keyword}{const} MatrixType\& matrix);}
+\DoxyCodeLine{177     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1SparseLU_a39858b0e72f2659d596364e252b34cbc}{factorize}} (\textcolor{keyword}{const} MatrixType\& matrix);}
+\DoxyCodeLine{178     \textcolor{keywordtype}{void} simplicialfactorize(\textcolor{keyword}{const} MatrixType\& matrix);}
+\DoxyCodeLine{179     }
+\DoxyCodeLine{184     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1SparseLU_a5b509284ea760c16df0a199a02222706}{compute}} (\textcolor{keyword}{const} MatrixType\& matrix)}
+\DoxyCodeLine{185     \{}
+\DoxyCodeLine{186       \textcolor{comment}{// Analyze }}
+\DoxyCodeLine{187       \mbox{\hyperlink{classEigen_1_1SparseLU_aa907ff958c4f4855145091d2686f3a8a}{analyzePattern}}(matrix); }
+\DoxyCodeLine{188       \textcolor{comment}{//Factorize}}
+\DoxyCodeLine{189       \mbox{\hyperlink{classEigen_1_1SparseLU_a39858b0e72f2659d596364e252b34cbc}{factorize}}(matrix);}
+\DoxyCodeLine{190     \} }
+\DoxyCodeLine{191 }
+\DoxyCodeLine{202     \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SparseLUTransposeView}{SparseLUTransposeView<false,SparseLU<MatrixType\_,OrderingType\_>}} > \mbox{\hyperlink{classEigen_1_1SparseLU_af05e6d3b85dc27bd7ec0b3ef9380a9de}{transpose}}()}
+\DoxyCodeLine{203     \{}
+\DoxyCodeLine{204       \mbox{\hyperlink{classEigen_1_1SparseLUTransposeView}{SparseLUTransposeView<false,  SparseLU<MatrixType\_,OrderingType\_>}} > transposeView;}
+\DoxyCodeLine{205       transposeView.setSparseLU(\textcolor{keyword}{this});}
+\DoxyCodeLine{206       transposeView.setIsInitialized(this-\/>m\_isInitialized);}
+\DoxyCodeLine{207       \textcolor{keywordflow}{return} transposeView;}
+\DoxyCodeLine{208     \}}
+\DoxyCodeLine{209 }
+\DoxyCodeLine{210 }
+\DoxyCodeLine{223     \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SparseLUTransposeView}{SparseLUTransposeView<true, SparseLU<MatrixType\_,OrderingType\_>}} > \mbox{\hyperlink{classEigen_1_1SparseLU_a25dc8970973e010a7876398ab3f47332}{adjoint}}()}
+\DoxyCodeLine{224     \{}
+\DoxyCodeLine{225       \mbox{\hyperlink{classEigen_1_1SparseLUTransposeView}{SparseLUTransposeView<true,  SparseLU<MatrixType\_,OrderingType\_>}} > adjointView;}
+\DoxyCodeLine{226       adjointView.setSparseLU(\textcolor{keyword}{this});}
+\DoxyCodeLine{227       adjointView.setIsInitialized(this-\/>m\_isInitialized);}
+\DoxyCodeLine{228       \textcolor{keywordflow}{return} adjointView;}
+\DoxyCodeLine{229     \}}
+\DoxyCodeLine{230     }
+\DoxyCodeLine{231     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_mat.\mbox{\hyperlink{classEigen_1_1SparseMatrix_a853a76dd42349fa2f3654a4a61e0f574}{rows}}(); \}}
+\DoxyCodeLine{232     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_mat.\mbox{\hyperlink{classEigen_1_1SparseMatrix_a36b8cc95234b4e2de38a199b6b2af9fc}{cols}}(); \}}
+\DoxyCodeLine{234     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1SparseLU_adc74f4ce95a46895eb0195cce99ff4d7}{isSymmetric}}(\textcolor{keywordtype}{bool} sym)}
+\DoxyCodeLine{235     \{}
+\DoxyCodeLine{236       m\_symmetricmode = sym;}
+\DoxyCodeLine{237     \}}
+\DoxyCodeLine{238     }
+\DoxyCodeLine{245     \mbox{\hyperlink{structEigen_1_1SparseLUMatrixLReturnType}{SparseLUMatrixLReturnType<SCMatrix>}} \mbox{\hyperlink{classEigen_1_1SparseLU_a4ddf76c949b3fe9b423a35f400de9827}{matrixL}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{246 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{247       \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1SparseLUMatrixLReturnType}{SparseLUMatrixLReturnType<SCMatrix>}}(m\_Lstore);}
+\DoxyCodeLine{248     \}}
+\DoxyCodeLine{255     \mbox{\hyperlink{structEigen_1_1SparseLUMatrixUReturnType}{SparseLUMatrixUReturnType<SCMatrix,MappedSparseMatrix<Scalar,ColMajor,StorageIndex>}} > \mbox{\hyperlink{classEigen_1_1SparseLU_afe0af47de433733ab54be13ddb506391}{matrixU}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{256 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{257       \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1SparseLUMatrixUReturnType}{SparseLUMatrixUReturnType<SCMatrix, MappedSparseMatrix<Scalar,ColMajor,StorageIndex>}} >(m\_Lstore, m\_Ustore);}
+\DoxyCodeLine{258     \}}
+\DoxyCodeLine{259 }
+\DoxyCodeLine{264     \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationType}}\& \mbox{\hyperlink{classEigen_1_1SparseLU_ac15f3a4faf3cc42f09b444f4a57f1683}{rowsPermutation}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{265 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{266       \textcolor{keywordflow}{return} m\_perm\_r;}
+\DoxyCodeLine{267     \}}
+\DoxyCodeLine{272     \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationType}}\& \mbox{\hyperlink{classEigen_1_1SparseLU_a69fd18705475738bf1a950f9dfb0a49a}{colsPermutation}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{273 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{274       \textcolor{keywordflow}{return} m\_perm\_c;}
+\DoxyCodeLine{275     \}}
+\DoxyCodeLine{277     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1SparseLU_a0ab85d3c48ba0bdfea31754094f7233d}{setPivotThreshold}}(\textcolor{keyword}{const} RealScalar\& thresh)}
+\DoxyCodeLine{278     \{}
+\DoxyCodeLine{279       m\_diagpivotthresh = thresh; }
+\DoxyCodeLine{280     \}}
+\DoxyCodeLine{281 }
+\DoxyCodeLine{282 \textcolor{preprocessor}{\#ifdef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{289     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{290     \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Solve}{Solve<SparseLU, Rhs>}} \mbox{\hyperlink{classEigen_1_1SparseSolverBase_a57c5b7f5e35274b55b5d57e8c88cc4a6}{solve}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Rhs>}}\& B) \textcolor{keyword}{const};}
+\DoxyCodeLine{291 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{292     }
+\DoxyCodeLine{301     \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} \mbox{\hyperlink{classEigen_1_1SparseLU_a619e12b0ec4a3e767c1e797162e23745}{info}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{302 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{303       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}Decomposition is not initialized."{}});}
+\DoxyCodeLine{304       \textcolor{keywordflow}{return} m\_info;}
+\DoxyCodeLine{305     \}}
+\DoxyCodeLine{306     }
+\DoxyCodeLine{310     std::string \mbox{\hyperlink{classEigen_1_1SparseLU_a4591a05dc1b025ea2704da6cd1b19dde}{lastErrorMessage}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{311 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{312       \textcolor{keywordflow}{return} m\_lastError; }
+\DoxyCodeLine{313     \}}
+\DoxyCodeLine{314 }
+\DoxyCodeLine{315     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{316     \textcolor{keywordtype}{bool} \_solve\_impl(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Rhs>}} \&B, \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Dest>}} \&X\_base)\textcolor{keyword}{ const}}
+\DoxyCodeLine{317 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{318       Dest\& X(X\_base.derived());}
+\DoxyCodeLine{319       eigen\_assert(m\_factorizationIsOk \&\& \textcolor{stringliteral}{"{}The matrix should be factorized first"{}});}
+\DoxyCodeLine{320       EIGEN\_STATIC\_ASSERT((Dest::Flags\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})==0,}
+\DoxyCodeLine{321                         THIS\_METHOD\_IS\_ONLY\_FOR\_COLUMN\_MAJOR\_MATRICES);}
+\DoxyCodeLine{322       }
+\DoxyCodeLine{323       \textcolor{comment}{// Permute the right hand side to form X = Pr*B}}
+\DoxyCodeLine{324       \textcolor{comment}{// on return, X is overwritten by the computed solution}}
+\DoxyCodeLine{325       X.resize(B.rows(),B.cols());}
+\DoxyCodeLine{326 }
+\DoxyCodeLine{327       \textcolor{comment}{// this ugly const\_cast\_derived() helps to detect aliasing when applying the permutations}}
+\DoxyCodeLine{328       \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < B.cols(); ++j)}
+\DoxyCodeLine{329         X.col(j) = \mbox{\hyperlink{classEigen_1_1SparseLU_ac15f3a4faf3cc42f09b444f4a57f1683}{rowsPermutation}}() * B.const\_cast\_derived().col(j);}
+\DoxyCodeLine{330       }
+\DoxyCodeLine{331       \textcolor{comment}{//Forward substitution with L}}
+\DoxyCodeLine{332       this-\/>\mbox{\hyperlink{classEigen_1_1SparseLU_a4ddf76c949b3fe9b423a35f400de9827}{matrixL}}().solveInPlace(X);}
+\DoxyCodeLine{333       this-\/>\mbox{\hyperlink{classEigen_1_1SparseLU_afe0af47de433733ab54be13ddb506391}{matrixU}}().solveInPlace(X);}
+\DoxyCodeLine{334       }
+\DoxyCodeLine{335       \textcolor{comment}{// Permute back the solution }}
+\DoxyCodeLine{336       \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < B.cols(); ++j)}
+\DoxyCodeLine{337         X.col(j) = \mbox{\hyperlink{classEigen_1_1SparseLU_a69fd18705475738bf1a950f9dfb0a49a}{colsPermutation}}().\mbox{\hyperlink{classEigen_1_1PermutationBase_adb9af427f317202366c2832876064eb3}{inverse}}() * X.col(j);}
+\DoxyCodeLine{338       }
+\DoxyCodeLine{339       \textcolor{keywordflow}{return} \textcolor{keyword}{true}; }
+\DoxyCodeLine{340     \}}
+\DoxyCodeLine{341     }
+\DoxyCodeLine{352     Scalar \mbox{\hyperlink{classEigen_1_1SparseLU_a9607aab8ecb951b12a80dce2c39f44e8}{absDeterminant}}()}
+\DoxyCodeLine{353     \{}
+\DoxyCodeLine{354       \textcolor{keyword}{using} std::abs;}
+\DoxyCodeLine{355       eigen\_assert(m\_factorizationIsOk \&\& \textcolor{stringliteral}{"{}The matrix should be factorized first."{}});}
+\DoxyCodeLine{356       \textcolor{comment}{// Initialize with the determinant of the row matrix}}
+\DoxyCodeLine{357       Scalar det = Scalar(1.);}
+\DoxyCodeLine{358       \textcolor{comment}{// Note that the diagonal blocks of U are stored in supernodes,}}
+\DoxyCodeLine{359       \textcolor{comment}{// which are available in the  L part :)}}
+\DoxyCodeLine{360       \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < this-\/>cols(); ++j)}
+\DoxyCodeLine{361       \{}
+\DoxyCodeLine{362         \textcolor{keywordflow}{for} (\textcolor{keyword}{typename} SCMatrix::InnerIterator it(m\_Lstore, j); it; ++it)}
+\DoxyCodeLine{363         \{}
+\DoxyCodeLine{364           \textcolor{keywordflow}{if}(it.index() == j)}
+\DoxyCodeLine{365           \{}
+\DoxyCodeLine{366             det *= abs(it.value());}
+\DoxyCodeLine{367             \textcolor{keywordflow}{break};}
+\DoxyCodeLine{368           \}}
+\DoxyCodeLine{369         \}}
+\DoxyCodeLine{370       \}}
+\DoxyCodeLine{371       \textcolor{keywordflow}{return} det;}
+\DoxyCodeLine{372     \}}
+\DoxyCodeLine{373 }
+\DoxyCodeLine{382     Scalar \mbox{\hyperlink{classEigen_1_1SparseLU_a0b776be947c48a76d48f234fa6bf84da}{logAbsDeterminant}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{383 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{384       \textcolor{keyword}{using} std::log;}
+\DoxyCodeLine{385       \textcolor{keyword}{using} std::abs;}
+\DoxyCodeLine{386 }
+\DoxyCodeLine{387       eigen\_assert(m\_factorizationIsOk \&\& \textcolor{stringliteral}{"{}The matrix should be factorized first."{}});}
+\DoxyCodeLine{388       Scalar det = Scalar(0.);}
+\DoxyCodeLine{389       \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < this-\/>cols(); ++j)}
+\DoxyCodeLine{390       \{}
+\DoxyCodeLine{391         \textcolor{keywordflow}{for} (\textcolor{keyword}{typename} SCMatrix::InnerIterator it(m\_Lstore, j); it; ++it)}
+\DoxyCodeLine{392         \{}
+\DoxyCodeLine{393           \textcolor{keywordflow}{if}(it.row() < j) \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{394           \textcolor{keywordflow}{if}(it.row() == j)}
+\DoxyCodeLine{395           \{}
+\DoxyCodeLine{396             det += log(abs(it.value()));}
+\DoxyCodeLine{397             \textcolor{keywordflow}{break};}
+\DoxyCodeLine{398           \}}
+\DoxyCodeLine{399         \}}
+\DoxyCodeLine{400       \}}
+\DoxyCodeLine{401       \textcolor{keywordflow}{return} det;}
+\DoxyCodeLine{402     \}}
+\DoxyCodeLine{403 }
+\DoxyCodeLine{408     Scalar \mbox{\hyperlink{classEigen_1_1SparseLU_a66e90fafa69e65e84c0f5fb76d6f39f8}{signDeterminant}}()}
+\DoxyCodeLine{409     \{}
+\DoxyCodeLine{410       eigen\_assert(m\_factorizationIsOk \&\& \textcolor{stringliteral}{"{}The matrix should be factorized first."{}});}
+\DoxyCodeLine{411       \textcolor{comment}{// Initialize with the determinant of the row matrix}}
+\DoxyCodeLine{412       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} det = 1;}
+\DoxyCodeLine{413       \textcolor{comment}{// Note that the diagonal blocks of U are stored in supernodes,}}
+\DoxyCodeLine{414       \textcolor{comment}{// which are available in the  L part :)}}
+\DoxyCodeLine{415       \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < this-\/>cols(); ++j)}
+\DoxyCodeLine{416       \{}
+\DoxyCodeLine{417         \textcolor{keywordflow}{for} (\textcolor{keyword}{typename} SCMatrix::InnerIterator it(m\_Lstore, j); it; ++it)}
+\DoxyCodeLine{418         \{}
+\DoxyCodeLine{419           \textcolor{keywordflow}{if}(it.index() == j)}
+\DoxyCodeLine{420           \{}
+\DoxyCodeLine{421             \textcolor{keywordflow}{if}(it.value()<0)}
+\DoxyCodeLine{422               det = -\/det;}
+\DoxyCodeLine{423             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(it.value()==0)}
+\DoxyCodeLine{424               \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{425             \textcolor{keywordflow}{break};}
+\DoxyCodeLine{426           \}}
+\DoxyCodeLine{427         \}}
+\DoxyCodeLine{428       \}}
+\DoxyCodeLine{429       \textcolor{keywordflow}{return} det * m\_detPermR * m\_detPermC;}
+\DoxyCodeLine{430     \}}
+\DoxyCodeLine{431     }
+\DoxyCodeLine{436     Scalar \mbox{\hyperlink{classEigen_1_1SparseLU_aeccf9472f094f27f508a69526de44946}{determinant}}()}
+\DoxyCodeLine{437     \{}
+\DoxyCodeLine{438       eigen\_assert(m\_factorizationIsOk \&\& \textcolor{stringliteral}{"{}The matrix should be factorized first."{}});}
+\DoxyCodeLine{439       \textcolor{comment}{// Initialize with the determinant of the row matrix}}
+\DoxyCodeLine{440       Scalar det = Scalar(1.);}
+\DoxyCodeLine{441       \textcolor{comment}{// Note that the diagonal blocks of U are stored in supernodes,}}
+\DoxyCodeLine{442       \textcolor{comment}{// which are available in the  L part :)}}
+\DoxyCodeLine{443       \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < this-\/>cols(); ++j)}
+\DoxyCodeLine{444       \{}
+\DoxyCodeLine{445         \textcolor{keywordflow}{for} (\textcolor{keyword}{typename} SCMatrix::InnerIterator it(m\_Lstore, j); it; ++it)}
+\DoxyCodeLine{446         \{}
+\DoxyCodeLine{447           \textcolor{keywordflow}{if}(it.index() == j)}
+\DoxyCodeLine{448           \{}
+\DoxyCodeLine{449             det *= it.value();}
+\DoxyCodeLine{450             \textcolor{keywordflow}{break};}
+\DoxyCodeLine{451           \}}
+\DoxyCodeLine{452         \}}
+\DoxyCodeLine{453       \}}
+\DoxyCodeLine{454       \textcolor{keywordflow}{return} (m\_detPermR * m\_detPermC) > 0 ? det : -\/det;}
+\DoxyCodeLine{455     \}}
+\DoxyCodeLine{456 }
+\DoxyCodeLine{457     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nnzL()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_nnzL; \};}
+\DoxyCodeLine{458     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nnzU()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_nnzU; \};}
+\DoxyCodeLine{459 }
+\DoxyCodeLine{460   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{461     \textcolor{comment}{// Functions }}
+\DoxyCodeLine{462     \textcolor{keywordtype}{void} initperfvalues()}
+\DoxyCodeLine{463     \{}
+\DoxyCodeLine{464       m\_perfv.panel\_size = 16;}
+\DoxyCodeLine{465       m\_perfv.relax = 1; }
+\DoxyCodeLine{466       m\_perfv.maxsuper = 128; }
+\DoxyCodeLine{467       m\_perfv.rowblk = 16; }
+\DoxyCodeLine{468       m\_perfv.colblk = 8; }
+\DoxyCodeLine{469       m\_perfv.fillfactor = 20;  }
+\DoxyCodeLine{470     \}}
+\DoxyCodeLine{471       }
+\DoxyCodeLine{472     \textcolor{comment}{// Variables }}
+\DoxyCodeLine{473     \textcolor{keyword}{mutable} \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} m\_info;}
+\DoxyCodeLine{474     \textcolor{keywordtype}{bool} m\_factorizationIsOk;}
+\DoxyCodeLine{475     \textcolor{keywordtype}{bool} m\_analysisIsOk;}
+\DoxyCodeLine{476     std::string m\_lastError;}
+\DoxyCodeLine{477     NCMatrix m\_mat; \textcolor{comment}{// The input (permuted ) matrix }}
+\DoxyCodeLine{478     SCMatrix m\_Lstore; \textcolor{comment}{// The lower triangular matrix (supernodal)}}
+\DoxyCodeLine{479     MappedSparseMatrix<Scalar,ColMajor,StorageIndex> m\_Ustore; \textcolor{comment}{// The upper triangular matrix}}
+\DoxyCodeLine{480     PermutationType m\_perm\_c; \textcolor{comment}{// Column permutation }}
+\DoxyCodeLine{481     PermutationType m\_perm\_r ; \textcolor{comment}{// Row permutation}}
+\DoxyCodeLine{482     IndexVector m\_etree; \textcolor{comment}{// Column elimination tree }}
+\DoxyCodeLine{483     }
+\DoxyCodeLine{484     \textcolor{keyword}{typename} Base::GlobalLU\_t m\_glu; }
+\DoxyCodeLine{485                                }
+\DoxyCodeLine{486     \textcolor{comment}{// SparseLU options }}
+\DoxyCodeLine{487     \textcolor{keywordtype}{bool} m\_symmetricmode;}
+\DoxyCodeLine{488     \textcolor{comment}{// values for performance }}
+\DoxyCodeLine{489     internal::perfvalues m\_perfv;}
+\DoxyCodeLine{490     RealScalar m\_diagpivotthresh; \textcolor{comment}{// Specifies the threshold used for a diagonal entry to be an acceptable pivot}}
+\DoxyCodeLine{491     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m\_nnzL, m\_nnzU; \textcolor{comment}{// Nonzeros in L and U factors}}
+\DoxyCodeLine{492     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m\_detPermR, m\_detPermC; \textcolor{comment}{// Determinants of the permutation matrices}}
+\DoxyCodeLine{493   \textcolor{keyword}{private}:}
+\DoxyCodeLine{494     \textcolor{comment}{// Disable copy constructor }}
+\DoxyCodeLine{495     SparseLU (\textcolor{keyword}{const} SparseLU\& );}
+\DoxyCodeLine{496 \}; \textcolor{comment}{// End class SparseLU}}
+\DoxyCodeLine{497 }
+\DoxyCodeLine{498 }
+\DoxyCodeLine{499 }
+\DoxyCodeLine{500 \textcolor{comment}{// Functions needed by the anaysis phase}}
+\DoxyCodeLine{511 \textcolor{comment}{}\textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixType, \textcolor{keyword}{typename} OrderingType>}
+\DoxyCodeLine{512 \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1SparseLU_aa907ff958c4f4855145091d2686f3a8a}{SparseLU<MatrixType, OrderingType>::analyzePattern}}(\textcolor{keyword}{const} MatrixType\& mat)}
+\DoxyCodeLine{513 \{}
+\DoxyCodeLine{514   }
+\DoxyCodeLine{515   \textcolor{comment}{//TODO  It is possible as in SuperLU to compute row and columns scaling vectors to equilibrate the matrix mat.}}
+\DoxyCodeLine{516   }
+\DoxyCodeLine{517   \textcolor{comment}{// Firstly, copy the whole input matrix. }}
+\DoxyCodeLine{518   m\_mat = mat;}
+\DoxyCodeLine{519   }
+\DoxyCodeLine{520   \textcolor{comment}{// Compute fill-\/in ordering}}
+\DoxyCodeLine{521   OrderingType ord; }
+\DoxyCodeLine{522   ord(m\_mat,m\_perm\_c);}
+\DoxyCodeLine{523   }
+\DoxyCodeLine{524   \textcolor{comment}{// Apply the permutation to the column of the input  matrix}}
+\DoxyCodeLine{525   \textcolor{keywordflow}{if} (m\_perm\_c.size())}
+\DoxyCodeLine{526   \{}
+\DoxyCodeLine{527     m\_mat.uncompress(); \textcolor{comment}{//NOTE: The effect of this command is only to create the InnerNonzeros pointers. FIXME : This vector is filled but not subsequently used.  }}
+\DoxyCodeLine{528     \textcolor{comment}{// Then, permute only the column pointers}}
+\DoxyCodeLine{529     ei\_declare\_aligned\_stack\_constructed\_variable(StorageIndex,outerIndexPtr,mat.cols()+1,mat.isCompressed()?\textcolor{keyword}{const\_cast<}StorageIndex*\textcolor{keyword}{>}(mat.outerIndexPtr()):0);}
+\DoxyCodeLine{530     }
+\DoxyCodeLine{531     \textcolor{comment}{// If the input matrix 'mat' is uncompressed, then the outer-\/indices do not match the ones of m\_mat, and a copy is thus needed.}}
+\DoxyCodeLine{532     \textcolor{keywordflow}{if}(!mat.isCompressed()) }
+\DoxyCodeLine{533       IndexVector::Map(outerIndexPtr, mat.cols()+1) = IndexVector::Map(m\_mat.outerIndexPtr(),mat.cols()+1);}
+\DoxyCodeLine{534     }
+\DoxyCodeLine{535     \textcolor{comment}{// Apply the permutation and compute the nnz per column.}}
+\DoxyCodeLine{536     \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = 0; i < mat.cols(); i++)}
+\DoxyCodeLine{537     \{}
+\DoxyCodeLine{538       m\_mat.outerIndexPtr()[m\_perm\_c.indices()(i)] = outerIndexPtr[i];}
+\DoxyCodeLine{539       m\_mat.innerNonZeroPtr()[m\_perm\_c.indices()(i)] = outerIndexPtr[i+1] -\/ outerIndexPtr[i];}
+\DoxyCodeLine{540     \}}
+\DoxyCodeLine{541   \}}
+\DoxyCodeLine{542   }
+\DoxyCodeLine{543   \textcolor{comment}{// Compute the column elimination tree of the permuted matrix }}
+\DoxyCodeLine{544   \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}} firstRowElt;}
+\DoxyCodeLine{545   internal::coletree(m\_mat, m\_etree,firstRowElt); }
+\DoxyCodeLine{546      }
+\DoxyCodeLine{547   \textcolor{comment}{// In symmetric mode, do not do postorder here}}
+\DoxyCodeLine{548   \textcolor{keywordflow}{if} (!m\_symmetricmode) \{}
+\DoxyCodeLine{549     \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}} post, iwork; }
+\DoxyCodeLine{550     \textcolor{comment}{// Post order etree}}
+\DoxyCodeLine{551     internal::treePostorder(StorageIndex(m\_mat.cols()), m\_etree, post); }
+\DoxyCodeLine{552       }
+\DoxyCodeLine{553    }
+\DoxyCodeLine{554     \textcolor{comment}{// Renumber etree in postorder }}
+\DoxyCodeLine{555     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m = m\_mat.cols(); }
+\DoxyCodeLine{556     iwork.resize(m+1);}
+\DoxyCodeLine{557     \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = 0; i < m; ++i) iwork(post(i)) = post(m\_etree(i));}
+\DoxyCodeLine{558     m\_etree = iwork;}
+\DoxyCodeLine{559     }
+\DoxyCodeLine{560     \textcolor{comment}{// Postmultiply A*Pc by post, i.e reorder the matrix according to the postorder of the etree}}
+\DoxyCodeLine{561     \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationType}} post\_perm(m); }
+\DoxyCodeLine{562     \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = 0; i < m; i++) }
+\DoxyCodeLine{563       post\_perm.\mbox{\hyperlink{classEigen_1_1PermutationMatrix_add5183846b9d0b236291b75d3d1a36d9}{indices}}()(i) = post(i); }
+\DoxyCodeLine{564         }
+\DoxyCodeLine{565     \textcolor{comment}{// Combine the two permutations : postorder the permutation for future use}}
+\DoxyCodeLine{566     \textcolor{keywordflow}{if}(m\_perm\_c.size()) \{}
+\DoxyCodeLine{567       m\_perm\_c = post\_perm * m\_perm\_c;}
+\DoxyCodeLine{568     \}}
+\DoxyCodeLine{569     }
+\DoxyCodeLine{570   \} \textcolor{comment}{// end postordering }}
+\DoxyCodeLine{571   }
+\DoxyCodeLine{572   m\_analysisIsOk = \textcolor{keyword}{true}; }
+\DoxyCodeLine{573 \}}
+\DoxyCodeLine{574 }
+\DoxyCodeLine{575 \textcolor{comment}{// Functions needed by the numerical factorization phase}}
+\DoxyCodeLine{576 }
+\DoxyCodeLine{577 }
+\DoxyCodeLine{596 \textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixType, \textcolor{keyword}{typename} OrderingType>}
+\DoxyCodeLine{597 \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1SparseLU_a39858b0e72f2659d596364e252b34cbc}{SparseLU<MatrixType, OrderingType>::factorize}}(\textcolor{keyword}{const} MatrixType\& matrix)}
+\DoxyCodeLine{598 \{}
+\DoxyCodeLine{599   \textcolor{keyword}{using} internal::emptyIdxLU;}
+\DoxyCodeLine{600   eigen\_assert(m\_analysisIsOk \&\& \textcolor{stringliteral}{"{}analyzePattern() should be called first"{}}); }
+\DoxyCodeLine{601   eigen\_assert((matrix.rows() == matrix.cols()) \&\& \textcolor{stringliteral}{"{}Only for squared matrices"{}});}
+\DoxyCodeLine{602   }
+\DoxyCodeLine{603   m\_isInitialized = \textcolor{keyword}{true};}
+\DoxyCodeLine{604   }
+\DoxyCodeLine{605   \textcolor{comment}{// Apply the column permutation computed in analyzepattern()}}
+\DoxyCodeLine{606   \textcolor{comment}{//   m\_mat = matrix * m\_perm\_c.inverse(); }}
+\DoxyCodeLine{607   m\_mat = matrix;}
+\DoxyCodeLine{608   \textcolor{keywordflow}{if} (m\_perm\_c.size()) }
+\DoxyCodeLine{609   \{}
+\DoxyCodeLine{610     m\_mat.uncompress(); \textcolor{comment}{//NOTE: The effect of this command is only to create the InnerNonzeros pointers.}}
+\DoxyCodeLine{611     \textcolor{comment}{//Then, permute only the column pointers}}
+\DoxyCodeLine{612     \textcolor{keyword}{const} StorageIndex * outerIndexPtr;}
+\DoxyCodeLine{613     \textcolor{keywordflow}{if} (matrix.isCompressed()) outerIndexPtr = matrix.outerIndexPtr();}
+\DoxyCodeLine{614     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{615     \{}
+\DoxyCodeLine{616       StorageIndex* outerIndexPtr\_t = \textcolor{keyword}{new} StorageIndex[matrix.cols()+1];}
+\DoxyCodeLine{617       \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = 0; i <= matrix.cols(); i++) outerIndexPtr\_t[i] = m\_mat.outerIndexPtr()[i];}
+\DoxyCodeLine{618       outerIndexPtr = outerIndexPtr\_t;}
+\DoxyCodeLine{619     \}}
+\DoxyCodeLine{620     \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = 0; i < matrix.cols(); i++)}
+\DoxyCodeLine{621     \{}
+\DoxyCodeLine{622       m\_mat.outerIndexPtr()[m\_perm\_c.indices()(i)] = outerIndexPtr[i];}
+\DoxyCodeLine{623       m\_mat.innerNonZeroPtr()[m\_perm\_c.indices()(i)] = outerIndexPtr[i+1] -\/ outerIndexPtr[i];}
+\DoxyCodeLine{624     \}}
+\DoxyCodeLine{625     \textcolor{keywordflow}{if}(!matrix.isCompressed()) \textcolor{keyword}{delete}[] outerIndexPtr;}
+\DoxyCodeLine{626   \} }
+\DoxyCodeLine{627   \textcolor{keywordflow}{else} }
+\DoxyCodeLine{628   \{ \textcolor{comment}{//FIXME This should not be needed if the empty permutation is handled transparently}}
+\DoxyCodeLine{629     m\_perm\_c.resize(matrix.cols());}
+\DoxyCodeLine{630     \textcolor{keywordflow}{for}(StorageIndex i = 0; i < matrix.cols(); ++i) m\_perm\_c.indices()(i) = i;}
+\DoxyCodeLine{631   \}}
+\DoxyCodeLine{632   }
+\DoxyCodeLine{633   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m = m\_mat.rows();}
+\DoxyCodeLine{634   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} n = m\_mat.cols();}
+\DoxyCodeLine{635   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nnz = m\_mat.nonZeros();}
+\DoxyCodeLine{636   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} maxpanel = m\_perfv.panel\_size * m;}
+\DoxyCodeLine{637   \textcolor{comment}{// Allocate working storage common to the factor routines}}
+\DoxyCodeLine{638   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} lwork = 0;}
+\DoxyCodeLine{639   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} info = Base::memInit(m, n, nnz, lwork, m\_perfv.fillfactor, m\_perfv.panel\_size, m\_glu); }
+\DoxyCodeLine{640   \textcolor{keywordflow}{if} (info) }
+\DoxyCodeLine{641   \{}
+\DoxyCodeLine{642     m\_lastError = \textcolor{stringliteral}{"{}UNABLE TO ALLOCATE WORKING MEMORY\(\backslash\)n\(\backslash\)n"{}} ;}
+\DoxyCodeLine{643     m\_factorizationIsOk = \textcolor{keyword}{false};}
+\DoxyCodeLine{644     return ; }
+\DoxyCodeLine{645   \}}
+\DoxyCodeLine{646   }
+\DoxyCodeLine{647   \textcolor{comment}{// Set up pointers for integer working arrays }}
+\DoxyCodeLine{648   \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}} segrep(m); segrep.\mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac21ad5f989f320e46958b75ac8d9a1da}{setZero}}();}
+\DoxyCodeLine{649   \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}} parent(m); parent.\mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac21ad5f989f320e46958b75ac8d9a1da}{setZero}}();}
+\DoxyCodeLine{650   \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}} xplore(m); xplore.\mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac21ad5f989f320e46958b75ac8d9a1da}{setZero}}();}
+\DoxyCodeLine{651   \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}} repfnz(maxpanel);}
+\DoxyCodeLine{652   \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}} panel\_lsub(maxpanel);}
+\DoxyCodeLine{653   \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}} xprune(n); xprune.\mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac21ad5f989f320e46958b75ac8d9a1da}{setZero}}();}
+\DoxyCodeLine{654   \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}} marker(m*internal::LUNoMarker); marker.\mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac21ad5f989f320e46958b75ac8d9a1da}{setZero}}();}
+\DoxyCodeLine{655   }
+\DoxyCodeLine{656   repfnz.\mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac8dea1df3d92b752cc683ff42abf6f9b}{setConstant}}(-\/1); }
+\DoxyCodeLine{657   panel\_lsub.\mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac8dea1df3d92b752cc683ff42abf6f9b}{setConstant}}(-\/1);}
+\DoxyCodeLine{658   }
+\DoxyCodeLine{659   \textcolor{comment}{// Set up pointers for scalar working arrays }}
+\DoxyCodeLine{660   \mbox{\hyperlink{classEigen_1_1Matrix}{ScalarVector}} dense; }
+\DoxyCodeLine{661   dense.\mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac21ad5f989f320e46958b75ac8d9a1da}{setZero}}(maxpanel);}
+\DoxyCodeLine{662   \mbox{\hyperlink{classEigen_1_1Matrix}{ScalarVector}} tempv; }
+\DoxyCodeLine{663   tempv.\mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac21ad5f989f320e46958b75ac8d9a1da}{setZero}}(internal::LUnumTempV(m, m\_perfv.panel\_size, m\_perfv.maxsuper, \textcolor{comment}{/*m\_perfv.rowblk*/}m) );}
+\DoxyCodeLine{664   }
+\DoxyCodeLine{665   \textcolor{comment}{// Compute the inverse of perm\_c}}
+\DoxyCodeLine{666   \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationType}} iperm\_c(m\_perm\_c.inverse()); }
+\DoxyCodeLine{667   }
+\DoxyCodeLine{668   \textcolor{comment}{// Identify initial relaxed snodes}}
+\DoxyCodeLine{669   \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}} relax\_end(n);}
+\DoxyCodeLine{670   \textcolor{keywordflow}{if} ( m\_symmetricmode == \textcolor{keyword}{true} ) }
+\DoxyCodeLine{671     Base::heap\_relax\_snode(n, m\_etree, m\_perfv.relax, marker, relax\_end);}
+\DoxyCodeLine{672   \textcolor{keywordflow}{else}}
+\DoxyCodeLine{673     Base::relax\_snode(n, m\_etree, m\_perfv.relax, marker, relax\_end);}
+\DoxyCodeLine{674   }
+\DoxyCodeLine{675   }
+\DoxyCodeLine{676   m\_perm\_r.resize(m); }
+\DoxyCodeLine{677   m\_perm\_r.indices().setConstant(-\/1);}
+\DoxyCodeLine{678   marker.\mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac8dea1df3d92b752cc683ff42abf6f9b}{setConstant}}(-\/1);}
+\DoxyCodeLine{679   m\_detPermR = 1; \textcolor{comment}{// Record the determinant of the row permutation}}
+\DoxyCodeLine{680   }
+\DoxyCodeLine{681   m\_glu.supno(0) = emptyIdxLU; m\_glu.xsup.setConstant(0);}
+\DoxyCodeLine{682   m\_glu.xsup(0) = m\_glu.xlsub(0) = m\_glu.xusub(0) = m\_glu.xlusup(0) = \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}(0);}
+\DoxyCodeLine{683   }
+\DoxyCodeLine{684   \textcolor{comment}{// Work on one 'panel' at a time. A panel is one of the following :}}
+\DoxyCodeLine{685   \textcolor{comment}{//  (a) a relaxed supernode at the bottom of the etree, or}}
+\DoxyCodeLine{686   \textcolor{comment}{//  (b) panel\_size contiguous columns, <panel\_size> defined by the user}}
+\DoxyCodeLine{687   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} jcol; }
+\DoxyCodeLine{688   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} pivrow; \textcolor{comment}{// Pivotal row number in the original row matrix}}
+\DoxyCodeLine{689   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nseg1; \textcolor{comment}{// Number of segments in U-\/column above panel row jcol}}
+\DoxyCodeLine{690   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nseg; \textcolor{comment}{// Number of segments in each U-\/column }}
+\DoxyCodeLine{691   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} irep; }
+\DoxyCodeLine{692   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, k, jj; }
+\DoxyCodeLine{693   \textcolor{keywordflow}{for} (jcol = 0; jcol < n; )}
+\DoxyCodeLine{694   \{}
+\DoxyCodeLine{695     \textcolor{comment}{// Adjust panel size so that a panel won't overlap with the next relaxed snode. }}
+\DoxyCodeLine{696     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} panel\_size = m\_perfv.panel\_size; \textcolor{comment}{// upper bound on panel width}}
+\DoxyCodeLine{697     \textcolor{keywordflow}{for} (k = jcol + 1; k < (std::min)(jcol+panel\_size, n); k++)}
+\DoxyCodeLine{698     \{}
+\DoxyCodeLine{699       \textcolor{keywordflow}{if} (relax\_end(k) != emptyIdxLU) }
+\DoxyCodeLine{700       \{}
+\DoxyCodeLine{701         panel\_size = k -\/ jcol; }
+\DoxyCodeLine{702         \textcolor{keywordflow}{break}; }
+\DoxyCodeLine{703       \}}
+\DoxyCodeLine{704     \}}
+\DoxyCodeLine{705     \textcolor{keywordflow}{if} (k == n) }
+\DoxyCodeLine{706       panel\_size = n -\/ jcol; }
+\DoxyCodeLine{707       }
+\DoxyCodeLine{708     \textcolor{comment}{// Symbolic outer factorization on a panel of columns }}
+\DoxyCodeLine{709     Base::panel\_dfs(m, panel\_size, jcol, m\_mat, m\_perm\_r.indices(), nseg1, dense, panel\_lsub, segrep, repfnz, xprune, marker, parent, xplore, m\_glu); }
+\DoxyCodeLine{710     }
+\DoxyCodeLine{711     \textcolor{comment}{// Numeric sup-\/panel updates in topological order }}
+\DoxyCodeLine{712     Base::panel\_bmod(m, panel\_size, jcol, nseg1, dense, tempv, segrep, repfnz, m\_glu); }
+\DoxyCodeLine{713     }
+\DoxyCodeLine{714     \textcolor{comment}{// Sparse LU within the panel, and below the panel diagonal }}
+\DoxyCodeLine{715     \textcolor{keywordflow}{for} ( jj = jcol; jj< jcol + panel\_size; jj++) }
+\DoxyCodeLine{716     \{}
+\DoxyCodeLine{717       k = (jj -\/ jcol) * m; \textcolor{comment}{// Column index for w-\/wide arrays }}
+\DoxyCodeLine{718       }
+\DoxyCodeLine{719       nseg = nseg1; \textcolor{comment}{// begin after all the panel segments}}
+\DoxyCodeLine{720       \textcolor{comment}{//Depth-\/first-\/search for the current column}}
+\DoxyCodeLine{721       \mbox{\hyperlink{classEigen_1_1VectorBlock}{VectorBlock<IndexVector>}} panel\_lsubk(panel\_lsub, k, m);}
+\DoxyCodeLine{722       \mbox{\hyperlink{classEigen_1_1VectorBlock}{VectorBlock<IndexVector>}} repfnz\_k(repfnz, k, m); }
+\DoxyCodeLine{723       info = Base::column\_dfs(m, jj, m\_perm\_r.indices(), m\_perfv.maxsuper, nseg, panel\_lsubk, segrep, repfnz\_k, xprune, marker, parent, xplore, m\_glu); }
+\DoxyCodeLine{724       \textcolor{keywordflow}{if} ( info ) }
+\DoxyCodeLine{725       \{}
+\DoxyCodeLine{726         m\_lastError =  \textcolor{stringliteral}{"{}UNABLE TO EXPAND MEMORY IN COLUMN\_DFS() "{}};}
+\DoxyCodeLine{727         m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea1c6e20706575a629b27a105f07f1883b}{NumericalIssue}}; }
+\DoxyCodeLine{728         m\_factorizationIsOk = \textcolor{keyword}{false}; }
+\DoxyCodeLine{729         \textcolor{keywordflow}{return}; }
+\DoxyCodeLine{730       \}}
+\DoxyCodeLine{731       \textcolor{comment}{// Numeric updates to this column }}
+\DoxyCodeLine{732       \mbox{\hyperlink{classEigen_1_1VectorBlock}{VectorBlock<ScalarVector>}} dense\_k(dense, k, m); }
+\DoxyCodeLine{733       \mbox{\hyperlink{classEigen_1_1VectorBlock}{VectorBlock<IndexVector>}} segrep\_k(segrep, nseg1, m-\/nseg1); }
+\DoxyCodeLine{734       info = Base::column\_bmod(jj, (nseg -\/ nseg1), dense\_k, tempv, segrep\_k, repfnz\_k, jcol, m\_glu); }
+\DoxyCodeLine{735       \textcolor{keywordflow}{if} ( info ) }
+\DoxyCodeLine{736       \{}
+\DoxyCodeLine{737         m\_lastError = \textcolor{stringliteral}{"{}UNABLE TO EXPAND MEMORY IN COLUMN\_BMOD() "{}};}
+\DoxyCodeLine{738         m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea1c6e20706575a629b27a105f07f1883b}{NumericalIssue}}; }
+\DoxyCodeLine{739         m\_factorizationIsOk = \textcolor{keyword}{false}; }
+\DoxyCodeLine{740         \textcolor{keywordflow}{return}; }
+\DoxyCodeLine{741       \}}
+\DoxyCodeLine{742       }
+\DoxyCodeLine{743       \textcolor{comment}{// Copy the U-\/segments to ucol(*)}}
+\DoxyCodeLine{744       info = Base::copy\_to\_ucol(jj, nseg, segrep, repfnz\_k ,m\_perm\_r.indices(), dense\_k, m\_glu); }
+\DoxyCodeLine{745       \textcolor{keywordflow}{if} ( info ) }
+\DoxyCodeLine{746       \{}
+\DoxyCodeLine{747         m\_lastError = \textcolor{stringliteral}{"{}UNABLE TO EXPAND MEMORY IN COPY\_TO\_UCOL() "{}};}
+\DoxyCodeLine{748         m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea1c6e20706575a629b27a105f07f1883b}{NumericalIssue}}; }
+\DoxyCodeLine{749         m\_factorizationIsOk = \textcolor{keyword}{false}; }
+\DoxyCodeLine{750         \textcolor{keywordflow}{return}; }
+\DoxyCodeLine{751       \}}
+\DoxyCodeLine{752       }
+\DoxyCodeLine{753       \textcolor{comment}{// Form the L-\/segment }}
+\DoxyCodeLine{754       info = Base::pivotL(jj, m\_diagpivotthresh, m\_perm\_r.indices(), iperm\_c.\mbox{\hyperlink{classEigen_1_1PermutationMatrix_add5183846b9d0b236291b75d3d1a36d9}{indices}}(), pivrow, m\_glu);}
+\DoxyCodeLine{755       \textcolor{keywordflow}{if} ( info ) }
+\DoxyCodeLine{756       \{}
+\DoxyCodeLine{757         m\_lastError = \textcolor{stringliteral}{"{}THE MATRIX IS STRUCTURALLY SINGULAR ... ZERO COLUMN AT "{}};}
+\DoxyCodeLine{758         std::ostringstream returnInfo;}
+\DoxyCodeLine{759         returnInfo << info; }
+\DoxyCodeLine{760         m\_lastError += returnInfo.str();}
+\DoxyCodeLine{761         m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea1c6e20706575a629b27a105f07f1883b}{NumericalIssue}}; }
+\DoxyCodeLine{762         m\_factorizationIsOk = \textcolor{keyword}{false}; }
+\DoxyCodeLine{763         \textcolor{keywordflow}{return}; }
+\DoxyCodeLine{764       \}}
+\DoxyCodeLine{765       }
+\DoxyCodeLine{766       \textcolor{comment}{// Update the determinant of the row permutation matrix}}
+\DoxyCodeLine{767       \textcolor{comment}{// FIXME: the following test is not correct, we should probably take iperm\_c into account and pivrow is not directly the row pivot.}}
+\DoxyCodeLine{768       \textcolor{keywordflow}{if} (pivrow != jj) m\_detPermR = -\/m\_detPermR;}
+\DoxyCodeLine{769 }
+\DoxyCodeLine{770       \textcolor{comment}{// Prune columns (0:jj-\/1) using column jj}}
+\DoxyCodeLine{771       Base::pruneL(jj, m\_perm\_r.indices(), pivrow, nseg, segrep, repfnz\_k, xprune, m\_glu); }
+\DoxyCodeLine{772       }
+\DoxyCodeLine{773       \textcolor{comment}{// Reset repfnz for this column }}
+\DoxyCodeLine{774       \textcolor{keywordflow}{for} (i = 0; i < nseg; i++)}
+\DoxyCodeLine{775       \{}
+\DoxyCodeLine{776         irep = segrep(i); }
+\DoxyCodeLine{777         repfnz\_k(irep) = emptyIdxLU; }
+\DoxyCodeLine{778       \}}
+\DoxyCodeLine{779     \} \textcolor{comment}{// end SparseLU within the panel  }}
+\DoxyCodeLine{780     jcol += panel\_size;  \textcolor{comment}{// Move to the next panel}}
+\DoxyCodeLine{781   \} \textcolor{comment}{// end for -\/-\/ end elimination }}
+\DoxyCodeLine{782   }
+\DoxyCodeLine{783   m\_detPermR = m\_perm\_r.determinant();}
+\DoxyCodeLine{784   m\_detPermC = m\_perm\_c.determinant();}
+\DoxyCodeLine{785   }
+\DoxyCodeLine{786   \textcolor{comment}{// Count the number of nonzeros in factors }}
+\DoxyCodeLine{787   Base::countnz(n, m\_nnzL, m\_nnzU, m\_glu); }
+\DoxyCodeLine{788   \textcolor{comment}{// Apply permutation  to the L subscripts }}
+\DoxyCodeLine{789   Base::fixupL(n, m\_perm\_r.indices(), m\_glu);}
+\DoxyCodeLine{790   }
+\DoxyCodeLine{791   \textcolor{comment}{// Create supernode matrix L }}
+\DoxyCodeLine{792   m\_Lstore.setInfos(m, n, m\_glu.lusup, m\_glu.xlusup, m\_glu.lsub, m\_glu.xlsub, m\_glu.supno, m\_glu.xsup); }
+\DoxyCodeLine{793   \textcolor{comment}{// Create the column major upper sparse matrix  U; }}
+\DoxyCodeLine{794   \textcolor{keyword}{new} (\&m\_Ustore) \mbox{\hyperlink{classEigen_1_1MappedSparseMatrix}{MappedSparseMatrix<Scalar, ColMajor, StorageIndex>}} ( m, n, m\_nnzU, m\_glu.xusub.data(), m\_glu.usub.data(), m\_glu.ucol.data() );}
+\DoxyCodeLine{795   }
+\DoxyCodeLine{796   m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}};}
+\DoxyCodeLine{797   m\_factorizationIsOk = \textcolor{keyword}{true};}
+\DoxyCodeLine{798 \}}
+\DoxyCodeLine{799 }
+\DoxyCodeLine{800 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MappedSupernodalType>}
+\DoxyCodeLine{801 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1SparseLUMatrixLReturnType}{SparseLUMatrixLReturnType}} : \mbox{\hyperlink{classEigen_1_1internal_1_1no__assignment__operator}{internal::no\_assignment\_operator}}}
+\DoxyCodeLine{802 \{}
+\DoxyCodeLine{803   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MappedSupernodalType::Scalar Scalar;}
+\DoxyCodeLine{804   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1SparseLUMatrixLReturnType}{SparseLUMatrixLReturnType}}(\textcolor{keyword}{const} MappedSupernodalType\& mapL) : m\_mapL(mapL)}
+\DoxyCodeLine{805   \{ \}}
+\DoxyCodeLine{806   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_mapL.rows(); \}}
+\DoxyCodeLine{807   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_mapL.cols(); \}}
+\DoxyCodeLine{808   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{809   \textcolor{keywordtype}{void} solveInPlace( \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Dest>}} \&X)\textcolor{keyword}{ const}}
+\DoxyCodeLine{810 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{811     m\_mapL.solveInPlace(X);}
+\DoxyCodeLine{812   \}}
+\DoxyCodeLine{813   \textcolor{keyword}{template}<\textcolor{keywordtype}{bool} Conjugate, \textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{814   \textcolor{keywordtype}{void} solveTransposedInPlace( \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Dest>}} \&X)\textcolor{keyword}{ const}}
+\DoxyCodeLine{815 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{816     m\_mapL.template solveTransposedInPlace<Conjugate>(X);}
+\DoxyCodeLine{817   \}}
+\DoxyCodeLine{818 }
+\DoxyCodeLine{819   \textcolor{keyword}{const} MappedSupernodalType\& m\_mapL;}
+\DoxyCodeLine{820 \};}
+\DoxyCodeLine{821 }
+\DoxyCodeLine{822 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixLType, \textcolor{keyword}{typename} MatrixUType>}
+\DoxyCodeLine{823 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1SparseLUMatrixUReturnType}{SparseLUMatrixUReturnType}} : \mbox{\hyperlink{classEigen_1_1internal_1_1no__assignment__operator}{internal::no\_assignment\_operator}}}
+\DoxyCodeLine{824 \{}
+\DoxyCodeLine{825   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixLType::Scalar Scalar;}
+\DoxyCodeLine{826   \mbox{\hyperlink{structEigen_1_1SparseLUMatrixUReturnType}{SparseLUMatrixUReturnType}}(\textcolor{keyword}{const} MatrixLType\& mapL, \textcolor{keyword}{const} MatrixUType\& mapU)}
+\DoxyCodeLine{827   : m\_mapL(mapL),m\_mapU(mapU)}
+\DoxyCodeLine{828   \{ \}}
+\DoxyCodeLine{829   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_mapL.rows(); \}}
+\DoxyCodeLine{830   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_mapL.cols(); \}}
+\DoxyCodeLine{831 }
+\DoxyCodeLine{832   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest>   \textcolor{keywordtype}{void} solveInPlace(\mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Dest>}} \&X)\textcolor{keyword}{ const}}
+\DoxyCodeLine{833 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{834     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nrhs = X.cols();}
+\DoxyCodeLine{835     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} n    = X.rows();}
+\DoxyCodeLine{836     \textcolor{comment}{// Backward solve with U}}
+\DoxyCodeLine{837     \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} k = m\_mapL.nsuper(); k >= 0; k-\/-\/)}
+\DoxyCodeLine{838     \{}
+\DoxyCodeLine{839       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} fsupc = m\_mapL.supToCol()[k];}
+\DoxyCodeLine{840       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} lda = m\_mapL.colIndexPtr()[fsupc+1] -\/ m\_mapL.colIndexPtr()[fsupc]; \textcolor{comment}{// leading dimension}}
+\DoxyCodeLine{841       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nsupc = m\_mapL.supToCol()[k+1] -\/ fsupc;}
+\DoxyCodeLine{842       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} luptr = m\_mapL.colIndexPtr()[fsupc];}
+\DoxyCodeLine{843 }
+\DoxyCodeLine{844       \textcolor{keywordflow}{if} (nsupc == 1)}
+\DoxyCodeLine{845       \{}
+\DoxyCodeLine{846         \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < nrhs; j++)}
+\DoxyCodeLine{847         \{}
+\DoxyCodeLine{848           X(fsupc, j) /= m\_mapL.valuePtr()[luptr];}
+\DoxyCodeLine{849         \}}
+\DoxyCodeLine{850       \}}
+\DoxyCodeLine{851       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{852       \{}
+\DoxyCodeLine{853         \textcolor{comment}{// FIXME: the following lines should use Block expressions and not Map!}}
+\DoxyCodeLine{854         \mbox{\hyperlink{classEigen_1_1Map}{Map<const Matrix<Scalar,Dynamic,Dynamic, ColMajor>}}, 0, \mbox{\hyperlink{classEigen_1_1OuterStride}{OuterStride<>}} > A( \&(m\_mapL.valuePtr()[luptr]), nsupc, nsupc, \mbox{\hyperlink{classEigen_1_1OuterStride}{OuterStride<>}}(lda) );}
+\DoxyCodeLine{855         \mbox{\hyperlink{classEigen_1_1Map}{Map< Matrix<Scalar,Dynamic,Dest::ColsAtCompileTime, ColMajor>}}, 0, \mbox{\hyperlink{classEigen_1_1OuterStride}{OuterStride<>}} > U (\&(X.coeffRef(fsupc,0)), nsupc, nrhs, \mbox{\hyperlink{classEigen_1_1OuterStride}{OuterStride<>}}(n) );}
+\DoxyCodeLine{856         U = A.template triangularView<Upper>().solve(U);}
+\DoxyCodeLine{857       \}}
+\DoxyCodeLine{858 }
+\DoxyCodeLine{859       \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < nrhs; ++j)}
+\DoxyCodeLine{860       \{}
+\DoxyCodeLine{861         \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} jcol = fsupc; jcol < fsupc + nsupc; jcol++)}
+\DoxyCodeLine{862         \{}
+\DoxyCodeLine{863           \textcolor{keyword}{typename} MatrixUType::InnerIterator it(m\_mapU, jcol);}
+\DoxyCodeLine{864           \textcolor{keywordflow}{for} ( ; it; ++it)}
+\DoxyCodeLine{865           \{}
+\DoxyCodeLine{866             \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} irow = it.index();}
+\DoxyCodeLine{867             X(irow, j) -\/= X(jcol, j) * it.\mbox{\hyperlink{classEigen_1_1DenseBase_a8da735a6bfc7012606acf787156d10a0}{value}}();}
+\DoxyCodeLine{868           \}}
+\DoxyCodeLine{869         \}}
+\DoxyCodeLine{870       \}}
+\DoxyCodeLine{871     \} \textcolor{comment}{// End For U-\/solve}}
+\DoxyCodeLine{872   \}}
+\DoxyCodeLine{873 }
+\DoxyCodeLine{874   \textcolor{keyword}{template}<\textcolor{keywordtype}{bool} Conjugate, \textcolor{keyword}{typename} Dest>   \textcolor{keywordtype}{void} solveTransposedInPlace(\mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Dest>}} \&X)\textcolor{keyword}{ const}}
+\DoxyCodeLine{875 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{876     \textcolor{keyword}{using} numext::conj;}
+\DoxyCodeLine{877     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nrhs = X.cols();}
+\DoxyCodeLine{878     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} n    = X.rows();}
+\DoxyCodeLine{879     \textcolor{comment}{// Forward solve with U}}
+\DoxyCodeLine{880     \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} k = 0; k <=  m\_mapL.nsuper(); k++)}
+\DoxyCodeLine{881     \{}
+\DoxyCodeLine{882       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} fsupc = m\_mapL.supToCol()[k];}
+\DoxyCodeLine{883       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} lda = m\_mapL.colIndexPtr()[fsupc+1] -\/ m\_mapL.colIndexPtr()[fsupc]; \textcolor{comment}{// leading dimension}}
+\DoxyCodeLine{884       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nsupc = m\_mapL.supToCol()[k+1] -\/ fsupc;}
+\DoxyCodeLine{885       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} luptr = m\_mapL.colIndexPtr()[fsupc];}
+\DoxyCodeLine{886 }
+\DoxyCodeLine{887       \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < nrhs; ++j)}
+\DoxyCodeLine{888       \{}
+\DoxyCodeLine{889         \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} jcol = fsupc; jcol < fsupc + nsupc; jcol++)}
+\DoxyCodeLine{890         \{}
+\DoxyCodeLine{891           \textcolor{keyword}{typename} MatrixUType::InnerIterator it(m\_mapU, jcol);}
+\DoxyCodeLine{892           \textcolor{keywordflow}{for} ( ; it; ++it)}
+\DoxyCodeLine{893           \{}
+\DoxyCodeLine{894             \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} irow = it.index();}
+\DoxyCodeLine{895             X(jcol, j) -\/= X(irow, j) * (\mbox{\hyperlink{classEigen_1_1Conjugate}{Conjugate}}? conj(it.value()): it.value());}
+\DoxyCodeLine{896           \}}
+\DoxyCodeLine{897         \}}
+\DoxyCodeLine{898       \}}
+\DoxyCodeLine{899       \textcolor{keywordflow}{if} (nsupc == 1)}
+\DoxyCodeLine{900       \{}
+\DoxyCodeLine{901         \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < nrhs; j++)}
+\DoxyCodeLine{902         \{}
+\DoxyCodeLine{903           X(fsupc, j) /= (\mbox{\hyperlink{classEigen_1_1Conjugate}{Conjugate}}? conj(m\_mapL.valuePtr()[luptr]) : m\_mapL.valuePtr()[luptr]);}
+\DoxyCodeLine{904         \}}
+\DoxyCodeLine{905       \}}
+\DoxyCodeLine{906       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{907       \{}
+\DoxyCodeLine{908         \mbox{\hyperlink{classEigen_1_1Map}{Map<const Matrix<Scalar,Dynamic,Dynamic, ColMajor>}}, 0, \mbox{\hyperlink{classEigen_1_1OuterStride}{OuterStride<>}} > A( \&(m\_mapL.valuePtr()[luptr]), nsupc, nsupc, \mbox{\hyperlink{classEigen_1_1OuterStride}{OuterStride<>}}(lda) );}
+\DoxyCodeLine{909         \mbox{\hyperlink{classEigen_1_1Map}{Map< Matrix<Scalar,Dynamic,Dest::ColsAtCompileTime, ColMajor>}}, 0, \mbox{\hyperlink{classEigen_1_1OuterStride}{OuterStride<>}} > U (\&(X(fsupc,0)), nsupc, nrhs, \mbox{\hyperlink{classEigen_1_1OuterStride}{OuterStride<>}}(n) );}
+\DoxyCodeLine{910         \textcolor{keywordflow}{if}(\mbox{\hyperlink{classEigen_1_1Conjugate}{Conjugate}})}
+\DoxyCodeLine{911           U = A.adjoint().template triangularView<Lower>().solve(U);}
+\DoxyCodeLine{912         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{913           U = A.transpose().template triangularView<Lower>().solve(U);}
+\DoxyCodeLine{914       \}}
+\DoxyCodeLine{915     \}\textcolor{comment}{// End For U-\/solve}}
+\DoxyCodeLine{916   \}}
+\DoxyCodeLine{917 }
+\DoxyCodeLine{918 }
+\DoxyCodeLine{919   \textcolor{keyword}{const} MatrixLType\& m\_mapL;}
+\DoxyCodeLine{920   \textcolor{keyword}{const} MatrixUType\& m\_mapU;}
+\DoxyCodeLine{921 \};}
+\DoxyCodeLine{922 }
+\DoxyCodeLine{923 \} \textcolor{comment}{// End namespace Eigen }}
+\DoxyCodeLine{924 }
+\DoxyCodeLine{925 \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

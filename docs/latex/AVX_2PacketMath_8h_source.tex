@@ -1,0 +1,1748 @@
+\hypertarget{AVX_2PacketMath_8h_source}{}\doxysection{Packet\+Math.\+h}
+\label{AVX_2PacketMath_8h_source}\index{include/Eigen/src/Core/arch/AVX/PacketMath.h@{include/Eigen/src/Core/arch/AVX/PacketMath.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2014 Benoit Steiner (benoit.steiner.goog@gmail.com)}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_PACKET\_MATH\_AVX\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_PACKET\_MATH\_AVX\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}../../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{preprocessor}{\#ifndef EIGEN\_CACHEFRIENDLY\_PRODUCT\_THRESHOLD}}
+\DoxyCodeLine{20 \textcolor{preprocessor}{\#define EIGEN\_CACHEFRIENDLY\_PRODUCT\_THRESHOLD 8}}
+\DoxyCodeLine{21 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{22 }
+\DoxyCodeLine{23 \textcolor{preprocessor}{\#if !defined(EIGEN\_VECTORIZE\_AVX512) \&\& !defined(EIGEN\_ARCH\_DEFAULT\_NUMBER\_OF\_REGISTERS)}}
+\DoxyCodeLine{24 \textcolor{preprocessor}{\#define EIGEN\_ARCH\_DEFAULT\_NUMBER\_OF\_REGISTERS 16}}
+\DoxyCodeLine{25 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{26 }
+\DoxyCodeLine{27 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_FMA}}
+\DoxyCodeLine{28 \textcolor{preprocessor}{\#ifndef EIGEN\_HAS\_SINGLE\_INSTRUCTION\_MADD}}
+\DoxyCodeLine{29 \textcolor{preprocessor}{\#define EIGEN\_HAS\_SINGLE\_INSTRUCTION\_MADD}}
+\DoxyCodeLine{30 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{31 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33 \textcolor{keyword}{typedef} \_\_m256  Packet8f;}
+\DoxyCodeLine{34 \textcolor{keyword}{typedef} \_\_m256i Packet8i;}
+\DoxyCodeLine{35 \textcolor{keyword}{typedef} \_\_m256d Packet4d;}
+\DoxyCodeLine{36 \textcolor{keyword}{typedef} eigen\_packet\_wrapper<\_\_m128i, 2> Packet8h;}
+\DoxyCodeLine{37 \textcolor{keyword}{typedef} eigen\_packet\_wrapper<\_\_m128i, 3> Packet8bf;}
+\DoxyCodeLine{38 }
+\DoxyCodeLine{39 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__arithmetic}{is\_arithmetic}}<\_\_m256>  \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{40 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__arithmetic}{is\_arithmetic}}<\_\_m256i> \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{41 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__arithmetic}{is\_arithmetic}}<\_\_m256d> \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{42 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__arithmetic}{is\_arithmetic}}<\mbox{\hyperlink{structEigen_1_1internal_1_1eigen__packet__wrapper}{Packet8h}}> \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{43 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__arithmetic}{is\_arithmetic}}<\mbox{\hyperlink{structEigen_1_1internal_1_1eigen__packet__wrapper}{Packet8bf}}> \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{44 }
+\DoxyCodeLine{45 \textcolor{preprocessor}{\#define \_EIGEN\_DECLARE\_CONST\_Packet8f(NAME,X) \(\backslash\)}}
+\DoxyCodeLine{46 \textcolor{preprocessor}{  const Packet8f p8f\_\#\#NAME = pset1<Packet8f>(X)}}
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48 \textcolor{preprocessor}{\#define \_EIGEN\_DECLARE\_CONST\_Packet4d(NAME,X) \(\backslash\)}}
+\DoxyCodeLine{49 \textcolor{preprocessor}{  const Packet4d p4d\_\#\#NAME = pset1<Packet4d>(X)}}
+\DoxyCodeLine{50 }
+\DoxyCodeLine{51 \textcolor{preprocessor}{\#define \_EIGEN\_DECLARE\_CONST\_Packet8f\_FROM\_INT(NAME,X) \(\backslash\)}}
+\DoxyCodeLine{52 \textcolor{preprocessor}{  const Packet8f p8f\_\#\#NAME = \_mm256\_castsi256\_ps(pset1<Packet8i>(X))}}
+\DoxyCodeLine{53 }
+\DoxyCodeLine{54 \textcolor{preprocessor}{\#define \_EIGEN\_DECLARE\_CONST\_Packet8i(NAME,X) \(\backslash\)}}
+\DoxyCodeLine{55 \textcolor{preprocessor}{  const Packet8i p8i\_\#\#NAME = pset1<Packet8i>(X)}}
+\DoxyCodeLine{56 }
+\DoxyCodeLine{57 \textcolor{comment}{// Use the packet\_traits defined in AVX512/PacketMath.h instead if we're going}}
+\DoxyCodeLine{58 \textcolor{comment}{// to leverage AVX512 instructions.}}
+\DoxyCodeLine{59 \textcolor{preprocessor}{\#ifndef EIGEN\_VECTORIZE\_AVX512}}
+\DoxyCodeLine{60 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits}}<float>  : \mbox{\hyperlink{structEigen_1_1internal_1_1default__packet__traits}{default\_packet\_traits}}}
+\DoxyCodeLine{61 \{}
+\DoxyCodeLine{62   \textcolor{keyword}{typedef} Packet8f type;}
+\DoxyCodeLine{63   \textcolor{keyword}{typedef} Packet4f \mbox{\hyperlink{structEigen_1_1half}{half}};}
+\DoxyCodeLine{64   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{65     Vectorizable = 1,}
+\DoxyCodeLine{66     AlignedOnScalar = 1,}
+\DoxyCodeLine{67     size = 8,}
+\DoxyCodeLine{68     HasHalfPacket = 1,}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70     HasCmp  = 1,}
+\DoxyCodeLine{71     HasDiv = 1,}
+\DoxyCodeLine{72     HasSin = EIGEN\_FAST\_MATH,}
+\DoxyCodeLine{73     HasCos = EIGEN\_FAST\_MATH,}
+\DoxyCodeLine{74     HasLog = 1,}
+\DoxyCodeLine{75     HasLog1p = 1,}
+\DoxyCodeLine{76     HasExpm1 = 1,}
+\DoxyCodeLine{77     HasExp = 1,}
+\DoxyCodeLine{78     HasNdtri = 1,}
+\DoxyCodeLine{79     HasBessel = 1,}
+\DoxyCodeLine{80     HasSqrt = 1,}
+\DoxyCodeLine{81     HasRsqrt = 1,}
+\DoxyCodeLine{82     HasTanh = EIGEN\_FAST\_MATH,}
+\DoxyCodeLine{83     HasErf = EIGEN\_FAST\_MATH,}
+\DoxyCodeLine{84     HasBlend = 1,}
+\DoxyCodeLine{85     HasRound = 1,}
+\DoxyCodeLine{86     HasFloor = 1,}
+\DoxyCodeLine{87     HasCeil = 1,}
+\DoxyCodeLine{88     HasRint = 1}
+\DoxyCodeLine{89   \};}
+\DoxyCodeLine{90 \};}
+\DoxyCodeLine{91 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits}}<double> : \mbox{\hyperlink{structEigen_1_1internal_1_1default__packet__traits}{default\_packet\_traits}}}
+\DoxyCodeLine{92 \{}
+\DoxyCodeLine{93   \textcolor{keyword}{typedef} Packet4d type;}
+\DoxyCodeLine{94   \textcolor{keyword}{typedef} Packet2d half;}
+\DoxyCodeLine{95   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{96     Vectorizable = 1,}
+\DoxyCodeLine{97     AlignedOnScalar = 1,}
+\DoxyCodeLine{98     size=4,}
+\DoxyCodeLine{99     HasHalfPacket = 1,}
+\DoxyCodeLine{100 }
+\DoxyCodeLine{101     HasCmp  = 1,}
+\DoxyCodeLine{102     HasDiv  = 1,}
+\DoxyCodeLine{103     HasLog  = 1,}
+\DoxyCodeLine{104     HasExp  = 1,}
+\DoxyCodeLine{105     HasSqrt = 1,}
+\DoxyCodeLine{106     HasRsqrt = 1,}
+\DoxyCodeLine{107     HasBlend = 1,}
+\DoxyCodeLine{108     HasRound = 1,}
+\DoxyCodeLine{109     HasFloor = 1,}
+\DoxyCodeLine{110     HasCeil = 1,}
+\DoxyCodeLine{111     HasRint = 1}
+\DoxyCodeLine{112   \};}
+\DoxyCodeLine{113 \};}
+\DoxyCodeLine{114 }
+\DoxyCodeLine{115 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{116 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits}}<\mbox{\hyperlink{namespaceEigen}{Eigen}}::\mbox{\hyperlink{structEigen_1_1internal_1_1eigen__packet__wrapper}{half}}> : \mbox{\hyperlink{structEigen_1_1internal_1_1default__packet__traits}{default\_packet\_traits}} \{}
+\DoxyCodeLine{117   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1eigen__packet__wrapper}{Packet8h}} \mbox{\hyperlink{structEigen_1_1internal_1_1eigen__packet__wrapper}{type}};}
+\DoxyCodeLine{118   \textcolor{comment}{// There is no half-\/size packet for Packet8h.}}
+\DoxyCodeLine{119   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1eigen__packet__wrapper}{Packet8h}} \mbox{\hyperlink{structEigen_1_1internal_1_1eigen__packet__wrapper}{half}};}
+\DoxyCodeLine{120   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{121     Vectorizable = 1,}
+\DoxyCodeLine{122     AlignedOnScalar = 1,}
+\DoxyCodeLine{123     size = 8,}
+\DoxyCodeLine{124     HasHalfPacket = 0,}
+\DoxyCodeLine{125 }
+\DoxyCodeLine{126     HasCmp    = 1,}
+\DoxyCodeLine{127     HasAdd    = 1,}
+\DoxyCodeLine{128     HasSub    = 1,}
+\DoxyCodeLine{129     HasMul    = 1,}
+\DoxyCodeLine{130     HasDiv    = 1,}
+\DoxyCodeLine{131     HasSin    = EIGEN\_FAST\_MATH,}
+\DoxyCodeLine{132     HasCos    = EIGEN\_FAST\_MATH,}
+\DoxyCodeLine{133     HasNegate = 1,}
+\DoxyCodeLine{134     HasAbs    = 1,}
+\DoxyCodeLine{135     HasAbs2   = 0,}
+\DoxyCodeLine{136     HasMin    = 1,}
+\DoxyCodeLine{137     HasMax    = 1,}
+\DoxyCodeLine{138     HasConj   = 1,}
+\DoxyCodeLine{139     HasSetLinear = 0,}
+\DoxyCodeLine{140     HasLog    = 1,}
+\DoxyCodeLine{141     HasLog1p  = 1,}
+\DoxyCodeLine{142     HasExpm1  = 1,}
+\DoxyCodeLine{143     HasExp    = 1,}
+\DoxyCodeLine{144     HasSqrt   = 1,}
+\DoxyCodeLine{145     HasRsqrt  = 1,}
+\DoxyCodeLine{146     HasTanh   = EIGEN\_FAST\_MATH,}
+\DoxyCodeLine{147     HasErf    = EIGEN\_FAST\_MATH,}
+\DoxyCodeLine{148     HasBlend  = 0,}
+\DoxyCodeLine{149     HasRound  = 1,}
+\DoxyCodeLine{150     HasFloor  = 1,}
+\DoxyCodeLine{151     HasCeil   = 1,}
+\DoxyCodeLine{152     HasRint   = 1,}
+\DoxyCodeLine{153     HasBessel = 1,}
+\DoxyCodeLine{154     HasNdtri  = 1}
+\DoxyCodeLine{155   \};}
+\DoxyCodeLine{156 \};}
+\DoxyCodeLine{157 }
+\DoxyCodeLine{158 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{159 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits}}<\mbox{\hyperlink{structEigen_1_1bfloat16}{bfloat16}}> : \mbox{\hyperlink{structEigen_1_1internal_1_1default__packet__traits}{default\_packet\_traits}} \{}
+\DoxyCodeLine{160   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1eigen__packet__wrapper}{Packet8bf}} type;}
+\DoxyCodeLine{161   \textcolor{comment}{// There is no half-\/size packet for current Packet8bf.}}
+\DoxyCodeLine{162   \textcolor{comment}{// TODO: support as SSE path.}}
+\DoxyCodeLine{163   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1eigen__packet__wrapper}{Packet8bf}} \mbox{\hyperlink{structEigen_1_1half}{half}};}
+\DoxyCodeLine{164   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{165     Vectorizable = 1,}
+\DoxyCodeLine{166     AlignedOnScalar = 1,}
+\DoxyCodeLine{167     size = 8,}
+\DoxyCodeLine{168     HasHalfPacket = 0,}
+\DoxyCodeLine{169 }
+\DoxyCodeLine{170     HasCmp = 1,}
+\DoxyCodeLine{171     HasAdd = 1,}
+\DoxyCodeLine{172     HasSub = 1,}
+\DoxyCodeLine{173     HasMul = 1,}
+\DoxyCodeLine{174     HasDiv = 1,}
+\DoxyCodeLine{175     HasSin = EIGEN\_FAST\_MATH,}
+\DoxyCodeLine{176     HasCos = EIGEN\_FAST\_MATH,}
+\DoxyCodeLine{177     HasNegate = 1,}
+\DoxyCodeLine{178     HasAbs    = 1,}
+\DoxyCodeLine{179     HasAbs2   = 0,}
+\DoxyCodeLine{180     HasMin    = 1,}
+\DoxyCodeLine{181     HasMax    = 1,}
+\DoxyCodeLine{182     HasConj   = 1,}
+\DoxyCodeLine{183     HasSetLinear = 0,}
+\DoxyCodeLine{184     HasLog = 1,}
+\DoxyCodeLine{185     HasLog1p  = 1,}
+\DoxyCodeLine{186     HasExpm1  = 1,}
+\DoxyCodeLine{187     HasExp = 1,}
+\DoxyCodeLine{188     HasSqrt = 1,}
+\DoxyCodeLine{189     HasRsqrt = 1,}
+\DoxyCodeLine{190     HasTanh = EIGEN\_FAST\_MATH,}
+\DoxyCodeLine{191     HasErf = EIGEN\_FAST\_MATH,}
+\DoxyCodeLine{192     HasBlend = 0,}
+\DoxyCodeLine{193     HasRound = 1,}
+\DoxyCodeLine{194     HasFloor = 1,}
+\DoxyCodeLine{195     HasCeil = 1,}
+\DoxyCodeLine{196     HasRint = 1,}
+\DoxyCodeLine{197     HasBessel = 1,}
+\DoxyCodeLine{198     HasNdtri  = 1}
+\DoxyCodeLine{199   \};}
+\DoxyCodeLine{200 \};}
+\DoxyCodeLine{201 }
+\DoxyCodeLine{202 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }packet\_traits<int> : default\_packet\_traits}
+\DoxyCodeLine{203 \{}
+\DoxyCodeLine{204   \textcolor{keyword}{typedef} Packet8i type;}
+\DoxyCodeLine{205   \textcolor{keyword}{typedef} Packet4i half;}
+\DoxyCodeLine{206   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{207     Vectorizable = 1,}
+\DoxyCodeLine{208     AlignedOnScalar = 1,}
+\DoxyCodeLine{209     size=8}
+\DoxyCodeLine{210   \};}
+\DoxyCodeLine{211 \};}
+\DoxyCodeLine{212 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{213 }
+\DoxyCodeLine{214 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__div__cost}{scalar\_div\_cost}}<float,true> \{ \textcolor{keyword}{enum} \{ value = 14 \}; \};}
+\DoxyCodeLine{215 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__div__cost}{scalar\_div\_cost}}<double,true> \{ \textcolor{keyword}{enum} \{ value = 16 \}; \};}
+\DoxyCodeLine{216 }
+\DoxyCodeLine{217 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unpacket__traits}{unpacket\_traits}}<Packet8f> \{}
+\DoxyCodeLine{218   \textcolor{keyword}{typedef} \textcolor{keywordtype}{float}     type;}
+\DoxyCodeLine{219   \textcolor{keyword}{typedef} Packet4f  half;}
+\DoxyCodeLine{220   \textcolor{keyword}{typedef} Packet8i  integer\_packet;}
+\DoxyCodeLine{221   \textcolor{keyword}{typedef} uint8\_t   mask\_t;}
+\DoxyCodeLine{222   \textcolor{keyword}{enum} \{size=8, alignment=\mbox{\hyperlink{group__enums_gga45fe06e29902b7a2773de05ba27b47a1a8a380b1cd0c3e5a6cceac06f8235157a}{Aligned32}}, vectorizable=\textcolor{keyword}{true}, masked\_load\_available=\textcolor{keyword}{true}, masked\_store\_available=\textcolor{keyword}{true}\};}
+\DoxyCodeLine{223 \};}
+\DoxyCodeLine{224 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unpacket__traits}{unpacket\_traits}}<Packet4d> \{}
+\DoxyCodeLine{225   \textcolor{keyword}{typedef} \textcolor{keywordtype}{double} type;}
+\DoxyCodeLine{226   \textcolor{keyword}{typedef} Packet2d half;}
+\DoxyCodeLine{227   \textcolor{keyword}{enum} \{size=4, alignment=\mbox{\hyperlink{group__enums_gga45fe06e29902b7a2773de05ba27b47a1a8a380b1cd0c3e5a6cceac06f8235157a}{Aligned32}}, vectorizable=\textcolor{keyword}{true}, masked\_load\_available=\textcolor{keyword}{false}, masked\_store\_available=\textcolor{keyword}{false}\};}
+\DoxyCodeLine{228 \};}
+\DoxyCodeLine{229 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unpacket__traits}{unpacket\_traits}}<Packet8i> \{}
+\DoxyCodeLine{230   \textcolor{keyword}{typedef} \textcolor{keywordtype}{int}    type;}
+\DoxyCodeLine{231   \textcolor{keyword}{typedef} Packet4i half;}
+\DoxyCodeLine{232   \textcolor{keyword}{enum} \{size=8, alignment=\mbox{\hyperlink{group__enums_gga45fe06e29902b7a2773de05ba27b47a1a8a380b1cd0c3e5a6cceac06f8235157a}{Aligned32}}, vectorizable=\textcolor{keyword}{true}, masked\_load\_available=\textcolor{keyword}{false}, masked\_store\_available=\textcolor{keyword}{false}\};}
+\DoxyCodeLine{233 \};}
+\DoxyCodeLine{234 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unpacket__traits}{unpacket\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1eigen__packet__wrapper}{Packet8bf}}> \{}
+\DoxyCodeLine{235   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1bfloat16}{bfloat16}} type;}
+\DoxyCodeLine{236   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1eigen__packet__wrapper}{Packet8bf}} \mbox{\hyperlink{structEigen_1_1half}{half}};}
+\DoxyCodeLine{237   \textcolor{keyword}{enum} \{size=8, alignment=\mbox{\hyperlink{group__enums_gga45fe06e29902b7a2773de05ba27b47a1ad0b140cd97bc74365b51843d28379655}{Aligned16}}, vectorizable=\textcolor{keyword}{true}, masked\_load\_available=\textcolor{keyword}{false}, masked\_store\_available=\textcolor{keyword}{false}\};}
+\DoxyCodeLine{238 \};}
+\DoxyCodeLine{239 }
+\DoxyCodeLine{240 \textcolor{comment}{// Helper function for bit packing snippet of low precision comparison.}}
+\DoxyCodeLine{241 \textcolor{comment}{// It packs the flags from 16x16 to 8x16.}}
+\DoxyCodeLine{242 EIGEN\_STRONG\_INLINE \_\_m128i Pack16To8(Packet8f rf) \{}
+\DoxyCodeLine{243   \textcolor{keywordflow}{return} \_mm\_packs\_epi32(\_mm256\_extractf128\_si256(\_mm256\_castps\_si256(rf), 0),}
+\DoxyCodeLine{244                          \_mm256\_extractf128\_si256(\_mm256\_castps\_si256(rf), 1));}
+\DoxyCodeLine{245 \}}
+\DoxyCodeLine{246 }
+\DoxyCodeLine{247 }
+\DoxyCodeLine{248 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pset1<Packet8f>(\textcolor{keyword}{const} \textcolor{keywordtype}{float}\&  from) \{ \textcolor{keywordflow}{return} \_mm256\_set1\_ps(from); \}}
+\DoxyCodeLine{249 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pset1<Packet4d>(\textcolor{keyword}{const} \textcolor{keywordtype}{double}\& from) \{ \textcolor{keywordflow}{return} \_mm256\_set1\_pd(from); \}}
+\DoxyCodeLine{250 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i pset1<Packet8i>(\textcolor{keyword}{const} \textcolor{keywordtype}{int}\&    from) \{ \textcolor{keywordflow}{return} \_mm256\_set1\_epi32(from); \}}
+\DoxyCodeLine{251 }
+\DoxyCodeLine{252 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pset1frombits<Packet8f>(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} from) \{ \textcolor{keywordflow}{return} \_mm256\_castsi256\_ps(pset1<Packet8i>(from)); \}}
+\DoxyCodeLine{253 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pset1frombits<Packet4d>(uint64\_t from) \{ \textcolor{keywordflow}{return} \_mm256\_castsi256\_pd(\_mm256\_set1\_epi64x(from)); \}}
+\DoxyCodeLine{254 }
+\DoxyCodeLine{255 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pzero(\textcolor{keyword}{const} Packet8f\& \textcolor{comment}{/*a*/}) \{ \textcolor{keywordflow}{return} \_mm256\_setzero\_ps(); \}}
+\DoxyCodeLine{256 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pzero(\textcolor{keyword}{const} Packet4d\& \textcolor{comment}{/*a*/}) \{ \textcolor{keywordflow}{return} \_mm256\_setzero\_pd(); \}}
+\DoxyCodeLine{257 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i pzero(\textcolor{keyword}{const} Packet8i\& \textcolor{comment}{/*a*/}) \{ \textcolor{keywordflow}{return} \_mm256\_setzero\_si256(); \}}
+\DoxyCodeLine{258 }
+\DoxyCodeLine{259 }
+\DoxyCodeLine{260 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f peven\_mask(\textcolor{keyword}{const} Packet8f\& \textcolor{comment}{/*a*/}) \{ \textcolor{keywordflow}{return} \_mm256\_castsi256\_ps(\_mm256\_set\_epi32(0, -\/1, 0, -\/1, 0, -\/1, 0, -\/1)); \}}
+\DoxyCodeLine{261 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i peven\_mask(\textcolor{keyword}{const} Packet8i\& \textcolor{comment}{/*a*/}) \{ \textcolor{keywordflow}{return} \_mm256\_set\_epi32(0, -\/1, 0, -\/1, 0, -\/1, 0, -\/1); \}}
+\DoxyCodeLine{262 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d peven\_mask(\textcolor{keyword}{const} Packet4d\& \textcolor{comment}{/*a*/}) \{ \textcolor{keywordflow}{return} \_mm256\_castsi256\_pd(\_mm256\_set\_epi32(0, 0, -\/1, -\/1, 0, 0, -\/1, -\/1)); \}}
+\DoxyCodeLine{263 }
+\DoxyCodeLine{264 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pload1<Packet8f>(\textcolor{keyword}{const} \textcolor{keywordtype}{float}*  from) \{ \textcolor{keywordflow}{return} \_mm256\_broadcast\_ss(from); \}}
+\DoxyCodeLine{265 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pload1<Packet4d>(\textcolor{keyword}{const} \textcolor{keywordtype}{double}* from) \{ \textcolor{keywordflow}{return} \_mm256\_broadcast\_sd(from); \}}
+\DoxyCodeLine{266 }
+\DoxyCodeLine{267 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f padd<Packet8f>(\textcolor{keyword}{const} Packet8f\& a, \textcolor{keyword}{const} Packet8f\& b) \{ \textcolor{keywordflow}{return} \_mm256\_add\_ps(a,b); \}}
+\DoxyCodeLine{268 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d padd<Packet4d>(\textcolor{keyword}{const} Packet4d\& a, \textcolor{keyword}{const} Packet4d\& b) \{ \textcolor{keywordflow}{return} \_mm256\_add\_pd(a,b); \}}
+\DoxyCodeLine{269 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i padd<Packet8i>(\textcolor{keyword}{const} Packet8i\& a, \textcolor{keyword}{const} Packet8i\& b) \{}
+\DoxyCodeLine{270 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{271   \textcolor{keywordflow}{return} \_mm256\_add\_epi32(a,b);}
+\DoxyCodeLine{272 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{273   \_\_m128i lo = \_mm\_add\_epi32(\_mm256\_extractf128\_si256(a, 0), \_mm256\_extractf128\_si256(b, 0));}
+\DoxyCodeLine{274   \_\_m128i hi = \_mm\_add\_epi32(\_mm256\_extractf128\_si256(a, 1), \_mm256\_extractf128\_si256(b, 1));}
+\DoxyCodeLine{275   \textcolor{keywordflow}{return} \_mm256\_insertf128\_si256(\_mm256\_castsi128\_si256(lo), (hi), 1);}
+\DoxyCodeLine{276 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{277 \}}
+\DoxyCodeLine{278 }
+\DoxyCodeLine{279 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f plset<Packet8f>(\textcolor{keyword}{const} \textcolor{keywordtype}{float}\& a) \{ \textcolor{keywordflow}{return} padd(pset1<Packet8f>(a), \_mm256\_set\_ps(7.0,6.0,5.0,4.0,3.0,2.0,1.0,0.0)); \}}
+\DoxyCodeLine{280 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d plset<Packet4d>(\textcolor{keyword}{const} \textcolor{keywordtype}{double}\& a) \{ \textcolor{keywordflow}{return} padd(pset1<Packet4d>(a), \_mm256\_set\_pd(3.0,2.0,1.0,0.0)); \}}
+\DoxyCodeLine{281 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i plset<Packet8i>(\textcolor{keyword}{const} \textcolor{keywordtype}{int}\& a) \{ \textcolor{keywordflow}{return} padd(pset1<Packet8i>(a), \_mm256\_set\_epi32(7,6,5,4,3,2,1,0)); \}}
+\DoxyCodeLine{282 }
+\DoxyCodeLine{283 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f psub<Packet8f>(\textcolor{keyword}{const} Packet8f\& a, \textcolor{keyword}{const} Packet8f\& b) \{ \textcolor{keywordflow}{return} \_mm256\_sub\_ps(a,b); \}}
+\DoxyCodeLine{284 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d psub<Packet4d>(\textcolor{keyword}{const} Packet4d\& a, \textcolor{keyword}{const} Packet4d\& b) \{ \textcolor{keywordflow}{return} \_mm256\_sub\_pd(a,b); \}}
+\DoxyCodeLine{285 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i psub<Packet8i>(\textcolor{keyword}{const} Packet8i\& a, \textcolor{keyword}{const} Packet8i\& b) \{}
+\DoxyCodeLine{286 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{287   \textcolor{keywordflow}{return} \_mm256\_sub\_epi32(a,b);}
+\DoxyCodeLine{288 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{289   \_\_m128i lo = \_mm\_sub\_epi32(\_mm256\_extractf128\_si256(a, 0), \_mm256\_extractf128\_si256(b, 0));}
+\DoxyCodeLine{290   \_\_m128i hi = \_mm\_sub\_epi32(\_mm256\_extractf128\_si256(a, 1), \_mm256\_extractf128\_si256(b, 1));}
+\DoxyCodeLine{291   \textcolor{keywordflow}{return} \_mm256\_insertf128\_si256(\_mm256\_castsi128\_si256(lo), (hi), 1);}
+\DoxyCodeLine{292 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{293 \}}
+\DoxyCodeLine{294 }
+\DoxyCodeLine{295 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pnegate(\textcolor{keyword}{const} Packet8f\& a)}
+\DoxyCodeLine{296 \{}
+\DoxyCodeLine{297   \textcolor{keywordflow}{return} \_mm256\_sub\_ps(\_mm256\_set1\_ps(0.0),a);}
+\DoxyCodeLine{298 \}}
+\DoxyCodeLine{299 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pnegate(\textcolor{keyword}{const} Packet4d\& a)}
+\DoxyCodeLine{300 \{}
+\DoxyCodeLine{301   \textcolor{keywordflow}{return} \_mm256\_sub\_pd(\_mm256\_set1\_pd(0.0),a);}
+\DoxyCodeLine{302 \}}
+\DoxyCodeLine{303 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i pnegate(\textcolor{keyword}{const} Packet8i\& a)}
+\DoxyCodeLine{304 \{}
+\DoxyCodeLine{305   \textcolor{keywordflow}{return} psub(pzero(a), a);}
+\DoxyCodeLine{306 \}}
+\DoxyCodeLine{307 }
+\DoxyCodeLine{308 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pconj(\textcolor{keyword}{const} Packet8f\& a) \{ \textcolor{keywordflow}{return} a; \}}
+\DoxyCodeLine{309 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pconj(\textcolor{keyword}{const} Packet4d\& a) \{ \textcolor{keywordflow}{return} a; \}}
+\DoxyCodeLine{310 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i pconj(\textcolor{keyword}{const} Packet8i\& a) \{ \textcolor{keywordflow}{return} a; \}}
+\DoxyCodeLine{311 }
+\DoxyCodeLine{312 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pmul<Packet8f>(\textcolor{keyword}{const} Packet8f\& a, \textcolor{keyword}{const} Packet8f\& b) \{ \textcolor{keywordflow}{return} \_mm256\_mul\_ps(a,b); \}}
+\DoxyCodeLine{313 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pmul<Packet4d>(\textcolor{keyword}{const} Packet4d\& a, \textcolor{keyword}{const} Packet4d\& b) \{ \textcolor{keywordflow}{return} \_mm256\_mul\_pd(a,b); \}}
+\DoxyCodeLine{314 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i pmul<Packet8i>(\textcolor{keyword}{const} Packet8i\& a, \textcolor{keyword}{const} Packet8i\& b) \{}
+\DoxyCodeLine{315 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{316   \textcolor{keywordflow}{return} \_mm256\_mullo\_epi32(a,b);}
+\DoxyCodeLine{317 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{318   \textcolor{keyword}{const} \_\_m128i lo = \_mm\_mullo\_epi32(\_mm256\_extractf128\_si256(a, 0), \_mm256\_extractf128\_si256(b, 0));}
+\DoxyCodeLine{319   \textcolor{keyword}{const} \_\_m128i hi = \_mm\_mullo\_epi32(\_mm256\_extractf128\_si256(a, 1), \_mm256\_extractf128\_si256(b, 1));}
+\DoxyCodeLine{320   \textcolor{keywordflow}{return} \_mm256\_insertf128\_si256(\_mm256\_castsi128\_si256(lo), (hi), 1);}
+\DoxyCodeLine{321 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{322 \}}
+\DoxyCodeLine{323 }
+\DoxyCodeLine{324 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pdiv<Packet8f>(\textcolor{keyword}{const} Packet8f\& a, \textcolor{keyword}{const} Packet8f\& b) \{ \textcolor{keywordflow}{return} \_mm256\_div\_ps(a,b); \}}
+\DoxyCodeLine{325 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pdiv<Packet4d>(\textcolor{keyword}{const} Packet4d\& a, \textcolor{keyword}{const} Packet4d\& b) \{ \textcolor{keywordflow}{return} \_mm256\_div\_pd(a,b); \}}
+\DoxyCodeLine{326 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i pdiv<Packet8i>(\textcolor{keyword}{const} Packet8i\& \textcolor{comment}{/*a*/}, \textcolor{keyword}{const} Packet8i\& \textcolor{comment}{/*b*/})}
+\DoxyCodeLine{327 \{ eigen\_assert(\textcolor{keyword}{false} \&\& \textcolor{stringliteral}{"{}packet integer division are not supported by AVX"{}});}
+\DoxyCodeLine{328   \textcolor{keywordflow}{return} pset1<Packet8i>(0);}
+\DoxyCodeLine{329 \}}
+\DoxyCodeLine{330 }
+\DoxyCodeLine{331 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_FMA}}
+\DoxyCodeLine{332 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pmadd(\textcolor{keyword}{const} Packet8f\& a, \textcolor{keyword}{const} Packet8f\& b, \textcolor{keyword}{const} Packet8f\& c) \{}
+\DoxyCodeLine{333 \textcolor{preprocessor}{\#if ( (EIGEN\_COMP\_GNUC\_STRICT \&\& EIGEN\_COMP\_GNUC<80) || (EIGEN\_COMP\_CLANG) )}}
+\DoxyCodeLine{334   \textcolor{comment}{// Clang stupidly generates a vfmadd213ps instruction plus some vmovaps on registers,}}
+\DoxyCodeLine{335   \textcolor{comment}{//  and even register spilling with clang>=6.0 (bug 1637).}}
+\DoxyCodeLine{336   \textcolor{comment}{// Gcc stupidly generates a vfmadd132ps instruction.}}
+\DoxyCodeLine{337   \textcolor{comment}{// So let's enforce it to generate a vfmadd231ps instruction since the most common use}}
+\DoxyCodeLine{338   \textcolor{comment}{//  case is to accumulate the result of the product.}}
+\DoxyCodeLine{339   Packet8f res = c;}
+\DoxyCodeLine{340   \_\_asm\_\_(\textcolor{stringliteral}{"{}vfmadd231ps \%[a], \%[b], \%[c]"{}} : [c] \textcolor{stringliteral}{"{}+x"{}} (res) : [a] \textcolor{stringliteral}{"{}x"{}} (a), [b] \textcolor{stringliteral}{"{}x"{}} (b));}
+\DoxyCodeLine{341   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{342 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{343   \textcolor{keywordflow}{return} \_mm256\_fmadd\_ps(a,b,c);}
+\DoxyCodeLine{344 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{345 \}}
+\DoxyCodeLine{346 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pmadd(\textcolor{keyword}{const} Packet4d\& a, \textcolor{keyword}{const} Packet4d\& b, \textcolor{keyword}{const} Packet4d\& c) \{}
+\DoxyCodeLine{347 \textcolor{preprocessor}{\#if ( (EIGEN\_COMP\_GNUC\_STRICT \&\& EIGEN\_COMP\_GNUC<80) || (EIGEN\_COMP\_CLANG) )}}
+\DoxyCodeLine{348   \textcolor{comment}{// see above}}
+\DoxyCodeLine{349   Packet4d res = c;}
+\DoxyCodeLine{350   \_\_asm\_\_(\textcolor{stringliteral}{"{}vfmadd231pd \%[a], \%[b], \%[c]"{}} : [c] \textcolor{stringliteral}{"{}+x"{}} (res) : [a] \textcolor{stringliteral}{"{}x"{}} (a), [b] \textcolor{stringliteral}{"{}x"{}} (b));}
+\DoxyCodeLine{351   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{352 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{353   \textcolor{keywordflow}{return} \_mm256\_fmadd\_pd(a,b,c);}
+\DoxyCodeLine{354 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{355 \}}
+\DoxyCodeLine{356 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{357 }
+\DoxyCodeLine{358 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pcmp\_le(\textcolor{keyword}{const} Packet8f\& a, \textcolor{keyword}{const} Packet8f\& b) \{ \textcolor{keywordflow}{return} \_mm256\_cmp\_ps(a,b,\_CMP\_LE\_OQ); \}}
+\DoxyCodeLine{359 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pcmp\_lt(\textcolor{keyword}{const} Packet8f\& a, \textcolor{keyword}{const} Packet8f\& b) \{ \textcolor{keywordflow}{return} \_mm256\_cmp\_ps(a,b,\_CMP\_LT\_OQ); \}}
+\DoxyCodeLine{360 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pcmp\_lt\_or\_nan(\textcolor{keyword}{const} Packet8f\& a, \textcolor{keyword}{const} Packet8f\& b) \{ \textcolor{keywordflow}{return} \_mm256\_cmp\_ps(a, b, \_CMP\_NGE\_UQ); \}}
+\DoxyCodeLine{361 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pcmp\_eq(\textcolor{keyword}{const} Packet8f\& a, \textcolor{keyword}{const} Packet8f\& b) \{ \textcolor{keywordflow}{return} \_mm256\_cmp\_ps(a,b,\_CMP\_EQ\_OQ); \}}
+\DoxyCodeLine{362 }
+\DoxyCodeLine{363 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pcmp\_le(\textcolor{keyword}{const} Packet4d\& a, \textcolor{keyword}{const} Packet4d\& b) \{ \textcolor{keywordflow}{return} \_mm256\_cmp\_pd(a,b,\_CMP\_LE\_OQ); \}}
+\DoxyCodeLine{364 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pcmp\_lt(\textcolor{keyword}{const} Packet4d\& a, \textcolor{keyword}{const} Packet4d\& b) \{ \textcolor{keywordflow}{return} \_mm256\_cmp\_pd(a,b,\_CMP\_LT\_OQ); \}}
+\DoxyCodeLine{365 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pcmp\_lt\_or\_nan(\textcolor{keyword}{const} Packet4d\& a, \textcolor{keyword}{const} Packet4d\& b) \{ \textcolor{keywordflow}{return} \_mm256\_cmp\_pd(a, b, \_CMP\_NGE\_UQ); \}}
+\DoxyCodeLine{366 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pcmp\_eq(\textcolor{keyword}{const} Packet4d\& a, \textcolor{keyword}{const} Packet4d\& b) \{ \textcolor{keywordflow}{return} \_mm256\_cmp\_pd(a,b,\_CMP\_EQ\_OQ); \}}
+\DoxyCodeLine{367 }
+\DoxyCodeLine{368 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i pcmp\_le(\textcolor{keyword}{const} Packet8i\& a, \textcolor{keyword}{const} Packet8i\& b) \{}
+\DoxyCodeLine{369 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{370   \textcolor{keywordflow}{return} \_mm256\_xor\_si256(\_mm256\_cmpgt\_epi32(a,b), \_mm256\_set1\_epi32(-\/1));}
+\DoxyCodeLine{371 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{372   \_\_m128i lo = \_mm\_cmpgt\_epi32(\_mm256\_extractf128\_si256(a, 0), \_mm256\_extractf128\_si256(b, 0));}
+\DoxyCodeLine{373   lo = \_mm\_xor\_si128(lo, \_mm\_set1\_epi32(-\/1));}
+\DoxyCodeLine{374   \_\_m128i hi = \_mm\_cmpgt\_epi32(\_mm256\_extractf128\_si256(a, 1), \_mm256\_extractf128\_si256(b, 1));}
+\DoxyCodeLine{375   hi = \_mm\_xor\_si128(hi, \_mm\_set1\_epi32(-\/1));}
+\DoxyCodeLine{376   \textcolor{keywordflow}{return} \_mm256\_insertf128\_si256(\_mm256\_castsi128\_si256(lo), (hi), 1);}
+\DoxyCodeLine{377 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{378 \}}
+\DoxyCodeLine{379 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i pcmp\_lt(\textcolor{keyword}{const} Packet8i\& a, \textcolor{keyword}{const} Packet8i\& b) \{}
+\DoxyCodeLine{380 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{381   \textcolor{keywordflow}{return} \_mm256\_cmpgt\_epi32(b,a);}
+\DoxyCodeLine{382 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{383   \_\_m128i lo = \_mm\_cmpgt\_epi32(\_mm256\_extractf128\_si256(b, 0), \_mm256\_extractf128\_si256(a, 0));}
+\DoxyCodeLine{384   \_\_m128i hi = \_mm\_cmpgt\_epi32(\_mm256\_extractf128\_si256(b, 1), \_mm256\_extractf128\_si256(a, 1));}
+\DoxyCodeLine{385   \textcolor{keywordflow}{return} \_mm256\_insertf128\_si256(\_mm256\_castsi128\_si256(lo), (hi), 1);}
+\DoxyCodeLine{386 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{387 \}}
+\DoxyCodeLine{388 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i pcmp\_eq(\textcolor{keyword}{const} Packet8i\& a, \textcolor{keyword}{const} Packet8i\& b) \{}
+\DoxyCodeLine{389 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{390   \textcolor{keywordflow}{return} \_mm256\_cmpeq\_epi32(a,b);}
+\DoxyCodeLine{391 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{392   \_\_m128i lo = \_mm\_cmpeq\_epi32(\_mm256\_extractf128\_si256(a, 0), \_mm256\_extractf128\_si256(b, 0));}
+\DoxyCodeLine{393   \_\_m128i hi = \_mm\_cmpeq\_epi32(\_mm256\_extractf128\_si256(a, 1), \_mm256\_extractf128\_si256(b, 1));}
+\DoxyCodeLine{394   \textcolor{keywordflow}{return} \_mm256\_insertf128\_si256(\_mm256\_castsi128\_si256(lo), (hi), 1);}
+\DoxyCodeLine{395 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{396 \}}
+\DoxyCodeLine{397 }
+\DoxyCodeLine{398 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pmin<Packet8f>(\textcolor{keyword}{const} Packet8f\& a, \textcolor{keyword}{const} Packet8f\& b) \{}
+\DoxyCodeLine{399 \textcolor{preprocessor}{\#if EIGEN\_COMP\_GNUC \&\& EIGEN\_COMP\_GNUC < 63}}
+\DoxyCodeLine{400   \textcolor{comment}{// There appears to be a bug in GCC, by which the optimizer may flip}}
+\DoxyCodeLine{401   \textcolor{comment}{// the argument order in calls to \_mm\_min\_ps/\_mm\_max\_ps, so we have to}}
+\DoxyCodeLine{402   \textcolor{comment}{// resort to inline ASM here. This is supposed to be fixed in gcc6.3,}}
+\DoxyCodeLine{403   \textcolor{comment}{// see also: https://gcc.gnu.org/bugzilla/show\_bug.cgi?id=72867}}
+\DoxyCodeLine{404   Packet8f res;}
+\DoxyCodeLine{405   \textcolor{keyword}{asm}(\textcolor{stringliteral}{"{}vminps \%[a], \%[b], \%[res]"{}} : [res] \textcolor{stringliteral}{"{}=x"{}} (res) : [a] \textcolor{stringliteral}{"{}x"{}} (a), [b] \textcolor{stringliteral}{"{}x"{}} (b));}
+\DoxyCodeLine{406   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{407 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{408   \textcolor{comment}{// Arguments are swapped to match NaN propagation behavior of std::min.}}
+\DoxyCodeLine{409   \textcolor{keywordflow}{return} \_mm256\_min\_ps(b,a);}
+\DoxyCodeLine{410 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{411 \}}
+\DoxyCodeLine{412 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pmin<Packet4d>(\textcolor{keyword}{const} Packet4d\& a, \textcolor{keyword}{const} Packet4d\& b) \{}
+\DoxyCodeLine{413 \textcolor{preprocessor}{\#if EIGEN\_COMP\_GNUC \&\& EIGEN\_COMP\_GNUC < 63}}
+\DoxyCodeLine{414   \textcolor{comment}{// See pmin above}}
+\DoxyCodeLine{415   Packet4d res;}
+\DoxyCodeLine{416   \textcolor{keyword}{asm}(\textcolor{stringliteral}{"{}vminpd \%[a], \%[b], \%[res]"{}} : [res] \textcolor{stringliteral}{"{}=x"{}} (res) : [a] \textcolor{stringliteral}{"{}x"{}} (a), [b] \textcolor{stringliteral}{"{}x"{}} (b));}
+\DoxyCodeLine{417   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{418 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{419   \textcolor{comment}{// Arguments are swapped to match NaN propagation behavior of std::min.}}
+\DoxyCodeLine{420   \textcolor{keywordflow}{return} \_mm256\_min\_pd(b,a);}
+\DoxyCodeLine{421 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{422 \}}
+\DoxyCodeLine{423 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i pmin<Packet8i>(\textcolor{keyword}{const} Packet8i\& a, \textcolor{keyword}{const} Packet8i\& b) \{}
+\DoxyCodeLine{424 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{425   \textcolor{keywordflow}{return} \_mm256\_min\_epi32(a, b);}
+\DoxyCodeLine{426 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{427   \_\_m128i lo = \_mm\_min\_epi32(\_mm256\_extractf128\_si256(a, 0), \_mm256\_extractf128\_si256(b, 0));}
+\DoxyCodeLine{428   \_\_m128i hi = \_mm\_min\_epi32(\_mm256\_extractf128\_si256(a, 1), \_mm256\_extractf128\_si256(b, 1));}
+\DoxyCodeLine{429   \textcolor{keywordflow}{return} \_mm256\_insertf128\_si256(\_mm256\_castsi128\_si256(lo), (hi), 1);}
+\DoxyCodeLine{430 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{431 \}}
+\DoxyCodeLine{432 }
+\DoxyCodeLine{433 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pmax<Packet8f>(\textcolor{keyword}{const} Packet8f\& a, \textcolor{keyword}{const} Packet8f\& b) \{}
+\DoxyCodeLine{434 \textcolor{preprocessor}{\#if EIGEN\_COMP\_GNUC \&\& EIGEN\_COMP\_GNUC < 63}}
+\DoxyCodeLine{435   \textcolor{comment}{// See pmin above}}
+\DoxyCodeLine{436   Packet8f res;}
+\DoxyCodeLine{437   \textcolor{keyword}{asm}(\textcolor{stringliteral}{"{}vmaxps \%[a], \%[b], \%[res]"{}} : [res] \textcolor{stringliteral}{"{}=x"{}} (res) : [a] \textcolor{stringliteral}{"{}x"{}} (a), [b] \textcolor{stringliteral}{"{}x"{}} (b));}
+\DoxyCodeLine{438   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{439 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{440   \textcolor{comment}{// Arguments are swapped to match NaN propagation behavior of std::max.}}
+\DoxyCodeLine{441   \textcolor{keywordflow}{return} \_mm256\_max\_ps(b,a);}
+\DoxyCodeLine{442 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{443 \}}
+\DoxyCodeLine{444 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pmax<Packet4d>(\textcolor{keyword}{const} Packet4d\& a, \textcolor{keyword}{const} Packet4d\& b) \{}
+\DoxyCodeLine{445 \textcolor{preprocessor}{\#if EIGEN\_COMP\_GNUC \&\& EIGEN\_COMP\_GNUC < 63}}
+\DoxyCodeLine{446   \textcolor{comment}{// See pmin above}}
+\DoxyCodeLine{447   Packet4d res;}
+\DoxyCodeLine{448   \textcolor{keyword}{asm}(\textcolor{stringliteral}{"{}vmaxpd \%[a], \%[b], \%[res]"{}} : [res] \textcolor{stringliteral}{"{}=x"{}} (res) : [a] \textcolor{stringliteral}{"{}x"{}} (a), [b] \textcolor{stringliteral}{"{}x"{}} (b));}
+\DoxyCodeLine{449   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{450 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{451   \textcolor{comment}{// Arguments are swapped to match NaN propagation behavior of std::max.}}
+\DoxyCodeLine{452   \textcolor{keywordflow}{return} \_mm256\_max\_pd(b,a);}
+\DoxyCodeLine{453 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{454 \}}
+\DoxyCodeLine{455 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i pmax<Packet8i>(\textcolor{keyword}{const} Packet8i\& a, \textcolor{keyword}{const} Packet8i\& b) \{}
+\DoxyCodeLine{456 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{457   \textcolor{keywordflow}{return} \_mm256\_max\_epi32(a, b);}
+\DoxyCodeLine{458 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{459   \_\_m128i lo = \_mm\_max\_epi32(\_mm256\_extractf128\_si256(a, 0), \_mm256\_extractf128\_si256(b, 0));}
+\DoxyCodeLine{460   \_\_m128i hi = \_mm\_max\_epi32(\_mm256\_extractf128\_si256(a, 1), \_mm256\_extractf128\_si256(b, 1));}
+\DoxyCodeLine{461   \textcolor{keywordflow}{return} \_mm256\_insertf128\_si256(\_mm256\_castsi128\_si256(lo), (hi), 1);}
+\DoxyCodeLine{462 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{463 \}}
+\DoxyCodeLine{464 }
+\DoxyCodeLine{465 \textcolor{comment}{// Add specializations for min/max with prescribed NaN progation.}}
+\DoxyCodeLine{466 \textcolor{keyword}{template}<>}
+\DoxyCodeLine{467 EIGEN\_STRONG\_INLINE Packet8f pmin<PropagateNumbers, Packet8f>(\textcolor{keyword}{const} Packet8f\& a, \textcolor{keyword}{const} Packet8f\& b) \{}
+\DoxyCodeLine{468   \textcolor{keywordflow}{return} pminmax\_propagate\_numbers(a, b, pmin<Packet8f>);}
+\DoxyCodeLine{469 \}}
+\DoxyCodeLine{470 \textcolor{keyword}{template}<>}
+\DoxyCodeLine{471 EIGEN\_STRONG\_INLINE Packet4d pmin<PropagateNumbers, Packet4d>(\textcolor{keyword}{const} Packet4d\& a, \textcolor{keyword}{const} Packet4d\& b) \{}
+\DoxyCodeLine{472   \textcolor{keywordflow}{return} pminmax\_propagate\_numbers(a, b, pmin<Packet4d>);}
+\DoxyCodeLine{473 \}}
+\DoxyCodeLine{474 \textcolor{keyword}{template}<>}
+\DoxyCodeLine{475 EIGEN\_STRONG\_INLINE Packet8f pmax<PropagateNumbers, Packet8f>(\textcolor{keyword}{const} Packet8f\& a, \textcolor{keyword}{const} Packet8f\& b) \{}
+\DoxyCodeLine{476   \textcolor{keywordflow}{return} pminmax\_propagate\_numbers(a, b, pmax<Packet8f>);}
+\DoxyCodeLine{477 \}}
+\DoxyCodeLine{478 \textcolor{keyword}{template}<>}
+\DoxyCodeLine{479 EIGEN\_STRONG\_INLINE Packet4d pmax<PropagateNumbers, Packet4d>(\textcolor{keyword}{const} Packet4d\& a, \textcolor{keyword}{const} Packet4d\& b) \{}
+\DoxyCodeLine{480   \textcolor{keywordflow}{return} pminmax\_propagate\_numbers(a, b, pmax<Packet4d>);}
+\DoxyCodeLine{481 \}}
+\DoxyCodeLine{482 \textcolor{keyword}{template}<>}
+\DoxyCodeLine{483 EIGEN\_STRONG\_INLINE Packet8f pmin<PropagateNaN, Packet8f>(\textcolor{keyword}{const} Packet8f\& a, \textcolor{keyword}{const} Packet8f\& b) \{}
+\DoxyCodeLine{484   \textcolor{keywordflow}{return} pminmax\_propagate\_nan(a, b, pmin<Packet8f>);}
+\DoxyCodeLine{485 \}}
+\DoxyCodeLine{486 \textcolor{keyword}{template}<>}
+\DoxyCodeLine{487 EIGEN\_STRONG\_INLINE Packet4d pmin<PropagateNaN, Packet4d>(\textcolor{keyword}{const} Packet4d\& a, \textcolor{keyword}{const} Packet4d\& b) \{}
+\DoxyCodeLine{488   \textcolor{keywordflow}{return} pminmax\_propagate\_nan(a, b, pmin<Packet4d>);}
+\DoxyCodeLine{489 \}}
+\DoxyCodeLine{490 \textcolor{keyword}{template}<>}
+\DoxyCodeLine{491 EIGEN\_STRONG\_INLINE Packet8f pmax<PropagateNaN, Packet8f>(\textcolor{keyword}{const} Packet8f\& a, \textcolor{keyword}{const} Packet8f\& b) \{}
+\DoxyCodeLine{492   \textcolor{keywordflow}{return} pminmax\_propagate\_nan(a, b, pmax<Packet8f>);}
+\DoxyCodeLine{493 \}}
+\DoxyCodeLine{494 \textcolor{keyword}{template}<>}
+\DoxyCodeLine{495 EIGEN\_STRONG\_INLINE Packet4d pmax<PropagateNaN, Packet4d>(\textcolor{keyword}{const} Packet4d\& a, \textcolor{keyword}{const} Packet4d\& b) \{}
+\DoxyCodeLine{496   \textcolor{keywordflow}{return} pminmax\_propagate\_nan(a, b, pmax<Packet4d>);}
+\DoxyCodeLine{497 \}}
+\DoxyCodeLine{498 }
+\DoxyCodeLine{499 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f print<Packet8f>(\textcolor{keyword}{const} Packet8f\& a) \{ \textcolor{keywordflow}{return} \_mm256\_round\_ps(a, \_MM\_FROUND\_CUR\_DIRECTION); \}}
+\DoxyCodeLine{500 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d print<Packet4d>(\textcolor{keyword}{const} Packet4d\& a) \{ \textcolor{keywordflow}{return} \_mm256\_round\_pd(a, \_MM\_FROUND\_CUR\_DIRECTION); \}}
+\DoxyCodeLine{501 }
+\DoxyCodeLine{502 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pceil<Packet8f>(\textcolor{keyword}{const} Packet8f\& a) \{ \textcolor{keywordflow}{return} \_mm256\_ceil\_ps(a); \}}
+\DoxyCodeLine{503 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pceil<Packet4d>(\textcolor{keyword}{const} Packet4d\& a) \{ \textcolor{keywordflow}{return} \_mm256\_ceil\_pd(a); \}}
+\DoxyCodeLine{504 }
+\DoxyCodeLine{505 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pfloor<Packet8f>(\textcolor{keyword}{const} Packet8f\& a) \{ \textcolor{keywordflow}{return} \_mm256\_floor\_ps(a); \}}
+\DoxyCodeLine{506 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pfloor<Packet4d>(\textcolor{keyword}{const} Packet4d\& a) \{ \textcolor{keywordflow}{return} \_mm256\_floor\_pd(a); \}}
+\DoxyCodeLine{507 }
+\DoxyCodeLine{508 }
+\DoxyCodeLine{509 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i ptrue<Packet8i>(\textcolor{keyword}{const} Packet8i\& a) \{}
+\DoxyCodeLine{510 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{511   \textcolor{comment}{// vpcmpeqd has lower latency than the more general vcmpps}}
+\DoxyCodeLine{512   \textcolor{keywordflow}{return} \_mm256\_cmpeq\_epi32(a,a);}
+\DoxyCodeLine{513 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{514   \textcolor{keyword}{const} \_\_m256 b = \_mm256\_castsi256\_ps(a);}
+\DoxyCodeLine{515   \textcolor{keywordflow}{return} \_mm256\_castps\_si256(\_mm256\_cmp\_ps(b,b,\_CMP\_TRUE\_UQ));}
+\DoxyCodeLine{516 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{517 \}}
+\DoxyCodeLine{518 }
+\DoxyCodeLine{519 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f ptrue<Packet8f>(\textcolor{keyword}{const} Packet8f\& a) \{}
+\DoxyCodeLine{520 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{521   \textcolor{comment}{// vpcmpeqd has lower latency than the more general vcmpps}}
+\DoxyCodeLine{522   \textcolor{keyword}{const} \_\_m256i b = \_mm256\_castps\_si256(a);}
+\DoxyCodeLine{523   \textcolor{keywordflow}{return} \_mm256\_castsi256\_ps(\_mm256\_cmpeq\_epi32(b,b));}
+\DoxyCodeLine{524 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{525   \textcolor{keywordflow}{return} \_mm256\_cmp\_ps(a,a,\_CMP\_TRUE\_UQ);}
+\DoxyCodeLine{526 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{527 \}}
+\DoxyCodeLine{528 }
+\DoxyCodeLine{529 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d ptrue<Packet4d>(\textcolor{keyword}{const} Packet4d\& a) \{}
+\DoxyCodeLine{530 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{531   \textcolor{comment}{// vpcmpeqq has lower latency than the more general vcmppd}}
+\DoxyCodeLine{532   \textcolor{keyword}{const} \_\_m256i b = \_mm256\_castpd\_si256(a);}
+\DoxyCodeLine{533   \textcolor{keywordflow}{return} \_mm256\_castsi256\_pd(\_mm256\_cmpeq\_epi64(b,b));}
+\DoxyCodeLine{534 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{535   \textcolor{keywordflow}{return} \_mm256\_cmp\_pd(a,a,\_CMP\_TRUE\_UQ);}
+\DoxyCodeLine{536 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{537 \}}
+\DoxyCodeLine{538 }
+\DoxyCodeLine{539 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pand<Packet8f>(\textcolor{keyword}{const} Packet8f\& a, \textcolor{keyword}{const} Packet8f\& b) \{ \textcolor{keywordflow}{return} \_mm256\_and\_ps(a,b); \}}
+\DoxyCodeLine{540 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pand<Packet4d>(\textcolor{keyword}{const} Packet4d\& a, \textcolor{keyword}{const} Packet4d\& b) \{ \textcolor{keywordflow}{return} \_mm256\_and\_pd(a,b); \}}
+\DoxyCodeLine{541 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i pand<Packet8i>(\textcolor{keyword}{const} Packet8i\& a, \textcolor{keyword}{const} Packet8i\& b) \{}
+\DoxyCodeLine{542 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{543   \textcolor{keywordflow}{return} \_mm256\_and\_si256(a,b);}
+\DoxyCodeLine{544 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{545   \textcolor{keywordflow}{return} \_mm256\_castps\_si256(\_mm256\_and\_ps(\_mm256\_castsi256\_ps(a),\_mm256\_castsi256\_ps(b)));}
+\DoxyCodeLine{546 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{547 \}}
+\DoxyCodeLine{548 }
+\DoxyCodeLine{549 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f por<Packet8f>(\textcolor{keyword}{const} Packet8f\& a, \textcolor{keyword}{const} Packet8f\& b) \{ \textcolor{keywordflow}{return} \_mm256\_or\_ps(a,b); \}}
+\DoxyCodeLine{550 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d por<Packet4d>(\textcolor{keyword}{const} Packet4d\& a, \textcolor{keyword}{const} Packet4d\& b) \{ \textcolor{keywordflow}{return} \_mm256\_or\_pd(a,b); \}}
+\DoxyCodeLine{551 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i por<Packet8i>(\textcolor{keyword}{const} Packet8i\& a, \textcolor{keyword}{const} Packet8i\& b) \{}
+\DoxyCodeLine{552 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{553   \textcolor{keywordflow}{return} \_mm256\_or\_si256(a,b);}
+\DoxyCodeLine{554 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{555   \textcolor{keywordflow}{return} \_mm256\_castps\_si256(\_mm256\_or\_ps(\_mm256\_castsi256\_ps(a),\_mm256\_castsi256\_ps(b)));}
+\DoxyCodeLine{556 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{557 \}}
+\DoxyCodeLine{558 }
+\DoxyCodeLine{559 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pxor<Packet8f>(\textcolor{keyword}{const} Packet8f\& a, \textcolor{keyword}{const} Packet8f\& b) \{ \textcolor{keywordflow}{return} \_mm256\_xor\_ps(a,b); \}}
+\DoxyCodeLine{560 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pxor<Packet4d>(\textcolor{keyword}{const} Packet4d\& a, \textcolor{keyword}{const} Packet4d\& b) \{ \textcolor{keywordflow}{return} \_mm256\_xor\_pd(a,b); \}}
+\DoxyCodeLine{561 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i pxor<Packet8i>(\textcolor{keyword}{const} Packet8i\& a, \textcolor{keyword}{const} Packet8i\& b) \{}
+\DoxyCodeLine{562 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{563   \textcolor{keywordflow}{return} \_mm256\_xor\_si256(a,b);}
+\DoxyCodeLine{564 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{565   \textcolor{keywordflow}{return} \_mm256\_castps\_si256(\_mm256\_xor\_ps(\_mm256\_castsi256\_ps(a),\_mm256\_castsi256\_ps(b)));}
+\DoxyCodeLine{566 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{567 \}}
+\DoxyCodeLine{568 }
+\DoxyCodeLine{569 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pandnot<Packet8f>(\textcolor{keyword}{const} Packet8f\& a, \textcolor{keyword}{const} Packet8f\& b) \{ \textcolor{keywordflow}{return} \_mm256\_andnot\_ps(b,a); \}}
+\DoxyCodeLine{570 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pandnot<Packet4d>(\textcolor{keyword}{const} Packet4d\& a, \textcolor{keyword}{const} Packet4d\& b) \{ \textcolor{keywordflow}{return} \_mm256\_andnot\_pd(b,a); \}}
+\DoxyCodeLine{571 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i pandnot<Packet8i>(\textcolor{keyword}{const} Packet8i\& a, \textcolor{keyword}{const} Packet8i\& b) \{}
+\DoxyCodeLine{572 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{573   \textcolor{keywordflow}{return} \_mm256\_andnot\_si256(b,a);}
+\DoxyCodeLine{574 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{575   \textcolor{keywordflow}{return} \_mm256\_castps\_si256(\_mm256\_andnot\_ps(\_mm256\_castsi256\_ps(b),\_mm256\_castsi256\_ps(a)));}
+\DoxyCodeLine{576 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{577 \}}
+\DoxyCodeLine{578 }
+\DoxyCodeLine{579 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pround<Packet8f>(\textcolor{keyword}{const} Packet8f\& a)}
+\DoxyCodeLine{580 \{}
+\DoxyCodeLine{581   \textcolor{keyword}{const} Packet8f mask = pset1frombits<Packet8f>(\textcolor{keyword}{static\_cast<}numext::uint32\_t\textcolor{keyword}{>}(0x80000000u));}
+\DoxyCodeLine{582   \textcolor{keyword}{const} Packet8f prev0dot5 = pset1frombits<Packet8f>(\textcolor{keyword}{static\_cast<}numext::uint32\_t\textcolor{keyword}{>}(0x3EFFFFFFu));}
+\DoxyCodeLine{583   \textcolor{keywordflow}{return} \_mm256\_round\_ps(padd(por(pand(a, mask), prev0dot5), a), \_MM\_FROUND\_TO\_ZERO);}
+\DoxyCodeLine{584 \}}
+\DoxyCodeLine{585 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pround<Packet4d>(\textcolor{keyword}{const} Packet4d\& a)}
+\DoxyCodeLine{586 \{}
+\DoxyCodeLine{587   \textcolor{keyword}{const} Packet4d mask = pset1frombits<Packet4d>(\textcolor{keyword}{static\_cast<}numext::uint64\_t\textcolor{keyword}{>}(0x8000000000000000ull));}
+\DoxyCodeLine{588   \textcolor{keyword}{const} Packet4d prev0dot5 = pset1frombits<Packet4d>(\textcolor{keyword}{static\_cast<}numext::uint64\_t\textcolor{keyword}{>}(0x3FDFFFFFFFFFFFFFull));}
+\DoxyCodeLine{589   \textcolor{keywordflow}{return} \_mm256\_round\_pd(padd(por(pand(a, mask), prev0dot5), a), \_MM\_FROUND\_TO\_ZERO);}
+\DoxyCodeLine{590 \}}
+\DoxyCodeLine{591 }
+\DoxyCodeLine{592 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pselect<Packet8f>(\textcolor{keyword}{const} Packet8f\& mask, \textcolor{keyword}{const} Packet8f\& a, \textcolor{keyword}{const} Packet8f\& b)}
+\DoxyCodeLine{593 \{ \textcolor{keywordflow}{return} \_mm256\_blendv\_ps(b,a,mask); \}}
+\DoxyCodeLine{594 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pselect<Packet4d>(\textcolor{keyword}{const} Packet4d\& mask, \textcolor{keyword}{const} Packet4d\& a, \textcolor{keyword}{const} Packet4d\& b)}
+\DoxyCodeLine{595 \{ \textcolor{keywordflow}{return} \_mm256\_blendv\_pd(b,a,mask); \}}
+\DoxyCodeLine{596 }
+\DoxyCodeLine{597 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} N> EIGEN\_STRONG\_INLINE Packet8i parithmetic\_shift\_right(Packet8i a) \{}
+\DoxyCodeLine{598 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{599   \textcolor{keywordflow}{return} \_mm256\_srai\_epi32(a, N);}
+\DoxyCodeLine{600 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{601   \_\_m128i lo = \_mm\_srai\_epi32(\_mm256\_extractf128\_si256(a, 0), N);}
+\DoxyCodeLine{602   \_\_m128i hi = \_mm\_srai\_epi32(\_mm256\_extractf128\_si256(a, 1), N);}
+\DoxyCodeLine{603   \textcolor{keywordflow}{return} \_mm256\_insertf128\_si256(\_mm256\_castsi128\_si256(lo), (hi), 1);}
+\DoxyCodeLine{604 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{605 \}}
+\DoxyCodeLine{606 }
+\DoxyCodeLine{607 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} N> EIGEN\_STRONG\_INLINE Packet8i plogical\_shift\_right(Packet8i a) \{}
+\DoxyCodeLine{608 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{609   \textcolor{keywordflow}{return} \_mm256\_srli\_epi32(a, N);}
+\DoxyCodeLine{610 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{611   \_\_m128i lo = \_mm\_srli\_epi32(\_mm256\_extractf128\_si256(a, 0), N);}
+\DoxyCodeLine{612   \_\_m128i hi = \_mm\_srli\_epi32(\_mm256\_extractf128\_si256(a, 1), N);}
+\DoxyCodeLine{613   \textcolor{keywordflow}{return} \_mm256\_insertf128\_si256(\_mm256\_castsi128\_si256(lo), (hi), 1);}
+\DoxyCodeLine{614 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{615 \}}
+\DoxyCodeLine{616 }
+\DoxyCodeLine{617 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} N> EIGEN\_STRONG\_INLINE Packet8i plogical\_shift\_left(Packet8i a) \{}
+\DoxyCodeLine{618 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{619   \textcolor{keywordflow}{return} \_mm256\_slli\_epi32(a, N);}
+\DoxyCodeLine{620 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{621   \_\_m128i lo = \_mm\_slli\_epi32(\_mm256\_extractf128\_si256(a, 0), N);}
+\DoxyCodeLine{622   \_\_m128i hi = \_mm\_slli\_epi32(\_mm256\_extractf128\_si256(a, 1), N);}
+\DoxyCodeLine{623   \textcolor{keywordflow}{return} \_mm256\_insertf128\_si256(\_mm256\_castsi128\_si256(lo), (hi), 1);}
+\DoxyCodeLine{624 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{625 \}}
+\DoxyCodeLine{626 }
+\DoxyCodeLine{627 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pload<Packet8f>(\textcolor{keyword}{const} \textcolor{keywordtype}{float}*   from) \{ EIGEN\_DEBUG\_ALIGNED\_LOAD \textcolor{keywordflow}{return} \_mm256\_load\_ps(from); \}}
+\DoxyCodeLine{628 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pload<Packet4d>(\textcolor{keyword}{const} \textcolor{keywordtype}{double}*  from) \{ EIGEN\_DEBUG\_ALIGNED\_LOAD \textcolor{keywordflow}{return} \_mm256\_load\_pd(from); \}}
+\DoxyCodeLine{629 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i pload<Packet8i>(\textcolor{keyword}{const} \textcolor{keywordtype}{int}*     from) \{ EIGEN\_DEBUG\_ALIGNED\_LOAD \textcolor{keywordflow}{return} \_mm256\_load\_si256(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const }\_\_m256i*\textcolor{keyword}{>}(from)); \}}
+\DoxyCodeLine{630 }
+\DoxyCodeLine{631 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f ploadu<Packet8f>(\textcolor{keyword}{const} \textcolor{keywordtype}{float}* from) \{ EIGEN\_DEBUG\_UNALIGNED\_LOAD \textcolor{keywordflow}{return} \_mm256\_loadu\_ps(from); \}}
+\DoxyCodeLine{632 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d ploadu<Packet4d>(\textcolor{keyword}{const} \textcolor{keywordtype}{double}* from) \{ EIGEN\_DEBUG\_UNALIGNED\_LOAD \textcolor{keywordflow}{return} \_mm256\_loadu\_pd(from); \}}
+\DoxyCodeLine{633 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i ploadu<Packet8i>(\textcolor{keyword}{const} \textcolor{keywordtype}{int}* from) \{ EIGEN\_DEBUG\_UNALIGNED\_LOAD \textcolor{keywordflow}{return} \_mm256\_loadu\_si256(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const }\_\_m256i*\textcolor{keyword}{>}(from)); \}}
+\DoxyCodeLine{634 }
+\DoxyCodeLine{635 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f ploadu<Packet8f>(\textcolor{keyword}{const} \textcolor{keywordtype}{float}* from, uint8\_t umask) \{}
+\DoxyCodeLine{636   Packet8i mask = \_mm256\_set1\_epi8(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(umask));}
+\DoxyCodeLine{637   \textcolor{keyword}{const} Packet8i bit\_mask = \_mm256\_set\_epi32(0xffffff7f, 0xffffffbf, 0xffffffdf, 0xffffffef, 0xfffffff7, 0xfffffffb, 0xfffffffd, 0xfffffffe);}
+\DoxyCodeLine{638   mask = por<Packet8i>(mask, bit\_mask);}
+\DoxyCodeLine{639   mask = pcmp\_eq<Packet8i>(mask, \_mm256\_set1\_epi32(0xffffffff));}
+\DoxyCodeLine{640   EIGEN\_DEBUG\_UNALIGNED\_LOAD \textcolor{keywordflow}{return} \_mm256\_maskload\_ps(from, mask);}
+\DoxyCodeLine{641 \}}
+\DoxyCodeLine{642 }
+\DoxyCodeLine{643 \textcolor{comment}{// Loads 4 floats from memory a returns the packet \{a0, a0  a1, a1, a2, a2, a3, a3\}}}
+\DoxyCodeLine{644 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f ploaddup<Packet8f>(\textcolor{keyword}{const} \textcolor{keywordtype}{float}* from)}
+\DoxyCodeLine{645 \{}
+\DoxyCodeLine{646   \textcolor{comment}{// TODO try to find a way to avoid the need of a temporary register}}
+\DoxyCodeLine{647 \textcolor{comment}{//   Packet8f tmp  = \_mm256\_castps128\_ps256(\_mm\_loadu\_ps(from));}}
+\DoxyCodeLine{648 \textcolor{comment}{//   tmp = \_mm256\_insertf128\_ps(tmp, \_mm\_movehl\_ps(\_mm256\_castps256\_ps128(tmp),\_mm256\_castps256\_ps128(tmp)), 1);}}
+\DoxyCodeLine{649 \textcolor{comment}{//   return \_mm256\_unpacklo\_ps(tmp,tmp);}}
+\DoxyCodeLine{650 }
+\DoxyCodeLine{651   \textcolor{comment}{// \_mm256\_insertf128\_ps is very slow on Haswell, thus:}}
+\DoxyCodeLine{652   Packet8f tmp = \_mm256\_broadcast\_ps((\textcolor{keyword}{const} \_\_m128*)(\textcolor{keyword}{const} \textcolor{keywordtype}{void}*)from);}
+\DoxyCodeLine{653   \textcolor{comment}{// mimic an "{}inplace"{} permutation of the lower 128bits using a blend}}
+\DoxyCodeLine{654   tmp = \_mm256\_blend\_ps(tmp,\_mm256\_castps128\_ps256(\_mm\_permute\_ps( \_mm256\_castps256\_ps128(tmp), \_MM\_SHUFFLE(1,0,1,0))), 15);}
+\DoxyCodeLine{655   \textcolor{comment}{// then we can perform a consistent permutation on the global register to get everything in shape:}}
+\DoxyCodeLine{656   \textcolor{keywordflow}{return}  \_mm256\_permute\_ps(tmp, \_MM\_SHUFFLE(3,3,2,2));}
+\DoxyCodeLine{657 \}}
+\DoxyCodeLine{658 \textcolor{comment}{// Loads 2 doubles from memory a returns the packet \{a0, a0, a1, a1\}}}
+\DoxyCodeLine{659 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d ploaddup<Packet4d>(\textcolor{keyword}{const} \textcolor{keywordtype}{double}* from)}
+\DoxyCodeLine{660 \{}
+\DoxyCodeLine{661   Packet4d tmp = \_mm256\_broadcast\_pd((\textcolor{keyword}{const} \_\_m128d*)(\textcolor{keyword}{const} \textcolor{keywordtype}{void}*)from);}
+\DoxyCodeLine{662   \textcolor{keywordflow}{return}  \_mm256\_permute\_pd(tmp, 3<<2);}
+\DoxyCodeLine{663 \}}
+\DoxyCodeLine{664 \textcolor{comment}{// Loads 4 integers from memory a returns the packet \{a0, a0, a1, a1, a2, a2, a3, a3\}}}
+\DoxyCodeLine{665 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i ploaddup<Packet8i>(\textcolor{keyword}{const} \textcolor{keywordtype}{int}* from)}
+\DoxyCodeLine{666 \{}
+\DoxyCodeLine{667 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{668   \textcolor{keyword}{const} Packet8i a = \_mm256\_castsi128\_si256(ploadu<Packet4i>(from));}
+\DoxyCodeLine{669   \textcolor{keywordflow}{return} \_mm256\_permutevar8x32\_epi32(a, \_mm256\_setr\_epi32(0, 0, 1, 1, 2, 2, 3, 3));}
+\DoxyCodeLine{670 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{671   \_\_m256 tmp = \_mm256\_broadcast\_ps((\textcolor{keyword}{const} \_\_m128*)(\textcolor{keyword}{const} \textcolor{keywordtype}{void}*)from);}
+\DoxyCodeLine{672   \textcolor{comment}{// mimic an "{}inplace"{} permutation of the lower 128bits using a blend}}
+\DoxyCodeLine{673   tmp = \_mm256\_blend\_ps(tmp,\_mm256\_castps128\_ps256(\_mm\_permute\_ps( \_mm256\_castps256\_ps128(tmp), \_MM\_SHUFFLE(1,0,1,0))), 15);}
+\DoxyCodeLine{674   \textcolor{comment}{// then we can perform a consistent permutation on the global register to get everything in shape:}}
+\DoxyCodeLine{675   \textcolor{keywordflow}{return}  \_mm256\_castps\_si256(\_mm256\_permute\_ps(tmp, \_MM\_SHUFFLE(3,3,2,2)));}
+\DoxyCodeLine{676 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{677 \}}
+\DoxyCodeLine{678 }
+\DoxyCodeLine{679 \textcolor{comment}{// Loads 2 floats from memory a returns the packet \{a0, a0  a0, a0, a1, a1, a1, a1\}}}
+\DoxyCodeLine{680 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f ploadquad<Packet8f>(\textcolor{keyword}{const} \textcolor{keywordtype}{float}* from)}
+\DoxyCodeLine{681 \{}
+\DoxyCodeLine{682   Packet8f tmp = \_mm256\_castps128\_ps256(\_mm\_broadcast\_ss(from));}
+\DoxyCodeLine{683   \textcolor{keywordflow}{return} \_mm256\_insertf128\_ps(tmp, \_mm\_broadcast\_ss(from+1), 1);}
+\DoxyCodeLine{684 \}}
+\DoxyCodeLine{685 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i ploadquad<Packet8i>(\textcolor{keyword}{const} \textcolor{keywordtype}{int}* from)}
+\DoxyCodeLine{686 \{}
+\DoxyCodeLine{687   \textcolor{keywordflow}{return} \_mm256\_insertf128\_si256(\_mm256\_set1\_epi32(*from), \_mm\_set1\_epi32(*(from+1)), 1);}
+\DoxyCodeLine{688 \}}
+\DoxyCodeLine{689 }
+\DoxyCodeLine{690 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pstore<float>(\textcolor{keywordtype}{float}*   to, \textcolor{keyword}{const} Packet8f\& from) \{ EIGEN\_DEBUG\_ALIGNED\_STORE \_mm256\_store\_ps(to, from); \}}
+\DoxyCodeLine{691 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pstore<double>(\textcolor{keywordtype}{double}* to, \textcolor{keyword}{const} Packet4d\& from) \{ EIGEN\_DEBUG\_ALIGNED\_STORE \_mm256\_store\_pd(to, from); \}}
+\DoxyCodeLine{692 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pstore<int>(\textcolor{keywordtype}{int}*       to, \textcolor{keyword}{const} Packet8i\& from) \{ EIGEN\_DEBUG\_ALIGNED\_STORE \_mm256\_storeu\_si256(\textcolor{keyword}{reinterpret\_cast<}\_\_m256i*\textcolor{keyword}{>}(to), from); \}}
+\DoxyCodeLine{693 }
+\DoxyCodeLine{694 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pstoreu<float>(\textcolor{keywordtype}{float}*   to, \textcolor{keyword}{const} Packet8f\& from) \{ EIGEN\_DEBUG\_UNALIGNED\_STORE \_mm256\_storeu\_ps(to, from); \}}
+\DoxyCodeLine{695 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pstoreu<double>(\textcolor{keywordtype}{double}* to, \textcolor{keyword}{const} Packet4d\& from) \{ EIGEN\_DEBUG\_UNALIGNED\_STORE \_mm256\_storeu\_pd(to, from); \}}
+\DoxyCodeLine{696 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pstoreu<int>(\textcolor{keywordtype}{int}*       to, \textcolor{keyword}{const} Packet8i\& from) \{ EIGEN\_DEBUG\_UNALIGNED\_STORE \_mm256\_storeu\_si256(\textcolor{keyword}{reinterpret\_cast<}\_\_m256i*\textcolor{keyword}{>}(to), from); \}}
+\DoxyCodeLine{697 }
+\DoxyCodeLine{698 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pstoreu<float>(\textcolor{keywordtype}{float}*   to, \textcolor{keyword}{const} Packet8f\& from, uint8\_t umask) \{}
+\DoxyCodeLine{699   Packet8i mask = \_mm256\_set1\_epi8(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(umask));}
+\DoxyCodeLine{700   \textcolor{keyword}{const} Packet8i bit\_mask = \_mm256\_set\_epi32(0xffffff7f, 0xffffffbf, 0xffffffdf, 0xffffffef, 0xfffffff7, 0xfffffffb, 0xfffffffd, 0xfffffffe);}
+\DoxyCodeLine{701   mask = por<Packet8i>(mask, bit\_mask);}
+\DoxyCodeLine{702   mask = pcmp\_eq<Packet8i>(mask, \_mm256\_set1\_epi32(0xffffffff));}
+\DoxyCodeLine{703   EIGEN\_DEBUG\_UNALIGNED\_STORE \textcolor{keywordflow}{return} \_mm256\_maskstore\_ps(to, mask, from);}
+\DoxyCodeLine{704 \}}
+\DoxyCodeLine{705 }
+\DoxyCodeLine{706 \textcolor{comment}{// NOTE: leverage \_mm256\_i32gather\_ps and \_mm256\_i32gather\_pd if AVX2 instructions are available}}
+\DoxyCodeLine{707 \textcolor{comment}{// NOTE: for the record the following seems to be slower: return \_mm256\_i32gather\_ps(from, \_mm256\_set1\_epi32(stride), 4);}}
+\DoxyCodeLine{708 \textcolor{keyword}{template}<> EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} Packet8f pgather<float, Packet8f>(\textcolor{keyword}{const} \textcolor{keywordtype}{float}* from, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride)}
+\DoxyCodeLine{709 \{}
+\DoxyCodeLine{710   \textcolor{keywordflow}{return} \_mm256\_set\_ps(from[7*stride], from[6*stride], from[5*stride], from[4*stride],}
+\DoxyCodeLine{711                        from[3*stride], from[2*stride], from[1*stride], from[0*stride]);}
+\DoxyCodeLine{712 \}}
+\DoxyCodeLine{713 \textcolor{keyword}{template}<> EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} Packet4d pgather<double, Packet4d>(\textcolor{keyword}{const} \textcolor{keywordtype}{double}* from, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride)}
+\DoxyCodeLine{714 \{}
+\DoxyCodeLine{715   \textcolor{keywordflow}{return} \_mm256\_set\_pd(from[3*stride], from[2*stride], from[1*stride], from[0*stride]);}
+\DoxyCodeLine{716 \}}
+\DoxyCodeLine{717 \textcolor{keyword}{template}<> EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} Packet8i pgather<int, Packet8i>(\textcolor{keyword}{const} \textcolor{keywordtype}{int}* from, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride)}
+\DoxyCodeLine{718 \{}
+\DoxyCodeLine{719   \textcolor{keywordflow}{return} \_mm256\_set\_epi32(from[7*stride], from[6*stride], from[5*stride], from[4*stride],}
+\DoxyCodeLine{720                           from[3*stride], from[2*stride], from[1*stride], from[0*stride]);}
+\DoxyCodeLine{721 \}}
+\DoxyCodeLine{722 }
+\DoxyCodeLine{723 \textcolor{keyword}{template}<> EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keywordtype}{void} pscatter<float, Packet8f>(\textcolor{keywordtype}{float}* to, \textcolor{keyword}{const} Packet8f\& from, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride)}
+\DoxyCodeLine{724 \{}
+\DoxyCodeLine{725   \_\_m128 low = \_mm256\_extractf128\_ps(from, 0);}
+\DoxyCodeLine{726   to[stride*0] = \_mm\_cvtss\_f32(low);}
+\DoxyCodeLine{727   to[stride*1] = \_mm\_cvtss\_f32(\_mm\_shuffle\_ps(low, low, 1));}
+\DoxyCodeLine{728   to[stride*2] = \_mm\_cvtss\_f32(\_mm\_shuffle\_ps(low, low, 2));}
+\DoxyCodeLine{729   to[stride*3] = \_mm\_cvtss\_f32(\_mm\_shuffle\_ps(low, low, 3));}
+\DoxyCodeLine{730 }
+\DoxyCodeLine{731   \_\_m128 high = \_mm256\_extractf128\_ps(from, 1);}
+\DoxyCodeLine{732   to[stride*4] = \_mm\_cvtss\_f32(high);}
+\DoxyCodeLine{733   to[stride*5] = \_mm\_cvtss\_f32(\_mm\_shuffle\_ps(high, high, 1));}
+\DoxyCodeLine{734   to[stride*6] = \_mm\_cvtss\_f32(\_mm\_shuffle\_ps(high, high, 2));}
+\DoxyCodeLine{735   to[stride*7] = \_mm\_cvtss\_f32(\_mm\_shuffle\_ps(high, high, 3));}
+\DoxyCodeLine{736 \}}
+\DoxyCodeLine{737 \textcolor{keyword}{template}<> EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keywordtype}{void} pscatter<double, Packet4d>(\textcolor{keywordtype}{double}* to, \textcolor{keyword}{const} Packet4d\& from, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride)}
+\DoxyCodeLine{738 \{}
+\DoxyCodeLine{739   \_\_m128d low = \_mm256\_extractf128\_pd(from, 0);}
+\DoxyCodeLine{740   to[stride*0] = \_mm\_cvtsd\_f64(low);}
+\DoxyCodeLine{741   to[stride*1] = \_mm\_cvtsd\_f64(\_mm\_shuffle\_pd(low, low, 1));}
+\DoxyCodeLine{742   \_\_m128d high = \_mm256\_extractf128\_pd(from, 1);}
+\DoxyCodeLine{743   to[stride*2] = \_mm\_cvtsd\_f64(high);}
+\DoxyCodeLine{744   to[stride*3] = \_mm\_cvtsd\_f64(\_mm\_shuffle\_pd(high, high, 1));}
+\DoxyCodeLine{745 \}}
+\DoxyCodeLine{746 \textcolor{keyword}{template}<> EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keywordtype}{void} pscatter<int, Packet8i>(\textcolor{keywordtype}{int}* to, \textcolor{keyword}{const} Packet8i\& from, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride)}
+\DoxyCodeLine{747 \{}
+\DoxyCodeLine{748   \_\_m128i low = \_mm256\_extractf128\_si256(from, 0);}
+\DoxyCodeLine{749   to[stride*0] = \_mm\_extract\_epi32(low, 0);}
+\DoxyCodeLine{750   to[stride*1] = \_mm\_extract\_epi32(low, 1);}
+\DoxyCodeLine{751   to[stride*2] = \_mm\_extract\_epi32(low, 2);}
+\DoxyCodeLine{752   to[stride*3] = \_mm\_extract\_epi32(low, 3);}
+\DoxyCodeLine{753 }
+\DoxyCodeLine{754   \_\_m128i high = \_mm256\_extractf128\_si256(from, 1);}
+\DoxyCodeLine{755   to[stride*4] = \_mm\_extract\_epi32(high, 0);}
+\DoxyCodeLine{756   to[stride*5] = \_mm\_extract\_epi32(high, 1);}
+\DoxyCodeLine{757   to[stride*6] = \_mm\_extract\_epi32(high, 2);}
+\DoxyCodeLine{758   to[stride*7] = \_mm\_extract\_epi32(high, 3);}
+\DoxyCodeLine{759 \}}
+\DoxyCodeLine{760 }
+\DoxyCodeLine{761 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pstore1<Packet8f>(\textcolor{keywordtype}{float}* to, \textcolor{keyword}{const} \textcolor{keywordtype}{float}\& a)}
+\DoxyCodeLine{762 \{}
+\DoxyCodeLine{763   Packet8f pa = pset1<Packet8f>(a);}
+\DoxyCodeLine{764   pstore(to, pa);}
+\DoxyCodeLine{765 \}}
+\DoxyCodeLine{766 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pstore1<Packet4d>(\textcolor{keywordtype}{double}* to, \textcolor{keyword}{const} \textcolor{keywordtype}{double}\& a)}
+\DoxyCodeLine{767 \{}
+\DoxyCodeLine{768   Packet4d pa = pset1<Packet4d>(a);}
+\DoxyCodeLine{769   pstore(to, pa);}
+\DoxyCodeLine{770 \}}
+\DoxyCodeLine{771 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pstore1<Packet8i>(\textcolor{keywordtype}{int}* to, \textcolor{keyword}{const} \textcolor{keywordtype}{int}\& a)}
+\DoxyCodeLine{772 \{}
+\DoxyCodeLine{773   Packet8i pa = pset1<Packet8i>(a);}
+\DoxyCodeLine{774   pstore(to, pa);}
+\DoxyCodeLine{775 \}}
+\DoxyCodeLine{776 }
+\DoxyCodeLine{777 \textcolor{preprocessor}{\#ifndef EIGEN\_VECTORIZE\_AVX512}}
+\DoxyCodeLine{778 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} prefetch<float>(\textcolor{keyword}{const} \textcolor{keywordtype}{float}*   addr) \{ \_mm\_prefetch((SsePrefetchPtrType)(addr), \_MM\_HINT\_T0); \}}
+\DoxyCodeLine{779 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} prefetch<double>(\textcolor{keyword}{const} \textcolor{keywordtype}{double}* addr) \{ \_mm\_prefetch((SsePrefetchPtrType)(addr), \_MM\_HINT\_T0); \}}
+\DoxyCodeLine{780 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} prefetch<int>(\textcolor{keyword}{const} \textcolor{keywordtype}{int}*       addr) \{ \_mm\_prefetch((SsePrefetchPtrType)(addr), \_MM\_HINT\_T0); \}}
+\DoxyCodeLine{781 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{782 }
+\DoxyCodeLine{783 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{float}  pfirst<Packet8f>(\textcolor{keyword}{const} Packet8f\& a) \{}
+\DoxyCodeLine{784   \textcolor{keywordflow}{return} \_mm\_cvtss\_f32(\_mm256\_castps256\_ps128(a));}
+\DoxyCodeLine{785 \}}
+\DoxyCodeLine{786 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{double} pfirst<Packet4d>(\textcolor{keyword}{const} Packet4d\& a) \{}
+\DoxyCodeLine{787   \textcolor{keywordflow}{return} \_mm\_cvtsd\_f64(\_mm256\_castpd256\_pd128(a));}
+\DoxyCodeLine{788 \}}
+\DoxyCodeLine{789 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{int}    pfirst<Packet8i>(\textcolor{keyword}{const} Packet8i\& a) \{}
+\DoxyCodeLine{790   \textcolor{keywordflow}{return} \_mm\_cvtsi128\_si32(\_mm256\_castsi256\_si128(a));}
+\DoxyCodeLine{791 \}}
+\DoxyCodeLine{792 }
+\DoxyCodeLine{793 }
+\DoxyCodeLine{794 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f preverse(\textcolor{keyword}{const} Packet8f\& a)}
+\DoxyCodeLine{795 \{}
+\DoxyCodeLine{796   \_\_m256 tmp = \_mm256\_shuffle\_ps(a,a,0x1b);}
+\DoxyCodeLine{797   \textcolor{keywordflow}{return} \_mm256\_permute2f128\_ps(tmp, tmp, 1);}
+\DoxyCodeLine{798 \}}
+\DoxyCodeLine{799 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d preverse(\textcolor{keyword}{const} Packet4d\& a)}
+\DoxyCodeLine{800 \{}
+\DoxyCodeLine{801    \_\_m256d tmp = \_mm256\_shuffle\_pd(a,a,5);}
+\DoxyCodeLine{802   \textcolor{keywordflow}{return} \_mm256\_permute2f128\_pd(tmp, tmp, 1);}
+\DoxyCodeLine{803 \textcolor{preprocessor}{  \#if 0}}
+\DoxyCodeLine{804   \textcolor{comment}{// This version is unlikely to be faster as \_mm256\_shuffle\_ps and \_mm256\_permute\_pd}}
+\DoxyCodeLine{805   \textcolor{comment}{// exhibit the same latency/throughput, but it is here for future reference/benchmarking...}}
+\DoxyCodeLine{806   \_\_m256d swap\_halves = \_mm256\_permute2f128\_pd(a,a,1);}
+\DoxyCodeLine{807     \textcolor{keywordflow}{return} \_mm256\_permute\_pd(swap\_halves,5);}
+\DoxyCodeLine{808 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{809 \}}
+\DoxyCodeLine{810 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i preverse(\textcolor{keyword}{const} Packet8i\& a)}
+\DoxyCodeLine{811 \{}
+\DoxyCodeLine{812   \textcolor{keywordflow}{return} \_mm256\_castps\_si256(preverse(\_mm256\_castsi256\_ps(a)));}
+\DoxyCodeLine{813 \}}
+\DoxyCodeLine{814 }
+\DoxyCodeLine{815 \textcolor{comment}{// pabs should be ok}}
+\DoxyCodeLine{816 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pabs(\textcolor{keyword}{const} Packet8f\& a)}
+\DoxyCodeLine{817 \{}
+\DoxyCodeLine{818   \textcolor{keyword}{const} Packet8f mask = \_mm256\_castsi256\_ps(\_mm256\_setr\_epi32(0x7FFFFFFF,0x7FFFFFFF,0x7FFFFFFF,0x7FFFFFFF,0x7FFFFFFF,0x7FFFFFFF,0x7FFFFFFF,0x7FFFFFFF));}
+\DoxyCodeLine{819   \textcolor{keywordflow}{return} \_mm256\_and\_ps(a,mask);}
+\DoxyCodeLine{820 \}}
+\DoxyCodeLine{821 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pabs(\textcolor{keyword}{const} Packet4d\& a)}
+\DoxyCodeLine{822 \{}
+\DoxyCodeLine{823   \textcolor{keyword}{const} Packet4d mask = \_mm256\_castsi256\_pd(\_mm256\_setr\_epi32(0xFFFFFFFF,0x7FFFFFFF,0xFFFFFFFF,0x7FFFFFFF,0xFFFFFFFF,0x7FFFFFFF,0xFFFFFFFF,0x7FFFFFFF));}
+\DoxyCodeLine{824   \textcolor{keywordflow}{return} \_mm256\_and\_pd(a,mask);}
+\DoxyCodeLine{825 \}}
+\DoxyCodeLine{826 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8i pabs(\textcolor{keyword}{const} Packet8i\& a)}
+\DoxyCodeLine{827 \{}
+\DoxyCodeLine{828 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{829   \textcolor{keywordflow}{return} \_mm256\_abs\_epi32(a);}
+\DoxyCodeLine{830 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{831   \_\_m128i lo = \_mm\_abs\_epi32(\_mm256\_extractf128\_si256(a, 0));}
+\DoxyCodeLine{832   \_\_m128i hi = \_mm\_abs\_epi32(\_mm256\_extractf128\_si256(a, 1));}
+\DoxyCodeLine{833   \textcolor{keywordflow}{return} \_mm256\_insertf128\_si256(\_mm256\_castsi128\_si256(lo), (hi), 1);}
+\DoxyCodeLine{834 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{835 \}}
+\DoxyCodeLine{836 }
+\DoxyCodeLine{837 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pfrexp<Packet8f>(\textcolor{keyword}{const} Packet8f\& a, Packet8f\& exponent) \{}
+\DoxyCodeLine{838   \textcolor{keywordflow}{return} pfrexp\_generic(a,exponent);}
+\DoxyCodeLine{839 \}}
+\DoxyCodeLine{840 }
+\DoxyCodeLine{841 \textcolor{comment}{// Extract exponent without existence of Packet4l.}}
+\DoxyCodeLine{842 \textcolor{keyword}{template}<>}
+\DoxyCodeLine{843 EIGEN\_STRONG\_INLINE  }
+\DoxyCodeLine{844 Packet4d pfrexp\_generic\_get\_biased\_exponent(\textcolor{keyword}{const} Packet4d\& a) \{}
+\DoxyCodeLine{845   \textcolor{keyword}{const} Packet4d cst\_exp\_mask  = pset1frombits<Packet4d>(\textcolor{keyword}{static\_cast<}uint64\_t\textcolor{keyword}{>}(0x7ff0000000000000ull));}
+\DoxyCodeLine{846   \_\_m256i a\_expo = \_mm256\_castpd\_si256(pand(a, cst\_exp\_mask));}
+\DoxyCodeLine{847 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{848   a\_expo = \_mm256\_srli\_epi64(a\_expo, 52);}
+\DoxyCodeLine{849   \_\_m128i lo = \_mm256\_extractf128\_si256(a\_expo, 0);}
+\DoxyCodeLine{850   \_\_m128i hi = \_mm256\_extractf128\_si256(a\_expo, 1);}
+\DoxyCodeLine{851 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{852   \_\_m128i lo = \_mm256\_extractf128\_si256(a\_expo, 0);}
+\DoxyCodeLine{853   \_\_m128i hi = \_mm256\_extractf128\_si256(a\_expo, 1);}
+\DoxyCodeLine{854   lo = \_mm\_srli\_epi64(lo, 52);}
+\DoxyCodeLine{855   hi = \_mm\_srli\_epi64(hi, 52);}
+\DoxyCodeLine{856 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{857   Packet2d exponent\_lo = \_mm\_cvtepi32\_pd(vec4i\_swizzle1(lo, 0, 2, 1, 3));}
+\DoxyCodeLine{858   Packet2d exponent\_hi = \_mm\_cvtepi32\_pd(vec4i\_swizzle1(hi, 0, 2, 1, 3));}
+\DoxyCodeLine{859   Packet4d exponent = \_mm256\_insertf128\_pd(\_mm256\_setzero\_pd(), exponent\_lo, 0);}
+\DoxyCodeLine{860   exponent = \_mm256\_insertf128\_pd(exponent, exponent\_hi, 1);}
+\DoxyCodeLine{861   \textcolor{keywordflow}{return} exponent;}
+\DoxyCodeLine{862 \}}
+\DoxyCodeLine{863 }
+\DoxyCodeLine{864 }
+\DoxyCodeLine{865 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pfrexp<Packet4d>(\textcolor{keyword}{const} Packet4d\& a, Packet4d\& exponent) \{}
+\DoxyCodeLine{866   \textcolor{keywordflow}{return} pfrexp\_generic(a, exponent);}
+\DoxyCodeLine{867 \}}
+\DoxyCodeLine{868 }
+\DoxyCodeLine{869 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pldexp<Packet8f>(\textcolor{keyword}{const} Packet8f\& a, \textcolor{keyword}{const} Packet8f\& exponent) \{}
+\DoxyCodeLine{870   \textcolor{keywordflow}{return} pldexp\_generic(a, exponent);}
+\DoxyCodeLine{871 \}}
+\DoxyCodeLine{872 }
+\DoxyCodeLine{873 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pldexp<Packet4d>(\textcolor{keyword}{const} Packet4d\& a, \textcolor{keyword}{const} Packet4d\& exponent) \{}
+\DoxyCodeLine{874   \textcolor{comment}{// Clamp exponent to [-\/2099, 2099]}}
+\DoxyCodeLine{875   \textcolor{keyword}{const} Packet4d max\_exponent = pset1<Packet4d>(2099.0);}
+\DoxyCodeLine{876   \textcolor{keyword}{const} Packet4i e = \_mm256\_cvtpd\_epi32(pmin(pmax(exponent, pnegate(max\_exponent)), max\_exponent));}
+\DoxyCodeLine{877   }
+\DoxyCodeLine{878   \textcolor{comment}{// Split 2\string^e into four factors and multiply.}}
+\DoxyCodeLine{879   \textcolor{keyword}{const} Packet4i bias = pset1<Packet4i>(1023);}
+\DoxyCodeLine{880   Packet4i b = parithmetic\_shift\_right<2>(e);  \textcolor{comment}{// floor(e/4)}}
+\DoxyCodeLine{881   }
+\DoxyCodeLine{882   \textcolor{comment}{// 2\string^b}}
+\DoxyCodeLine{883   Packet4i hi = vec4i\_swizzle1(padd(b, bias), 0, 2, 1, 3);}
+\DoxyCodeLine{884   Packet4i lo = \_mm\_slli\_epi64(hi, 52);}
+\DoxyCodeLine{885   hi = \_mm\_slli\_epi64(\_mm\_srli\_epi64(hi, 32), 52);}
+\DoxyCodeLine{886   Packet4d c = \_mm256\_castsi256\_pd(\_mm256\_insertf128\_si256(\_mm256\_castsi128\_si256(lo), hi, 1));}
+\DoxyCodeLine{887   Packet4d out = pmul(pmul(pmul(a, c), c), c);  \textcolor{comment}{// a * 2\string^(3b)}}
+\DoxyCodeLine{888   }
+\DoxyCodeLine{889   \textcolor{comment}{// 2\string^(e -\/ 3b)}}
+\DoxyCodeLine{890   b = psub(psub(psub(e, b), b), b);  \textcolor{comment}{// e -\/ 3b}}
+\DoxyCodeLine{891   hi = vec4i\_swizzle1(padd(b, bias), 0, 2, 1, 3);}
+\DoxyCodeLine{892   lo = \_mm\_slli\_epi64(hi, 52);}
+\DoxyCodeLine{893   hi = \_mm\_slli\_epi64(\_mm\_srli\_epi64(hi, 32), 52);}
+\DoxyCodeLine{894   c = \_mm256\_castsi256\_pd(\_mm256\_insertf128\_si256(\_mm256\_castsi128\_si256(lo), hi, 1));}
+\DoxyCodeLine{895   out = pmul(out, c); \textcolor{comment}{// a * 2\string^e}}
+\DoxyCodeLine{896   \textcolor{keywordflow}{return} out;}
+\DoxyCodeLine{897 \}}
+\DoxyCodeLine{898 }
+\DoxyCodeLine{899 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{float} predux<Packet8f>(\textcolor{keyword}{const} Packet8f\& a)}
+\DoxyCodeLine{900 \{}
+\DoxyCodeLine{901   \textcolor{keywordflow}{return} predux(Packet4f(\_mm\_add\_ps(\_mm256\_castps256\_ps128(a),\_mm256\_extractf128\_ps(a,1))));}
+\DoxyCodeLine{902 \}}
+\DoxyCodeLine{903 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{double} predux<Packet4d>(\textcolor{keyword}{const} Packet4d\& a)}
+\DoxyCodeLine{904 \{}
+\DoxyCodeLine{905   \textcolor{keywordflow}{return} predux(Packet2d(\_mm\_add\_pd(\_mm256\_castpd256\_pd128(a),\_mm256\_extractf128\_pd(a,1))));}
+\DoxyCodeLine{906 \}}
+\DoxyCodeLine{907 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{int} predux<Packet8i>(\textcolor{keyword}{const} Packet8i\& a)}
+\DoxyCodeLine{908 \{}
+\DoxyCodeLine{909   \textcolor{keywordflow}{return} predux(Packet4i(\_mm\_add\_epi32(\_mm256\_castsi256\_si128(a),\_mm256\_extractf128\_si256(a,1))));}
+\DoxyCodeLine{910 \}}
+\DoxyCodeLine{911 }
+\DoxyCodeLine{912 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4f predux\_half\_dowto4<Packet8f>(\textcolor{keyword}{const} Packet8f\& a)}
+\DoxyCodeLine{913 \{}
+\DoxyCodeLine{914   \textcolor{keywordflow}{return} \_mm\_add\_ps(\_mm256\_castps256\_ps128(a),\_mm256\_extractf128\_ps(a,1));}
+\DoxyCodeLine{915 \}}
+\DoxyCodeLine{916 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4i predux\_half\_dowto4<Packet8i>(\textcolor{keyword}{const} Packet8i\& a)}
+\DoxyCodeLine{917 \{}
+\DoxyCodeLine{918   \textcolor{keywordflow}{return} \_mm\_add\_epi32(\_mm256\_castsi256\_si128(a),\_mm256\_extractf128\_si256(a,1));}
+\DoxyCodeLine{919 \}}
+\DoxyCodeLine{920 }
+\DoxyCodeLine{921 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{float} predux\_mul<Packet8f>(\textcolor{keyword}{const} Packet8f\& a)}
+\DoxyCodeLine{922 \{}
+\DoxyCodeLine{923   Packet8f tmp;}
+\DoxyCodeLine{924   tmp = \_mm256\_mul\_ps(a, \_mm256\_permute2f128\_ps(a,a,1));}
+\DoxyCodeLine{925   tmp = \_mm256\_mul\_ps(tmp, \_mm256\_shuffle\_ps(tmp,tmp,\_MM\_SHUFFLE(1,0,3,2)));}
+\DoxyCodeLine{926   \textcolor{keywordflow}{return} pfirst(\_mm256\_mul\_ps(tmp, \_mm256\_shuffle\_ps(tmp,tmp,1)));}
+\DoxyCodeLine{927 \}}
+\DoxyCodeLine{928 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{double} predux\_mul<Packet4d>(\textcolor{keyword}{const} Packet4d\& a)}
+\DoxyCodeLine{929 \{}
+\DoxyCodeLine{930   Packet4d tmp;}
+\DoxyCodeLine{931   tmp = \_mm256\_mul\_pd(a, \_mm256\_permute2f128\_pd(a,a,1));}
+\DoxyCodeLine{932   \textcolor{keywordflow}{return} pfirst(\_mm256\_mul\_pd(tmp, \_mm256\_shuffle\_pd(tmp,tmp,1)));}
+\DoxyCodeLine{933 \}}
+\DoxyCodeLine{934 }
+\DoxyCodeLine{935 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{float} predux\_min<Packet8f>(\textcolor{keyword}{const} Packet8f\& a)}
+\DoxyCodeLine{936 \{}
+\DoxyCodeLine{937   Packet8f tmp = \_mm256\_min\_ps(a, \_mm256\_permute2f128\_ps(a,a,1));}
+\DoxyCodeLine{938   tmp = \_mm256\_min\_ps(tmp, \_mm256\_shuffle\_ps(tmp,tmp,\_MM\_SHUFFLE(1,0,3,2)));}
+\DoxyCodeLine{939   \textcolor{keywordflow}{return} pfirst(\_mm256\_min\_ps(tmp, \_mm256\_shuffle\_ps(tmp,tmp,1)));}
+\DoxyCodeLine{940 \}}
+\DoxyCodeLine{941 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{double} predux\_min<Packet4d>(\textcolor{keyword}{const} Packet4d\& a)}
+\DoxyCodeLine{942 \{}
+\DoxyCodeLine{943   Packet4d tmp = \_mm256\_min\_pd(a, \_mm256\_permute2f128\_pd(a,a,1));}
+\DoxyCodeLine{944   \textcolor{keywordflow}{return} pfirst(\_mm256\_min\_pd(tmp, \_mm256\_shuffle\_pd(tmp, tmp, 1)));}
+\DoxyCodeLine{945 \}}
+\DoxyCodeLine{946 }
+\DoxyCodeLine{947 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{float} predux\_max<Packet8f>(\textcolor{keyword}{const} Packet8f\& a)}
+\DoxyCodeLine{948 \{}
+\DoxyCodeLine{949   Packet8f tmp = \_mm256\_max\_ps(a, \_mm256\_permute2f128\_ps(a,a,1));}
+\DoxyCodeLine{950   tmp = \_mm256\_max\_ps(tmp, \_mm256\_shuffle\_ps(tmp,tmp,\_MM\_SHUFFLE(1,0,3,2)));}
+\DoxyCodeLine{951   \textcolor{keywordflow}{return} pfirst(\_mm256\_max\_ps(tmp, \_mm256\_shuffle\_ps(tmp,tmp,1)));}
+\DoxyCodeLine{952 \}}
+\DoxyCodeLine{953 }
+\DoxyCodeLine{954 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{double} predux\_max<Packet4d>(\textcolor{keyword}{const} Packet4d\& a)}
+\DoxyCodeLine{955 \{}
+\DoxyCodeLine{956   Packet4d tmp = \_mm256\_max\_pd(a, \_mm256\_permute2f128\_pd(a,a,1));}
+\DoxyCodeLine{957   \textcolor{keywordflow}{return} pfirst(\_mm256\_max\_pd(tmp, \_mm256\_shuffle\_pd(tmp, tmp, 1)));}
+\DoxyCodeLine{958 \}}
+\DoxyCodeLine{959 }
+\DoxyCodeLine{960 \textcolor{comment}{// not needed yet}}
+\DoxyCodeLine{961 \textcolor{comment}{// template<> EIGEN\_STRONG\_INLINE bool predux\_all(const Packet8f\& x)}}
+\DoxyCodeLine{962 \textcolor{comment}{// \{}}
+\DoxyCodeLine{963 \textcolor{comment}{//   return \_mm256\_movemask\_ps(x)==0xFF;}}
+\DoxyCodeLine{964 \textcolor{comment}{// \}}}
+\DoxyCodeLine{965 }
+\DoxyCodeLine{966 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{bool} predux\_any(\textcolor{keyword}{const} Packet8f\& x)}
+\DoxyCodeLine{967 \{}
+\DoxyCodeLine{968   \textcolor{keywordflow}{return} \_mm256\_movemask\_ps(x)!=0;}
+\DoxyCodeLine{969 \}}
+\DoxyCodeLine{970 }
+\DoxyCodeLine{971 EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keywordtype}{void}}
+\DoxyCodeLine{972 ptranspose(PacketBlock<Packet8f,8>\& kernel) \{}
+\DoxyCodeLine{973   \_\_m256 T0 = \_mm256\_unpacklo\_ps(kernel.packet[0], kernel.packet[1]);}
+\DoxyCodeLine{974   \_\_m256 T1 = \_mm256\_unpackhi\_ps(kernel.packet[0], kernel.packet[1]);}
+\DoxyCodeLine{975   \_\_m256 T2 = \_mm256\_unpacklo\_ps(kernel.packet[2], kernel.packet[3]);}
+\DoxyCodeLine{976   \_\_m256 T3 = \_mm256\_unpackhi\_ps(kernel.packet[2], kernel.packet[3]);}
+\DoxyCodeLine{977   \_\_m256 T4 = \_mm256\_unpacklo\_ps(kernel.packet[4], kernel.packet[5]);}
+\DoxyCodeLine{978   \_\_m256 T5 = \_mm256\_unpackhi\_ps(kernel.packet[4], kernel.packet[5]);}
+\DoxyCodeLine{979   \_\_m256 T6 = \_mm256\_unpacklo\_ps(kernel.packet[6], kernel.packet[7]);}
+\DoxyCodeLine{980   \_\_m256 T7 = \_mm256\_unpackhi\_ps(kernel.packet[6], kernel.packet[7]);}
+\DoxyCodeLine{981   \_\_m256 S0 = \_mm256\_shuffle\_ps(T0,T2,\_MM\_SHUFFLE(1,0,1,0));}
+\DoxyCodeLine{982   \_\_m256 S1 = \_mm256\_shuffle\_ps(T0,T2,\_MM\_SHUFFLE(3,2,3,2));}
+\DoxyCodeLine{983   \_\_m256 S2 = \_mm256\_shuffle\_ps(T1,T3,\_MM\_SHUFFLE(1,0,1,0));}
+\DoxyCodeLine{984   \_\_m256 S3 = \_mm256\_shuffle\_ps(T1,T3,\_MM\_SHUFFLE(3,2,3,2));}
+\DoxyCodeLine{985   \_\_m256 S4 = \_mm256\_shuffle\_ps(T4,T6,\_MM\_SHUFFLE(1,0,1,0));}
+\DoxyCodeLine{986   \_\_m256 S5 = \_mm256\_shuffle\_ps(T4,T6,\_MM\_SHUFFLE(3,2,3,2));}
+\DoxyCodeLine{987   \_\_m256 S6 = \_mm256\_shuffle\_ps(T5,T7,\_MM\_SHUFFLE(1,0,1,0));}
+\DoxyCodeLine{988   \_\_m256 S7 = \_mm256\_shuffle\_ps(T5,T7,\_MM\_SHUFFLE(3,2,3,2));}
+\DoxyCodeLine{989   kernel.packet[0] = \_mm256\_permute2f128\_ps(S0, S4, 0x20);}
+\DoxyCodeLine{990   kernel.packet[1] = \_mm256\_permute2f128\_ps(S1, S5, 0x20);}
+\DoxyCodeLine{991   kernel.packet[2] = \_mm256\_permute2f128\_ps(S2, S6, 0x20);}
+\DoxyCodeLine{992   kernel.packet[3] = \_mm256\_permute2f128\_ps(S3, S7, 0x20);}
+\DoxyCodeLine{993   kernel.packet[4] = \_mm256\_permute2f128\_ps(S0, S4, 0x31);}
+\DoxyCodeLine{994   kernel.packet[5] = \_mm256\_permute2f128\_ps(S1, S5, 0x31);}
+\DoxyCodeLine{995   kernel.packet[6] = \_mm256\_permute2f128\_ps(S2, S6, 0x31);}
+\DoxyCodeLine{996   kernel.packet[7] = \_mm256\_permute2f128\_ps(S3, S7, 0x31);}
+\DoxyCodeLine{997 \}}
+\DoxyCodeLine{998 }
+\DoxyCodeLine{999 EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keywordtype}{void}}
+\DoxyCodeLine{1000 ptranspose(PacketBlock<Packet8f,4>\& kernel) \{}
+\DoxyCodeLine{1001   \_\_m256 T0 = \_mm256\_unpacklo\_ps(kernel.packet[0], kernel.packet[1]);}
+\DoxyCodeLine{1002   \_\_m256 T1 = \_mm256\_unpackhi\_ps(kernel.packet[0], kernel.packet[1]);}
+\DoxyCodeLine{1003   \_\_m256 T2 = \_mm256\_unpacklo\_ps(kernel.packet[2], kernel.packet[3]);}
+\DoxyCodeLine{1004   \_\_m256 T3 = \_mm256\_unpackhi\_ps(kernel.packet[2], kernel.packet[3]);}
+\DoxyCodeLine{1005 }
+\DoxyCodeLine{1006   \_\_m256 S0 = \_mm256\_shuffle\_ps(T0,T2,\_MM\_SHUFFLE(1,0,1,0));}
+\DoxyCodeLine{1007   \_\_m256 S1 = \_mm256\_shuffle\_ps(T0,T2,\_MM\_SHUFFLE(3,2,3,2));}
+\DoxyCodeLine{1008   \_\_m256 S2 = \_mm256\_shuffle\_ps(T1,T3,\_MM\_SHUFFLE(1,0,1,0));}
+\DoxyCodeLine{1009   \_\_m256 S3 = \_mm256\_shuffle\_ps(T1,T3,\_MM\_SHUFFLE(3,2,3,2));}
+\DoxyCodeLine{1010 }
+\DoxyCodeLine{1011   kernel.packet[0] = \_mm256\_permute2f128\_ps(S0, S1, 0x20);}
+\DoxyCodeLine{1012   kernel.packet[1] = \_mm256\_permute2f128\_ps(S2, S3, 0x20);}
+\DoxyCodeLine{1013   kernel.packet[2] = \_mm256\_permute2f128\_ps(S0, S1, 0x31);}
+\DoxyCodeLine{1014   kernel.packet[3] = \_mm256\_permute2f128\_ps(S2, S3, 0x31);}
+\DoxyCodeLine{1015 \}}
+\DoxyCodeLine{1016 }
+\DoxyCodeLine{1017 \textcolor{preprocessor}{\#define MM256\_SHUFFLE\_EPI32(A, B, M) \(\backslash\)}}
+\DoxyCodeLine{1018 \textcolor{preprocessor}{  \_mm256\_castps\_si256(\_mm256\_shuffle\_ps(\_mm256\_castsi256\_ps(A), \_mm256\_castsi256\_ps(B), M))}}
+\DoxyCodeLine{1019 }
+\DoxyCodeLine{1020 \textcolor{preprocessor}{\#ifndef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{1021 \textcolor{preprocessor}{\#define MM256\_UNPACKLO\_EPI32(A, B) \(\backslash\)}}
+\DoxyCodeLine{1022 \textcolor{preprocessor}{  \_mm256\_castps\_si256(\_mm256\_unpacklo\_ps(\_mm256\_castsi256\_ps(A), \_mm256\_castsi256\_ps(B)))}}
+\DoxyCodeLine{1023 \textcolor{preprocessor}{\#define MM256\_UNPACKHI\_EPI32(A, B) \(\backslash\)}}
+\DoxyCodeLine{1024 \textcolor{preprocessor}{  \_mm256\_castps\_si256(\_mm256\_unpackhi\_ps(\_mm256\_castsi256\_ps(A), \_mm256\_castsi256\_ps(B)))}}
+\DoxyCodeLine{1025 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{1026 \textcolor{preprocessor}{\#define MM256\_UNPACKLO\_EPI32(A, B) \_mm256\_unpacklo\_epi32(A, B)}}
+\DoxyCodeLine{1027 \textcolor{preprocessor}{\#define MM256\_UNPACKHI\_EPI32(A, B) \_mm256\_unpackhi\_epi32(A, B)}}
+\DoxyCodeLine{1028 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{1029 }
+\DoxyCodeLine{1030 }
+\DoxyCodeLine{1031 EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keywordtype}{void}}
+\DoxyCodeLine{1032 ptranspose(PacketBlock<Packet8i,8>\& kernel) \{}
+\DoxyCodeLine{1033   \_\_m256i T0 = MM256\_UNPACKLO\_EPI32(kernel.packet[0], kernel.packet[1]);}
+\DoxyCodeLine{1034   \_\_m256i T1 = MM256\_UNPACKHI\_EPI32(kernel.packet[0], kernel.packet[1]);}
+\DoxyCodeLine{1035   \_\_m256i T2 = MM256\_UNPACKLO\_EPI32(kernel.packet[2], kernel.packet[3]);}
+\DoxyCodeLine{1036   \_\_m256i T3 = MM256\_UNPACKHI\_EPI32(kernel.packet[2], kernel.packet[3]);}
+\DoxyCodeLine{1037   \_\_m256i T4 = MM256\_UNPACKLO\_EPI32(kernel.packet[4], kernel.packet[5]);}
+\DoxyCodeLine{1038   \_\_m256i T5 = MM256\_UNPACKHI\_EPI32(kernel.packet[4], kernel.packet[5]);}
+\DoxyCodeLine{1039   \_\_m256i T6 = MM256\_UNPACKLO\_EPI32(kernel.packet[6], kernel.packet[7]);}
+\DoxyCodeLine{1040   \_\_m256i T7 = MM256\_UNPACKHI\_EPI32(kernel.packet[6], kernel.packet[7]);}
+\DoxyCodeLine{1041   \_\_m256i S0 = MM256\_SHUFFLE\_EPI32(T0,T2,\_MM\_SHUFFLE(1,0,1,0));}
+\DoxyCodeLine{1042   \_\_m256i S1 = MM256\_SHUFFLE\_EPI32(T0,T2,\_MM\_SHUFFLE(3,2,3,2));}
+\DoxyCodeLine{1043   \_\_m256i S2 = MM256\_SHUFFLE\_EPI32(T1,T3,\_MM\_SHUFFLE(1,0,1,0));}
+\DoxyCodeLine{1044   \_\_m256i S3 = MM256\_SHUFFLE\_EPI32(T1,T3,\_MM\_SHUFFLE(3,2,3,2));}
+\DoxyCodeLine{1045   \_\_m256i S4 = MM256\_SHUFFLE\_EPI32(T4,T6,\_MM\_SHUFFLE(1,0,1,0));}
+\DoxyCodeLine{1046   \_\_m256i S5 = MM256\_SHUFFLE\_EPI32(T4,T6,\_MM\_SHUFFLE(3,2,3,2));}
+\DoxyCodeLine{1047   \_\_m256i S6 = MM256\_SHUFFLE\_EPI32(T5,T7,\_MM\_SHUFFLE(1,0,1,0));}
+\DoxyCodeLine{1048   \_\_m256i S7 = MM256\_SHUFFLE\_EPI32(T5,T7,\_MM\_SHUFFLE(3,2,3,2));}
+\DoxyCodeLine{1049   kernel.packet[0] = \_mm256\_permute2f128\_si256(S0, S4, 0x20);}
+\DoxyCodeLine{1050   kernel.packet[1] = \_mm256\_permute2f128\_si256(S1, S5, 0x20);}
+\DoxyCodeLine{1051   kernel.packet[2] = \_mm256\_permute2f128\_si256(S2, S6, 0x20);}
+\DoxyCodeLine{1052   kernel.packet[3] = \_mm256\_permute2f128\_si256(S3, S7, 0x20);}
+\DoxyCodeLine{1053   kernel.packet[4] = \_mm256\_permute2f128\_si256(S0, S4, 0x31);}
+\DoxyCodeLine{1054   kernel.packet[5] = \_mm256\_permute2f128\_si256(S1, S5, 0x31);}
+\DoxyCodeLine{1055   kernel.packet[6] = \_mm256\_permute2f128\_si256(S2, S6, 0x31);}
+\DoxyCodeLine{1056   kernel.packet[7] = \_mm256\_permute2f128\_si256(S3, S7, 0x31);}
+\DoxyCodeLine{1057 \}}
+\DoxyCodeLine{1058 }
+\DoxyCodeLine{1059 EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keywordtype}{void}}
+\DoxyCodeLine{1060 ptranspose(PacketBlock<Packet8i,4>\& kernel) \{}
+\DoxyCodeLine{1061   \_\_m256i T0 = MM256\_UNPACKLO\_EPI32(kernel.packet[0], kernel.packet[1]);}
+\DoxyCodeLine{1062   \_\_m256i T1 = MM256\_UNPACKHI\_EPI32(kernel.packet[0], kernel.packet[1]);}
+\DoxyCodeLine{1063   \_\_m256i T2 = MM256\_UNPACKLO\_EPI32(kernel.packet[2], kernel.packet[3]);}
+\DoxyCodeLine{1064   \_\_m256i T3 = MM256\_UNPACKHI\_EPI32(kernel.packet[2], kernel.packet[3]);}
+\DoxyCodeLine{1065 }
+\DoxyCodeLine{1066   \_\_m256i S0 = MM256\_SHUFFLE\_EPI32(T0,T2,\_MM\_SHUFFLE(1,0,1,0));}
+\DoxyCodeLine{1067   \_\_m256i S1 = MM256\_SHUFFLE\_EPI32(T0,T2,\_MM\_SHUFFLE(3,2,3,2));}
+\DoxyCodeLine{1068   \_\_m256i S2 = MM256\_SHUFFLE\_EPI32(T1,T3,\_MM\_SHUFFLE(1,0,1,0));}
+\DoxyCodeLine{1069   \_\_m256i S3 = MM256\_SHUFFLE\_EPI32(T1,T3,\_MM\_SHUFFLE(3,2,3,2));}
+\DoxyCodeLine{1070 }
+\DoxyCodeLine{1071   kernel.packet[0] = \_mm256\_permute2f128\_si256(S0, S1, 0x20);}
+\DoxyCodeLine{1072   kernel.packet[1] = \_mm256\_permute2f128\_si256(S2, S3, 0x20);}
+\DoxyCodeLine{1073   kernel.packet[2] = \_mm256\_permute2f128\_si256(S0, S1, 0x31);}
+\DoxyCodeLine{1074   kernel.packet[3] = \_mm256\_permute2f128\_si256(S2, S3, 0x31);}
+\DoxyCodeLine{1075 \}}
+\DoxyCodeLine{1076 }
+\DoxyCodeLine{1077 EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keywordtype}{void}}
+\DoxyCodeLine{1078 ptranspose(PacketBlock<Packet4d,4>\& kernel) \{}
+\DoxyCodeLine{1079   \_\_m256d T0 = \_mm256\_shuffle\_pd(kernel.packet[0], kernel.packet[1], 15);}
+\DoxyCodeLine{1080   \_\_m256d T1 = \_mm256\_shuffle\_pd(kernel.packet[0], kernel.packet[1], 0);}
+\DoxyCodeLine{1081   \_\_m256d T2 = \_mm256\_shuffle\_pd(kernel.packet[2], kernel.packet[3], 15);}
+\DoxyCodeLine{1082   \_\_m256d T3 = \_mm256\_shuffle\_pd(kernel.packet[2], kernel.packet[3], 0);}
+\DoxyCodeLine{1083 }
+\DoxyCodeLine{1084   kernel.packet[1] = \_mm256\_permute2f128\_pd(T0, T2, 32);}
+\DoxyCodeLine{1085   kernel.packet[3] = \_mm256\_permute2f128\_pd(T0, T2, 49);}
+\DoxyCodeLine{1086   kernel.packet[0] = \_mm256\_permute2f128\_pd(T1, T3, 32);}
+\DoxyCodeLine{1087   kernel.packet[2] = \_mm256\_permute2f128\_pd(T1, T3, 49);}
+\DoxyCodeLine{1088 \}}
+\DoxyCodeLine{1089 }
+\DoxyCodeLine{1090 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8f pblend(\textcolor{keyword}{const} Selector<8>\& ifPacket, \textcolor{keyword}{const} Packet8f\& thenPacket, \textcolor{keyword}{const} Packet8f\& elsePacket) \{}
+\DoxyCodeLine{1091   \textcolor{keyword}{const} \_\_m256 zero = \_mm256\_setzero\_ps();}
+\DoxyCodeLine{1092   \textcolor{keyword}{const} \_\_m256 select = \_mm256\_set\_ps(ifPacket.select[7], ifPacket.select[6], ifPacket.select[5], ifPacket.select[4], ifPacket.select[3], ifPacket.select[2], ifPacket.select[1], ifPacket.select[0]);}
+\DoxyCodeLine{1093   \_\_m256 false\_mask = \_mm256\_cmp\_ps(select, zero, \_CMP\_EQ\_UQ);}
+\DoxyCodeLine{1094   \textcolor{keywordflow}{return} \_mm256\_blendv\_ps(thenPacket, elsePacket, false\_mask);}
+\DoxyCodeLine{1095 \}}
+\DoxyCodeLine{1096 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4d pblend(\textcolor{keyword}{const} Selector<4>\& ifPacket, \textcolor{keyword}{const} Packet4d\& thenPacket, \textcolor{keyword}{const} Packet4d\& elsePacket) \{}
+\DoxyCodeLine{1097   \textcolor{keyword}{const} \_\_m256d zero = \_mm256\_setzero\_pd();}
+\DoxyCodeLine{1098   \textcolor{keyword}{const} \_\_m256d select = \_mm256\_set\_pd(ifPacket.select[3], ifPacket.select[2], ifPacket.select[1], ifPacket.select[0]);}
+\DoxyCodeLine{1099   \_\_m256d false\_mask = \_mm256\_cmp\_pd(select, zero, \_CMP\_EQ\_UQ);}
+\DoxyCodeLine{1100   \textcolor{keywordflow}{return} \_mm256\_blendv\_pd(thenPacket, elsePacket, false\_mask);}
+\DoxyCodeLine{1101 \}}
+\DoxyCodeLine{1102 }
+\DoxyCodeLine{1103 \textcolor{comment}{// Packet math for Eigen::half}}
+\DoxyCodeLine{1104 }
+\DoxyCodeLine{1105 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unpacket__traits}{unpacket\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1eigen__packet__wrapper}{Packet8h}}> \{ \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}} \mbox{\hyperlink{structEigen_1_1half}{type}}; \textcolor{keyword}{enum} \{size=8, alignment=\mbox{\hyperlink{group__enums_gga45fe06e29902b7a2773de05ba27b47a1ad0b140cd97bc74365b51843d28379655}{Aligned16}}, vectorizable=\textcolor{keyword}{true}, masked\_load\_available=\textcolor{keyword}{false}, masked\_store\_available=\textcolor{keyword}{false}\}; \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1eigen__packet__wrapper}{Packet8h}} \mbox{\hyperlink{structEigen_1_1internal_1_1eigen__packet__wrapper}{half}}; \};}
+\DoxyCodeLine{1106 }
+\DoxyCodeLine{1107 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \mbox{\hyperlink{structEigen_1_1internal_1_1eigen__packet__wrapper}{Packet8h}} pset1<Packet8h>(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}}\& from) \{}
+\DoxyCodeLine{1108   \textcolor{keywordflow}{return} \_mm\_set1\_epi16(numext::bit\_cast<numext::uint16\_t>(from));}
+\DoxyCodeLine{1109 \}}
+\DoxyCodeLine{1110 }
+\DoxyCodeLine{1111 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}} pfirst<Packet8h>(\textcolor{keyword}{const} Packet8h\& from) \{}
+\DoxyCodeLine{1112   \textcolor{keywordflow}{return} numext::bit\_cast<Eigen::half>(\textcolor{keyword}{static\_cast<}numext::uint16\_t\textcolor{keyword}{>}(\_mm\_extract\_epi16(from, 0)));}
+\DoxyCodeLine{1113 \}}
+\DoxyCodeLine{1114 }
+\DoxyCodeLine{1115 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h pload<Packet8h>(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}}* from) \{}
+\DoxyCodeLine{1116   \textcolor{keywordflow}{return} \_mm\_load\_si128(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const }\_\_m128i*\textcolor{keyword}{>}(from));}
+\DoxyCodeLine{1117 \}}
+\DoxyCodeLine{1118 }
+\DoxyCodeLine{1119 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h ploadu<Packet8h>(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}}* from) \{}
+\DoxyCodeLine{1120   \textcolor{keywordflow}{return} \_mm\_loadu\_si128(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const }\_\_m128i*\textcolor{keyword}{>}(from));}
+\DoxyCodeLine{1121 \}}
+\DoxyCodeLine{1122 }
+\DoxyCodeLine{1123 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pstore<Eigen::half>(\mbox{\hyperlink{structEigen_1_1half}{Eigen::half}}* to, \textcolor{keyword}{const} Packet8h\& from) \{}
+\DoxyCodeLine{1124   \_mm\_store\_si128(\textcolor{keyword}{reinterpret\_cast<}\_\_m128i*\textcolor{keyword}{>}(to), from);}
+\DoxyCodeLine{1125 \}}
+\DoxyCodeLine{1126 }
+\DoxyCodeLine{1127 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pstoreu<Eigen::half>(\mbox{\hyperlink{structEigen_1_1half}{Eigen::half}}* to, \textcolor{keyword}{const} Packet8h\& from) \{}
+\DoxyCodeLine{1128   \_mm\_storeu\_si128(\textcolor{keyword}{reinterpret\_cast<}\_\_m128i*\textcolor{keyword}{>}(to), from);}
+\DoxyCodeLine{1129 \}}
+\DoxyCodeLine{1130 }
+\DoxyCodeLine{1131 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h}
+\DoxyCodeLine{1132 ploaddup<Packet8h>(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}}*  from) \{}
+\DoxyCodeLine{1133   \textcolor{keyword}{const} numext::uint16\_t a = numext::bit\_cast<numext::uint16\_t>(from[0]);}
+\DoxyCodeLine{1134   \textcolor{keyword}{const} numext::uint16\_t b = numext::bit\_cast<numext::uint16\_t>(from[1]);}
+\DoxyCodeLine{1135   \textcolor{keyword}{const} numext::uint16\_t c = numext::bit\_cast<numext::uint16\_t>(from[2]);}
+\DoxyCodeLine{1136   \textcolor{keyword}{const} numext::uint16\_t d = numext::bit\_cast<numext::uint16\_t>(from[3]);}
+\DoxyCodeLine{1137   \textcolor{keywordflow}{return} \_mm\_set\_epi16(d, d, c, c, b, b, a, a);}
+\DoxyCodeLine{1138 \}}
+\DoxyCodeLine{1139 }
+\DoxyCodeLine{1140 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h}
+\DoxyCodeLine{1141 ploadquad<Packet8h>(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}}* from) \{}
+\DoxyCodeLine{1142   \textcolor{keyword}{const} numext::uint16\_t a = numext::bit\_cast<numext::uint16\_t>(from[0]);}
+\DoxyCodeLine{1143   \textcolor{keyword}{const} numext::uint16\_t b = numext::bit\_cast<numext::uint16\_t>(from[1]);}
+\DoxyCodeLine{1144   \textcolor{keywordflow}{return} \_mm\_set\_epi16(b, b, b, b, a, a, a, a);}
+\DoxyCodeLine{1145 \}}
+\DoxyCodeLine{1146 }
+\DoxyCodeLine{1147 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h ptrue(\textcolor{keyword}{const} Packet8h\& a) \{}
+\DoxyCodeLine{1148  \textcolor{keywordflow}{return} \_mm\_cmpeq\_epi32(a, a);}
+\DoxyCodeLine{1149 \}}
+\DoxyCodeLine{1150 }
+\DoxyCodeLine{1151 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1152 EIGEN\_STRONG\_INLINE Packet8h pabs(\textcolor{keyword}{const} Packet8h\& a) \{}
+\DoxyCodeLine{1153   \textcolor{keyword}{const} \_\_m128i sign\_mask = \_mm\_set1\_epi16(\textcolor{keyword}{static\_cast<}numext::uint16\_t\textcolor{keyword}{>}(0x8000));}
+\DoxyCodeLine{1154   \textcolor{keywordflow}{return} \_mm\_andnot\_si128(sign\_mask, a);}
+\DoxyCodeLine{1155 \}}
+\DoxyCodeLine{1156 }
+\DoxyCodeLine{1157 EIGEN\_STRONG\_INLINE Packet8f half2float(\textcolor{keyword}{const} Packet8h\& a) \{}
+\DoxyCodeLine{1158 \textcolor{preprocessor}{\#ifdef EIGEN\_HAS\_FP16\_C}}
+\DoxyCodeLine{1159   \textcolor{keywordflow}{return} \_mm256\_cvtph\_ps(a);}
+\DoxyCodeLine{1160 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{1161   EIGEN\_ALIGN32 \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}} aux[8];}
+\DoxyCodeLine{1162   pstore(aux, a);}
+\DoxyCodeLine{1163   \textcolor{keywordtype}{float} f0(aux[0]);}
+\DoxyCodeLine{1164   \textcolor{keywordtype}{float} f1(aux[1]);}
+\DoxyCodeLine{1165   \textcolor{keywordtype}{float} f2(aux[2]);}
+\DoxyCodeLine{1166   \textcolor{keywordtype}{float} f3(aux[3]);}
+\DoxyCodeLine{1167   \textcolor{keywordtype}{float} f4(aux[4]);}
+\DoxyCodeLine{1168   \textcolor{keywordtype}{float} f5(aux[5]);}
+\DoxyCodeLine{1169   \textcolor{keywordtype}{float} f6(aux[6]);}
+\DoxyCodeLine{1170   \textcolor{keywordtype}{float} f7(aux[7]);}
+\DoxyCodeLine{1171 }
+\DoxyCodeLine{1172   \textcolor{keywordflow}{return} \_mm256\_set\_ps(f7, f6, f5, f4, f3, f2, f1, f0);}
+\DoxyCodeLine{1173 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{1174 \}}
+\DoxyCodeLine{1175 }
+\DoxyCodeLine{1176 EIGEN\_STRONG\_INLINE Packet8h float2half(\textcolor{keyword}{const} Packet8f\& a) \{}
+\DoxyCodeLine{1177 \textcolor{preprocessor}{\#ifdef EIGEN\_HAS\_FP16\_C}}
+\DoxyCodeLine{1178   \textcolor{keywordflow}{return} \_mm256\_cvtps\_ph(a, \_MM\_FROUND\_TO\_NEAREST\_INT|\_MM\_FROUND\_NO\_EXC);}
+\DoxyCodeLine{1179 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{1180   EIGEN\_ALIGN32 \textcolor{keywordtype}{float} aux[8];}
+\DoxyCodeLine{1181   pstore(aux, a);}
+\DoxyCodeLine{1182   \textcolor{keyword}{const} numext::uint16\_t s0 = numext::bit\_cast<numext::uint16\_t>(\mbox{\hyperlink{structEigen_1_1half}{Eigen::half}}(aux[0]));}
+\DoxyCodeLine{1183   \textcolor{keyword}{const} numext::uint16\_t s1 = numext::bit\_cast<numext::uint16\_t>(\mbox{\hyperlink{structEigen_1_1half}{Eigen::half}}(aux[1]));}
+\DoxyCodeLine{1184   \textcolor{keyword}{const} numext::uint16\_t s2 = numext::bit\_cast<numext::uint16\_t>(\mbox{\hyperlink{structEigen_1_1half}{Eigen::half}}(aux[2]));}
+\DoxyCodeLine{1185   \textcolor{keyword}{const} numext::uint16\_t s3 = numext::bit\_cast<numext::uint16\_t>(\mbox{\hyperlink{structEigen_1_1half}{Eigen::half}}(aux[3]));}
+\DoxyCodeLine{1186   \textcolor{keyword}{const} numext::uint16\_t s4 = numext::bit\_cast<numext::uint16\_t>(\mbox{\hyperlink{structEigen_1_1half}{Eigen::half}}(aux[4]));}
+\DoxyCodeLine{1187   \textcolor{keyword}{const} numext::uint16\_t s5 = numext::bit\_cast<numext::uint16\_t>(\mbox{\hyperlink{structEigen_1_1half}{Eigen::half}}(aux[5]));}
+\DoxyCodeLine{1188   \textcolor{keyword}{const} numext::uint16\_t s6 = numext::bit\_cast<numext::uint16\_t>(\mbox{\hyperlink{structEigen_1_1half}{Eigen::half}}(aux[6]));}
+\DoxyCodeLine{1189   \textcolor{keyword}{const} numext::uint16\_t s7 = numext::bit\_cast<numext::uint16\_t>(\mbox{\hyperlink{structEigen_1_1half}{Eigen::half}}(aux[7]));}
+\DoxyCodeLine{1190   \textcolor{keywordflow}{return} \_mm\_set\_epi16(s7, s6, s5, s4, s3, s2, s1, s0);}
+\DoxyCodeLine{1191 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{1192 \}}
+\DoxyCodeLine{1193 }
+\DoxyCodeLine{1194 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1195 EIGEN\_STRONG\_INLINE Packet8h pmin<Packet8h>(\textcolor{keyword}{const} Packet8h\& a,}
+\DoxyCodeLine{1196                                             \textcolor{keyword}{const} Packet8h\& b) \{}
+\DoxyCodeLine{1197   \textcolor{keywordflow}{return} float2half(pmin<Packet8f>(half2float(a), half2float(b)));}
+\DoxyCodeLine{1198 \}}
+\DoxyCodeLine{1199 }
+\DoxyCodeLine{1200 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1201 EIGEN\_STRONG\_INLINE Packet8h pmax<Packet8h>(\textcolor{keyword}{const} Packet8h\& a,}
+\DoxyCodeLine{1202                                             \textcolor{keyword}{const} Packet8h\& b) \{}
+\DoxyCodeLine{1203   \textcolor{keywordflow}{return} float2half(pmax<Packet8f>(half2float(a), half2float(b)));}
+\DoxyCodeLine{1204 \}}
+\DoxyCodeLine{1205 }
+\DoxyCodeLine{1206 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1207 EIGEN\_STRONG\_INLINE Packet8h plset<Packet8h>(\textcolor{keyword}{const} half\& a) \{}
+\DoxyCodeLine{1208   \textcolor{keywordflow}{return} float2half(plset<Packet8f>(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(a)));}
+\DoxyCodeLine{1209 \}}
+\DoxyCodeLine{1210 }
+\DoxyCodeLine{1211 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h por(\textcolor{keyword}{const} Packet8h\& a,\textcolor{keyword}{const} Packet8h\& b) \{}
+\DoxyCodeLine{1212   \textcolor{comment}{// in some cases Packet4i is a wrapper around \_\_m128i, so we either need to}}
+\DoxyCodeLine{1213   \textcolor{comment}{// cast to Packet4i to directly call the intrinsics as below:}}
+\DoxyCodeLine{1214   \textcolor{keywordflow}{return} \_mm\_or\_si128(a,b);}
+\DoxyCodeLine{1215 \}}
+\DoxyCodeLine{1216 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h pxor(\textcolor{keyword}{const} Packet8h\& a,\textcolor{keyword}{const} Packet8h\& b) \{}
+\DoxyCodeLine{1217   \textcolor{keywordflow}{return} \_mm\_xor\_si128(a,b);}
+\DoxyCodeLine{1218 \}}
+\DoxyCodeLine{1219 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h pand(\textcolor{keyword}{const} Packet8h\& a,\textcolor{keyword}{const} Packet8h\& b) \{}
+\DoxyCodeLine{1220   \textcolor{keywordflow}{return} \_mm\_and\_si128(a,b);}
+\DoxyCodeLine{1221 \}}
+\DoxyCodeLine{1222 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h pandnot(\textcolor{keyword}{const} Packet8h\& a,\textcolor{keyword}{const} Packet8h\& b) \{}
+\DoxyCodeLine{1223   \textcolor{keywordflow}{return} \_mm\_andnot\_si128(b,a);}
+\DoxyCodeLine{1224 \}}
+\DoxyCodeLine{1225 }
+\DoxyCodeLine{1226 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h pselect(\textcolor{keyword}{const} Packet8h\& mask, \textcolor{keyword}{const} Packet8h\& a, \textcolor{keyword}{const} Packet8h\& b) \{}
+\DoxyCodeLine{1227   \textcolor{keywordflow}{return} \_mm\_blendv\_epi8(b, a, mask);}
+\DoxyCodeLine{1228 \}}
+\DoxyCodeLine{1229 }
+\DoxyCodeLine{1230 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h pround<Packet8h>(\textcolor{keyword}{const} Packet8h\& a) \{}
+\DoxyCodeLine{1231   \textcolor{keywordflow}{return} float2half(pround<Packet8f>(half2float(a)));}
+\DoxyCodeLine{1232 \}}
+\DoxyCodeLine{1233 }
+\DoxyCodeLine{1234 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h print<Packet8h>(\textcolor{keyword}{const} Packet8h\& a) \{}
+\DoxyCodeLine{1235   \textcolor{keywordflow}{return} float2half(print<Packet8f>(half2float(a)));}
+\DoxyCodeLine{1236 \}}
+\DoxyCodeLine{1237 }
+\DoxyCodeLine{1238 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h pceil<Packet8h>(\textcolor{keyword}{const} Packet8h\& a) \{}
+\DoxyCodeLine{1239   \textcolor{keywordflow}{return} float2half(pceil<Packet8f>(half2float(a)));}
+\DoxyCodeLine{1240 \}}
+\DoxyCodeLine{1241 }
+\DoxyCodeLine{1242 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h pfloor<Packet8h>(\textcolor{keyword}{const} Packet8h\& a) \{}
+\DoxyCodeLine{1243   \textcolor{keywordflow}{return} float2half(pfloor<Packet8f>(half2float(a)));}
+\DoxyCodeLine{1244 \}}
+\DoxyCodeLine{1245 }
+\DoxyCodeLine{1246 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h pcmp\_eq(\textcolor{keyword}{const} Packet8h\& a,\textcolor{keyword}{const} Packet8h\& b) \{}
+\DoxyCodeLine{1247   \textcolor{keywordflow}{return} Pack16To8(pcmp\_eq(half2float(a), half2float(b)));}
+\DoxyCodeLine{1248 \}}
+\DoxyCodeLine{1249 }
+\DoxyCodeLine{1250 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h pcmp\_le(\textcolor{keyword}{const} Packet8h\& a,\textcolor{keyword}{const} Packet8h\& b) \{}
+\DoxyCodeLine{1251   \textcolor{keywordflow}{return} Pack16To8(pcmp\_le(half2float(a), half2float(b)));}
+\DoxyCodeLine{1252 \}}
+\DoxyCodeLine{1253 }
+\DoxyCodeLine{1254 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h pcmp\_lt(\textcolor{keyword}{const} Packet8h\& a,\textcolor{keyword}{const} Packet8h\& b) \{}
+\DoxyCodeLine{1255   \textcolor{keywordflow}{return} Pack16To8(pcmp\_lt(half2float(a), half2float(b)));}
+\DoxyCodeLine{1256 \}}
+\DoxyCodeLine{1257 }
+\DoxyCodeLine{1258 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h pcmp\_lt\_or\_nan(\textcolor{keyword}{const} Packet8h\& a,\textcolor{keyword}{const} Packet8h\& b) \{}
+\DoxyCodeLine{1259   \textcolor{keywordflow}{return} Pack16To8(pcmp\_lt\_or\_nan(half2float(a), half2float(b)));}
+\DoxyCodeLine{1260 \}}
+\DoxyCodeLine{1261 }
+\DoxyCodeLine{1262 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h pconj(\textcolor{keyword}{const} Packet8h\& a) \{ \textcolor{keywordflow}{return} a; \}}
+\DoxyCodeLine{1263 }
+\DoxyCodeLine{1264 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h pnegate(\textcolor{keyword}{const} Packet8h\& a) \{}
+\DoxyCodeLine{1265   Packet8h sign\_mask = \_mm\_set1\_epi16(\textcolor{keyword}{static\_cast<}numext::uint16\_t\textcolor{keyword}{>}(0x8000));}
+\DoxyCodeLine{1266   \textcolor{keywordflow}{return} \_mm\_xor\_si128(a, sign\_mask);}
+\DoxyCodeLine{1267 \}}
+\DoxyCodeLine{1268 }
+\DoxyCodeLine{1269 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h padd<Packet8h>(\textcolor{keyword}{const} Packet8h\& a, \textcolor{keyword}{const} Packet8h\& b) \{}
+\DoxyCodeLine{1270   Packet8f af = half2float(a);}
+\DoxyCodeLine{1271   Packet8f bf = half2float(b);}
+\DoxyCodeLine{1272   Packet8f rf = padd(af, bf);}
+\DoxyCodeLine{1273   \textcolor{keywordflow}{return} float2half(rf);}
+\DoxyCodeLine{1274 \}}
+\DoxyCodeLine{1275 }
+\DoxyCodeLine{1276 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h psub<Packet8h>(\textcolor{keyword}{const} Packet8h\& a, \textcolor{keyword}{const} Packet8h\& b) \{}
+\DoxyCodeLine{1277   Packet8f af = half2float(a);}
+\DoxyCodeLine{1278   Packet8f bf = half2float(b);}
+\DoxyCodeLine{1279   Packet8f rf = psub(af, bf);}
+\DoxyCodeLine{1280   \textcolor{keywordflow}{return} float2half(rf);}
+\DoxyCodeLine{1281 \}}
+\DoxyCodeLine{1282 }
+\DoxyCodeLine{1283 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h pmul<Packet8h>(\textcolor{keyword}{const} Packet8h\& a, \textcolor{keyword}{const} Packet8h\& b) \{}
+\DoxyCodeLine{1284   Packet8f af = half2float(a);}
+\DoxyCodeLine{1285   Packet8f bf = half2float(b);}
+\DoxyCodeLine{1286   Packet8f rf = pmul(af, bf);}
+\DoxyCodeLine{1287   \textcolor{keywordflow}{return} float2half(rf);}
+\DoxyCodeLine{1288 \}}
+\DoxyCodeLine{1289 }
+\DoxyCodeLine{1290 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h pdiv<Packet8h>(\textcolor{keyword}{const} Packet8h\& a, \textcolor{keyword}{const} Packet8h\& b) \{}
+\DoxyCodeLine{1291   Packet8f af = half2float(a);}
+\DoxyCodeLine{1292   Packet8f bf = half2float(b);}
+\DoxyCodeLine{1293   Packet8f rf = pdiv(af, bf);}
+\DoxyCodeLine{1294   \textcolor{keywordflow}{return} float2half(rf);}
+\DoxyCodeLine{1295 \}}
+\DoxyCodeLine{1296 }
+\DoxyCodeLine{1297 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h pgather<Eigen::half, Packet8h>(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}}* from, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride)}
+\DoxyCodeLine{1298 \{}
+\DoxyCodeLine{1299   \textcolor{keyword}{const} numext::uint16\_t s0 = numext::bit\_cast<numext::uint16\_t>(from[0*stride]);}
+\DoxyCodeLine{1300   \textcolor{keyword}{const} numext::uint16\_t s1 = numext::bit\_cast<numext::uint16\_t>(from[1*stride]);}
+\DoxyCodeLine{1301   \textcolor{keyword}{const} numext::uint16\_t s2 = numext::bit\_cast<numext::uint16\_t>(from[2*stride]);}
+\DoxyCodeLine{1302   \textcolor{keyword}{const} numext::uint16\_t s3 = numext::bit\_cast<numext::uint16\_t>(from[3*stride]);}
+\DoxyCodeLine{1303   \textcolor{keyword}{const} numext::uint16\_t s4 = numext::bit\_cast<numext::uint16\_t>(from[4*stride]);}
+\DoxyCodeLine{1304   \textcolor{keyword}{const} numext::uint16\_t s5 = numext::bit\_cast<numext::uint16\_t>(from[5*stride]);}
+\DoxyCodeLine{1305   \textcolor{keyword}{const} numext::uint16\_t s6 = numext::bit\_cast<numext::uint16\_t>(from[6*stride]);}
+\DoxyCodeLine{1306   \textcolor{keyword}{const} numext::uint16\_t s7 = numext::bit\_cast<numext::uint16\_t>(from[7*stride]);}
+\DoxyCodeLine{1307   \textcolor{keywordflow}{return} \_mm\_set\_epi16(s7, s6, s5, s4, s3, s2, s1, s0);}
+\DoxyCodeLine{1308 \}}
+\DoxyCodeLine{1309 }
+\DoxyCodeLine{1310 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pscatter<Eigen::half, Packet8h>(\mbox{\hyperlink{structEigen_1_1half}{Eigen::half}}* to, \textcolor{keyword}{const} Packet8h\& from, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride)}
+\DoxyCodeLine{1311 \{}
+\DoxyCodeLine{1312   EIGEN\_ALIGN32 \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}} aux[8];}
+\DoxyCodeLine{1313   pstore(aux, from);}
+\DoxyCodeLine{1314   to[stride*0] = aux[0];}
+\DoxyCodeLine{1315   to[stride*1] = aux[1];}
+\DoxyCodeLine{1316   to[stride*2] = aux[2];}
+\DoxyCodeLine{1317   to[stride*3] = aux[3];}
+\DoxyCodeLine{1318   to[stride*4] = aux[4];}
+\DoxyCodeLine{1319   to[stride*5] = aux[5];}
+\DoxyCodeLine{1320   to[stride*6] = aux[6];}
+\DoxyCodeLine{1321   to[stride*7] = aux[7];}
+\DoxyCodeLine{1322 \}}
+\DoxyCodeLine{1323 }
+\DoxyCodeLine{1324 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}} predux<Packet8h>(\textcolor{keyword}{const} Packet8h\& a) \{}
+\DoxyCodeLine{1325   Packet8f af = half2float(a);}
+\DoxyCodeLine{1326   \textcolor{keywordtype}{float} reduced = predux<Packet8f>(af);}
+\DoxyCodeLine{1327   \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}}(reduced);}
+\DoxyCodeLine{1328 \}}
+\DoxyCodeLine{1329 }
+\DoxyCodeLine{1330 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}} predux\_max<Packet8h>(\textcolor{keyword}{const} Packet8h\& a) \{}
+\DoxyCodeLine{1331   Packet8f af = half2float(a);}
+\DoxyCodeLine{1332   \textcolor{keywordtype}{float} reduced = predux\_max<Packet8f>(af);}
+\DoxyCodeLine{1333   \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}}(reduced);}
+\DoxyCodeLine{1334 \}}
+\DoxyCodeLine{1335 }
+\DoxyCodeLine{1336 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}} predux\_min<Packet8h>(\textcolor{keyword}{const} Packet8h\& a) \{}
+\DoxyCodeLine{1337   Packet8f af = half2float(a);}
+\DoxyCodeLine{1338   \textcolor{keywordtype}{float} reduced = predux\_min<Packet8f>(af);}
+\DoxyCodeLine{1339   \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}}(reduced);}
+\DoxyCodeLine{1340 \}}
+\DoxyCodeLine{1341 }
+\DoxyCodeLine{1342 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}} predux\_mul<Packet8h>(\textcolor{keyword}{const} Packet8h\& a) \{}
+\DoxyCodeLine{1343   Packet8f af = half2float(a);}
+\DoxyCodeLine{1344   \textcolor{keywordtype}{float} reduced = predux\_mul<Packet8f>(af);}
+\DoxyCodeLine{1345   \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}}(reduced);}
+\DoxyCodeLine{1346 \}}
+\DoxyCodeLine{1347 }
+\DoxyCodeLine{1348 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8h preverse(\textcolor{keyword}{const} Packet8h\& a)}
+\DoxyCodeLine{1349 \{}
+\DoxyCodeLine{1350   \_\_m128i m = \_mm\_setr\_epi8(14,15,12,13,10,11,8,9,6,7,4,5,2,3,0,1);}
+\DoxyCodeLine{1351   \textcolor{keywordflow}{return} \_mm\_shuffle\_epi8(a,m);}
+\DoxyCodeLine{1352 \}}
+\DoxyCodeLine{1353 }
+\DoxyCodeLine{1354 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void}}
+\DoxyCodeLine{1355 ptranspose(PacketBlock<Packet8h,8>\& kernel) \{}
+\DoxyCodeLine{1356   \_\_m128i a = kernel.packet[0];}
+\DoxyCodeLine{1357   \_\_m128i b = kernel.packet[1];}
+\DoxyCodeLine{1358   \_\_m128i c = kernel.packet[2];}
+\DoxyCodeLine{1359   \_\_m128i d = kernel.packet[3];}
+\DoxyCodeLine{1360   \_\_m128i e = kernel.packet[4];}
+\DoxyCodeLine{1361   \_\_m128i f = kernel.packet[5];}
+\DoxyCodeLine{1362   \_\_m128i g = kernel.packet[6];}
+\DoxyCodeLine{1363   \_\_m128i h = kernel.packet[7];}
+\DoxyCodeLine{1364 }
+\DoxyCodeLine{1365   \_\_m128i a03b03 = \_mm\_unpacklo\_epi16(a, b);}
+\DoxyCodeLine{1366   \_\_m128i c03d03 = \_mm\_unpacklo\_epi16(c, d);}
+\DoxyCodeLine{1367   \_\_m128i e03f03 = \_mm\_unpacklo\_epi16(e, f);}
+\DoxyCodeLine{1368   \_\_m128i g03h03 = \_mm\_unpacklo\_epi16(g, h);}
+\DoxyCodeLine{1369   \_\_m128i a47b47 = \_mm\_unpackhi\_epi16(a, b);}
+\DoxyCodeLine{1370   \_\_m128i c47d47 = \_mm\_unpackhi\_epi16(c, d);}
+\DoxyCodeLine{1371   \_\_m128i e47f47 = \_mm\_unpackhi\_epi16(e, f);}
+\DoxyCodeLine{1372   \_\_m128i g47h47 = \_mm\_unpackhi\_epi16(g, h);}
+\DoxyCodeLine{1373 }
+\DoxyCodeLine{1374   \_\_m128i a01b01c01d01 = \_mm\_unpacklo\_epi32(a03b03, c03d03);}
+\DoxyCodeLine{1375   \_\_m128i a23b23c23d23 = \_mm\_unpackhi\_epi32(a03b03, c03d03);}
+\DoxyCodeLine{1376   \_\_m128i e01f01g01h01 = \_mm\_unpacklo\_epi32(e03f03, g03h03);}
+\DoxyCodeLine{1377   \_\_m128i e23f23g23h23 = \_mm\_unpackhi\_epi32(e03f03, g03h03);}
+\DoxyCodeLine{1378   \_\_m128i a45b45c45d45 = \_mm\_unpacklo\_epi32(a47b47, c47d47);}
+\DoxyCodeLine{1379   \_\_m128i a67b67c67d67 = \_mm\_unpackhi\_epi32(a47b47, c47d47);}
+\DoxyCodeLine{1380   \_\_m128i e45f45g45h45 = \_mm\_unpacklo\_epi32(e47f47, g47h47);}
+\DoxyCodeLine{1381   \_\_m128i e67f67g67h67 = \_mm\_unpackhi\_epi32(e47f47, g47h47);}
+\DoxyCodeLine{1382 }
+\DoxyCodeLine{1383   \_\_m128i a0b0c0d0e0f0g0h0 = \_mm\_unpacklo\_epi64(a01b01c01d01, e01f01g01h01);}
+\DoxyCodeLine{1384   \_\_m128i a1b1c1d1e1f1g1h1 = \_mm\_unpackhi\_epi64(a01b01c01d01, e01f01g01h01);}
+\DoxyCodeLine{1385   \_\_m128i a2b2c2d2e2f2g2h2 = \_mm\_unpacklo\_epi64(a23b23c23d23, e23f23g23h23);}
+\DoxyCodeLine{1386   \_\_m128i a3b3c3d3e3f3g3h3 = \_mm\_unpackhi\_epi64(a23b23c23d23, e23f23g23h23);}
+\DoxyCodeLine{1387   \_\_m128i a4b4c4d4e4f4g4h4 = \_mm\_unpacklo\_epi64(a45b45c45d45, e45f45g45h45);}
+\DoxyCodeLine{1388   \_\_m128i a5b5c5d5e5f5g5h5 = \_mm\_unpackhi\_epi64(a45b45c45d45, e45f45g45h45);}
+\DoxyCodeLine{1389   \_\_m128i a6b6c6d6e6f6g6h6 = \_mm\_unpacklo\_epi64(a67b67c67d67, e67f67g67h67);}
+\DoxyCodeLine{1390   \_\_m128i a7b7c7d7e7f7g7h7 = \_mm\_unpackhi\_epi64(a67b67c67d67, e67f67g67h67);}
+\DoxyCodeLine{1391 }
+\DoxyCodeLine{1392   kernel.packet[0] = a0b0c0d0e0f0g0h0;}
+\DoxyCodeLine{1393   kernel.packet[1] = a1b1c1d1e1f1g1h1;}
+\DoxyCodeLine{1394   kernel.packet[2] = a2b2c2d2e2f2g2h2;}
+\DoxyCodeLine{1395   kernel.packet[3] = a3b3c3d3e3f3g3h3;}
+\DoxyCodeLine{1396   kernel.packet[4] = a4b4c4d4e4f4g4h4;}
+\DoxyCodeLine{1397   kernel.packet[5] = a5b5c5d5e5f5g5h5;}
+\DoxyCodeLine{1398   kernel.packet[6] = a6b6c6d6e6f6g6h6;}
+\DoxyCodeLine{1399   kernel.packet[7] = a7b7c7d7e7f7g7h7;}
+\DoxyCodeLine{1400 \}}
+\DoxyCodeLine{1401 }
+\DoxyCodeLine{1402 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void}}
+\DoxyCodeLine{1403 ptranspose(PacketBlock<Packet8h,4>\& kernel) \{}
+\DoxyCodeLine{1404   EIGEN\_ALIGN32 \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}} in[4][8];}
+\DoxyCodeLine{1405   pstore<Eigen::half>(in[0], kernel.packet[0]);}
+\DoxyCodeLine{1406   pstore<Eigen::half>(in[1], kernel.packet[1]);}
+\DoxyCodeLine{1407   pstore<Eigen::half>(in[2], kernel.packet[2]);}
+\DoxyCodeLine{1408   pstore<Eigen::half>(in[3], kernel.packet[3]);}
+\DoxyCodeLine{1409 }
+\DoxyCodeLine{1410   EIGEN\_ALIGN32 \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}} out[4][8];}
+\DoxyCodeLine{1411 }
+\DoxyCodeLine{1412   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 4; ++i) \{}
+\DoxyCodeLine{1413     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} j = 0; j < 4; ++j) \{}
+\DoxyCodeLine{1414       out[i][j] = in[j][2*i];}
+\DoxyCodeLine{1415     \}}
+\DoxyCodeLine{1416     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} j = 0; j < 4; ++j) \{}
+\DoxyCodeLine{1417       out[i][j+4] = in[j][2*i+1];}
+\DoxyCodeLine{1418     \}}
+\DoxyCodeLine{1419   \}}
+\DoxyCodeLine{1420 }
+\DoxyCodeLine{1421   kernel.packet[0] = pload<Packet8h>(out[0]);}
+\DoxyCodeLine{1422   kernel.packet[1] = pload<Packet8h>(out[1]);}
+\DoxyCodeLine{1423   kernel.packet[2] = pload<Packet8h>(out[2]);}
+\DoxyCodeLine{1424   kernel.packet[3] = pload<Packet8h>(out[3]);}
+\DoxyCodeLine{1425 \}}
+\DoxyCodeLine{1426 }
+\DoxyCodeLine{1427 \textcolor{comment}{// BFloat16 implementation.}}
+\DoxyCodeLine{1428 }
+\DoxyCodeLine{1429 EIGEN\_STRONG\_INLINE Packet8f Bf16ToF32(\textcolor{keyword}{const} Packet8bf\& a) \{}
+\DoxyCodeLine{1430 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{1431   \_\_m256i extend = \_mm256\_cvtepu16\_epi32(a);}
+\DoxyCodeLine{1432   \textcolor{keywordflow}{return} \_mm256\_castsi256\_ps(\_mm256\_slli\_epi32(extend, 16));}
+\DoxyCodeLine{1433 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{1434   \_\_m128i lo = \_mm\_cvtepu16\_epi32(a);}
+\DoxyCodeLine{1435   \_\_m128i hi = \_mm\_cvtepu16\_epi32(\_mm\_srli\_si128(a, 8));}
+\DoxyCodeLine{1436   \_\_m128i lo\_shift = \_mm\_slli\_epi32(lo, 16);}
+\DoxyCodeLine{1437   \_\_m128i hi\_shift = \_mm\_slli\_epi32(hi, 16);}
+\DoxyCodeLine{1438   \textcolor{keywordflow}{return} \_mm256\_castsi256\_ps(\_mm256\_insertf128\_si256(\_mm256\_castsi128\_si256(lo\_shift), hi\_shift, 1));}
+\DoxyCodeLine{1439 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{1440 \}}
+\DoxyCodeLine{1441 }
+\DoxyCodeLine{1442 \textcolor{comment}{// Convert float to bfloat16 according to round-\/to-\/nearest-\/even/denormals algorithm.}}
+\DoxyCodeLine{1443 EIGEN\_STRONG\_INLINE Packet8bf F32ToBf16(\textcolor{keyword}{const} Packet8f\& a) \{}
+\DoxyCodeLine{1444 }
+\DoxyCodeLine{1445   \_\_m256i input = \_mm256\_castps\_si256(a);}
+\DoxyCodeLine{1446 }
+\DoxyCodeLine{1447 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_AVX2}}
+\DoxyCodeLine{1448   \textcolor{comment}{// uint32\_t lsb = (input >> 16);}}
+\DoxyCodeLine{1449   \_\_m256i t = \_mm256\_srli\_epi32(input, 16);}
+\DoxyCodeLine{1450   \textcolor{comment}{// uint32\_t lsb = lsb \& 1;}}
+\DoxyCodeLine{1451   t = \_mm256\_and\_si256(t, \_mm256\_set1\_epi32(1));}
+\DoxyCodeLine{1452   \textcolor{comment}{// uint32\_t rounding\_bias = 0x7fff + lsb;}}
+\DoxyCodeLine{1453   t = \_mm256\_add\_epi32(t, \_mm256\_set1\_epi32(0x7fff));}
+\DoxyCodeLine{1454   \textcolor{comment}{// input += rounding\_bias;}}
+\DoxyCodeLine{1455   t = \_mm256\_add\_epi32(t, input);}
+\DoxyCodeLine{1456   \textcolor{comment}{// input = input >> 16;}}
+\DoxyCodeLine{1457   t = \_mm256\_srli\_epi32(t, 16);}
+\DoxyCodeLine{1458   \textcolor{comment}{// Check NaN before converting back to bf16}}
+\DoxyCodeLine{1459   \_\_m256 mask = \_mm256\_cmp\_ps(a, a, \_CMP\_ORD\_Q);}
+\DoxyCodeLine{1460   \_\_m256i nan = \_mm256\_set1\_epi32(0x7fc0);}
+\DoxyCodeLine{1461   t = \_mm256\_blendv\_epi8(nan, t, \_mm256\_castps\_si256(mask));}
+\DoxyCodeLine{1462   \textcolor{comment}{// output = numext::bit\_cast<uint16\_t>(input);}}
+\DoxyCodeLine{1463   \textcolor{keywordflow}{return} \_mm\_packus\_epi32(\_mm256\_extractf128\_si256(t, 0),}
+\DoxyCodeLine{1464                          \_mm256\_extractf128\_si256(t, 1));}
+\DoxyCodeLine{1465 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{1466   \textcolor{comment}{// uint32\_t lsb = (input >> 16);}}
+\DoxyCodeLine{1467   \_\_m128i lo = \_mm\_srli\_epi32(\_mm256\_extractf128\_si256(input, 0), 16);}
+\DoxyCodeLine{1468   \_\_m128i hi = \_mm\_srli\_epi32(\_mm256\_extractf128\_si256(input, 1), 16);}
+\DoxyCodeLine{1469   \textcolor{comment}{// uint32\_t lsb = lsb \& 1;}}
+\DoxyCodeLine{1470   lo = \_mm\_and\_si128(lo, \_mm\_set1\_epi32(1));}
+\DoxyCodeLine{1471   hi = \_mm\_and\_si128(hi, \_mm\_set1\_epi32(1));}
+\DoxyCodeLine{1472   \textcolor{comment}{// uint32\_t rounding\_bias = 0x7fff + lsb;}}
+\DoxyCodeLine{1473   lo = \_mm\_add\_epi32(lo, \_mm\_set1\_epi32(0x7fff));}
+\DoxyCodeLine{1474   hi = \_mm\_add\_epi32(hi, \_mm\_set1\_epi32(0x7fff));}
+\DoxyCodeLine{1475   \textcolor{comment}{// input += rounding\_bias;}}
+\DoxyCodeLine{1476   lo = \_mm\_add\_epi32(lo, \_mm256\_extractf128\_si256(input, 0));}
+\DoxyCodeLine{1477   hi = \_mm\_add\_epi32(hi, \_mm256\_extractf128\_si256(input, 1));}
+\DoxyCodeLine{1478   \textcolor{comment}{// input = input >> 16;}}
+\DoxyCodeLine{1479   lo = \_mm\_srli\_epi32(lo, 16);}
+\DoxyCodeLine{1480   hi = \_mm\_srli\_epi32(hi, 16);}
+\DoxyCodeLine{1481   \textcolor{comment}{// Check NaN before converting back to bf16}}
+\DoxyCodeLine{1482   \_\_m256 mask = \_mm256\_cmp\_ps(a, a, \_CMP\_ORD\_Q);}
+\DoxyCodeLine{1483   \_\_m128i nan = \_mm\_set1\_epi32(0x7fc0);}
+\DoxyCodeLine{1484   lo = \_mm\_blendv\_epi8(nan, lo, \_mm\_castps\_si128(\_mm256\_castps256\_ps128(mask)));}
+\DoxyCodeLine{1485   hi = \_mm\_blendv\_epi8(nan, hi, \_mm\_castps\_si128(\_mm256\_extractf128\_ps(mask, 1)));}
+\DoxyCodeLine{1486   \textcolor{comment}{// output = numext::bit\_cast<uint16\_t>(input);}}
+\DoxyCodeLine{1487   \textcolor{keywordflow}{return} \_mm\_packus\_epi32(lo, hi);}
+\DoxyCodeLine{1488 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{1489 \}}
+\DoxyCodeLine{1490 }
+\DoxyCodeLine{1491 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf pset1<Packet8bf>(\textcolor{keyword}{const} bfloat16\& from) \{}
+\DoxyCodeLine{1492   \textcolor{keywordflow}{return} \_mm\_set1\_epi16(numext::bit\_cast<numext::uint16\_t>(from));}
+\DoxyCodeLine{1493 \}}
+\DoxyCodeLine{1494 }
+\DoxyCodeLine{1495 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE bfloat16 pfirst<Packet8bf>(\textcolor{keyword}{const} Packet8bf\& from) \{}
+\DoxyCodeLine{1496   \textcolor{keywordflow}{return} numext::bit\_cast<bfloat16>(\textcolor{keyword}{static\_cast<}numext::uint16\_t\textcolor{keyword}{>}(\_mm\_extract\_epi16(from, 0)));}
+\DoxyCodeLine{1497 \}}
+\DoxyCodeLine{1498 }
+\DoxyCodeLine{1499 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf pload<Packet8bf>(\textcolor{keyword}{const} bfloat16* from) \{}
+\DoxyCodeLine{1500   \textcolor{keywordflow}{return} \_mm\_load\_si128(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const }\_\_m128i*\textcolor{keyword}{>}(from));}
+\DoxyCodeLine{1501 \}}
+\DoxyCodeLine{1502 }
+\DoxyCodeLine{1503 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf ploadu<Packet8bf>(\textcolor{keyword}{const} bfloat16* from) \{}
+\DoxyCodeLine{1504   \textcolor{keywordflow}{return} \_mm\_loadu\_si128(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const }\_\_m128i*\textcolor{keyword}{>}(from));}
+\DoxyCodeLine{1505 \}}
+\DoxyCodeLine{1506 }
+\DoxyCodeLine{1507 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pstore<bfloat16>(bfloat16* to, \textcolor{keyword}{const} Packet8bf\& from) \{}
+\DoxyCodeLine{1508   \_mm\_store\_si128(\textcolor{keyword}{reinterpret\_cast<}\_\_m128i*\textcolor{keyword}{>}(to), from);}
+\DoxyCodeLine{1509 \}}
+\DoxyCodeLine{1510 }
+\DoxyCodeLine{1511 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pstoreu<bfloat16>(bfloat16* to, \textcolor{keyword}{const} Packet8bf\& from) \{}
+\DoxyCodeLine{1512   \_mm\_storeu\_si128(\textcolor{keyword}{reinterpret\_cast<}\_\_m128i*\textcolor{keyword}{>}(to), from);}
+\DoxyCodeLine{1513 \}}
+\DoxyCodeLine{1514 }
+\DoxyCodeLine{1515 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf}
+\DoxyCodeLine{1516 ploaddup<Packet8bf>(\textcolor{keyword}{const} bfloat16* from) \{}
+\DoxyCodeLine{1517   \textcolor{keyword}{const} numext::uint16\_t a = numext::bit\_cast<numext::uint16\_t>(from[0]);}
+\DoxyCodeLine{1518   \textcolor{keyword}{const} numext::uint16\_t b = numext::bit\_cast<numext::uint16\_t>(from[1]);}
+\DoxyCodeLine{1519   \textcolor{keyword}{const} numext::uint16\_t c = numext::bit\_cast<numext::uint16\_t>(from[2]);}
+\DoxyCodeLine{1520   \textcolor{keyword}{const} numext::uint16\_t d = numext::bit\_cast<numext::uint16\_t>(from[3]);}
+\DoxyCodeLine{1521   \textcolor{keywordflow}{return} \_mm\_set\_epi16(d, d, c, c, b, b, a, a);}
+\DoxyCodeLine{1522 \}}
+\DoxyCodeLine{1523 }
+\DoxyCodeLine{1524 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf}
+\DoxyCodeLine{1525 ploadquad<Packet8bf>(\textcolor{keyword}{const} bfloat16* from) \{}
+\DoxyCodeLine{1526   \textcolor{keyword}{const} numext::uint16\_t a = numext::bit\_cast<numext::uint16\_t>(from[0]);}
+\DoxyCodeLine{1527   \textcolor{keyword}{const} numext::uint16\_t b = numext::bit\_cast<numext::uint16\_t>(from[1]);}
+\DoxyCodeLine{1528   \textcolor{keywordflow}{return} \_mm\_set\_epi16(b, b, b, b, a, a, a, a);}
+\DoxyCodeLine{1529 \}}
+\DoxyCodeLine{1530 }
+\DoxyCodeLine{1531 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf ptrue(\textcolor{keyword}{const} Packet8bf\& a) \{}
+\DoxyCodeLine{1532  \textcolor{keywordflow}{return} \_mm\_cmpeq\_epi32(a, a);}
+\DoxyCodeLine{1533 \}}
+\DoxyCodeLine{1534 }
+\DoxyCodeLine{1535 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1536 EIGEN\_STRONG\_INLINE Packet8bf pabs(\textcolor{keyword}{const} Packet8bf\& a) \{}
+\DoxyCodeLine{1537   \textcolor{keyword}{const} \_\_m128i sign\_mask = \_mm\_set1\_epi16(\textcolor{keyword}{static\_cast<}numext::uint16\_t\textcolor{keyword}{>}(0x8000));}
+\DoxyCodeLine{1538   \textcolor{keywordflow}{return} \_mm\_andnot\_si128(sign\_mask, a);}
+\DoxyCodeLine{1539 \}}
+\DoxyCodeLine{1540 }
+\DoxyCodeLine{1541 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1542 EIGEN\_STRONG\_INLINE Packet8bf pmin<Packet8bf>(\textcolor{keyword}{const} Packet8bf\& a,}
+\DoxyCodeLine{1543                                                 \textcolor{keyword}{const} Packet8bf\& b) \{}
+\DoxyCodeLine{1544   \textcolor{keywordflow}{return} F32ToBf16(pmin<Packet8f>(Bf16ToF32(a), Bf16ToF32(b)));}
+\DoxyCodeLine{1545 \}}
+\DoxyCodeLine{1546 }
+\DoxyCodeLine{1547 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1548 EIGEN\_STRONG\_INLINE Packet8bf pmax<Packet8bf>(\textcolor{keyword}{const} Packet8bf\& a,}
+\DoxyCodeLine{1549                                                 \textcolor{keyword}{const} Packet8bf\& b) \{}
+\DoxyCodeLine{1550   \textcolor{keywordflow}{return} F32ToBf16(pmax<Packet8f>(Bf16ToF32(a), Bf16ToF32(b)));}
+\DoxyCodeLine{1551 \}}
+\DoxyCodeLine{1552 }
+\DoxyCodeLine{1553 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1554 EIGEN\_STRONG\_INLINE Packet8bf plset<Packet8bf>(\textcolor{keyword}{const} bfloat16\& a) \{}
+\DoxyCodeLine{1555   \textcolor{keywordflow}{return} F32ToBf16(plset<Packet8f>(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(a)));}
+\DoxyCodeLine{1556 \}}
+\DoxyCodeLine{1557 }
+\DoxyCodeLine{1558 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf por(\textcolor{keyword}{const} Packet8bf\& a,\textcolor{keyword}{const} Packet8bf\& b) \{}
+\DoxyCodeLine{1559   \textcolor{keywordflow}{return} \_mm\_or\_si128(a,b);}
+\DoxyCodeLine{1560 \}}
+\DoxyCodeLine{1561 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf pxor(\textcolor{keyword}{const} Packet8bf\& a,\textcolor{keyword}{const} Packet8bf\& b) \{}
+\DoxyCodeLine{1562   \textcolor{keywordflow}{return} \_mm\_xor\_si128(a,b);}
+\DoxyCodeLine{1563 \}}
+\DoxyCodeLine{1564 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf pand(\textcolor{keyword}{const} Packet8bf\& a,\textcolor{keyword}{const} Packet8bf\& b) \{}
+\DoxyCodeLine{1565   \textcolor{keywordflow}{return} \_mm\_and\_si128(a,b);}
+\DoxyCodeLine{1566 \}}
+\DoxyCodeLine{1567 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf pandnot(\textcolor{keyword}{const} Packet8bf\& a,\textcolor{keyword}{const} Packet8bf\& b) \{}
+\DoxyCodeLine{1568   \textcolor{keywordflow}{return} \_mm\_andnot\_si128(b,a);}
+\DoxyCodeLine{1569 \}}
+\DoxyCodeLine{1570 }
+\DoxyCodeLine{1571 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf pselect(\textcolor{keyword}{const} Packet8bf\& mask, \textcolor{keyword}{const} Packet8bf\& a, \textcolor{keyword}{const} Packet8bf\& b) \{}
+\DoxyCodeLine{1572   \textcolor{keywordflow}{return} \_mm\_blendv\_epi8(b, a, mask);}
+\DoxyCodeLine{1573 \}}
+\DoxyCodeLine{1574 }
+\DoxyCodeLine{1575 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf pround<Packet8bf>(\textcolor{keyword}{const} Packet8bf\& a)}
+\DoxyCodeLine{1576 \{}
+\DoxyCodeLine{1577   \textcolor{keywordflow}{return} F32ToBf16(pround<Packet8f>(Bf16ToF32(a)));}
+\DoxyCodeLine{1578 \}}
+\DoxyCodeLine{1579 }
+\DoxyCodeLine{1580 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf print<Packet8bf>(\textcolor{keyword}{const} Packet8bf\& a) \{}
+\DoxyCodeLine{1581   \textcolor{keywordflow}{return} F32ToBf16(print<Packet8f>(Bf16ToF32(a)));}
+\DoxyCodeLine{1582 \}}
+\DoxyCodeLine{1583 }
+\DoxyCodeLine{1584 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf pceil<Packet8bf>(\textcolor{keyword}{const} Packet8bf\& a) \{}
+\DoxyCodeLine{1585   \textcolor{keywordflow}{return} F32ToBf16(pceil<Packet8f>(Bf16ToF32(a)));}
+\DoxyCodeLine{1586 \}}
+\DoxyCodeLine{1587 }
+\DoxyCodeLine{1588 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf pfloor<Packet8bf>(\textcolor{keyword}{const} Packet8bf\& a) \{}
+\DoxyCodeLine{1589   \textcolor{keywordflow}{return} F32ToBf16(pfloor<Packet8f>(Bf16ToF32(a)));}
+\DoxyCodeLine{1590 \}}
+\DoxyCodeLine{1591 }
+\DoxyCodeLine{1592 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf pcmp\_eq(\textcolor{keyword}{const} Packet8bf\& a,\textcolor{keyword}{const} Packet8bf\& b) \{}
+\DoxyCodeLine{1593   \textcolor{keywordflow}{return} Pack16To8(pcmp\_eq(Bf16ToF32(a), Bf16ToF32(b)));}
+\DoxyCodeLine{1594 \}}
+\DoxyCodeLine{1595 }
+\DoxyCodeLine{1596 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf pcmp\_le(\textcolor{keyword}{const} Packet8bf\& a,\textcolor{keyword}{const} Packet8bf\& b) \{}
+\DoxyCodeLine{1597   \textcolor{keywordflow}{return} Pack16To8(pcmp\_le(Bf16ToF32(a), Bf16ToF32(b)));}
+\DoxyCodeLine{1598 \}}
+\DoxyCodeLine{1599 }
+\DoxyCodeLine{1600 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf pcmp\_lt(\textcolor{keyword}{const} Packet8bf\& a,\textcolor{keyword}{const} Packet8bf\& b) \{}
+\DoxyCodeLine{1601   \textcolor{keywordflow}{return} Pack16To8(pcmp\_lt(Bf16ToF32(a), Bf16ToF32(b)));}
+\DoxyCodeLine{1602 \}}
+\DoxyCodeLine{1603 }
+\DoxyCodeLine{1604 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf pcmp\_lt\_or\_nan(\textcolor{keyword}{const} Packet8bf\& a,\textcolor{keyword}{const} Packet8bf\& b) \{}
+\DoxyCodeLine{1605   \textcolor{keywordflow}{return} Pack16To8(pcmp\_lt\_or\_nan(Bf16ToF32(a), Bf16ToF32(b)));}
+\DoxyCodeLine{1606 \}}
+\DoxyCodeLine{1607 }
+\DoxyCodeLine{1608 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf pconj(\textcolor{keyword}{const} Packet8bf\& a) \{ \textcolor{keywordflow}{return} a; \}}
+\DoxyCodeLine{1609 }
+\DoxyCodeLine{1610 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf pnegate(\textcolor{keyword}{const} Packet8bf\& a) \{}
+\DoxyCodeLine{1611   Packet8bf sign\_mask = \_mm\_set1\_epi16(\textcolor{keyword}{static\_cast<}numext::uint16\_t\textcolor{keyword}{>}(0x8000));}
+\DoxyCodeLine{1612   \textcolor{keywordflow}{return} \_mm\_xor\_si128(a, sign\_mask);}
+\DoxyCodeLine{1613 \}}
+\DoxyCodeLine{1614 }
+\DoxyCodeLine{1615 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf padd<Packet8bf>(\textcolor{keyword}{const} Packet8bf\& a, \textcolor{keyword}{const} Packet8bf\& b) \{}
+\DoxyCodeLine{1616   \textcolor{keywordflow}{return} F32ToBf16(padd<Packet8f>(Bf16ToF32(a), Bf16ToF32(b)));}
+\DoxyCodeLine{1617 \}}
+\DoxyCodeLine{1618 }
+\DoxyCodeLine{1619 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf psub<Packet8bf>(\textcolor{keyword}{const} Packet8bf\& a, \textcolor{keyword}{const} Packet8bf\& b) \{}
+\DoxyCodeLine{1620   \textcolor{keywordflow}{return} F32ToBf16(psub<Packet8f>(Bf16ToF32(a), Bf16ToF32(b)));}
+\DoxyCodeLine{1621 \}}
+\DoxyCodeLine{1622 }
+\DoxyCodeLine{1623 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf pmul<Packet8bf>(\textcolor{keyword}{const} Packet8bf\& a, \textcolor{keyword}{const} Packet8bf\& b) \{}
+\DoxyCodeLine{1624   \textcolor{keywordflow}{return} F32ToBf16(pmul<Packet8f>(Bf16ToF32(a), Bf16ToF32(b)));}
+\DoxyCodeLine{1625 \}}
+\DoxyCodeLine{1626 }
+\DoxyCodeLine{1627 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf pdiv<Packet8bf>(\textcolor{keyword}{const} Packet8bf\& a, \textcolor{keyword}{const} Packet8bf\& b) \{}
+\DoxyCodeLine{1628   \textcolor{keywordflow}{return} F32ToBf16(pdiv<Packet8f>(Bf16ToF32(a), Bf16ToF32(b)));}
+\DoxyCodeLine{1629 \}}
+\DoxyCodeLine{1630 }
+\DoxyCodeLine{1631 }
+\DoxyCodeLine{1632 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf pgather<bfloat16, Packet8bf>(\textcolor{keyword}{const} bfloat16* from, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride)}
+\DoxyCodeLine{1633 \{}
+\DoxyCodeLine{1634   \textcolor{keyword}{const} numext::uint16\_t s0 = numext::bit\_cast<numext::uint16\_t>(from[0*stride]);}
+\DoxyCodeLine{1635   \textcolor{keyword}{const} numext::uint16\_t s1 = numext::bit\_cast<numext::uint16\_t>(from[1*stride]);}
+\DoxyCodeLine{1636   \textcolor{keyword}{const} numext::uint16\_t s2 = numext::bit\_cast<numext::uint16\_t>(from[2*stride]);}
+\DoxyCodeLine{1637   \textcolor{keyword}{const} numext::uint16\_t s3 = numext::bit\_cast<numext::uint16\_t>(from[3*stride]);}
+\DoxyCodeLine{1638   \textcolor{keyword}{const} numext::uint16\_t s4 = numext::bit\_cast<numext::uint16\_t>(from[4*stride]);}
+\DoxyCodeLine{1639   \textcolor{keyword}{const} numext::uint16\_t s5 = numext::bit\_cast<numext::uint16\_t>(from[5*stride]);}
+\DoxyCodeLine{1640   \textcolor{keyword}{const} numext::uint16\_t s6 = numext::bit\_cast<numext::uint16\_t>(from[6*stride]);}
+\DoxyCodeLine{1641   \textcolor{keyword}{const} numext::uint16\_t s7 = numext::bit\_cast<numext::uint16\_t>(from[7*stride]);}
+\DoxyCodeLine{1642   \textcolor{keywordflow}{return} \_mm\_set\_epi16(s7, s6, s5, s4, s3, s2, s1, s0);}
+\DoxyCodeLine{1643 \}}
+\DoxyCodeLine{1644 }
+\DoxyCodeLine{1645 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pscatter<bfloat16, Packet8bf>(bfloat16* to, \textcolor{keyword}{const} Packet8bf\& from, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride)}
+\DoxyCodeLine{1646 \{}
+\DoxyCodeLine{1647   EIGEN\_ALIGN32 bfloat16 aux[8];}
+\DoxyCodeLine{1648   pstore(aux, from);}
+\DoxyCodeLine{1649   to[stride*0] = aux[0];}
+\DoxyCodeLine{1650   to[stride*1] = aux[1];}
+\DoxyCodeLine{1651   to[stride*2] = aux[2];}
+\DoxyCodeLine{1652   to[stride*3] = aux[3];}
+\DoxyCodeLine{1653   to[stride*4] = aux[4];}
+\DoxyCodeLine{1654   to[stride*5] = aux[5];}
+\DoxyCodeLine{1655   to[stride*6] = aux[6];}
+\DoxyCodeLine{1656   to[stride*7] = aux[7];}
+\DoxyCodeLine{1657 \}}
+\DoxyCodeLine{1658 }
+\DoxyCodeLine{1659 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE bfloat16 predux<Packet8bf>(\textcolor{keyword}{const} Packet8bf\& a) \{}
+\DoxyCodeLine{1660   \textcolor{keywordflow}{return} \textcolor{keyword}{static\_cast<}bfloat16\textcolor{keyword}{>}(predux<Packet8f>(Bf16ToF32(a)));}
+\DoxyCodeLine{1661 \}}
+\DoxyCodeLine{1662 }
+\DoxyCodeLine{1663 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE bfloat16 predux\_max<Packet8bf>(\textcolor{keyword}{const} Packet8bf\& a) \{}
+\DoxyCodeLine{1664   \textcolor{keywordflow}{return} \textcolor{keyword}{static\_cast<}bfloat16\textcolor{keyword}{>}(predux\_max<Packet8f>(Bf16ToF32(a)));}
+\DoxyCodeLine{1665 \}}
+\DoxyCodeLine{1666 }
+\DoxyCodeLine{1667 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE bfloat16 predux\_min<Packet8bf>(\textcolor{keyword}{const} Packet8bf\& a) \{}
+\DoxyCodeLine{1668   \textcolor{keywordflow}{return} \textcolor{keyword}{static\_cast<}bfloat16\textcolor{keyword}{>}(predux\_min<Packet8f>(Bf16ToF32(a)));}
+\DoxyCodeLine{1669 \}}
+\DoxyCodeLine{1670 }
+\DoxyCodeLine{1671 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE bfloat16 predux\_mul<Packet8bf>(\textcolor{keyword}{const} Packet8bf\& a) \{}
+\DoxyCodeLine{1672   \textcolor{keywordflow}{return} \textcolor{keyword}{static\_cast<}bfloat16\textcolor{keyword}{>}(predux\_mul<Packet8f>(Bf16ToF32(a)));}
+\DoxyCodeLine{1673 \}}
+\DoxyCodeLine{1674 }
+\DoxyCodeLine{1675 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet8bf preverse(\textcolor{keyword}{const} Packet8bf\& a)}
+\DoxyCodeLine{1676 \{}
+\DoxyCodeLine{1677   \_\_m128i m = \_mm\_setr\_epi8(14,15,12,13,10,11,8,9,6,7,4,5,2,3,0,1);}
+\DoxyCodeLine{1678   \textcolor{keywordflow}{return} \_mm\_shuffle\_epi8(a,m);}
+\DoxyCodeLine{1679 \}}
+\DoxyCodeLine{1680 }
+\DoxyCodeLine{1681 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void}}
+\DoxyCodeLine{1682 ptranspose(PacketBlock<Packet8bf,8>\& kernel) \{}
+\DoxyCodeLine{1683   \_\_m128i a = kernel.packet[0];}
+\DoxyCodeLine{1684   \_\_m128i b = kernel.packet[1];}
+\DoxyCodeLine{1685   \_\_m128i c = kernel.packet[2];}
+\DoxyCodeLine{1686   \_\_m128i d = kernel.packet[3];}
+\DoxyCodeLine{1687   \_\_m128i e = kernel.packet[4];}
+\DoxyCodeLine{1688   \_\_m128i f = kernel.packet[5];}
+\DoxyCodeLine{1689   \_\_m128i g = kernel.packet[6];}
+\DoxyCodeLine{1690   \_\_m128i h = kernel.packet[7];}
+\DoxyCodeLine{1691 }
+\DoxyCodeLine{1692   \_\_m128i a03b03 = \_mm\_unpacklo\_epi16(a, b);}
+\DoxyCodeLine{1693   \_\_m128i c03d03 = \_mm\_unpacklo\_epi16(c, d);}
+\DoxyCodeLine{1694   \_\_m128i e03f03 = \_mm\_unpacklo\_epi16(e, f);}
+\DoxyCodeLine{1695   \_\_m128i g03h03 = \_mm\_unpacklo\_epi16(g, h);}
+\DoxyCodeLine{1696   \_\_m128i a47b47 = \_mm\_unpackhi\_epi16(a, b);}
+\DoxyCodeLine{1697   \_\_m128i c47d47 = \_mm\_unpackhi\_epi16(c, d);}
+\DoxyCodeLine{1698   \_\_m128i e47f47 = \_mm\_unpackhi\_epi16(e, f);}
+\DoxyCodeLine{1699   \_\_m128i g47h47 = \_mm\_unpackhi\_epi16(g, h);}
+\DoxyCodeLine{1700 }
+\DoxyCodeLine{1701   \_\_m128i a01b01c01d01 = \_mm\_unpacklo\_epi32(a03b03, c03d03);}
+\DoxyCodeLine{1702   \_\_m128i a23b23c23d23 = \_mm\_unpackhi\_epi32(a03b03, c03d03);}
+\DoxyCodeLine{1703   \_\_m128i e01f01g01h01 = \_mm\_unpacklo\_epi32(e03f03, g03h03);}
+\DoxyCodeLine{1704   \_\_m128i e23f23g23h23 = \_mm\_unpackhi\_epi32(e03f03, g03h03);}
+\DoxyCodeLine{1705   \_\_m128i a45b45c45d45 = \_mm\_unpacklo\_epi32(a47b47, c47d47);}
+\DoxyCodeLine{1706   \_\_m128i a67b67c67d67 = \_mm\_unpackhi\_epi32(a47b47, c47d47);}
+\DoxyCodeLine{1707   \_\_m128i e45f45g45h45 = \_mm\_unpacklo\_epi32(e47f47, g47h47);}
+\DoxyCodeLine{1708   \_\_m128i e67f67g67h67 = \_mm\_unpackhi\_epi32(e47f47, g47h47);}
+\DoxyCodeLine{1709 }
+\DoxyCodeLine{1710   kernel.packet[0] = \_mm\_unpacklo\_epi64(a01b01c01d01, e01f01g01h01);}
+\DoxyCodeLine{1711   kernel.packet[1] = \_mm\_unpackhi\_epi64(a01b01c01d01, e01f01g01h01);}
+\DoxyCodeLine{1712   kernel.packet[2] = \_mm\_unpacklo\_epi64(a23b23c23d23, e23f23g23h23);}
+\DoxyCodeLine{1713   kernel.packet[3] = \_mm\_unpackhi\_epi64(a23b23c23d23, e23f23g23h23);}
+\DoxyCodeLine{1714   kernel.packet[4] = \_mm\_unpacklo\_epi64(a45b45c45d45, e45f45g45h45);}
+\DoxyCodeLine{1715   kernel.packet[5] = \_mm\_unpackhi\_epi64(a45b45c45d45, e45f45g45h45);}
+\DoxyCodeLine{1716   kernel.packet[6] = \_mm\_unpacklo\_epi64(a67b67c67d67, e67f67g67h67);}
+\DoxyCodeLine{1717   kernel.packet[7] = \_mm\_unpackhi\_epi64(a67b67c67d67, e67f67g67h67);}
+\DoxyCodeLine{1718 \}}
+\DoxyCodeLine{1719 }
+\DoxyCodeLine{1720 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void}}
+\DoxyCodeLine{1721 ptranspose(PacketBlock<Packet8bf,4>\& kernel) \{}
+\DoxyCodeLine{1722   \_\_m128i a = kernel.packet[0];}
+\DoxyCodeLine{1723   \_\_m128i b = kernel.packet[1];}
+\DoxyCodeLine{1724   \_\_m128i c = kernel.packet[2];}
+\DoxyCodeLine{1725   \_\_m128i d = kernel.packet[3];}
+\DoxyCodeLine{1726 }
+\DoxyCodeLine{1727   \_\_m128i ab\_03 = \_mm\_unpacklo\_epi16(a, b);}
+\DoxyCodeLine{1728   \_\_m128i cd\_03 = \_mm\_unpacklo\_epi16(c, d);}
+\DoxyCodeLine{1729   \_\_m128i ab\_47 = \_mm\_unpackhi\_epi16(a, b);}
+\DoxyCodeLine{1730   \_\_m128i cd\_47 = \_mm\_unpackhi\_epi16(c, d);}
+\DoxyCodeLine{1731 }
+\DoxyCodeLine{1732   kernel.packet[0] = \_mm\_unpacklo\_epi32(ab\_03, cd\_03);}
+\DoxyCodeLine{1733   kernel.packet[1] = \_mm\_unpackhi\_epi32(ab\_03, cd\_03);}
+\DoxyCodeLine{1734   kernel.packet[2] = \_mm\_unpacklo\_epi32(ab\_47, cd\_47);}
+\DoxyCodeLine{1735   kernel.packet[3] = \_mm\_unpackhi\_epi32(ab\_47, cd\_47);}
+\DoxyCodeLine{1736 \}}
+\DoxyCodeLine{1737 }
+\DoxyCodeLine{1738 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{1739 }
+\DoxyCodeLine{1740 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{1741 }
+\DoxyCodeLine{1742 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_PACKET\_MATH\_AVX\_H}}
+
+\end{DoxyCode}

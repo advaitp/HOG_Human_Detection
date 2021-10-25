@@ -1,0 +1,78 @@
+\hypertarget{SparseLU__Utils_8h_source}{}\doxysection{Sparse\+LU\+\_\+\+Utils.\+h}
+\label{SparseLU__Utils_8h_source}\index{include/Eigen/src/SparseLU/SparseLU\_Utils.h@{include/Eigen/src/SparseLU/SparseLU\_Utils.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2012 Désiré Nuentsa-\/Wakam <desire.nuentsa\_wakam@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_SPARSELU\_UTILS\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_SPARSELU\_UTILS\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{22 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} StorageIndex>}
+\DoxyCodeLine{23 \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1internal_1_1SparseLUImpl_acbede3f259186d48ad42ca093f80b64b}{SparseLUImpl<Scalar,StorageIndex>::countnz}}(\textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} n, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}\& nnzL, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}\& nnzU, \mbox{\hyperlink{structEigen_1_1internal_1_1LU__GlobalLU__t}{GlobalLU\_t}}\& glu)}
+\DoxyCodeLine{24 \{}
+\DoxyCodeLine{25  nnzL = 0; }
+\DoxyCodeLine{26  nnzU = (glu.xusub)(n); }
+\DoxyCodeLine{27  \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nsuper = (glu.supno)(n); }
+\DoxyCodeLine{28  \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} jlen; }
+\DoxyCodeLine{29  \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i, j, fsupc;}
+\DoxyCodeLine{30  \textcolor{keywordflow}{if} (n <= 0 ) \textcolor{keywordflow}{return}; }
+\DoxyCodeLine{31  \textcolor{comment}{// For each supernode}}
+\DoxyCodeLine{32  \textcolor{keywordflow}{for} (i = 0; i <= nsuper; i++)}
+\DoxyCodeLine{33  \{}
+\DoxyCodeLine{34    fsupc = glu.xsup(i); }
+\DoxyCodeLine{35    jlen = glu.xlsub(fsupc+1) -\/ glu.xlsub(fsupc); }
+\DoxyCodeLine{36    }
+\DoxyCodeLine{37    \textcolor{keywordflow}{for} (j = fsupc; j < glu.xsup(i+1); j++)}
+\DoxyCodeLine{38    \{}
+\DoxyCodeLine{39      nnzL += jlen; }
+\DoxyCodeLine{40      nnzU += j -\/ fsupc + 1; }
+\DoxyCodeLine{41      jlen-\/-\/; }
+\DoxyCodeLine{42    \}}
+\DoxyCodeLine{43  \}}
+\DoxyCodeLine{44 \}}
+\DoxyCodeLine{45 }
+\DoxyCodeLine{53 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} StorageIndex>}
+\DoxyCodeLine{54 \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1internal_1_1SparseLUImpl_ae1d1ed091956ff4e5734b4e3f79f866e}{SparseLUImpl<Scalar,StorageIndex>::fixupL}}(\textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} n, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}}\& perm\_r, \mbox{\hyperlink{structEigen_1_1internal_1_1LU__GlobalLU__t}{GlobalLU\_t}}\& glu)}
+\DoxyCodeLine{55 \{}
+\DoxyCodeLine{56   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} fsupc, i, j, k, jstart; }
+\DoxyCodeLine{57   }
+\DoxyCodeLine{58   StorageIndex nextl = 0; }
+\DoxyCodeLine{59   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nsuper = (glu.supno)(n); }
+\DoxyCodeLine{60   }
+\DoxyCodeLine{61   \textcolor{comment}{// For each supernode }}
+\DoxyCodeLine{62   \textcolor{keywordflow}{for} (i = 0; i <= nsuper; i++)}
+\DoxyCodeLine{63   \{}
+\DoxyCodeLine{64     fsupc = glu.xsup(i); }
+\DoxyCodeLine{65     jstart = glu.xlsub(fsupc); }
+\DoxyCodeLine{66     glu.xlsub(fsupc) = nextl; }
+\DoxyCodeLine{67     \textcolor{keywordflow}{for} (j = jstart; j < glu.xlsub(fsupc + 1); j++)}
+\DoxyCodeLine{68     \{}
+\DoxyCodeLine{69       glu.lsub(nextl) = perm\_r(glu.lsub(j)); \textcolor{comment}{// Now indexed into P*A}}
+\DoxyCodeLine{70       nextl++;}
+\DoxyCodeLine{71     \}}
+\DoxyCodeLine{72     \textcolor{keywordflow}{for} (k = fsupc+1; k < glu.xsup(i+1); k++)}
+\DoxyCodeLine{73       glu.xlsub(k) = nextl; \textcolor{comment}{// other columns in supernode i}}
+\DoxyCodeLine{74   \}}
+\DoxyCodeLine{75   }
+\DoxyCodeLine{76   glu.xlsub(n) = nextl; }
+\DoxyCodeLine{77 \}}
+\DoxyCodeLine{78 }
+\DoxyCodeLine{79 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{80 }
+\DoxyCodeLine{81 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{82 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_SPARSELU\_UTILS\_H}}
+
+\end{DoxyCode}

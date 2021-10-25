@@ -1,0 +1,240 @@
+\hypertarget{InteropHeaders_8h_source}{}\doxysection{Interop\+Headers.\+h}
+\label{InteropHeaders_8h_source}\index{include/Eigen/src/Core/arch/SYCL/InteropHeaders.h@{include/Eigen/src/Core/arch/SYCL/InteropHeaders.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Mehdi Goli    Codeplay Software Ltd.}}
+\DoxyCodeLine{5 \textcolor{comment}{// Ralph Potter  Codeplay Software Ltd.}}
+\DoxyCodeLine{6 \textcolor{comment}{// Luke Iwanski  Codeplay Software Ltd.}}
+\DoxyCodeLine{7 \textcolor{comment}{// Contact: <eigen@codeplay.com>}}
+\DoxyCodeLine{8 \textcolor{comment}{//}}
+\DoxyCodeLine{9 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{10 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{11 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{comment}{/*****************************************************************}}
+\DoxyCodeLine{14 \textcolor{comment}{ * InteropHeaders.h}}
+\DoxyCodeLine{15 \textcolor{comment}{ *}}
+\DoxyCodeLine{16 \textcolor{comment}{ * \(\backslash\)brief:}}
+\DoxyCodeLine{17 \textcolor{comment}{ *  InteropHeaders}}
+\DoxyCodeLine{18 \textcolor{comment}{ *}}
+\DoxyCodeLine{19 \textcolor{comment}{ *****************************************************************/}}
+\DoxyCodeLine{20 }
+\DoxyCodeLine{21 \textcolor{preprocessor}{\#ifndef EIGEN\_INTEROP\_HEADERS\_SYCL\_H}}
+\DoxyCodeLine{22 \textcolor{preprocessor}{\#define EIGEN\_INTEROP\_HEADERS\_SYCL\_H}}
+\DoxyCodeLine{23 }
+\DoxyCodeLine{24 \textcolor{preprocessor}{\#include "{}../../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{25 }
+\DoxyCodeLine{26 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{27 }
+\DoxyCodeLine{28 \textcolor{preprocessor}{\#if !defined(EIGEN\_DONT\_VECTORIZE\_SYCL)}}
+\DoxyCodeLine{29 }
+\DoxyCodeLine{30 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{31 }
+\DoxyCodeLine{32 \textcolor{keyword}{template} <\textcolor{keywordtype}{int} has\_blend, \textcolor{keywordtype}{int} lengths>}
+\DoxyCodeLine{33 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1sycl__packet__traits}{sycl\_packet\_traits}} : \mbox{\hyperlink{structEigen_1_1internal_1_1default__packet__traits}{default\_packet\_traits}} \{}
+\DoxyCodeLine{34   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{35     Vectorizable = 1,}
+\DoxyCodeLine{36     AlignedOnScalar = 1,}
+\DoxyCodeLine{37     size = lengths,}
+\DoxyCodeLine{38     HasHalfPacket = 0,}
+\DoxyCodeLine{39     HasDiv = 1,}
+\DoxyCodeLine{40     HasLog = 1,}
+\DoxyCodeLine{41     HasExp = 1,}
+\DoxyCodeLine{42     HasSqrt = 1,}
+\DoxyCodeLine{43     HasRsqrt = 1,}
+\DoxyCodeLine{44     HasSin = 1,}
+\DoxyCodeLine{45     HasCos = 1,}
+\DoxyCodeLine{46     HasTan = 1,}
+\DoxyCodeLine{47     HasASin = 1,}
+\DoxyCodeLine{48     HasACos = 1,}
+\DoxyCodeLine{49     HasATan = 1,}
+\DoxyCodeLine{50     HasSinh = 1,}
+\DoxyCodeLine{51     HasCosh = 1,}
+\DoxyCodeLine{52     HasTanh = 1,}
+\DoxyCodeLine{53     HasLGamma = 0,}
+\DoxyCodeLine{54     HasDiGamma = 0,}
+\DoxyCodeLine{55     HasZeta = 0,}
+\DoxyCodeLine{56     HasPolygamma = 0,}
+\DoxyCodeLine{57     HasErf = 0,}
+\DoxyCodeLine{58     HasErfc = 0,}
+\DoxyCodeLine{59     HasNdtri = 0,}
+\DoxyCodeLine{60     HasIGamma = 0,}
+\DoxyCodeLine{61     HasIGammac = 0,}
+\DoxyCodeLine{62     HasBetaInc = 0,}
+\DoxyCodeLine{63     HasBlend = has\_blend,}
+\DoxyCodeLine{64     \textcolor{comment}{// This flag is used to indicate whether packet comparison is supported.}}
+\DoxyCodeLine{65     \textcolor{comment}{// pcmp\_eq, pcmp\_lt and pcmp\_le should be defined for it to be true.}}
+\DoxyCodeLine{66     HasCmp = 1,}
+\DoxyCodeLine{67     HasMax = 1,}
+\DoxyCodeLine{68     HasMin = 1,}
+\DoxyCodeLine{69     HasMul = 1,}
+\DoxyCodeLine{70     HasAdd = 1,}
+\DoxyCodeLine{71     HasFloor = 1,}
+\DoxyCodeLine{72     HasRound = 1,}
+\DoxyCodeLine{73     HasRint = 1,}
+\DoxyCodeLine{74     HasLog1p = 1,}
+\DoxyCodeLine{75     HasExpm1 = 1,}
+\DoxyCodeLine{76     HasCeil = 1,}
+\DoxyCodeLine{77   \};}
+\DoxyCodeLine{78 \};}
+\DoxyCodeLine{79 }
+\DoxyCodeLine{80 \textcolor{preprocessor}{\#ifdef SYCL\_DEVICE\_ONLY}}
+\DoxyCodeLine{81 \textcolor{preprocessor}{\#define SYCL\_PACKET\_TRAITS(packet\_type, has\_blend, unpacket\_type, lengths) \(\backslash\)}}
+\DoxyCodeLine{82 \textcolor{preprocessor}{  template <>                                                              \(\backslash\)}}
+\DoxyCodeLine{83 \textcolor{preprocessor}{  struct packet\_traits<unpacket\_type>                                      \(\backslash\)}}
+\DoxyCodeLine{84 \textcolor{preprocessor}{      : sycl\_packet\_traits<has\_blend, lengths> \{                           \(\backslash\)}}
+\DoxyCodeLine{85 \textcolor{preprocessor}{    typedef packet\_type type;                                              \(\backslash\)}}
+\DoxyCodeLine{86 \textcolor{preprocessor}{    typedef packet\_type half;                                              \(\backslash\)}}
+\DoxyCodeLine{87 \textcolor{preprocessor}{  \};}}
+\DoxyCodeLine{88 }
+\DoxyCodeLine{89 SYCL\_PACKET\_TRAITS(cl::sycl::cl\_float4, 1, \textcolor{keywordtype}{float}, 4)}
+\DoxyCodeLine{90 SYCL\_PACKET\_TRAITS(cl::sycl::cl\_float4, 1, const \textcolor{keywordtype}{float}, 4)}
+\DoxyCodeLine{91 SYCL\_PACKET\_TRAITS(cl::sycl::cl\_double2, 0, \textcolor{keywordtype}{double}, 2)}
+\DoxyCodeLine{92 SYCL\_PACKET\_TRAITS(cl::sycl::cl\_double2, 0, const \textcolor{keywordtype}{double}, 2)}
+\DoxyCodeLine{93 \textcolor{preprocessor}{\#undef SYCL\_PACKET\_TRAITS}}
+\DoxyCodeLine{94 }
+\DoxyCodeLine{95 \textcolor{comment}{// Make sure this is only available when targeting a GPU: we don't want to}}
+\DoxyCodeLine{96 \textcolor{comment}{// introduce conflicts between these packet\_traits definitions and the ones}}
+\DoxyCodeLine{97 \textcolor{comment}{// we'll use on the host side (SSE, AVX, ...)}}
+\DoxyCodeLine{98 \textcolor{preprocessor}{\#define SYCL\_ARITHMETIC(packet\_type)  \(\backslash\)}}
+\DoxyCodeLine{99 \textcolor{preprocessor}{  template <>                         \(\backslash\)}}
+\DoxyCodeLine{100 \textcolor{preprocessor}{  struct is\_arithmetic<packet\_type> \{ \(\backslash\)}}
+\DoxyCodeLine{101 \textcolor{preprocessor}{    enum \{ value = true \};            \(\backslash\)}}
+\DoxyCodeLine{102 \textcolor{preprocessor}{  \};}}
+\DoxyCodeLine{103 SYCL\_ARITHMETIC(cl::sycl::cl\_float4)}
+\DoxyCodeLine{104 SYCL\_ARITHMETIC(cl::sycl::cl\_double2)}
+\DoxyCodeLine{105 \textcolor{preprocessor}{\#undef SYCL\_ARITHMETIC}}
+\DoxyCodeLine{106 }
+\DoxyCodeLine{107 \textcolor{preprocessor}{\#define SYCL\_UNPACKET\_TRAITS(packet\_type, unpacket\_type, lengths)        \(\backslash\)}}
+\DoxyCodeLine{108 \textcolor{preprocessor}{  template <>                                                            \(\backslash\)}}
+\DoxyCodeLine{109 \textcolor{preprocessor}{  struct unpacket\_traits<packet\_type> \{                                  \(\backslash\)}}
+\DoxyCodeLine{110 \textcolor{preprocessor}{    typedef unpacket\_type type;                                          \(\backslash\)}}
+\DoxyCodeLine{111 \textcolor{preprocessor}{    enum \{ size = lengths, vectorizable = true, alignment = Aligned16 \}; \(\backslash\)}}
+\DoxyCodeLine{112 \textcolor{preprocessor}{    typedef packet\_type half;                                            \(\backslash\)}}
+\DoxyCodeLine{113 \textcolor{preprocessor}{  \};}}
+\DoxyCodeLine{114 SYCL\_UNPACKET\_TRAITS(cl::sycl::cl\_float4, \textcolor{keywordtype}{float}, 4)}
+\DoxyCodeLine{115 SYCL\_UNPACKET\_TRAITS(cl::sycl::cl\_double2, \textcolor{keywordtype}{double}, 2)}
+\DoxyCodeLine{116 }
+\DoxyCodeLine{117 \textcolor{preprocessor}{\#undef SYCL\_UNPACKET\_TRAITS}}
+\DoxyCodeLine{118 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{119 }
+\DoxyCodeLine{120 \}  \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{121 }
+\DoxyCodeLine{122 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{123 }
+\DoxyCodeLine{124 \textcolor{keyword}{namespace }TensorSycl \{}
+\DoxyCodeLine{125 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{126 }
+\DoxyCodeLine{127 \textcolor{keyword}{template} <\textcolor{keyword}{typename} PacketReturnType, \textcolor{keywordtype}{int} PacketSize>}
+\DoxyCodeLine{128 \textcolor{keyword}{struct }PacketWrapper;}
+\DoxyCodeLine{129 \textcolor{comment}{// This function should never get called on the device}}
+\DoxyCodeLine{130 \textcolor{preprocessor}{\#ifndef SYCL\_DEVICE\_ONLY}}
+\DoxyCodeLine{131 \textcolor{keyword}{template} <\textcolor{keyword}{typename} PacketReturnType, \textcolor{keywordtype}{int} PacketSize>}
+\DoxyCodeLine{132 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1TensorSycl_1_1internal_1_1PacketWrapper}{PacketWrapper}} \{}
+\DoxyCodeLine{133   \textcolor{keyword}{typedef} typename ::Eigen::internal::unpacket\_traits<PacketReturnType>::type}
+\DoxyCodeLine{134       \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Scalar}};}
+\DoxyCodeLine{135   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Index>}
+\DoxyCodeLine{136   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{static} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Scalar}} scalarize(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}, PacketReturnType \&) \{}
+\DoxyCodeLine{137     eigen\_assert(\textcolor{keyword}{false} \&\& \textcolor{stringliteral}{"{}THERE IS NO PACKETIZE VERSION FOR  THE CHOSEN TYPE"{}});}
+\DoxyCodeLine{138     abort();}
+\DoxyCodeLine{139   \}}
+\DoxyCodeLine{140   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{static} PacketReturnType convert\_to\_packet\_type(\mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Scalar}} in,}
+\DoxyCodeLine{141                                                                    \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Scalar}}) \{}
+\DoxyCodeLine{142     return ::Eigen::internal::template plset<PacketReturnType>(in);}
+\DoxyCodeLine{143   \}}
+\DoxyCodeLine{144   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{static} \textcolor{keywordtype}{void} set\_packet(PacketReturnType, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Scalar}} *) \{}
+\DoxyCodeLine{145     eigen\_assert(\textcolor{keyword}{false} \&\& \textcolor{stringliteral}{"{}THERE IS NO PACKETIZE VERSION FOR  THE CHOSEN TYPE"{}});}
+\DoxyCodeLine{146     abort();}
+\DoxyCodeLine{147   \}}
+\DoxyCodeLine{148 \};}
+\DoxyCodeLine{149 }
+\DoxyCodeLine{150 \textcolor{preprocessor}{\#elif defined(SYCL\_DEVICE\_ONLY)}}
+\DoxyCodeLine{151 \textcolor{keyword}{template} <\textcolor{keyword}{typename} PacketReturnType>}
+\DoxyCodeLine{152 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1TensorSycl_1_1internal_1_1PacketWrapper}{PacketWrapper}}<PacketReturnType, 4> \{}
+\DoxyCodeLine{153   \textcolor{keyword}{typedef} typename ::Eigen::internal::unpacket\_traits<PacketReturnType>::type}
+\DoxyCodeLine{154       Scalar;}
+\DoxyCodeLine{155   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Index>}
+\DoxyCodeLine{156   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{static} Scalar scalarize(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index, PacketReturnType \&in) \{}
+\DoxyCodeLine{157     \textcolor{keywordflow}{switch} (index) \{}
+\DoxyCodeLine{158       \textcolor{keywordflow}{case} 0:}
+\DoxyCodeLine{159         \textcolor{keywordflow}{return} in.x();}
+\DoxyCodeLine{160       \textcolor{keywordflow}{case} 1:}
+\DoxyCodeLine{161         \textcolor{keywordflow}{return} in.y();}
+\DoxyCodeLine{162       \textcolor{keywordflow}{case} 2:}
+\DoxyCodeLine{163         \textcolor{keywordflow}{return} in.z();}
+\DoxyCodeLine{164       \textcolor{keywordflow}{case} 3:}
+\DoxyCodeLine{165         \textcolor{keywordflow}{return} in.w();}
+\DoxyCodeLine{166       \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{167       \textcolor{comment}{//INDEX MUST BE BETWEEN 0 and 3.There is no abort function in SYCL kernel. so we cannot use abort here. }}
+\DoxyCodeLine{168       \textcolor{comment}{// The code will never reach here}}
+\DoxyCodeLine{169       \_\_builtin\_unreachable();}
+\DoxyCodeLine{170     \}}
+\DoxyCodeLine{171     \_\_builtin\_unreachable();}
+\DoxyCodeLine{172   \}}
+\DoxyCodeLine{173 }
+\DoxyCodeLine{174   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{static} PacketReturnType convert\_to\_packet\_type(}
+\DoxyCodeLine{175       Scalar in, Scalar other) \{}
+\DoxyCodeLine{176     \textcolor{keywordflow}{return} PacketReturnType(in, other, other, other);}
+\DoxyCodeLine{177   \}}
+\DoxyCodeLine{178   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{static} \textcolor{keywordtype}{void} set\_packet(PacketReturnType \&lhs, Scalar *rhs) \{}
+\DoxyCodeLine{179     lhs = PacketReturnType(rhs[0], rhs[1], rhs[2], rhs[3]);}
+\DoxyCodeLine{180   \}}
+\DoxyCodeLine{181 \};}
+\DoxyCodeLine{182 }
+\DoxyCodeLine{183 \textcolor{keyword}{template} <\textcolor{keyword}{typename} PacketReturnType>}
+\DoxyCodeLine{184 \textcolor{keyword}{struct }PacketWrapper<PacketReturnType, 1> \{}
+\DoxyCodeLine{185   \textcolor{keyword}{typedef} typename ::Eigen::internal::unpacket\_traits<PacketReturnType>::type}
+\DoxyCodeLine{186       Scalar;}
+\DoxyCodeLine{187   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Index>}
+\DoxyCodeLine{188   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{static} Scalar scalarize(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}, PacketReturnType \&in) \{}
+\DoxyCodeLine{189     \textcolor{keywordflow}{return} in;}
+\DoxyCodeLine{190   \}}
+\DoxyCodeLine{191   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{static} PacketReturnType convert\_to\_packet\_type(Scalar in,}
+\DoxyCodeLine{192                                                                    Scalar) \{}
+\DoxyCodeLine{193     \textcolor{keywordflow}{return} PacketReturnType(in);}
+\DoxyCodeLine{194   \}}
+\DoxyCodeLine{195   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{static} \textcolor{keywordtype}{void} set\_packet(PacketReturnType \&lhs, Scalar *rhs) \{}
+\DoxyCodeLine{196     lhs = rhs[0];}
+\DoxyCodeLine{197   \}}
+\DoxyCodeLine{198 \};}
+\DoxyCodeLine{199 }
+\DoxyCodeLine{200 \textcolor{keyword}{template} <\textcolor{keyword}{typename} PacketReturnType>}
+\DoxyCodeLine{201 \textcolor{keyword}{struct }PacketWrapper<PacketReturnType, 2> \{}
+\DoxyCodeLine{202   \textcolor{keyword}{typedef} typename ::Eigen::internal::unpacket\_traits<PacketReturnType>::type}
+\DoxyCodeLine{203       Scalar;}
+\DoxyCodeLine{204   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Index>}
+\DoxyCodeLine{205   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{static} Scalar scalarize(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index, PacketReturnType \&in) \{}
+\DoxyCodeLine{206     \textcolor{keywordflow}{switch} (index) \{}
+\DoxyCodeLine{207       \textcolor{keywordflow}{case} 0:}
+\DoxyCodeLine{208         \textcolor{keywordflow}{return} in.x();}
+\DoxyCodeLine{209       \textcolor{keywordflow}{case} 1:}
+\DoxyCodeLine{210         \textcolor{keywordflow}{return} in.y();}
+\DoxyCodeLine{211       \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{212         \textcolor{comment}{//INDEX MUST BE BETWEEN 0 and 1.There is no abort function in SYCL kernel. so we cannot use abort here. }}
+\DoxyCodeLine{213       \textcolor{comment}{// The code will never reach here}}
+\DoxyCodeLine{214         \_\_builtin\_unreachable();}
+\DoxyCodeLine{215     \}}
+\DoxyCodeLine{216     \_\_builtin\_unreachable();}
+\DoxyCodeLine{217   \}}
+\DoxyCodeLine{218   }
+\DoxyCodeLine{219   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{static} PacketReturnType convert\_to\_packet\_type(}
+\DoxyCodeLine{220       Scalar in, Scalar other) \{}
+\DoxyCodeLine{221     \textcolor{keywordflow}{return} PacketReturnType(in, other);}
+\DoxyCodeLine{222   \}}
+\DoxyCodeLine{223   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{static} \textcolor{keywordtype}{void} set\_packet(PacketReturnType \&lhs, Scalar *rhs) \{}
+\DoxyCodeLine{224     lhs = PacketReturnType(rhs[0], rhs[1]);}
+\DoxyCodeLine{225   \}}
+\DoxyCodeLine{226 \};}
+\DoxyCodeLine{227 }
+\DoxyCodeLine{228 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{229 }
+\DoxyCodeLine{230 \}  \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{231 \}  \textcolor{comment}{// end namespace TensorSycl}}
+\DoxyCodeLine{232 \}  \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{233 }
+\DoxyCodeLine{234 \textcolor{preprocessor}{\#endif  }\textcolor{comment}{// EIGEN\_INTEROP\_HEADERS\_SYCL\_H}}
+
+\end{DoxyCode}

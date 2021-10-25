@@ -1,0 +1,87 @@
+\hypertarget{GPU_2TypeCasting_8h_source}{}\doxysection{Type\+Casting.\+h}
+\label{GPU_2TypeCasting_8h_source}\index{include/Eigen/src/Core/arch/GPU/TypeCasting.h@{include/Eigen/src/Core/arch/GPU/TypeCasting.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2016 Benoit Steiner <benoit.steiner.goog@gmail.com>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_TYPE\_CASTING\_GPU\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_TYPE\_CASTING\_GPU\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}../../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{preprocessor}{\#if (defined(EIGEN\_HAS\_CUDA\_FP16) \&\& defined(EIGEN\_CUDA\_ARCH) \&\& EIGEN\_CUDA\_ARCH >= 300) || \(\backslash\)}}
+\DoxyCodeLine{20 \textcolor{preprocessor}{    (defined(EIGEN\_HAS\_HIP\_FP16) \&\& defined(EIGEN\_HIP\_DEVICE\_COMPILE))}}
+\DoxyCodeLine{21 }
+\DoxyCodeLine{22 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{23 \textcolor{keyword}{struct }type\_casting\_traits<\mbox{\hyperlink{namespaceEigen}{Eigen}}::half, float> \{}
+\DoxyCodeLine{24   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{25     VectorizedCast = 1,}
+\DoxyCodeLine{26     SrcCoeffRatio = 1,}
+\DoxyCodeLine{27     TgtCoeffRatio = 2}
+\DoxyCodeLine{28   \};}
+\DoxyCodeLine{29 \};}
+\DoxyCodeLine{30 }
+\DoxyCodeLine{31 \textcolor{keyword}{template}<> EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE float4 pcast<half2, float4>(\textcolor{keyword}{const} half2\& a, \textcolor{keyword}{const} half2\& b) \{}
+\DoxyCodeLine{32   float2 r1 = \_\_half22float2(a);}
+\DoxyCodeLine{33   float2 r2 = \_\_half22float2(b);}
+\DoxyCodeLine{34   \textcolor{keywordflow}{return} make\_float4(r1.x, r1.y, r2.x, r2.y);}
+\DoxyCodeLine{35 \}}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{37 }
+\DoxyCodeLine{38 \textcolor{keyword}{template}<> EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE Packet4h2 pcast<float4, Packet4h2>(\textcolor{keyword}{const} float4\& a, \textcolor{keyword}{const} float4\& b) \{}
+\DoxyCodeLine{39   Packet4h2 r;}
+\DoxyCodeLine{40   half2* r\_alias=\textcolor{keyword}{reinterpret\_cast<}half2*\textcolor{keyword}{>}(\&r);}
+\DoxyCodeLine{41   r\_alias[0]=\_\_floats2half2\_rn(a.x,a.y);}
+\DoxyCodeLine{42   r\_alias[1]=\_\_floats2half2\_rn(a.z,a.w);}
+\DoxyCodeLine{43   r\_alias[2]=\_\_floats2half2\_rn(b.x,b.y);}
+\DoxyCodeLine{44   r\_alias[3]=\_\_floats2half2\_rn(b.z,b.w);}
+\DoxyCodeLine{45   \textcolor{keywordflow}{return} r;}
+\DoxyCodeLine{46 \}}
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{49 \textcolor{keyword}{struct }type\_casting\_traits<float, \mbox{\hyperlink{namespaceEigen}{Eigen}}::half> \{}
+\DoxyCodeLine{50   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{51     VectorizedCast = 1,}
+\DoxyCodeLine{52     SrcCoeffRatio = 2,}
+\DoxyCodeLine{53     TgtCoeffRatio = 1}
+\DoxyCodeLine{54   \};}
+\DoxyCodeLine{55 \};}
+\DoxyCodeLine{56 }
+\DoxyCodeLine{57 \textcolor{keyword}{template}<> EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE float4 pcast<Packet4h2, float4>(\textcolor{keyword}{const} Packet4h2\& a) \{}
+\DoxyCodeLine{58   \textcolor{comment}{// Simply discard the second half of the input}}
+\DoxyCodeLine{59   float4 r;}
+\DoxyCodeLine{60   \textcolor{keyword}{const} half2* a\_alias=\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const }half2*\textcolor{keyword}{>}(\&a);}
+\DoxyCodeLine{61   float2 r1 = \_\_half22float2(a\_alias[0]);}
+\DoxyCodeLine{62   float2 r2 = \_\_half22float2(a\_alias[1]);}
+\DoxyCodeLine{63   r.x=\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(r1.x);}
+\DoxyCodeLine{64   r.y=\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(r1.y);}
+\DoxyCodeLine{65   r.z=\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(r2.x);}
+\DoxyCodeLine{66   r.w=\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(r2.y);}
+\DoxyCodeLine{67   \textcolor{keywordflow}{return} r;}
+\DoxyCodeLine{68 \}}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70 \textcolor{keyword}{template}<> EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE half2 pcast<float4, half2>(\textcolor{keyword}{const} float4\& a) \{}
+\DoxyCodeLine{71   \textcolor{comment}{// Simply discard the second half of the input}}
+\DoxyCodeLine{72   \textcolor{keywordflow}{return} \_\_floats2half2\_rn(a.x, a.y);}
+\DoxyCodeLine{73 \}}
+\DoxyCodeLine{74 }
+\DoxyCodeLine{75 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{76 }
+\DoxyCodeLine{77 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{78 }
+\DoxyCodeLine{79 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{80 }
+\DoxyCodeLine{81 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_TYPE\_CASTING\_GPU\_H}}
+
+\end{DoxyCode}

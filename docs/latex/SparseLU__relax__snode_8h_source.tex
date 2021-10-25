@@ -1,0 +1,80 @@
+\hypertarget{SparseLU__relax__snode_8h_source}{}\doxysection{Sparse\+LU\+\_\+relax\+\_\+snode.\+h}
+\label{SparseLU__relax__snode_8h_source}\index{include/Eigen/src/SparseLU/SparseLU\_relax\_snode.h@{include/Eigen/src/SparseLU/SparseLU\_relax\_snode.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2012 Désiré Nuentsa-\/Wakam <desire.nuentsa\_wakam@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{comment}{/* This file is a modified version of heap\_relax\_snode.c file in SuperLU}}
+\DoxyCodeLine{11 \textcolor{comment}{ * -\/-\/ SuperLU routine (version 3.0) -\/-\/}}
+\DoxyCodeLine{12 \textcolor{comment}{ * Univ. of California Berkeley, Xerox Palo Alto Research Center,}}
+\DoxyCodeLine{13 \textcolor{comment}{ * and Lawrence Berkeley National Lab.}}
+\DoxyCodeLine{14 \textcolor{comment}{ * October 15, 2003}}
+\DoxyCodeLine{15 \textcolor{comment}{ *}}
+\DoxyCodeLine{16 \textcolor{comment}{ * Copyright (c) 1994 by Xerox Corporation.  All rights reserved.}}
+\DoxyCodeLine{17 \textcolor{comment}{ *}}
+\DoxyCodeLine{18 \textcolor{comment}{ * THIS MATERIAL IS PROVIDED AS IS, WITH ABSOLUTELY NO WARRANTY}}
+\DoxyCodeLine{19 \textcolor{comment}{ * EXPRESSED OR IMPLIED.  ANY USE IS AT YOUR OWN RISK.}}
+\DoxyCodeLine{20 \textcolor{comment}{ *}}
+\DoxyCodeLine{21 \textcolor{comment}{ * Permission is hereby granted to use or copy this program for any}}
+\DoxyCodeLine{22 \textcolor{comment}{ * purpose, provided the above notices are retained on all copies.}}
+\DoxyCodeLine{23 \textcolor{comment}{ * Permission to modify the code and to distribute modified code is}}
+\DoxyCodeLine{24 \textcolor{comment}{ * granted, provided the above notices are retained, and a notice that}}
+\DoxyCodeLine{25 \textcolor{comment}{ * the code was modified is included with the above copyright notice.}}
+\DoxyCodeLine{26 \textcolor{comment}{ */}}
+\DoxyCodeLine{27 }
+\DoxyCodeLine{28 \textcolor{preprocessor}{\#ifndef SPARSELU\_RELAX\_SNODE\_H}}
+\DoxyCodeLine{29 \textcolor{preprocessor}{\#define SPARSELU\_RELAX\_SNODE\_H}}
+\DoxyCodeLine{30 }
+\DoxyCodeLine{31 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{34 }
+\DoxyCodeLine{35 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{36  }
+\DoxyCodeLine{48 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} StorageIndex>}
+\DoxyCodeLine{49 \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1internal_1_1SparseLUImpl_a33672df380f94e774c5a6919d3474af4}{SparseLUImpl<Scalar,StorageIndex>::relax\_snode}} (\textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} n, \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}}\& et, \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} relax\_columns, \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}}\& descendants, \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}}\& relax\_end)}
+\DoxyCodeLine{50 \{}
+\DoxyCodeLine{51   }
+\DoxyCodeLine{52   \textcolor{comment}{// compute the number of descendants of each node in the etree}}
+\DoxyCodeLine{53   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} parent; }
+\DoxyCodeLine{54   relax\_end.\mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac8dea1df3d92b752cc683ff42abf6f9b}{setConstant}}(emptyIdxLU);}
+\DoxyCodeLine{55   descendants.\mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac21ad5f989f320e46958b75ac8d9a1da}{setZero}}();}
+\DoxyCodeLine{56   \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < n; j++) }
+\DoxyCodeLine{57   \{}
+\DoxyCodeLine{58     parent = et(j);}
+\DoxyCodeLine{59     \textcolor{keywordflow}{if} (parent != n) \textcolor{comment}{// not the dummy root}}
+\DoxyCodeLine{60       descendants(parent) += descendants(j) + 1;}
+\DoxyCodeLine{61   \}}
+\DoxyCodeLine{62   \textcolor{comment}{// Identify the relaxed supernodes by postorder traversal of the etree}}
+\DoxyCodeLine{63   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} snode\_start; \textcolor{comment}{// beginning of a snode }}
+\DoxyCodeLine{64   \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < n; )}
+\DoxyCodeLine{65   \{}
+\DoxyCodeLine{66     parent = et(j);}
+\DoxyCodeLine{67     snode\_start = j; }
+\DoxyCodeLine{68     \textcolor{keywordflow}{while} ( parent != n \&\& descendants(parent) < relax\_columns ) }
+\DoxyCodeLine{69     \{}
+\DoxyCodeLine{70       j = parent; }
+\DoxyCodeLine{71       parent = et(j);}
+\DoxyCodeLine{72     \}}
+\DoxyCodeLine{73     \textcolor{comment}{// Found a supernode in postordered etree, j is the last column }}
+\DoxyCodeLine{74     relax\_end(snode\_start) = StorageIndex(j); \textcolor{comment}{// Record last column}}
+\DoxyCodeLine{75     j++;}
+\DoxyCodeLine{76     \textcolor{comment}{// Search for a new leaf}}
+\DoxyCodeLine{77     \textcolor{keywordflow}{while} (descendants(j) != 0 \&\& j < n) j++;}
+\DoxyCodeLine{78   \} \textcolor{comment}{// End postorder traversal of the etree}}
+\DoxyCodeLine{79   }
+\DoxyCodeLine{80 \}}
+\DoxyCodeLine{81 }
+\DoxyCodeLine{82 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{83 }
+\DoxyCodeLine{84 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{85 \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

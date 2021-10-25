@@ -1,0 +1,321 @@
+\hypertarget{ComplexSchur_8h_source}{}\doxysection{Complex\+Schur.\+h}
+\label{ComplexSchur_8h_source}\index{include/Eigen/src/Eigenvalues/ComplexSchur.h@{include/Eigen/src/Eigenvalues/ComplexSchur.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2009 Claire Maurice}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{6 \textcolor{comment}{// Copyright (C) 2010,2012 Jitse Niesen <jitse@maths.leeds.ac.uk>}}
+\DoxyCodeLine{7 \textcolor{comment}{//}}
+\DoxyCodeLine{8 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{9 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{10 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{11 }
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#ifndef EIGEN\_COMPLEX\_SCHUR\_H}}
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#define EIGEN\_COMPLEX\_SCHUR\_H}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{preprocessor}{\#include "{}./HessenbergDecomposition.h"{}}}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{20 }
+\DoxyCodeLine{21 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{22 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{bool} IsComplex> \textcolor{keyword}{struct }complex\_schur\_reduce\_to\_hessenberg;}
+\DoxyCodeLine{23 \}}
+\DoxyCodeLine{24 }
+\DoxyCodeLine{53 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1ComplexSchur}{ComplexSchur}}}
+\DoxyCodeLine{54 \{}
+\DoxyCodeLine{55   \textcolor{keyword}{public}:}
+\DoxyCodeLine{56     \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{57     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{58       RowsAtCompileTime = MatrixType::RowsAtCompileTime,}
+\DoxyCodeLine{59       ColsAtCompileTime = MatrixType::ColsAtCompileTime,}
+\DoxyCodeLine{60       Options = MatrixType::Options,}
+\DoxyCodeLine{61       MaxRowsAtCompileTime = MatrixType::MaxRowsAtCompileTime,}
+\DoxyCodeLine{62       MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime}
+\DoxyCodeLine{63     \};}
+\DoxyCodeLine{64 }
+\DoxyCodeLine{66     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar \mbox{\hyperlink{classEigen_1_1ComplexSchur_a3121a90f56446ec9a68f53f9b79bef9c}{Scalar}};}
+\DoxyCodeLine{67     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}} RealScalar;}
+\DoxyCodeLine{68     \textcolor{keyword}{typedef} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Eigen::Index}} \mbox{\hyperlink{classEigen_1_1ComplexSchur_a8e273074f2cafe49725fcc774b93d6bf}{Index}}; }
+\DoxyCodeLine{69 }
+\DoxyCodeLine{76     \textcolor{keyword}{typedef} std::complex<RealScalar> \mbox{\hyperlink{classEigen_1_1ComplexSchur_a9cfc7d20234dd51933b0cb6ef427c8b4}{ComplexScalar}};}
+\DoxyCodeLine{77 }
+\DoxyCodeLine{83     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<ComplexScalar, RowsAtCompileTime, ColsAtCompileTime, Options, MaxRowsAtCompileTime, MaxColsAtCompileTime>}} \mbox{\hyperlink{classEigen_1_1ComplexSchur_abed305877f8fec28d44a4e46fec72cb6}{ComplexMatrixType}};}
+\DoxyCodeLine{84 }
+\DoxyCodeLine{96     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1ComplexSchur_a49e78b336c89147fdc80589444884b1b}{ComplexSchur}}(\mbox{\hyperlink{classEigen_1_1ComplexSchur_a8e273074f2cafe49725fcc774b93d6bf}{Index}} size = RowsAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} ? 1 : RowsAtCompileTime)}
+\DoxyCodeLine{97       : m\_matT(size,size),}
+\DoxyCodeLine{98         m\_matU(size,size),}
+\DoxyCodeLine{99         m\_hess(size),}
+\DoxyCodeLine{100         m\_isInitialized(false),}
+\DoxyCodeLine{101         m\_matUisUptodate(false),}
+\DoxyCodeLine{102         m\_maxIters(-\/1)}
+\DoxyCodeLine{103     \{\}}
+\DoxyCodeLine{104 }
+\DoxyCodeLine{114     \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputType>}
+\DoxyCodeLine{115     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1ComplexSchur_ab5745362c6c27d259188a06b7ba74733}{ComplexSchur}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<InputType>}}\& matrix, \textcolor{keywordtype}{bool} computeU = \textcolor{keyword}{true})}
+\DoxyCodeLine{116       : m\_matT(matrix.rows(),matrix.cols()),}
+\DoxyCodeLine{117         m\_matU(matrix.rows(),matrix.cols()),}
+\DoxyCodeLine{118         m\_hess(matrix.rows()),}
+\DoxyCodeLine{119         m\_isInitialized(false),}
+\DoxyCodeLine{120         m\_matUisUptodate(false),}
+\DoxyCodeLine{121         m\_maxIters(-\/1)}
+\DoxyCodeLine{122     \{}
+\DoxyCodeLine{123       \mbox{\hyperlink{classEigen_1_1ComplexSchur_aca1195e9326f381dbabc047f2dbcc24d}{compute}}(matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}(), computeU);}
+\DoxyCodeLine{124     \}}
+\DoxyCodeLine{125 }
+\DoxyCodeLine{140     \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Matrix}{ComplexMatrixType}}\& \mbox{\hyperlink{classEigen_1_1ComplexSchur_afea5892af4e61a14898813082c86c6c5}{matrixU}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{141 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{142       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}ComplexSchur is not initialized."{}});}
+\DoxyCodeLine{143       eigen\_assert(m\_matUisUptodate \&\& \textcolor{stringliteral}{"{}The matrix U has not been computed during the ComplexSchur decomposition."{}});}
+\DoxyCodeLine{144       \textcolor{keywordflow}{return} m\_matU;}
+\DoxyCodeLine{145     \}}
+\DoxyCodeLine{146 }
+\DoxyCodeLine{164     \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Matrix}{ComplexMatrixType}}\& \mbox{\hyperlink{classEigen_1_1ComplexSchur_a508cd5453a15a3e543dc66ad1f54aec2}{matrixT}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{165 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{166       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}ComplexSchur is not initialized."{}});}
+\DoxyCodeLine{167       \textcolor{keywordflow}{return} m\_matT;}
+\DoxyCodeLine{168     \}}
+\DoxyCodeLine{169 }
+\DoxyCodeLine{192     \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputType>}
+\DoxyCodeLine{193     \mbox{\hyperlink{classEigen_1_1ComplexSchur}{ComplexSchur}}\& \mbox{\hyperlink{classEigen_1_1ComplexSchur_aca1195e9326f381dbabc047f2dbcc24d}{compute}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<InputType>}}\& matrix, \textcolor{keywordtype}{bool} computeU = \textcolor{keyword}{true});}
+\DoxyCodeLine{194     }
+\DoxyCodeLine{212     \textcolor{keyword}{template}<\textcolor{keyword}{typename} HessMatrixType, \textcolor{keyword}{typename} OrthMatrixType>}
+\DoxyCodeLine{213     \mbox{\hyperlink{classEigen_1_1ComplexSchur}{ComplexSchur}}\& \mbox{\hyperlink{classEigen_1_1ComplexSchur_a68de44741d2c4985a4ce78464295b80b}{computeFromHessenberg}}(\textcolor{keyword}{const} HessMatrixType\& matrixH, \textcolor{keyword}{const} OrthMatrixType\& matrixQ,  \textcolor{keywordtype}{bool} computeU=\textcolor{keyword}{true});}
+\DoxyCodeLine{214 }
+\DoxyCodeLine{219     \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} \mbox{\hyperlink{classEigen_1_1ComplexSchur_a13adef2a54e61bb5789eb7821a3b7b46}{info}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{220 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{221       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}ComplexSchur is not initialized."{}});}
+\DoxyCodeLine{222       \textcolor{keywordflow}{return} m\_info;}
+\DoxyCodeLine{223     \}}
+\DoxyCodeLine{224 }
+\DoxyCodeLine{230     \mbox{\hyperlink{classEigen_1_1ComplexSchur}{ComplexSchur}}\& \mbox{\hyperlink{classEigen_1_1ComplexSchur_af87b9cdada99e8a6f3b0e0406d7fda86}{setMaxIterations}}(\mbox{\hyperlink{classEigen_1_1ComplexSchur_a8e273074f2cafe49725fcc774b93d6bf}{Index}} maxIters)}
+\DoxyCodeLine{231     \{}
+\DoxyCodeLine{232       m\_maxIters = maxIters;}
+\DoxyCodeLine{233       \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{234     \}}
+\DoxyCodeLine{235 }
+\DoxyCodeLine{237     \mbox{\hyperlink{classEigen_1_1ComplexSchur_a8e273074f2cafe49725fcc774b93d6bf}{Index}} \mbox{\hyperlink{classEigen_1_1ComplexSchur_a6f35999b87c247bb24b2ad6ba1abee69}{getMaxIterations}}()}
+\DoxyCodeLine{238     \{}
+\DoxyCodeLine{239       \textcolor{keywordflow}{return} m\_maxIters;}
+\DoxyCodeLine{240     \}}
+\DoxyCodeLine{241 }
+\DoxyCodeLine{247     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} \mbox{\hyperlink{classEigen_1_1ComplexSchur_a79450087274edce80ee268e2f42e64f1}{m\_maxIterationsPerRow}} = 30;}
+\DoxyCodeLine{248 }
+\DoxyCodeLine{249   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{250     \mbox{\hyperlink{classEigen_1_1Matrix}{ComplexMatrixType}} m\_matT, m\_matU;}
+\DoxyCodeLine{251     \mbox{\hyperlink{classEigen_1_1HessenbergDecomposition}{HessenbergDecomposition<MatrixType>}} m\_hess;}
+\DoxyCodeLine{252     \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} m\_info;}
+\DoxyCodeLine{253     \textcolor{keywordtype}{bool} m\_isInitialized;}
+\DoxyCodeLine{254     \textcolor{keywordtype}{bool} m\_matUisUptodate;}
+\DoxyCodeLine{255     \mbox{\hyperlink{classEigen_1_1ComplexSchur_a8e273074f2cafe49725fcc774b93d6bf}{Index}} m\_maxIters;}
+\DoxyCodeLine{256 }
+\DoxyCodeLine{257   \textcolor{keyword}{private}:  }
+\DoxyCodeLine{258     \textcolor{keywordtype}{bool} subdiagonalEntryIsNeglegible(\mbox{\hyperlink{classEigen_1_1ComplexSchur_a8e273074f2cafe49725fcc774b93d6bf}{Index}} i);}
+\DoxyCodeLine{259     \mbox{\hyperlink{classEigen_1_1ComplexSchur_a9cfc7d20234dd51933b0cb6ef427c8b4}{ComplexScalar}} computeShift(\mbox{\hyperlink{classEigen_1_1ComplexSchur_a8e273074f2cafe49725fcc774b93d6bf}{Index}} iu, \mbox{\hyperlink{classEigen_1_1ComplexSchur_a8e273074f2cafe49725fcc774b93d6bf}{Index}} iter);}
+\DoxyCodeLine{260     \textcolor{keywordtype}{void} reduceToTriangularForm(\textcolor{keywordtype}{bool} computeU);}
+\DoxyCodeLine{261     \textcolor{keyword}{friend} \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1complex__schur__reduce__to__hessenberg}{internal::complex\_schur\_reduce\_to\_hessenberg}}<MatrixType, \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits}}<\mbox{\hyperlink{classEigen_1_1ComplexSchur_a3121a90f56446ec9a68f53f9b79bef9c}{Scalar}}>::IsComplex>;}
+\DoxyCodeLine{262 \};}
+\DoxyCodeLine{263 }
+\DoxyCodeLine{267 template<typename MatrixType>}
+\DoxyCodeLine{268 inline bool \mbox{\hyperlink{classEigen_1_1ComplexSchur}{ComplexSchur}}<MatrixType>::subdiagonalEntryIsNeglegible(Index i)}
+\DoxyCodeLine{269 \{}
+\DoxyCodeLine{270   RealScalar d = numext::norm1(m\_matT.coeff(i,i)) + numext::norm1(m\_matT.coeff(i+1,i+1));}
+\DoxyCodeLine{271   RealScalar sd = numext::norm1(m\_matT.coeff(i+1,i));}
+\DoxyCodeLine{272   \textcolor{keywordflow}{if} (internal::isMuchSmallerThan(sd, d, \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<RealScalar>::epsilon}}()))}
+\DoxyCodeLine{273   \{}
+\DoxyCodeLine{274     m\_matT.coeffRef(i+1,i) = \mbox{\hyperlink{classEigen_1_1ComplexSchur_a9cfc7d20234dd51933b0cb6ef427c8b4}{ComplexScalar}}(0);}
+\DoxyCodeLine{275     \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
+\DoxyCodeLine{276   \}}
+\DoxyCodeLine{277   \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{278 \}}
+\DoxyCodeLine{279 }
+\DoxyCodeLine{280 }
+\DoxyCodeLine{282 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{283 \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1ComplexSchur_a9cfc7d20234dd51933b0cb6ef427c8b4}{ComplexSchur<MatrixType>::ComplexScalar}} ComplexSchur<MatrixType>::computeShift(\mbox{\hyperlink{classEigen_1_1ComplexSchur_a8e273074f2cafe49725fcc774b93d6bf}{Index}} iu, \mbox{\hyperlink{classEigen_1_1ComplexSchur_a8e273074f2cafe49725fcc774b93d6bf}{Index}} iter)}
+\DoxyCodeLine{284 \{}
+\DoxyCodeLine{285   \textcolor{keyword}{using} std::abs;}
+\DoxyCodeLine{286   \textcolor{keywordflow}{if} (iter == 10 || iter == 20) }
+\DoxyCodeLine{287   \{}
+\DoxyCodeLine{288     \textcolor{comment}{// exceptional shift, taken from http://www.netlib.org/eispack/comqr.f}}
+\DoxyCodeLine{289     \textcolor{keywordflow}{return} abs(numext::real(m\_matT.coeff(iu,iu-\/1))) + abs(numext::real(m\_matT.coeff(iu-\/1,iu-\/2)));}
+\DoxyCodeLine{290   \}}
+\DoxyCodeLine{291 }
+\DoxyCodeLine{292   \textcolor{comment}{// compute the shift as one of the eigenvalues of t, the 2x2}}
+\DoxyCodeLine{293   \textcolor{comment}{// diagonal block on the bottom of the active submatrix}}
+\DoxyCodeLine{294   Matrix<ComplexScalar,2,2> t = m\_matT.template block<2,2>(iu-\/1,iu-\/1);}
+\DoxyCodeLine{295   RealScalar normt = t.cwiseAbs().sum();}
+\DoxyCodeLine{296   t /= normt;     \textcolor{comment}{// the normalization by sf is to avoid under/overflow}}
+\DoxyCodeLine{297 }
+\DoxyCodeLine{298   \mbox{\hyperlink{classEigen_1_1ComplexSchur_a9cfc7d20234dd51933b0cb6ef427c8b4}{ComplexScalar}} b = t.coeff(0,1) * t.coeff(1,0);}
+\DoxyCodeLine{299   \mbox{\hyperlink{classEigen_1_1ComplexSchur_a9cfc7d20234dd51933b0cb6ef427c8b4}{ComplexScalar}} c = t.coeff(0,0) -\/ t.coeff(1,1);}
+\DoxyCodeLine{300   \mbox{\hyperlink{classEigen_1_1ComplexSchur_a9cfc7d20234dd51933b0cb6ef427c8b4}{ComplexScalar}} disc = sqrt(c*c + RealScalar(4)*b);}
+\DoxyCodeLine{301   \mbox{\hyperlink{classEigen_1_1ComplexSchur_a9cfc7d20234dd51933b0cb6ef427c8b4}{ComplexScalar}} det = t.coeff(0,0) * t.coeff(1,1) -\/ b;}
+\DoxyCodeLine{302   \mbox{\hyperlink{classEigen_1_1ComplexSchur_a9cfc7d20234dd51933b0cb6ef427c8b4}{ComplexScalar}} trace = t.coeff(0,0) + t.coeff(1,1);}
+\DoxyCodeLine{303   \mbox{\hyperlink{classEigen_1_1ComplexSchur_a9cfc7d20234dd51933b0cb6ef427c8b4}{ComplexScalar}} eival1 = (trace + disc) / RealScalar(2);}
+\DoxyCodeLine{304   \mbox{\hyperlink{classEigen_1_1ComplexSchur_a9cfc7d20234dd51933b0cb6ef427c8b4}{ComplexScalar}} eival2 = (trace -\/ disc) / RealScalar(2);}
+\DoxyCodeLine{305   RealScalar eival1\_norm = numext::norm1(eival1);}
+\DoxyCodeLine{306   RealScalar eival2\_norm = numext::norm1(eival2);}
+\DoxyCodeLine{307   \textcolor{comment}{// A division by zero can only occur if eival1==eival2==0.}}
+\DoxyCodeLine{308   \textcolor{comment}{// In this case, det==0, and all we have to do is checking that eival2\_norm!=0}}
+\DoxyCodeLine{309   \textcolor{keywordflow}{if}(eival1\_norm > eival2\_norm)}
+\DoxyCodeLine{310     eival2 = det / eival1;}
+\DoxyCodeLine{311   \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(eival2\_norm!=RealScalar(0))}
+\DoxyCodeLine{312     eival1 = det / eival2;}
+\DoxyCodeLine{313 }
+\DoxyCodeLine{314   \textcolor{comment}{// choose the eigenvalue closest to the bottom entry of the diagonal}}
+\DoxyCodeLine{315   \textcolor{keywordflow}{if}(numext::norm1(eival1-\/t.coeff(1,1)) < numext::norm1(eival2-\/t.coeff(1,1)))}
+\DoxyCodeLine{316     \textcolor{keywordflow}{return} normt * eival1;}
+\DoxyCodeLine{317   \textcolor{keywordflow}{else}}
+\DoxyCodeLine{318     \textcolor{keywordflow}{return} normt * eival2;}
+\DoxyCodeLine{319 \}}
+\DoxyCodeLine{320 }
+\DoxyCodeLine{321 }
+\DoxyCodeLine{322 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{323 \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputType>}
+\DoxyCodeLine{324 ComplexSchur<MatrixType>\& \mbox{\hyperlink{classEigen_1_1ComplexSchur_aca1195e9326f381dbabc047f2dbcc24d}{ComplexSchur<MatrixType>::compute}}(\textcolor{keyword}{const} EigenBase<InputType>\& matrix, \textcolor{keywordtype}{bool} computeU)}
+\DoxyCodeLine{325 \{}
+\DoxyCodeLine{326   m\_matUisUptodate = \textcolor{keyword}{false};}
+\DoxyCodeLine{327   eigen\_assert(matrix.cols() == matrix.rows());}
+\DoxyCodeLine{328 }
+\DoxyCodeLine{329   \textcolor{keywordflow}{if}(matrix.cols() == 1)}
+\DoxyCodeLine{330   \{}
+\DoxyCodeLine{331     m\_matT = matrix.derived().template cast<ComplexScalar>();}
+\DoxyCodeLine{332     \textcolor{keywordflow}{if}(computeU)  m\_matU = ComplexMatrixType::Identity(1,1);}
+\DoxyCodeLine{333     m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}};}
+\DoxyCodeLine{334     m\_isInitialized = \textcolor{keyword}{true};}
+\DoxyCodeLine{335     m\_matUisUptodate = computeU;}
+\DoxyCodeLine{336     \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{337   \}}
+\DoxyCodeLine{338 }
+\DoxyCodeLine{339   internal::complex\_schur\_reduce\_to\_hessenberg<MatrixType, NumTraits<Scalar>::IsComplex>::run(*\textcolor{keyword}{this}, matrix.derived(), computeU);}
+\DoxyCodeLine{340   \mbox{\hyperlink{classEigen_1_1ComplexSchur_a68de44741d2c4985a4ce78464295b80b}{computeFromHessenberg}}(m\_matT, m\_matU, computeU);}
+\DoxyCodeLine{341   \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{342 \}}
+\DoxyCodeLine{343 }
+\DoxyCodeLine{344 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{345 \textcolor{keyword}{template}<\textcolor{keyword}{typename} HessMatrixType, \textcolor{keyword}{typename} OrthMatrixType>}
+\DoxyCodeLine{346 ComplexSchur<MatrixType>\& \mbox{\hyperlink{classEigen_1_1ComplexSchur_a68de44741d2c4985a4ce78464295b80b}{ComplexSchur<MatrixType>::computeFromHessenberg}}(\textcolor{keyword}{const} HessMatrixType\& matrixH, \textcolor{keyword}{const} OrthMatrixType\& matrixQ, \textcolor{keywordtype}{bool} computeU)}
+\DoxyCodeLine{347 \{}
+\DoxyCodeLine{348   m\_matT = matrixH;}
+\DoxyCodeLine{349   \textcolor{keywordflow}{if}(computeU)}
+\DoxyCodeLine{350     m\_matU = matrixQ;}
+\DoxyCodeLine{351   reduceToTriangularForm(computeU);}
+\DoxyCodeLine{352   \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{353 \}}
+\DoxyCodeLine{354 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{355 }
+\DoxyCodeLine{356 \textcolor{comment}{/* Reduce given matrix to Hessenberg form */}}
+\DoxyCodeLine{357 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{bool} IsComplex>}
+\DoxyCodeLine{358 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1complex__schur__reduce__to__hessenberg}{complex\_schur\_reduce\_to\_hessenberg}}}
+\DoxyCodeLine{359 \{}
+\DoxyCodeLine{360   \textcolor{comment}{// this is the implementation for the case IsComplex = true}}
+\DoxyCodeLine{361   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(\mbox{\hyperlink{classEigen_1_1ComplexSchur}{ComplexSchur<MatrixType>}}\& \_this, \textcolor{keyword}{const} MatrixType\& matrix, \textcolor{keywordtype}{bool} computeU)}
+\DoxyCodeLine{362   \{}
+\DoxyCodeLine{363     \_this.m\_hess.compute(matrix);}
+\DoxyCodeLine{364     \_this.m\_matT = \_this.m\_hess.matrixH();}
+\DoxyCodeLine{365     \textcolor{keywordflow}{if}(computeU)  \_this.m\_matU = \_this.m\_hess.matrixQ();}
+\DoxyCodeLine{366   \}}
+\DoxyCodeLine{367 \};}
+\DoxyCodeLine{368 }
+\DoxyCodeLine{369 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{370 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1complex__schur__reduce__to__hessenberg}{complex\_schur\_reduce\_to\_hessenberg}}<MatrixType, false>}
+\DoxyCodeLine{371 \{}
+\DoxyCodeLine{372   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(\mbox{\hyperlink{classEigen_1_1ComplexSchur}{ComplexSchur<MatrixType>}}\& \_this, \textcolor{keyword}{const} MatrixType\& matrix, \textcolor{keywordtype}{bool} computeU)}
+\DoxyCodeLine{373   \{}
+\DoxyCodeLine{374     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1ComplexSchur_a9cfc7d20234dd51933b0cb6ef427c8b4}{ComplexSchur<MatrixType>::ComplexScalar}} \mbox{\hyperlink{classEigen_1_1ComplexSchur_a9cfc7d20234dd51933b0cb6ef427c8b4}{ComplexScalar}};}
+\DoxyCodeLine{375 }
+\DoxyCodeLine{376     \textcolor{comment}{// Note: m\_hess is over RealScalar; m\_matT and m\_matU is over ComplexScalar}}
+\DoxyCodeLine{377     \_this.m\_hess.compute(matrix);}
+\DoxyCodeLine{378     \_this.m\_matT = \_this.m\_hess.matrixH().template cast<ComplexScalar>();}
+\DoxyCodeLine{379     \textcolor{keywordflow}{if}(computeU)  }
+\DoxyCodeLine{380     \{}
+\DoxyCodeLine{381       \textcolor{comment}{// This may cause an allocation which seems to be avoidable}}
+\DoxyCodeLine{382       MatrixType Q = \_this.m\_hess.matrixQ(); }
+\DoxyCodeLine{383       \_this.m\_matU = Q.template cast<ComplexScalar>();}
+\DoxyCodeLine{384     \}}
+\DoxyCodeLine{385   \}}
+\DoxyCodeLine{386 \};}
+\DoxyCodeLine{387 }
+\DoxyCodeLine{388 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{389 }
+\DoxyCodeLine{390 \textcolor{comment}{// Reduce the Hessenberg matrix m\_matT to triangular form by QR iteration.}}
+\DoxyCodeLine{391 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{392 \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1ComplexSchur}{ComplexSchur<MatrixType>::reduceToTriangularForm}}(\textcolor{keywordtype}{bool} computeU)}
+\DoxyCodeLine{393 \{  }
+\DoxyCodeLine{394   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} maxIters = m\_maxIters;}
+\DoxyCodeLine{395   \textcolor{keywordflow}{if} (maxIters == -\/1)}
+\DoxyCodeLine{396     maxIters = \mbox{\hyperlink{classEigen_1_1ComplexSchur_a79450087274edce80ee268e2f42e64f1}{m\_maxIterationsPerRow}} * m\_matT.rows();}
+\DoxyCodeLine{397 }
+\DoxyCodeLine{398   \textcolor{comment}{// The matrix m\_matT is divided in three parts. }}
+\DoxyCodeLine{399   \textcolor{comment}{// Rows 0,...,il-\/1 are decoupled from the rest because m\_matT(il,il-\/1) is zero. }}
+\DoxyCodeLine{400   \textcolor{comment}{// Rows il,...,iu is the part we are working on (the active submatrix).}}
+\DoxyCodeLine{401   \textcolor{comment}{// Rows iu+1,...,end are already brought in triangular form.}}
+\DoxyCodeLine{402   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} iu = m\_matT.cols() -\/ 1;}
+\DoxyCodeLine{403   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} il;}
+\DoxyCodeLine{404   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} iter = 0; \textcolor{comment}{// number of iterations we are working on the (iu,iu) element}}
+\DoxyCodeLine{405   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} totalIter = 0; \textcolor{comment}{// number of iterations for whole matrix}}
+\DoxyCodeLine{406 }
+\DoxyCodeLine{407   \textcolor{keywordflow}{while}(\textcolor{keyword}{true})}
+\DoxyCodeLine{408   \{}
+\DoxyCodeLine{409     \textcolor{comment}{// find iu, the bottom row of the active submatrix}}
+\DoxyCodeLine{410     \textcolor{keywordflow}{while}(iu > 0)}
+\DoxyCodeLine{411     \{}
+\DoxyCodeLine{412       \textcolor{keywordflow}{if}(!subdiagonalEntryIsNeglegible(iu-\/1)) \textcolor{keywordflow}{break};}
+\DoxyCodeLine{413       iter = 0;}
+\DoxyCodeLine{414       -\/-\/iu;}
+\DoxyCodeLine{415     \}}
+\DoxyCodeLine{416 }
+\DoxyCodeLine{417     \textcolor{comment}{// if iu is zero then we are done; the whole matrix is triangularized}}
+\DoxyCodeLine{418     \textcolor{keywordflow}{if}(iu==0) \textcolor{keywordflow}{break};}
+\DoxyCodeLine{419 }
+\DoxyCodeLine{420     \textcolor{comment}{// if we spent too many iterations, we give up}}
+\DoxyCodeLine{421     iter++;}
+\DoxyCodeLine{422     totalIter++;}
+\DoxyCodeLine{423     \textcolor{keywordflow}{if}(totalIter > maxIters) \textcolor{keywordflow}{break};}
+\DoxyCodeLine{424 }
+\DoxyCodeLine{425     \textcolor{comment}{// find il, the top row of the active submatrix}}
+\DoxyCodeLine{426     il = iu-\/1;}
+\DoxyCodeLine{427     \textcolor{keywordflow}{while}(il > 0 \&\& !subdiagonalEntryIsNeglegible(il-\/1))}
+\DoxyCodeLine{428     \{}
+\DoxyCodeLine{429       -\/-\/il;}
+\DoxyCodeLine{430     \}}
+\DoxyCodeLine{431 }
+\DoxyCodeLine{432     \textcolor{comment}{/* perform the QR step using Givens rotations. The first rotation}}
+\DoxyCodeLine{433 \textcolor{comment}{       creates a bulge; the (il+2,il) element becomes nonzero. This}}
+\DoxyCodeLine{434 \textcolor{comment}{       bulge is chased down to the bottom of the active submatrix. */}}
+\DoxyCodeLine{435 }
+\DoxyCodeLine{436     \mbox{\hyperlink{classEigen_1_1ComplexSchur_a9cfc7d20234dd51933b0cb6ef427c8b4}{ComplexScalar}} shift = computeShift(iu, iter);}
+\DoxyCodeLine{437     JacobiRotation<ComplexScalar> rot;}
+\DoxyCodeLine{438     rot.makeGivens(m\_matT.coeff(il,il) -\/ shift, m\_matT.coeff(il+1,il));}
+\DoxyCodeLine{439     m\_matT.rightCols(m\_matT.cols()-\/il).applyOnTheLeft(il, il+1, rot.adjoint());}
+\DoxyCodeLine{440     m\_matT.topRows((std::min)(il+2,iu)+1).applyOnTheRight(il, il+1, rot);}
+\DoxyCodeLine{441     \textcolor{keywordflow}{if}(computeU) m\_matU.applyOnTheRight(il, il+1, rot);}
+\DoxyCodeLine{442 }
+\DoxyCodeLine{443     \textcolor{keywordflow}{for}(\mbox{\hyperlink{classEigen_1_1ComplexSchur_a8e273074f2cafe49725fcc774b93d6bf}{Index}} i=il+1 ; i<iu ; i++)}
+\DoxyCodeLine{444     \{}
+\DoxyCodeLine{445       rot.makeGivens(m\_matT.coeffRef(i,i-\/1), m\_matT.coeffRef(i+1,i-\/1), \&m\_matT.coeffRef(i,i-\/1));}
+\DoxyCodeLine{446       m\_matT.coeffRef(i+1,i-\/1) = \mbox{\hyperlink{classEigen_1_1ComplexSchur_a9cfc7d20234dd51933b0cb6ef427c8b4}{ComplexScalar}}(0);}
+\DoxyCodeLine{447       m\_matT.rightCols(m\_matT.cols()-\/i).applyOnTheLeft(i, i+1, rot.adjoint());}
+\DoxyCodeLine{448       m\_matT.topRows((std::min)(i+2,iu)+1).applyOnTheRight(i, i+1, rot);}
+\DoxyCodeLine{449       \textcolor{keywordflow}{if}(computeU) m\_matU.applyOnTheRight(i, i+1, rot);}
+\DoxyCodeLine{450     \}}
+\DoxyCodeLine{451   \}}
+\DoxyCodeLine{452 }
+\DoxyCodeLine{453   \textcolor{keywordflow}{if}(totalIter <= maxIters)}
+\DoxyCodeLine{454     m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}};}
+\DoxyCodeLine{455   \textcolor{keywordflow}{else}}
+\DoxyCodeLine{456     m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea6a68dfb88a8336108a30588bdf356c57}{NoConvergence}};}
+\DoxyCodeLine{457 }
+\DoxyCodeLine{458   m\_isInitialized = \textcolor{keyword}{true};}
+\DoxyCodeLine{459   m\_matUisUptodate = computeU;}
+\DoxyCodeLine{460 \}}
+\DoxyCodeLine{461 }
+\DoxyCodeLine{462 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{463 }
+\DoxyCodeLine{464 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_COMPLEX\_SCHUR\_H}}
+
+\end{DoxyCode}

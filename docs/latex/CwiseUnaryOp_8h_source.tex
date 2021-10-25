@@ -1,0 +1,89 @@
+\hypertarget{CwiseUnaryOp_8h_source}{}\doxysection{Cwise\+Unary\+Op.\+h}
+\label{CwiseUnaryOp_8h_source}\index{include/Eigen/src/Core/CwiseUnaryOp.h@{include/Eigen/src/Core/CwiseUnaryOp.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2008-\/2014 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2006-\/2008 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_CWISE\_UNARY\_OP\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_CWISE\_UNARY\_OP\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{19 \textcolor{keyword}{template}<\textcolor{keyword}{typename} UnaryOp, \textcolor{keyword}{typename} XprType>}
+\DoxyCodeLine{20 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{CwiseUnaryOp}}<UnaryOp, XprType> >}
+\DoxyCodeLine{21  : \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<XprType>}
+\DoxyCodeLine{22 \{}
+\DoxyCodeLine{23   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1result__of}{result\_of}}<}
+\DoxyCodeLine{24                      UnaryOp(\textcolor{keyword}{const} \textcolor{keyword}{typename} XprType::Scalar\&)}
+\DoxyCodeLine{25                    >::type Scalar;}
+\DoxyCodeLine{26   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Nested XprTypeNested;}
+\DoxyCodeLine{27   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_reference<XprTypeNested>::type \_XprTypeNested;}
+\DoxyCodeLine{28   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{29     Flags = \_XprTypeNested::Flags \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}}
+\DoxyCodeLine{30   \};}
+\DoxyCodeLine{31 \};}
+\DoxyCodeLine{32 \}}
+\DoxyCodeLine{33 }
+\DoxyCodeLine{34 \textcolor{keyword}{template}<\textcolor{keyword}{typename} UnaryOp, \textcolor{keyword}{typename} XprType, \textcolor{keyword}{typename} StorageKind>}
+\DoxyCodeLine{35 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1CwiseUnaryOpImpl}{CwiseUnaryOpImpl}};}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{56 \textcolor{keyword}{template}<\textcolor{keyword}{typename} UnaryOp, \textcolor{keyword}{typename} XprType>}
+\DoxyCodeLine{57 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{CwiseUnaryOp}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1CwiseUnaryOpImpl}{CwiseUnaryOpImpl}}<UnaryOp, XprType, typename internal::traits<XprType>::StorageKind>, \mbox{\hyperlink{classEigen_1_1internal_1_1no__assignment__operator}{internal::no\_assignment\_operator}}}
+\DoxyCodeLine{58 \{}
+\DoxyCodeLine{59   \textcolor{keyword}{public}:}
+\DoxyCodeLine{60 }
+\DoxyCodeLine{61     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1CwiseUnaryOpImpl}{CwiseUnaryOpImpl<UnaryOp, XprType,typename internal::traits<XprType>::StorageKind}}>::Base \mbox{\hyperlink{classBase}{Base}};}
+\DoxyCodeLine{62     EIGEN\_GENERIC\_PUBLIC\_INTERFACE(\mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{CwiseUnaryOp}})}
+\DoxyCodeLine{63     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::ref\_selector<XprType>::type}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{XprTypeNested}};}
+\DoxyCodeLine{64     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<XprType>::type NestedExpression;}
+\DoxyCodeLine{65 }
+\DoxyCodeLine{66     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{67     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{CwiseUnaryOp}}(\textcolor{keyword}{const} XprType\& xpr, \textcolor{keyword}{const} UnaryOp\& func = UnaryOp())}
+\DoxyCodeLine{68       : m\_xpr(xpr), m\_functor(func) \{\}}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE EIGEN\_CONSTEXPR}
+\DoxyCodeLine{71     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_xpr.rows(); \}}
+\DoxyCodeLine{72     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE EIGEN\_CONSTEXPR}
+\DoxyCodeLine{73     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_xpr.cols(); \}}
+\DoxyCodeLine{74 }
+\DoxyCodeLine{76     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{77     \textcolor{keyword}{const} UnaryOp\& \mbox{\hyperlink{classEigen_1_1CwiseUnaryOp_a35cbdfeb47e4a4a909d0be001ffbf57c}{functor}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_functor; \}}
+\DoxyCodeLine{78 }
+\DoxyCodeLine{80     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{81     \textcolor{keyword}{const} \textcolor{keyword}{typename} internal::remove\_all<XprTypeNested>::type\&}
+\DoxyCodeLine{82     \mbox{\hyperlink{classEigen_1_1CwiseUnaryOp_a5b22c2e851e86c801e395792708c1f7c}{nestedExpression}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_xpr; \}}
+\DoxyCodeLine{83 }
+\DoxyCodeLine{85     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{86     \textcolor{keyword}{typename} internal::remove\_all<XprTypeNested>::type\&}
+\DoxyCodeLine{87     \mbox{\hyperlink{classEigen_1_1CwiseUnaryOp_ab602093ad6ca024b2974d91cba885fc5}{nestedExpression}}() \{ \textcolor{keywordflow}{return} m\_xpr; \}}
+\DoxyCodeLine{88 }
+\DoxyCodeLine{89   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{90     XprTypeNested m\_xpr;}
+\DoxyCodeLine{91     \textcolor{keyword}{const} UnaryOp m\_functor;}
+\DoxyCodeLine{92 \};}
+\DoxyCodeLine{93 }
+\DoxyCodeLine{94 \textcolor{comment}{// Generic API dispatcher}}
+\DoxyCodeLine{95 \textcolor{keyword}{template}<\textcolor{keyword}{typename} UnaryOp, \textcolor{keyword}{typename} XprType, \textcolor{keyword}{typename} StorageKind>}
+\DoxyCodeLine{96 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1CwiseUnaryOpImpl}{CwiseUnaryOpImpl}}}
+\DoxyCodeLine{97   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1generic__xpr__base}{internal::generic\_xpr\_base}}<CwiseUnaryOp<UnaryOp, XprType> >::type}
+\DoxyCodeLine{98 \{}
+\DoxyCodeLine{99 \textcolor{keyword}{public}:}
+\DoxyCodeLine{100   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1generic__xpr__base}{internal::generic\_xpr\_base<CwiseUnaryOp<UnaryOp, XprType>}} >::type \mbox{\hyperlink{classBase}{Base}};}
+\DoxyCodeLine{101 \};}
+\DoxyCodeLine{102 }
+\DoxyCodeLine{103 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{104 }
+\DoxyCodeLine{105 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_CWISE\_UNARY\_OP\_H}}
+
+\end{DoxyCode}

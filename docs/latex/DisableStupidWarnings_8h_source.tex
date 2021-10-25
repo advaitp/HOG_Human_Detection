@@ -1,0 +1,126 @@
+\hypertarget{DisableStupidWarnings_8h_source}{}\doxysection{Disable\+Stupid\+Warnings.\+h}
+\label{DisableStupidWarnings_8h_source}\index{include/Eigen/src/Core/util/DisableStupidWarnings.h@{include/Eigen/src/Core/util/DisableStupidWarnings.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{preprocessor}{\#ifndef EIGEN\_WARNINGS\_DISABLED}}
+\DoxyCodeLine{2 \textcolor{preprocessor}{\#define EIGEN\_WARNINGS\_DISABLED}}
+\DoxyCodeLine{3 }
+\DoxyCodeLine{4 \textcolor{preprocessor}{\#ifdef \_MSC\_VER}}
+\DoxyCodeLine{5   \textcolor{comment}{// 4100 -\/ unreferenced formal parameter (occurred e.g. in aligned\_allocator::destroy(pointer p))}}
+\DoxyCodeLine{6   \textcolor{comment}{// 4101 -\/ unreferenced local variable}}
+\DoxyCodeLine{7   \textcolor{comment}{// 4127 -\/ conditional expression is constant}}
+\DoxyCodeLine{8   \textcolor{comment}{// 4181 -\/ qualifier applied to reference type ignored}}
+\DoxyCodeLine{9   \textcolor{comment}{// 4211 -\/ nonstandard extension used : redefined extern to static}}
+\DoxyCodeLine{10   \textcolor{comment}{// 4244 -\/ 'argument' : conversion from 'type1' to 'type2', possible loss of data}}
+\DoxyCodeLine{11   \textcolor{comment}{// 4273 -\/ QtAlignedMalloc, inconsistent DLL linkage}}
+\DoxyCodeLine{12   \textcolor{comment}{// 4324 -\/ structure was padded due to declspec(align())}}
+\DoxyCodeLine{13   \textcolor{comment}{// 4503 -\/ decorated name length exceeded, name was truncated}}
+\DoxyCodeLine{14   \textcolor{comment}{// 4512 -\/ assignment operator could not be generated}}
+\DoxyCodeLine{15   \textcolor{comment}{// 4522 -\/ 'class' : multiple assignment operators specified}}
+\DoxyCodeLine{16   \textcolor{comment}{// 4700 -\/ uninitialized local variable 'xyz' used}}
+\DoxyCodeLine{17   \textcolor{comment}{// 4714 -\/ function marked as \_\_forceinline not inlined}}
+\DoxyCodeLine{18   \textcolor{comment}{// 4717 -\/ 'function' : recursive on all control paths, function will cause runtime stack overflow}}
+\DoxyCodeLine{19   \textcolor{comment}{// 4800 -\/ 'type' : forcing value to bool 'true' or 'false' (performance warning)}}
+\DoxyCodeLine{20 \textcolor{preprocessor}{  \#ifndef EIGEN\_PERMANENTLY\_DISABLE\_STUPID\_WARNINGS}}
+\DoxyCodeLine{21 \textcolor{preprocessor}{    \#pragma warning( push )}}
+\DoxyCodeLine{22 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{23 \textcolor{preprocessor}{  \#pragma warning( disable : 4100 4101 4127 4181 4211 4244 4273 4324 4503 4512 4522 4700 4714 4717 4800)}}
+\DoxyCodeLine{24 }
+\DoxyCodeLine{25 \textcolor{preprocessor}{\#elif defined \_\_INTEL\_COMPILER}}
+\DoxyCodeLine{26   \textcolor{comment}{// 2196 -\/ routine is both "{}inline"{} and "{}noinline"{} ("{}noinline"{} assumed)}}
+\DoxyCodeLine{27   \textcolor{comment}{//        ICC 12 generates this warning even without any inline keyword, when defining class methods 'inline' i.e. inside of class body}}
+\DoxyCodeLine{28   \textcolor{comment}{//        typedef that may be a reference type.}}
+\DoxyCodeLine{29   \textcolor{comment}{// 279  -\/ controlling expression is constant}}
+\DoxyCodeLine{30   \textcolor{comment}{//        ICC 12 generates this warning on assert(constant\_expression\_depending\_on\_template\_params) and frankly this is a legitimate use case.}}
+\DoxyCodeLine{31   \textcolor{comment}{// 1684 -\/ conversion from pointer to same-\/sized integral type (potential portability problem)}}
+\DoxyCodeLine{32   \textcolor{comment}{// 2259 -\/ non-\/pointer conversion from "{}Eigen::Index=\{ptrdiff\_t=\{long\}\}"{} to "{}int"{} may lose significant bits}}
+\DoxyCodeLine{33 \textcolor{preprocessor}{  \#ifndef EIGEN\_PERMANENTLY\_DISABLE\_STUPID\_WARNINGS}}
+\DoxyCodeLine{34 \textcolor{preprocessor}{    \#pragma warning push}}
+\DoxyCodeLine{35 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{36 \textcolor{preprocessor}{  \#pragma warning disable 2196 279 1684 2259}}
+\DoxyCodeLine{37 }
+\DoxyCodeLine{38 \textcolor{preprocessor}{\#elif defined \_\_clang\_\_}}
+\DoxyCodeLine{39   \textcolor{comment}{// -\/Wconstant-\/logical-\/operand -\/ warning: use of logical \&\& with constant operand; switch to bitwise \& or remove constant}}
+\DoxyCodeLine{40   \textcolor{comment}{//     this is really a stupid warning as it warns on compile-\/time expressions involving enums}}
+\DoxyCodeLine{41 \textcolor{preprocessor}{  \#ifndef EIGEN\_PERMANENTLY\_DISABLE\_STUPID\_WARNINGS}}
+\DoxyCodeLine{42 \textcolor{preprocessor}{    \#pragma clang diagnostic push}}
+\DoxyCodeLine{43 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{44 \textcolor{preprocessor}{  \#pragma clang diagnostic ignored "{}-\/Wconstant-\/logical-\/operand"{}}}
+\DoxyCodeLine{45 \textcolor{preprocessor}{  \#if \_\_clang\_major\_\_ >= 3 \&\& \_\_clang\_minor\_\_ >= 5}}
+\DoxyCodeLine{46 \textcolor{preprocessor}{    \#pragma clang diagnostic ignored "{}-\/Wabsolute-\/value"{}}}
+\DoxyCodeLine{47 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{48 \textcolor{preprocessor}{  \#if \_\_clang\_major\_\_ >= 10}}
+\DoxyCodeLine{49 \textcolor{preprocessor}{    \#pragma clang diagnostic ignored "{}-\/Wimplicit-\/int-\/float-\/conversion"{}}}
+\DoxyCodeLine{50 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{51 \textcolor{preprocessor}{  \#if ( defined(\_\_ALTIVEC\_\_) || defined(\_\_VSX\_\_) ) \&\& \_\_cplusplus < 201103L}}
+\DoxyCodeLine{52     \textcolor{comment}{// warning: generic selections are a C11-\/specific feature}}
+\DoxyCodeLine{53     \textcolor{comment}{// ignoring warnings thrown at vec\_ctf in Altivec/PacketMath.h}}
+\DoxyCodeLine{54 \textcolor{preprocessor}{    \#pragma clang diagnostic ignored "{}-\/Wc11-\/extensions"{}}}
+\DoxyCodeLine{55 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{56 }
+\DoxyCodeLine{57 \textcolor{preprocessor}{\#elif defined \_\_GNUC\_\_}}
+\DoxyCodeLine{58 }
+\DoxyCodeLine{59 \textcolor{preprocessor}{  \#if (!defined(EIGEN\_PERMANENTLY\_DISABLE\_STUPID\_WARNINGS)) \&\&  (\_\_GNUC\_\_ > 4 || (\_\_GNUC\_\_ == 4 \&\& \_\_GNUC\_MINOR\_\_ >= 6))}}
+\DoxyCodeLine{60 \textcolor{preprocessor}{    \#pragma GCC diagnostic push}}
+\DoxyCodeLine{61 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{62   \textcolor{comment}{// g++ warns about local variables shadowing member functions, which is too strict}}
+\DoxyCodeLine{63 \textcolor{preprocessor}{  \#pragma GCC diagnostic ignored "{}-\/Wshadow"{}}}
+\DoxyCodeLine{64 \textcolor{preprocessor}{  \#if \_\_GNUC\_\_ == 4 \&\& \_\_GNUC\_MINOR\_\_ < 8}}
+\DoxyCodeLine{65     \textcolor{comment}{// Until g++-\/4.7 there are warnings when comparing unsigned int vs 0, even in templated functions:}}
+\DoxyCodeLine{66 \textcolor{preprocessor}{    \#pragma GCC diagnostic ignored "{}-\/Wtype-\/limits"{}}}
+\DoxyCodeLine{67 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{68 \textcolor{preprocessor}{  \#if \_\_GNUC\_\_>=6}}
+\DoxyCodeLine{69 \textcolor{preprocessor}{    \#pragma GCC diagnostic ignored "{}-\/Wignored-\/attributes"{}}}
+\DoxyCodeLine{70 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{71 \textcolor{preprocessor}{  \#if \_\_GNUC\_\_==7}}
+\DoxyCodeLine{72     \textcolor{comment}{// See: https://gcc.gnu.org/bugzilla/show\_bug.cgi?id=89325}}
+\DoxyCodeLine{73 \textcolor{preprocessor}{    \#pragma GCC diagnostic ignored "{}-\/Wattributes"{}}}
+\DoxyCodeLine{74 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{75 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{76 }
+\DoxyCodeLine{77 \textcolor{preprocessor}{\#if defined \_\_NVCC\_\_}}
+\DoxyCodeLine{78 \textcolor{preprocessor}{  \#pragma diag\_suppress boolean\_controlling\_expr\_is\_constant}}
+\DoxyCodeLine{79   \textcolor{comment}{// Disable the "{}statement is unreachable"{} message}}
+\DoxyCodeLine{80 \textcolor{preprocessor}{  \#pragma diag\_suppress code\_is\_unreachable}}
+\DoxyCodeLine{81   \textcolor{comment}{// Disable the "{}dynamic initialization in unreachable code"{} message}}
+\DoxyCodeLine{82 \textcolor{preprocessor}{  \#pragma diag\_suppress initialization\_not\_reachable}}
+\DoxyCodeLine{83   \textcolor{comment}{// Disable the "{}invalid error number"{} message that we get with older versions of nvcc}}
+\DoxyCodeLine{84 \textcolor{preprocessor}{  \#pragma diag\_suppress 1222}}
+\DoxyCodeLine{85   \textcolor{comment}{// Disable the "{}calling a \_\_host\_\_ function from a \_\_host\_\_ \_\_device\_\_ function is not allowed"{} messages (yes, there are many of them and they seem to change with every version of the compiler)}}
+\DoxyCodeLine{86 \textcolor{preprocessor}{  \#pragma diag\_suppress 2527}}
+\DoxyCodeLine{87 \textcolor{preprocessor}{  \#pragma diag\_suppress 2529}}
+\DoxyCodeLine{88 \textcolor{preprocessor}{  \#pragma diag\_suppress 2651}}
+\DoxyCodeLine{89 \textcolor{preprocessor}{  \#pragma diag\_suppress 2653}}
+\DoxyCodeLine{90 \textcolor{preprocessor}{  \#pragma diag\_suppress 2668}}
+\DoxyCodeLine{91 \textcolor{preprocessor}{  \#pragma diag\_suppress 2669}}
+\DoxyCodeLine{92 \textcolor{preprocessor}{  \#pragma diag\_suppress 2670}}
+\DoxyCodeLine{93 \textcolor{preprocessor}{  \#pragma diag\_suppress 2671}}
+\DoxyCodeLine{94 \textcolor{preprocessor}{  \#pragma diag\_suppress 2735}}
+\DoxyCodeLine{95 \textcolor{preprocessor}{  \#pragma diag\_suppress 2737}}
+\DoxyCodeLine{96 \textcolor{preprocessor}{  \#pragma diag\_suppress 2739}}
+\DoxyCodeLine{97 \textcolor{preprocessor}{  \#pragma diag\_suppress 2885}}
+\DoxyCodeLine{98 \textcolor{preprocessor}{  \#pragma diag\_suppress 2888}}
+\DoxyCodeLine{99 \textcolor{preprocessor}{  \#pragma diag\_suppress 2976}}
+\DoxyCodeLine{100 \textcolor{preprocessor}{  \#pragma diag\_suppress 2979}}
+\DoxyCodeLine{101 \textcolor{preprocessor}{  \#pragma diag\_suppress 20011}}
+\DoxyCodeLine{102 \textcolor{preprocessor}{  \#pragma diag\_suppress 20014}}
+\DoxyCodeLine{103   \textcolor{comment}{// Disable the "{}// \_\_device\_\_ annotation is ignored on a function(...) that is}}
+\DoxyCodeLine{104   \textcolor{comment}{//              explicitly defaulted on its first declaration"{} message.}}
+\DoxyCodeLine{105   \textcolor{comment}{// The \_\_device\_\_ annotation seems to actually be needed in some cases,}}
+\DoxyCodeLine{106   \textcolor{comment}{// otherwise resulting in kernel runtime errors.}}
+\DoxyCodeLine{107 \textcolor{preprocessor}{  \#pragma diag\_suppress 2886}}
+\DoxyCodeLine{108 \textcolor{preprocessor}{  \#pragma diag\_suppress 2977}}
+\DoxyCodeLine{109 \textcolor{preprocessor}{  \#pragma diag\_suppress 20012}}
+\DoxyCodeLine{110 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{111 }
+\DoxyCodeLine{112 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{113 \textcolor{comment}{// warnings already disabled:}}
+\DoxyCodeLine{114 \textcolor{preprocessor}{\# ifndef EIGEN\_WARNINGS\_DISABLED\_2}}
+\DoxyCodeLine{115 \textcolor{preprocessor}{\#  define EIGEN\_WARNINGS\_DISABLED\_2}}
+\DoxyCodeLine{116 \textcolor{preprocessor}{\# elif defined(EIGEN\_INTERNAL\_DEBUGGING)}}
+\DoxyCodeLine{117 \textcolor{preprocessor}{\#  error "{}Do not include \(\backslash\)"{}DisableStupidWarnings.h\(\backslash\)"{} recursively more than twice!"{}}}
+\DoxyCodeLine{118 \textcolor{preprocessor}{\# endif}}
+\DoxyCodeLine{119 }
+\DoxyCodeLine{120 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// not EIGEN\_WARNINGS\_DISABLED}}
+
+\end{DoxyCode}

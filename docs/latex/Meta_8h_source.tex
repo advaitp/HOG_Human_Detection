@@ -1,0 +1,809 @@
+\hypertarget{Meta_8h_source}{}\doxysection{Meta.\+h}
+\label{Meta_8h_source}\index{include/Eigen/src/Core/util/Meta.h@{include/Eigen/src/Core/util/Meta.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2008-\/2015 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2006-\/2008 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_META\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_META\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{preprocessor}{\#if defined(EIGEN\_GPU\_COMPILE\_PHASE)}}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{preprocessor}{ \#include <cfloat>}}
+\DoxyCodeLine{19 }
+\DoxyCodeLine{20 \textcolor{preprocessor}{ \#if defined(EIGEN\_CUDA\_ARCH)}}
+\DoxyCodeLine{21 \textcolor{preprocessor}{  \#include <math\_constants.h>}}
+\DoxyCodeLine{22 \textcolor{preprocessor}{ \#endif}}
+\DoxyCodeLine{23 }
+\DoxyCodeLine{24 \textcolor{preprocessor}{ \#if defined(EIGEN\_HIP\_DEVICE\_COMPILE)}}
+\DoxyCodeLine{25 \textcolor{preprocessor}{  \#include "{}Eigen/src/Core/arch/HIP/hcc/math\_constants.h"{}}}
+\DoxyCodeLine{26 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{27 }
+\DoxyCodeLine{28 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{29 }
+\DoxyCodeLine{30 \textcolor{comment}{// Recent versions of ICC require <cstdint> for pointer types below.}}
+\DoxyCodeLine{31 \textcolor{preprocessor}{\#define EIGEN\_ICC\_NEEDS\_CSTDINT (EIGEN\_COMP\_ICC>=1600 \&\& EIGEN\_COMP\_CXXVER >= 11)}}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33 \textcolor{comment}{// Define portable (u)int\{32,64\} types}}
+\DoxyCodeLine{34 \textcolor{preprocessor}{\#if EIGEN\_HAS\_CXX11 || EIGEN\_ICC\_NEEDS\_CSTDINT}}
+\DoxyCodeLine{35 \textcolor{preprocessor}{\#include <cstdint>}}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{37 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{38 \textcolor{keyword}{namespace }numext \{}
+\DoxyCodeLine{39 \textcolor{keyword}{typedef} std::uint8\_t  uint8\_t;}
+\DoxyCodeLine{40 \textcolor{keyword}{typedef} std::int8\_t   int8\_t;}
+\DoxyCodeLine{41 \textcolor{keyword}{typedef} std::uint16\_t uint16\_t;}
+\DoxyCodeLine{42 \textcolor{keyword}{typedef} std::int16\_t  int16\_t;}
+\DoxyCodeLine{43 \textcolor{keyword}{typedef} std::uint32\_t uint32\_t;}
+\DoxyCodeLine{44 \textcolor{keyword}{typedef} std::int32\_t  int32\_t;}
+\DoxyCodeLine{45 \textcolor{keyword}{typedef} std::uint64\_t uint64\_t;}
+\DoxyCodeLine{46 \textcolor{keyword}{typedef} std::int64\_t  int64\_t;}
+\DoxyCodeLine{47 \}}
+\DoxyCodeLine{48 \}}
+\DoxyCodeLine{49 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{50 \textcolor{comment}{// Without c++11, all compilers able to compile Eigen also}}
+\DoxyCodeLine{51 \textcolor{comment}{// provide the C99 stdint.h header file.}}
+\DoxyCodeLine{52 \textcolor{preprocessor}{\#include <stdint.h>}}
+\DoxyCodeLine{53 }
+\DoxyCodeLine{54 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{55 \textcolor{keyword}{namespace }numext \{}
+\DoxyCodeLine{56 \textcolor{keyword}{typedef} ::uint8\_t  uint8\_t;}
+\DoxyCodeLine{57 \textcolor{keyword}{typedef} ::int8\_t   int8\_t;}
+\DoxyCodeLine{58 \textcolor{keyword}{typedef} ::uint16\_t uint16\_t;}
+\DoxyCodeLine{59 \textcolor{keyword}{typedef} ::int16\_t  int16\_t;}
+\DoxyCodeLine{60 \textcolor{keyword}{typedef} ::uint32\_t uint32\_t;}
+\DoxyCodeLine{61 \textcolor{keyword}{typedef} ::int32\_t  int32\_t;}
+\DoxyCodeLine{62 \textcolor{keyword}{typedef} ::uint64\_t uint64\_t;}
+\DoxyCodeLine{63 \textcolor{keyword}{typedef} ::int64\_t  int64\_t;}
+\DoxyCodeLine{64 \}}
+\DoxyCodeLine{65 \}}
+\DoxyCodeLine{66 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{67 }
+\DoxyCodeLine{68 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70 \textcolor{keyword}{typedef} EIGEN\_DEFAULT\_DENSE\_INDEX\_TYPE DenseIndex;}
+\DoxyCodeLine{71 }
+\DoxyCodeLine{78 \textcolor{keyword}{typedef} EIGEN\_DEFAULT\_DENSE\_INDEX\_TYPE \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}};}
+\DoxyCodeLine{79 }
+\DoxyCodeLine{80 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{81 }
+\DoxyCodeLine{89 \textcolor{comment}{// Only recent versions of ICC complain about using ptrdiff\_t to hold pointers,}}
+\DoxyCodeLine{90 \textcolor{comment}{// and older versions do not provide *intptr\_t types.}}
+\DoxyCodeLine{91 \textcolor{preprocessor}{\#if EIGEN\_ICC\_NEEDS\_CSTDINT}}
+\DoxyCodeLine{92 \textcolor{keyword}{typedef} std::intptr\_t  IntPtr;}
+\DoxyCodeLine{93 \textcolor{keyword}{typedef} std::uintptr\_t UIntPtr;}
+\DoxyCodeLine{94 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{95 \textcolor{keyword}{typedef} std::ptrdiff\_t IntPtr;}
+\DoxyCodeLine{96 \textcolor{keyword}{typedef} std::size\_t UIntPtr;}
+\DoxyCodeLine{97 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{98 \textcolor{preprocessor}{\#undef EIGEN\_ICC\_NEEDS\_CSTDINT}}
+\DoxyCodeLine{99 }
+\DoxyCodeLine{100 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{true\_type}} \{  \textcolor{keyword}{enum} \{ value = 1 \}; \};}
+\DoxyCodeLine{101 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1false__type}{false\_type}} \{ \textcolor{keyword}{enum} \{ value = 0 \}; \};}
+\DoxyCodeLine{102 }
+\DoxyCodeLine{103 \textcolor{keyword}{template}<\textcolor{keywordtype}{bool} Condition>}
+\DoxyCodeLine{104 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1bool__constant}{bool\_constant}};}
+\DoxyCodeLine{105 }
+\DoxyCodeLine{106 \textcolor{keyword}{template}<>}
+\DoxyCodeLine{107 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1bool__constant}{bool\_constant}}<true> : \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{true\_type}} \{\};}
+\DoxyCodeLine{108 }
+\DoxyCodeLine{109 \textcolor{keyword}{template}<>}
+\DoxyCodeLine{110 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1bool__constant}{bool\_constant}}<false> : \mbox{\hyperlink{structEigen_1_1internal_1_1false__type}{false\_type}} \{\};}
+\DoxyCodeLine{111 }
+\DoxyCodeLine{112 \textcolor{keyword}{template}<\textcolor{keywordtype}{bool} Condition, \textcolor{keyword}{typename} Then, \textcolor{keyword}{typename} Else>}
+\DoxyCodeLine{113 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1conditional}{conditional}} \{ \textcolor{keyword}{typedef} Then \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{type}}; \};}
+\DoxyCodeLine{114 }
+\DoxyCodeLine{115 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Then, \textcolor{keyword}{typename} Else>}
+\DoxyCodeLine{116 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1conditional}{conditional}} <false, Then, Else> \{ \textcolor{keyword}{typedef} Else type; \};}
+\DoxyCodeLine{117 }
+\DoxyCodeLine{118 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1remove__reference}{remove\_reference}} \{ \textcolor{keyword}{typedef} T type; \};}
+\DoxyCodeLine{119 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1remove__reference}{remove\_reference}}<T\&> \{ \textcolor{keyword}{typedef} T type; \};}
+\DoxyCodeLine{120 }
+\DoxyCodeLine{121 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1remove__pointer}{remove\_pointer}} \{ \textcolor{keyword}{typedef} T type; \};}
+\DoxyCodeLine{122 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1remove__pointer}{remove\_pointer}}<T*> \{ \textcolor{keyword}{typedef} T type; \};}
+\DoxyCodeLine{123 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1remove__pointer}{remove\_pointer}}<T*\textcolor{keyword}{const}> \{ \textcolor{keyword}{typedef} T type; \};}
+\DoxyCodeLine{124 }
+\DoxyCodeLine{125 \textcolor{keyword}{template} <\textcolor{keyword}{class} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1remove__const}{remove\_const}} \{ \textcolor{keyword}{typedef} T type; \};}
+\DoxyCodeLine{126 \textcolor{keyword}{template} <\textcolor{keyword}{class} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1remove__const}{remove\_const}}<const T> \{ \textcolor{keyword}{typedef} T type; \};}
+\DoxyCodeLine{127 \textcolor{keyword}{template} <\textcolor{keyword}{class} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1remove__const}{remove\_const}}<const T[]> \{ \textcolor{keyword}{typedef} T type[]; \};}
+\DoxyCodeLine{128 \textcolor{keyword}{template} <\textcolor{keyword}{class} T, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} Size> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1remove__const}{remove\_const}}<const T[Size]> \{ \textcolor{keyword}{typedef} T type[Size]; \};}
+\DoxyCodeLine{129 }
+\DoxyCodeLine{130 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1remove__all}{remove\_all}} \{ \textcolor{keyword}{typedef} T type; \};}
+\DoxyCodeLine{131 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1remove__all}{remove\_all}}<const T>   \{ \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<T>::type type; \};}
+\DoxyCodeLine{132 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1remove__all}{remove\_all}}<T const\&>  \{ \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<T>::type type; \};}
+\DoxyCodeLine{133 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1remove__all}{remove\_all}}<T\&>        \{ \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<T>::type type; \};}
+\DoxyCodeLine{134 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1remove__all}{remove\_all}}<T const*>  \{ \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<T>::type type; \};}
+\DoxyCodeLine{135 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1remove__all}{remove\_all}}<T*>        \{ \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<T>::type type; \};}
+\DoxyCodeLine{136 }
+\DoxyCodeLine{137 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__arithmetic}{is\_arithmetic}}      \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{false} \}; \};}
+\DoxyCodeLine{138 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__arithmetic}{is\_arithmetic}}<float>         \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{139 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__arithmetic}{is\_arithmetic}}<double>        \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{140 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__arithmetic}{is\_arithmetic}}<long double>   \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{141 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__arithmetic}{is\_arithmetic}}<bool>          \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{142 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__arithmetic}{is\_arithmetic}}<char>          \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{143 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__arithmetic}{is\_arithmetic}}<signed char>   \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{144 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__arithmetic}{is\_arithmetic}}<unsigned char> \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{145 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__arithmetic}{is\_arithmetic}}<signed short>  \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{146 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__arithmetic}{is\_arithmetic}}<unsigned short>\{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{147 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__arithmetic}{is\_arithmetic}}<signed int>    \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{148 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__arithmetic}{is\_arithmetic}}<unsigned int>  \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{149 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__arithmetic}{is\_arithmetic}}<signed long>   \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{150 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__arithmetic}{is\_arithmetic}}<unsigned long> \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{151 }
+\DoxyCodeLine{152 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} U> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{is\_same}} \{ \textcolor{keyword}{enum} \{ value = 0 \}; \};}
+\DoxyCodeLine{153 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{is\_same}}<T,T> \{ \textcolor{keyword}{enum} \{ value = 1 \}; \};}
+\DoxyCodeLine{154 }
+\DoxyCodeLine{155 \textcolor{keyword}{template}< \textcolor{keyword}{class} T >}
+\DoxyCodeLine{156 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__void}{is\_void}} : \mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{is\_same}}<void, typename remove\_const<T>::type> \{\};}
+\DoxyCodeLine{157 }
+\DoxyCodeLine{158 \textcolor{preprocessor}{\#if EIGEN\_HAS\_CXX11}}
+\DoxyCodeLine{159 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__arithmetic}{is\_arithmetic}}<signed long long>   \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{160 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }is\_arithmetic<unsigned long long> \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{161 \textcolor{keyword}{using} std::is\_integral;}
+\DoxyCodeLine{162 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{163 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__integral}{is\_integral}}               \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{false} \}; \};}
+\DoxyCodeLine{164 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__integral}{is\_integral}}<bool>                   \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{165 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__integral}{is\_integral}}<char>                   \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{166 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__integral}{is\_integral}}<signed char>            \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{167 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__integral}{is\_integral}}<unsigned char>          \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{168 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__integral}{is\_integral}}<signed short>           \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{169 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__integral}{is\_integral}}<unsigned short>         \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{170 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__integral}{is\_integral}}<signed int>             \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{171 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__integral}{is\_integral}}<unsigned int>           \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{172 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__integral}{is\_integral}}<signed long>            \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{173 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__integral}{is\_integral}}<unsigned long>          \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{174 \textcolor{preprocessor}{\#if EIGEN\_COMP\_MSVC}}
+\DoxyCodeLine{175 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__integral}{is\_integral}}<signed \_\_int64>         \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{176 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }is\_integral<unsigned \_\_int64>       \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{177 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{178 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{179 }
+\DoxyCodeLine{180 \textcolor{preprocessor}{\#if EIGEN\_HAS\_CXX11}}
+\DoxyCodeLine{181 \textcolor{keyword}{using} std::make\_unsigned;}
+\DoxyCodeLine{182 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{183 \textcolor{comment}{// TODO: Possibly improve this implementation of make\_unsigned.}}
+\DoxyCodeLine{184 \textcolor{comment}{// It is currently used only by}}
+\DoxyCodeLine{185 \textcolor{comment}{// template<typename Scalar> struct random\_default\_impl<Scalar, false, true>.}}
+\DoxyCodeLine{186 \textcolor{keyword}{template}<\textcolor{keyword}{typename}> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1make__unsigned}{make\_unsigned}};}
+\DoxyCodeLine{187 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1make__unsigned}{make\_unsigned}}<char>             \{ \textcolor{keyword}{typedef} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} type; \};}
+\DoxyCodeLine{188 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1make__unsigned}{make\_unsigned}}<signed char>      \{ \textcolor{keyword}{typedef} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} type; \};}
+\DoxyCodeLine{189 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1make__unsigned}{make\_unsigned}}<unsigned char>    \{ \textcolor{keyword}{typedef} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} type; \};}
+\DoxyCodeLine{190 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1make__unsigned}{make\_unsigned}}<signed short>     \{ \textcolor{keyword}{typedef} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} type; \};}
+\DoxyCodeLine{191 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1make__unsigned}{make\_unsigned}}<unsigned short>   \{ \textcolor{keyword}{typedef} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} type; \};}
+\DoxyCodeLine{192 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1make__unsigned}{make\_unsigned}}<signed int>       \{ \textcolor{keyword}{typedef} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} type; \};}
+\DoxyCodeLine{193 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1make__unsigned}{make\_unsigned}}<unsigned int>     \{ \textcolor{keyword}{typedef} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} type; \};}
+\DoxyCodeLine{194 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1make__unsigned}{make\_unsigned}}<signed long>      \{ \textcolor{keyword}{typedef} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} type; \};}
+\DoxyCodeLine{195 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1make__unsigned}{make\_unsigned}}<unsigned long>    \{ \textcolor{keyword}{typedef} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} type; \};}
+\DoxyCodeLine{196 \textcolor{preprocessor}{\#if EIGEN\_COMP\_MSVC}}
+\DoxyCodeLine{197 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1make__unsigned}{make\_unsigned}}<signed \_\_int64>   \{ \textcolor{keyword}{typedef} \textcolor{keywordtype}{unsigned} \_\_int64 type; \};}
+\DoxyCodeLine{198 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }make\_unsigned<unsigned \_\_int64> \{ \textcolor{keyword}{typedef} \textcolor{keywordtype}{unsigned} \_\_int64 type; \};}
+\DoxyCodeLine{199 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{200 }
+\DoxyCodeLine{201 \textcolor{comment}{// Some platforms define int64\_t as `long long` even for C++03, where}}
+\DoxyCodeLine{202 \textcolor{comment}{// `long long` is not guaranteed by the standard. In this case we are missing}}
+\DoxyCodeLine{203 \textcolor{comment}{// the definition for make\_unsigned. If we just define it, we run into issues}}
+\DoxyCodeLine{204 \textcolor{comment}{// where `long long` doesn't exist in some compilers for C++03. We therefore add}}
+\DoxyCodeLine{205 \textcolor{comment}{// the specialization for these platforms only.}}
+\DoxyCodeLine{206 \textcolor{preprocessor}{\#if EIGEN\_OS\_MAC || EIGEN\_COMP\_MINGW}}
+\DoxyCodeLine{207 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }make\_unsigned<unsigned long long> \{ \textcolor{keyword}{typedef} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} type; \};}
+\DoxyCodeLine{208 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }make\_unsigned<long long>          \{ \textcolor{keyword}{typedef} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} type; \};}
+\DoxyCodeLine{209 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{210 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{211 }
+\DoxyCodeLine{212 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1add__const}{add\_const}} \{ \textcolor{keyword}{typedef} \textcolor{keyword}{const} T \mbox{\hyperlink{classEigen_1_1Diagonal}{type}}; \};}
+\DoxyCodeLine{213 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1add__const}{add\_const}}<T\&> \{ \textcolor{keyword}{typedef} T\& type; \};}
+\DoxyCodeLine{214 }
+\DoxyCodeLine{215 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__const}{is\_const}} \{ \textcolor{keyword}{enum} \{ value = 0 \}; \};}
+\DoxyCodeLine{216 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__const}{is\_const}}<T const> \{ \textcolor{keyword}{enum} \{ value = 1 \}; \};}
+\DoxyCodeLine{217 }
+\DoxyCodeLine{218 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1add__const__on__value__type}{add\_const\_on\_value\_type}}            \{ \textcolor{keyword}{typedef} \textcolor{keyword}{const} T type;  \};}
+\DoxyCodeLine{219 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1add__const__on__value__type}{add\_const\_on\_value\_type}}<T\&>        \{ \textcolor{keyword}{typedef} T \textcolor{keyword}{const}\& type; \};}
+\DoxyCodeLine{220 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1add__const__on__value__type}{add\_const\_on\_value\_type}}<T*>        \{ \textcolor{keyword}{typedef} T \textcolor{keyword}{const}* type; \};}
+\DoxyCodeLine{221 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1add__const__on__value__type}{add\_const\_on\_value\_type}}<T* \textcolor{keyword}{const}>  \{ \textcolor{keyword}{typedef} T \textcolor{keyword}{const}* \textcolor{keyword}{const} type; \};}
+\DoxyCodeLine{222 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1add__const__on__value__type}{add\_const\_on\_value\_type}}<T const* \textcolor{keyword}{const}>  \{ \textcolor{keyword}{typedef} T \textcolor{keyword}{const}* \textcolor{keyword}{const} type; \};}
+\DoxyCodeLine{223 }
+\DoxyCodeLine{224 \textcolor{preprocessor}{\#if EIGEN\_HAS\_CXX11}}
+\DoxyCodeLine{225 }
+\DoxyCodeLine{226 \textcolor{keyword}{using} std::is\_convertible;}
+\DoxyCodeLine{227 }
+\DoxyCodeLine{228 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{229 }
+\DoxyCodeLine{230 \textcolor{keyword}{template}<\textcolor{keyword}{typename} From, \textcolor{keyword}{typename} To>}
+\DoxyCodeLine{231 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__convertible__impl}{is\_convertible\_impl}}}
+\DoxyCodeLine{232 \{}
+\DoxyCodeLine{233 \textcolor{keyword}{private}:}
+\DoxyCodeLine{234   \textcolor{keyword}{struct }any\_conversion}
+\DoxyCodeLine{235   \{}
+\DoxyCodeLine{236     \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> any\_conversion(\textcolor{keyword}{const} \textcolor{keyword}{volatile} T\&);}
+\DoxyCodeLine{237     \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> any\_conversion(T\&);}
+\DoxyCodeLine{238   \};}
+\DoxyCodeLine{239   \textcolor{keyword}{struct }yes \{\textcolor{keywordtype}{int} a[1];\};}
+\DoxyCodeLine{240   \textcolor{keyword}{struct }no  \{\textcolor{keywordtype}{int} a[2];\};}
+\DoxyCodeLine{241 }
+\DoxyCodeLine{242   \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{243   \textcolor{keyword}{static} yes test(T, \textcolor{keywordtype}{int});}
+\DoxyCodeLine{244 }
+\DoxyCodeLine{245   \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{246   \textcolor{keyword}{static} no  test(any\_conversion, ...);}
+\DoxyCodeLine{247 }
+\DoxyCodeLine{248 \textcolor{keyword}{public}:}
+\DoxyCodeLine{249   \textcolor{keyword}{static} \textcolor{keyword}{typename} internal::remove\_reference<From>::type* ms\_from;}
+\DoxyCodeLine{250 \textcolor{preprocessor}{\#ifdef \_\_INTEL\_COMPILER}}
+\DoxyCodeLine{251 \textcolor{preprocessor}{  \#pragma warning push}}
+\DoxyCodeLine{252 \textcolor{preprocessor}{  \#pragma warning ( disable : 2259 )}}
+\DoxyCodeLine{253 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{254   \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{sizeof}(test<To>(*ms\_from, 0))==\textcolor{keyword}{sizeof}(yes) \};}
+\DoxyCodeLine{255 \textcolor{preprocessor}{\#ifdef \_\_INTEL\_COMPILER}}
+\DoxyCodeLine{256 \textcolor{preprocessor}{  \#pragma warning pop}}
+\DoxyCodeLine{257 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{258 \};}
+\DoxyCodeLine{259 }
+\DoxyCodeLine{260 \textcolor{keyword}{template}<\textcolor{keyword}{typename} From, \textcolor{keyword}{typename} To>}
+\DoxyCodeLine{261 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__convertible}{is\_convertible}}}
+\DoxyCodeLine{262 \{}
+\DoxyCodeLine{263   \textcolor{keyword}{enum} \{ value = \mbox{\hyperlink{structEigen_1_1internal_1_1is__convertible__impl}{is\_convertible\_impl<From,To>::value}} \};}
+\DoxyCodeLine{264 \};}
+\DoxyCodeLine{265 }
+\DoxyCodeLine{266 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{267 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__convertible}{is\_convertible}}<T,T\&> \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{false} \}; \};}
+\DoxyCodeLine{268 }
+\DoxyCodeLine{269 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{270 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__convertible}{is\_convertible}}<const T,const T\&> \{ \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{true} \}; \};}
+\DoxyCodeLine{271 }
+\DoxyCodeLine{272 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{273 }
+\DoxyCodeLine{277 \textcolor{keyword}{template}<\textcolor{keywordtype}{bool} Condition, \textcolor{keyword}{typename} T=\textcolor{keywordtype}{void}> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1enable__if}{enable\_if}};}
+\DoxyCodeLine{278 }
+\DoxyCodeLine{279 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1enable__if}{enable\_if}}<true,T>}
+\DoxyCodeLine{280 \{ \textcolor{keyword}{typedef} T type; \};}
+\DoxyCodeLine{281 }
+\DoxyCodeLine{282 \textcolor{preprocessor}{\#if defined(EIGEN\_GPU\_COMPILE\_PHASE) \&\& !EIGEN\_HAS\_CXX11}}
+\DoxyCodeLine{283 \textcolor{preprocessor}{\#if !defined(\_\_FLT\_EPSILON\_\_)}}
+\DoxyCodeLine{284 \textcolor{preprocessor}{\#define \_\_FLT\_EPSILON\_\_ FLT\_EPSILON}}
+\DoxyCodeLine{285 \textcolor{preprocessor}{\#define \_\_DBL\_EPSILON\_\_ DBL\_EPSILON}}
+\DoxyCodeLine{286 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{287 }
+\DoxyCodeLine{288 \textcolor{keyword}{namespace }device \{}
+\DoxyCodeLine{289 }
+\DoxyCodeLine{290 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }numeric\_limits}
+\DoxyCodeLine{291 \{}
+\DoxyCodeLine{292   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{293   \textcolor{keyword}{static} EIGEN\_CONSTEXPR T epsilon() \{ \textcolor{keywordflow}{return} 0; \}}
+\DoxyCodeLine{294   \textcolor{keyword}{static} T (max)() \{ assert(\textcolor{keyword}{false} \&\& \textcolor{stringliteral}{"{}Highest not supported for this type"{}}); \}}
+\DoxyCodeLine{295   \textcolor{keyword}{static} T (min)() \{ assert(\textcolor{keyword}{false} \&\& \textcolor{stringliteral}{"{}Lowest not supported for this type"{}}); \}}
+\DoxyCodeLine{296   \textcolor{keyword}{static} T infinity() \{ assert(\textcolor{keyword}{false} \&\& \textcolor{stringliteral}{"{}Infinity not supported for this type"{}}); \}}
+\DoxyCodeLine{297   \textcolor{keyword}{static} T quiet\_NaN() \{ assert(\textcolor{keyword}{false} \&\& \textcolor{stringliteral}{"{}quiet\_NaN not supported for this type"{}}); \}}
+\DoxyCodeLine{298 \};}
+\DoxyCodeLine{299 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }numeric\_limits<float>}
+\DoxyCodeLine{300 \{}
+\DoxyCodeLine{301   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{302   \textcolor{keyword}{static} \textcolor{keywordtype}{float} epsilon() \{ \textcolor{keywordflow}{return} \_\_FLT\_EPSILON\_\_; \}}
+\DoxyCodeLine{303   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{304   \textcolor{keyword}{static} float (max)() \{}
+\DoxyCodeLine{305 \textcolor{preprocessor}{  \#if defined(EIGEN\_CUDA\_ARCH)}}
+\DoxyCodeLine{306     \textcolor{keywordflow}{return} CUDART\_MAX\_NORMAL\_F;}
+\DoxyCodeLine{307 \textcolor{preprocessor}{  \#else}}
+\DoxyCodeLine{308     \textcolor{keywordflow}{return} HIPRT\_MAX\_NORMAL\_F;}
+\DoxyCodeLine{309 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{310   \}}
+\DoxyCodeLine{311   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{312   \textcolor{keyword}{static} float (min)() \{ \textcolor{keywordflow}{return} FLT\_MIN; \}}
+\DoxyCodeLine{313   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{314   \textcolor{keyword}{static} \textcolor{keywordtype}{float} infinity() \{}
+\DoxyCodeLine{315 \textcolor{preprocessor}{  \#if defined(EIGEN\_CUDA\_ARCH)}}
+\DoxyCodeLine{316     \textcolor{keywordflow}{return} CUDART\_INF\_F;}
+\DoxyCodeLine{317 \textcolor{preprocessor}{  \#else}}
+\DoxyCodeLine{318     \textcolor{keywordflow}{return} HIPRT\_INF\_F;}
+\DoxyCodeLine{319 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{320   \}}
+\DoxyCodeLine{321   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{322   \textcolor{keyword}{static} \textcolor{keywordtype}{float} quiet\_NaN() \{}
+\DoxyCodeLine{323 \textcolor{preprocessor}{  \#if defined(EIGEN\_CUDA\_ARCH)}}
+\DoxyCodeLine{324     \textcolor{keywordflow}{return} CUDART\_NAN\_F;}
+\DoxyCodeLine{325 \textcolor{preprocessor}{  \#else}}
+\DoxyCodeLine{326     \textcolor{keywordflow}{return} HIPRT\_NAN\_F;}
+\DoxyCodeLine{327 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{328   \}}
+\DoxyCodeLine{329 \};}
+\DoxyCodeLine{330 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }numeric\_limits<double>}
+\DoxyCodeLine{331 \{}
+\DoxyCodeLine{332   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{333   \textcolor{keyword}{static} \textcolor{keywordtype}{double} epsilon() \{ \textcolor{keywordflow}{return} \_\_DBL\_EPSILON\_\_; \}}
+\DoxyCodeLine{334   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{335   \textcolor{keyword}{static} double (max)() \{ \textcolor{keywordflow}{return} DBL\_MAX; \}}
+\DoxyCodeLine{336   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{337   \textcolor{keyword}{static} double (min)() \{ \textcolor{keywordflow}{return} DBL\_MIN; \}}
+\DoxyCodeLine{338   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{339   \textcolor{keyword}{static} \textcolor{keywordtype}{double} infinity() \{}
+\DoxyCodeLine{340 \textcolor{preprocessor}{  \#if defined(EIGEN\_CUDA\_ARCH)}}
+\DoxyCodeLine{341     \textcolor{keywordflow}{return} CUDART\_INF;}
+\DoxyCodeLine{342 \textcolor{preprocessor}{  \#else}}
+\DoxyCodeLine{343     \textcolor{keywordflow}{return} HIPRT\_INF;}
+\DoxyCodeLine{344 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{345   \}}
+\DoxyCodeLine{346   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{347   \textcolor{keyword}{static} \textcolor{keywordtype}{double} quiet\_NaN() \{}
+\DoxyCodeLine{348 \textcolor{preprocessor}{  \#if defined(EIGEN\_CUDA\_ARCH)}}
+\DoxyCodeLine{349     \textcolor{keywordflow}{return} CUDART\_NAN;}
+\DoxyCodeLine{350 \textcolor{preprocessor}{  \#else}}
+\DoxyCodeLine{351     \textcolor{keywordflow}{return} HIPRT\_NAN;}
+\DoxyCodeLine{352 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{353   \}}
+\DoxyCodeLine{354 \};}
+\DoxyCodeLine{355 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }numeric\_limits<int>}
+\DoxyCodeLine{356 \{}
+\DoxyCodeLine{357   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{358   \textcolor{keyword}{static} \textcolor{keywordtype}{int} epsilon() \{ \textcolor{keywordflow}{return} 0; \}}
+\DoxyCodeLine{359   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{360   \textcolor{keyword}{static} int (max)() \{ \textcolor{keywordflow}{return} INT\_MAX; \}}
+\DoxyCodeLine{361   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{362   \textcolor{keyword}{static} int (min)() \{ \textcolor{keywordflow}{return} INT\_MIN; \}}
+\DoxyCodeLine{363 \};}
+\DoxyCodeLine{364 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }numeric\_limits<unsigned int>}
+\DoxyCodeLine{365 \{}
+\DoxyCodeLine{366   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{367   \textcolor{keyword}{static} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} epsilon() \{ \textcolor{keywordflow}{return} 0; \}}
+\DoxyCodeLine{368   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{369   \textcolor{keyword}{static} \textcolor{keywordtype}{unsigned} int (max)() \{ \textcolor{keywordflow}{return} UINT\_MAX; \}}
+\DoxyCodeLine{370   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{371   \textcolor{keyword}{static} \textcolor{keywordtype}{unsigned} int (min)() \{ \textcolor{keywordflow}{return} 0; \}}
+\DoxyCodeLine{372 \};}
+\DoxyCodeLine{373 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }numeric\_limits<long>}
+\DoxyCodeLine{374 \{}
+\DoxyCodeLine{375   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{376   \textcolor{keyword}{static} \textcolor{keywordtype}{long} epsilon() \{ \textcolor{keywordflow}{return} 0; \}}
+\DoxyCodeLine{377   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{378   \textcolor{keyword}{static} long (max)() \{ \textcolor{keywordflow}{return} LONG\_MAX; \}}
+\DoxyCodeLine{379   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{380   \textcolor{keyword}{static} long (min)() \{ \textcolor{keywordflow}{return} LONG\_MIN; \}}
+\DoxyCodeLine{381 \};}
+\DoxyCodeLine{382 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }numeric\_limits<unsigned long>}
+\DoxyCodeLine{383 \{}
+\DoxyCodeLine{384   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{385   \textcolor{keyword}{static} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} epsilon() \{ \textcolor{keywordflow}{return} 0; \}}
+\DoxyCodeLine{386   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{387   \textcolor{keyword}{static} \textcolor{keywordtype}{unsigned} long (max)() \{ \textcolor{keywordflow}{return} ULONG\_MAX; \}}
+\DoxyCodeLine{388   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{389   \textcolor{keyword}{static} \textcolor{keywordtype}{unsigned} long (min)() \{ \textcolor{keywordflow}{return} 0; \}}
+\DoxyCodeLine{390 \};}
+\DoxyCodeLine{391 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }numeric\_limits<long long>}
+\DoxyCodeLine{392 \{}
+\DoxyCodeLine{393   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{394   \textcolor{keyword}{static} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} epsilon() \{ \textcolor{keywordflow}{return} 0; \}}
+\DoxyCodeLine{395   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{396   \textcolor{keyword}{static} \textcolor{keywordtype}{long} long (max)() \{ \textcolor{keywordflow}{return} LLONG\_MAX; \}}
+\DoxyCodeLine{397   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{398   \textcolor{keyword}{static} \textcolor{keywordtype}{long} long (min)() \{ \textcolor{keywordflow}{return} LLONG\_MIN; \}}
+\DoxyCodeLine{399 \};}
+\DoxyCodeLine{400 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }numeric\_limits<unsigned long long>}
+\DoxyCodeLine{401 \{}
+\DoxyCodeLine{402   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{403   \textcolor{keyword}{static} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} epsilon() \{ \textcolor{keywordflow}{return} 0; \}}
+\DoxyCodeLine{404   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{405   \textcolor{keyword}{static} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} long (max)() \{ \textcolor{keywordflow}{return} ULLONG\_MAX; \}}
+\DoxyCodeLine{406   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{407   \textcolor{keyword}{static} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} long (min)() \{ \textcolor{keywordflow}{return} 0; \}}
+\DoxyCodeLine{408 \};}
+\DoxyCodeLine{409 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }numeric\_limits<bool>}
+\DoxyCodeLine{410 \{}
+\DoxyCodeLine{411   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{412   \textcolor{keyword}{static} \textcolor{keywordtype}{bool} epsilon() \{ \textcolor{keywordflow}{return} \textcolor{keyword}{false}; \}}
+\DoxyCodeLine{413   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{414   \textcolor{keyword}{static} bool (max)() \{ \textcolor{keywordflow}{return} \textcolor{keyword}{true}; \}}
+\DoxyCodeLine{415   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR }
+\DoxyCodeLine{416   \textcolor{keyword}{static} bool (min)() \{ \textcolor{keywordflow}{return} \textcolor{keyword}{false}; \}}
+\DoxyCodeLine{417 \};}
+\DoxyCodeLine{418 }
+\DoxyCodeLine{419 \}}
+\DoxyCodeLine{420 }
+\DoxyCodeLine{421 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// defined(EIGEN\_GPU\_COMPILE\_PHASE) \&\& !EIGEN\_HAS\_CXX11}}
+\DoxyCodeLine{422 }
+\DoxyCodeLine{426 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1noncopyable}{noncopyable}}}
+\DoxyCodeLine{427 \{}
+\DoxyCodeLine{428   EIGEN\_DEVICE\_FUNC \mbox{\hyperlink{classEigen_1_1internal_1_1noncopyable}{noncopyable}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1noncopyable}{noncopyable}}\&);}
+\DoxyCodeLine{429   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1noncopyable}{noncopyable}}\& operator=(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1noncopyable}{noncopyable}}\&);}
+\DoxyCodeLine{430 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{431   EIGEN\_DEVICE\_FUNC \mbox{\hyperlink{classEigen_1_1internal_1_1noncopyable}{noncopyable}}() \{\}}
+\DoxyCodeLine{432   EIGEN\_DEVICE\_FUNC \mbox{\hyperlink{classEigen_1_1internal_1_1noncopyable}{\string~noncopyable}}() \{\}}
+\DoxyCodeLine{433 \};}
+\DoxyCodeLine{434 }
+\DoxyCodeLine{449 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} EnableIf = \textcolor{keywordtype}{void}> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1array__size}{array\_size}} \{}
+\DoxyCodeLine{450   \textcolor{keyword}{enum} \{ value = \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} \};}
+\DoxyCodeLine{451 \};}
+\DoxyCodeLine{452 }
+\DoxyCodeLine{453 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1array__size}{array\_size}}<T,typename internal::\mbox{\hyperlink{structEigen_1_1internal_1_1enable__if}{enable\_if}}<((T::SizeAtCompileTime\&0)==0)>::type> \{}
+\DoxyCodeLine{454   \textcolor{keyword}{enum} \{ value = T::SizeAtCompileTime \};}
+\DoxyCodeLine{455 \};}
+\DoxyCodeLine{456 }
+\DoxyCodeLine{457 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, \textcolor{keywordtype}{int} N> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1array__size}{array\_size}}<const T (\&)[N]> \{}
+\DoxyCodeLine{458   \textcolor{keyword}{enum} \{ value = N \};}
+\DoxyCodeLine{459 \};}
+\DoxyCodeLine{460 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, \textcolor{keywordtype}{int} N> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1array__size}{array\_size}}<T (\&)[N]> \{}
+\DoxyCodeLine{461   \textcolor{keyword}{enum} \{ value = N \};}
+\DoxyCodeLine{462 \};}
+\DoxyCodeLine{463 }
+\DoxyCodeLine{464 \textcolor{preprocessor}{\#if EIGEN\_HAS\_CXX11}}
+\DoxyCodeLine{465 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, std::\textcolor{keywordtype}{size\_t} N> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1array__size}{array\_size}}<const std::array<T,N> > \{}
+\DoxyCodeLine{466   \textcolor{keyword}{enum} \{ value = N \};}
+\DoxyCodeLine{467 \};}
+\DoxyCodeLine{468 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, std::\textcolor{keywordtype}{size\_t} N> \textcolor{keyword}{struct }array\_size<std::array<T,N> > \{}
+\DoxyCodeLine{469   \textcolor{keyword}{enum} \{ value = N \};}
+\DoxyCodeLine{470 \};}
+\DoxyCodeLine{471 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{472 }
+\DoxyCodeLine{482 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{483 EIGEN\_CONSTEXPR \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size(\textcolor{keyword}{const} T\& x) \{ \textcolor{keywordflow}{return} x.size(); \}}
+\DoxyCodeLine{484 }
+\DoxyCodeLine{485 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T,std::\textcolor{keywordtype}{size\_t} N>}
+\DoxyCodeLine{486 EIGEN\_CONSTEXPR \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size(\textcolor{keyword}{const} T (\&) [N]) \{ \textcolor{keywordflow}{return} N; \}}
+\DoxyCodeLine{487 }
+\DoxyCodeLine{503 \textcolor{preprocessor}{\#if EIGEN\_HAS\_STD\_INVOKE\_RESULT}}
+\DoxyCodeLine{504 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }result\_of;}
+\DoxyCodeLine{505 }
+\DoxyCodeLine{506 \textcolor{keyword}{template}<\textcolor{keyword}{typename} F, \textcolor{keyword}{typename}... ArgTypes>}
+\DoxyCodeLine{507 \textcolor{keyword}{struct }result\_of<F(ArgTypes...)> \{}
+\DoxyCodeLine{508   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} std::invoke\_result<F, ArgTypes...>::type type1;}
+\DoxyCodeLine{509   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<type1>::type type;}
+\DoxyCodeLine{510 \};}
+\DoxyCodeLine{511 \textcolor{preprocessor}{\#elif EIGEN\_HAS\_STD\_RESULT\_OF}}
+\DoxyCodeLine{512 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }result\_of \{}
+\DoxyCodeLine{513   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} std::result\_of<T>::type type1;}
+\DoxyCodeLine{514   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<type1>::type type;}
+\DoxyCodeLine{515 \};}
+\DoxyCodeLine{516 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{517 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1result__of}{result\_of}} \{ \};}
+\DoxyCodeLine{518 }
+\DoxyCodeLine{519 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1has__none}{has\_none}} \{\textcolor{keywordtype}{int} a[1];\};}
+\DoxyCodeLine{520 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1has__std__result__type}{has\_std\_result\_type}} \{\textcolor{keywordtype}{int} a[2];\};}
+\DoxyCodeLine{521 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1has__tr1__result}{has\_tr1\_result}} \{\textcolor{keywordtype}{int} a[3];\};}
+\DoxyCodeLine{522 }
+\DoxyCodeLine{523 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Func, \textcolor{keywordtype}{int} SizeOf>}
+\DoxyCodeLine{524 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1nullary__result__of__select}{nullary\_result\_of\_select}} \{\};}
+\DoxyCodeLine{525 }
+\DoxyCodeLine{526 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Func>}
+\DoxyCodeLine{527 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1nullary__result__of__select}{nullary\_result\_of\_select}}<Func, sizeof(\mbox{\hyperlink{structEigen_1_1internal_1_1has__std__result__type}{has\_std\_result\_type}})> \{\textcolor{keyword}{typedef} \textcolor{keyword}{typename} Func::result\_type type;\};}
+\DoxyCodeLine{528 }
+\DoxyCodeLine{529 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Func>}
+\DoxyCodeLine{530 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1nullary__result__of__select}{nullary\_result\_of\_select}}<Func, sizeof(\mbox{\hyperlink{structEigen_1_1internal_1_1has__tr1__result}{has\_tr1\_result}})> \{\textcolor{keyword}{typedef} \textcolor{keyword}{typename} Func::template result<Func()>::type type;\};}
+\DoxyCodeLine{531 }
+\DoxyCodeLine{532 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Func>}
+\DoxyCodeLine{533 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1result__of}{result\_of}}<Func()> \{}
+\DoxyCodeLine{534     \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{535     \textcolor{keyword}{static} \mbox{\hyperlink{structEigen_1_1internal_1_1has__std__result__type}{has\_std\_result\_type}}    testFunctor(T \textcolor{keyword}{const} *, \textcolor{keyword}{typename} T::result\_type \textcolor{keyword}{const} * = 0);}
+\DoxyCodeLine{536     \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{537     \textcolor{keyword}{static} \mbox{\hyperlink{structEigen_1_1internal_1_1has__tr1__result}{has\_tr1\_result}}         testFunctor(T \textcolor{keyword}{const} *, \textcolor{keyword}{typename} T::template result<T()>::type \textcolor{keyword}{const} * = 0);}
+\DoxyCodeLine{538     \textcolor{keyword}{static} \mbox{\hyperlink{structEigen_1_1internal_1_1has__none}{has\_none}}               testFunctor(...);}
+\DoxyCodeLine{539 }
+\DoxyCodeLine{540     \textcolor{comment}{// note that the following indirection is needed for gcc-\/3.3}}
+\DoxyCodeLine{541     \textcolor{keyword}{enum} \{FunctorType = \textcolor{keyword}{sizeof}(testFunctor(\textcolor{keyword}{static\_cast<}Func*\textcolor{keyword}{>}(0)))\};}
+\DoxyCodeLine{542     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1nullary__result__of__select}{nullary\_result\_of\_select<Func, FunctorType>::type}} type;}
+\DoxyCodeLine{543 \};}
+\DoxyCodeLine{544 }
+\DoxyCodeLine{545 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Func, \textcolor{keyword}{typename} ArgType, \textcolor{keywordtype}{int} SizeOf=sizeof(has\_none)>}
+\DoxyCodeLine{546 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unary__result__of__select}{unary\_result\_of\_select}} \{\textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<ArgType>::type type;\};}
+\DoxyCodeLine{547 }
+\DoxyCodeLine{548 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Func, \textcolor{keyword}{typename} ArgType>}
+\DoxyCodeLine{549 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unary__result__of__select}{unary\_result\_of\_select}}<Func, ArgType, sizeof(\mbox{\hyperlink{structEigen_1_1internal_1_1has__std__result__type}{has\_std\_result\_type}})> \{\textcolor{keyword}{typedef} \textcolor{keyword}{typename} Func::result\_type type;\};}
+\DoxyCodeLine{550 }
+\DoxyCodeLine{551 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Func, \textcolor{keyword}{typename} ArgType>}
+\DoxyCodeLine{552 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unary__result__of__select}{unary\_result\_of\_select}}<Func, ArgType, sizeof(\mbox{\hyperlink{structEigen_1_1internal_1_1has__tr1__result}{has\_tr1\_result}})> \{\textcolor{keyword}{typedef} \textcolor{keyword}{typename} Func::template result<Func(ArgType)>::type type;\};}
+\DoxyCodeLine{553 }
+\DoxyCodeLine{554 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Func, \textcolor{keyword}{typename} ArgType>}
+\DoxyCodeLine{555 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1result__of}{result\_of}}<Func(ArgType)> \{}
+\DoxyCodeLine{556     \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{557     \textcolor{keyword}{static} \mbox{\hyperlink{structEigen_1_1internal_1_1has__std__result__type}{has\_std\_result\_type}}    testFunctor(T \textcolor{keyword}{const} *, \textcolor{keyword}{typename} T::result\_type \textcolor{keyword}{const} * = 0);}
+\DoxyCodeLine{558     \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{559     \textcolor{keyword}{static} \mbox{\hyperlink{structEigen_1_1internal_1_1has__tr1__result}{has\_tr1\_result}}         testFunctor(T \textcolor{keyword}{const} *, \textcolor{keyword}{typename} T::template result<T(ArgType)>::type \textcolor{keyword}{const} * = 0);}
+\DoxyCodeLine{560     \textcolor{keyword}{static} \mbox{\hyperlink{structEigen_1_1internal_1_1has__none}{has\_none}}               testFunctor(...);}
+\DoxyCodeLine{561 }
+\DoxyCodeLine{562     \textcolor{comment}{// note that the following indirection is needed for gcc-\/3.3}}
+\DoxyCodeLine{563     \textcolor{keyword}{enum} \{FunctorType = \textcolor{keyword}{sizeof}(testFunctor(\textcolor{keyword}{static\_cast<}Func*\textcolor{keyword}{>}(0)))\};}
+\DoxyCodeLine{564     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} unary\_result\_of\_select<Func, ArgType, FunctorType>::type type;}
+\DoxyCodeLine{565 \};}
+\DoxyCodeLine{566 }
+\DoxyCodeLine{567 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Func, \textcolor{keyword}{typename} ArgType0, \textcolor{keyword}{typename} ArgType1, \textcolor{keywordtype}{int} SizeOf=sizeof(has\_none)>}
+\DoxyCodeLine{568 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1binary__result__of__select}{binary\_result\_of\_select}} \{\textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<ArgType0>::type type;\};}
+\DoxyCodeLine{569 }
+\DoxyCodeLine{570 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Func, \textcolor{keyword}{typename} ArgType0, \textcolor{keyword}{typename} ArgType1>}
+\DoxyCodeLine{571 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1binary__result__of__select}{binary\_result\_of\_select}}<Func, ArgType0, ArgType1, sizeof(\mbox{\hyperlink{structEigen_1_1internal_1_1has__std__result__type}{has\_std\_result\_type}})>}
+\DoxyCodeLine{572 \{\textcolor{keyword}{typedef} \textcolor{keyword}{typename} Func::result\_type type;\};}
+\DoxyCodeLine{573 }
+\DoxyCodeLine{574 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Func, \textcolor{keyword}{typename} ArgType0, \textcolor{keyword}{typename} ArgType1>}
+\DoxyCodeLine{575 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1binary__result__of__select}{binary\_result\_of\_select}}<Func, ArgType0, ArgType1, sizeof(\mbox{\hyperlink{structEigen_1_1internal_1_1has__tr1__result}{has\_tr1\_result}})>}
+\DoxyCodeLine{576 \{\textcolor{keyword}{typedef} \textcolor{keyword}{typename} Func::template result<Func(ArgType0,ArgType1)>::type type;\};}
+\DoxyCodeLine{577 }
+\DoxyCodeLine{578 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Func, \textcolor{keyword}{typename} ArgType0, \textcolor{keyword}{typename} ArgType1>}
+\DoxyCodeLine{579 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1result__of}{result\_of}}<Func(ArgType0,ArgType1)> \{}
+\DoxyCodeLine{580     \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{581     \textcolor{keyword}{static} \mbox{\hyperlink{structEigen_1_1internal_1_1has__std__result__type}{has\_std\_result\_type}}    testFunctor(T \textcolor{keyword}{const} *, \textcolor{keyword}{typename} T::result\_type \textcolor{keyword}{const} * = 0);}
+\DoxyCodeLine{582     \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{583     \textcolor{keyword}{static} \mbox{\hyperlink{structEigen_1_1internal_1_1has__tr1__result}{has\_tr1\_result}}         testFunctor(T \textcolor{keyword}{const} *, \textcolor{keyword}{typename} T::template result<T(ArgType0,ArgType1)>::type \textcolor{keyword}{const} * = 0);}
+\DoxyCodeLine{584     \textcolor{keyword}{static} \mbox{\hyperlink{structEigen_1_1internal_1_1has__none}{has\_none}}               testFunctor(...);}
+\DoxyCodeLine{585 }
+\DoxyCodeLine{586     \textcolor{comment}{// note that the following indirection is needed for gcc-\/3.3}}
+\DoxyCodeLine{587     \textcolor{keyword}{enum} \{FunctorType = \textcolor{keyword}{sizeof}(testFunctor(\textcolor{keyword}{static\_cast<}Func*\textcolor{keyword}{>}(0)))\};}
+\DoxyCodeLine{588     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} binary\_result\_of\_select<Func, ArgType0, ArgType1, FunctorType>::type type;}
+\DoxyCodeLine{589 \};}
+\DoxyCodeLine{590 }
+\DoxyCodeLine{591 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Func, \textcolor{keyword}{typename} ArgType0, \textcolor{keyword}{typename} ArgType1, \textcolor{keyword}{typename} ArgType2, \textcolor{keywordtype}{int} SizeOf=sizeof(has\_none)>}
+\DoxyCodeLine{592 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1ternary__result__of__select}{ternary\_result\_of\_select}} \{\textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<ArgType0>::type type;\};}
+\DoxyCodeLine{593 }
+\DoxyCodeLine{594 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Func, \textcolor{keyword}{typename} ArgType0, \textcolor{keyword}{typename} ArgType1, \textcolor{keyword}{typename} ArgType2>}
+\DoxyCodeLine{595 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1ternary__result__of__select}{ternary\_result\_of\_select}}<Func, ArgType0, ArgType1, ArgType2, sizeof(\mbox{\hyperlink{structEigen_1_1internal_1_1has__std__result__type}{has\_std\_result\_type}})>}
+\DoxyCodeLine{596 \{\textcolor{keyword}{typedef} \textcolor{keyword}{typename} Func::result\_type type;\};}
+\DoxyCodeLine{597 }
+\DoxyCodeLine{598 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Func, \textcolor{keyword}{typename} ArgType0, \textcolor{keyword}{typename} ArgType1, \textcolor{keyword}{typename} ArgType2>}
+\DoxyCodeLine{599 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1ternary__result__of__select}{ternary\_result\_of\_select}}<Func, ArgType0, ArgType1, ArgType2, sizeof(\mbox{\hyperlink{structEigen_1_1internal_1_1has__tr1__result}{has\_tr1\_result}})>}
+\DoxyCodeLine{600 \{\textcolor{keyword}{typedef} \textcolor{keyword}{typename} Func::template result<Func(ArgType0,ArgType1,ArgType2)>::type type;\};}
+\DoxyCodeLine{601 }
+\DoxyCodeLine{602 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Func, \textcolor{keyword}{typename} ArgType0, \textcolor{keyword}{typename} ArgType1, \textcolor{keyword}{typename} ArgType2>}
+\DoxyCodeLine{603 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1result__of}{result\_of}}<Func(ArgType0,ArgType1,ArgType2)> \{}
+\DoxyCodeLine{604     \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{605     \textcolor{keyword}{static} \mbox{\hyperlink{structEigen_1_1internal_1_1has__std__result__type}{has\_std\_result\_type}}    testFunctor(T \textcolor{keyword}{const} *, \textcolor{keyword}{typename} T::result\_type \textcolor{keyword}{const} * = 0);}
+\DoxyCodeLine{606     \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{607     \textcolor{keyword}{static} \mbox{\hyperlink{structEigen_1_1internal_1_1has__tr1__result}{has\_tr1\_result}}         testFunctor(T \textcolor{keyword}{const} *, \textcolor{keyword}{typename} T::template result<T(ArgType0,ArgType1,ArgType2)>::type \textcolor{keyword}{const} * = 0);}
+\DoxyCodeLine{608     \textcolor{keyword}{static} \mbox{\hyperlink{structEigen_1_1internal_1_1has__none}{has\_none}}               testFunctor(...);}
+\DoxyCodeLine{609 }
+\DoxyCodeLine{610     \textcolor{comment}{// note that the following indirection is needed for gcc-\/3.3}}
+\DoxyCodeLine{611     \textcolor{keyword}{enum} \{FunctorType = \textcolor{keyword}{sizeof}(testFunctor(\textcolor{keyword}{static\_cast<}Func*\textcolor{keyword}{>}(0)))\};}
+\DoxyCodeLine{612     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} ternary\_result\_of\_select<Func, ArgType0, ArgType1, ArgType2, FunctorType>::type type;}
+\DoxyCodeLine{613 \};}
+\DoxyCodeLine{614 }
+\DoxyCodeLine{615 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{616 }
+\DoxyCodeLine{617 \textcolor{preprocessor}{\#if EIGEN\_HAS\_STD\_INVOKE\_RESULT}}
+\DoxyCodeLine{618 \textcolor{keyword}{template}<\textcolor{keyword}{typename} F, \textcolor{keyword}{typename}... ArgTypes>}
+\DoxyCodeLine{619 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1invoke__result}{invoke\_result}} \{}
+\DoxyCodeLine{620   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} std::invoke\_result<F, ArgTypes...>::type type1;}
+\DoxyCodeLine{621   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<type1>::type type;}
+\DoxyCodeLine{622 \};}
+\DoxyCodeLine{623 \textcolor{preprocessor}{\#elif EIGEN\_HAS\_CXX11}}
+\DoxyCodeLine{624 \textcolor{keyword}{template}<\textcolor{keyword}{typename} F, \textcolor{keyword}{typename}... ArgTypes>}
+\DoxyCodeLine{625 \textcolor{keyword}{struct }invoke\_result \{}
+\DoxyCodeLine{626   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} result\_of<F(ArgTypes...)>::type type1;}
+\DoxyCodeLine{627   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<type1>::type type;}
+\DoxyCodeLine{628 \};}
+\DoxyCodeLine{629 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{630 \textcolor{keyword}{template}<\textcolor{keyword}{typename} F, \textcolor{keyword}{typename} ArgType0 = \textcolor{keywordtype}{void}, \textcolor{keyword}{typename} ArgType1 = \textcolor{keywordtype}{void}, \textcolor{keyword}{typename} ArgType2 = \textcolor{keywordtype}{void}>}
+\DoxyCodeLine{631 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1invoke__result}{invoke\_result}} \{}
+\DoxyCodeLine{632   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1result__of}{result\_of}}<F(ArgType0, ArgType1, ArgType2)>::type type1;}
+\DoxyCodeLine{633   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<type1>::type type;}
+\DoxyCodeLine{634 \};}
+\DoxyCodeLine{635 }
+\DoxyCodeLine{636 \textcolor{keyword}{template}<\textcolor{keyword}{typename} F>}
+\DoxyCodeLine{637 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1invoke__result}{invoke\_result}}<F, void, void, void> \{}
+\DoxyCodeLine{638   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1result__of}{result\_of}}<F()>::type type1;}
+\DoxyCodeLine{639   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<type1>::type type;}
+\DoxyCodeLine{640 \};}
+\DoxyCodeLine{641 }
+\DoxyCodeLine{642 \textcolor{keyword}{template}<\textcolor{keyword}{typename} F, \textcolor{keyword}{typename} ArgType0>}
+\DoxyCodeLine{643 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1invoke__result}{invoke\_result}}<F, ArgType0, void, void> \{}
+\DoxyCodeLine{644   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1result__of}{result\_of}}<F(ArgType0)>::type type1;}
+\DoxyCodeLine{645   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<type1>::type type;}
+\DoxyCodeLine{646 \};}
+\DoxyCodeLine{647 }
+\DoxyCodeLine{648 \textcolor{keyword}{template}<\textcolor{keyword}{typename} F, \textcolor{keyword}{typename} ArgType0, \textcolor{keyword}{typename} ArgType1>}
+\DoxyCodeLine{649 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1invoke__result}{invoke\_result}}<F, ArgType0, ArgType1, void> \{}
+\DoxyCodeLine{650   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1result__of}{result\_of}}<F(ArgType0, ArgType1)>::type type1;}
+\DoxyCodeLine{651   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<type1>::type type;}
+\DoxyCodeLine{652 \};}
+\DoxyCodeLine{653 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{654 }
+\DoxyCodeLine{655 \textcolor{comment}{// C++14 integer/index\_sequence.}}
+\DoxyCodeLine{656 \textcolor{preprocessor}{\#if defined(\_\_cpp\_lib\_integer\_sequence) \&\& \_\_cpp\_lib\_integer\_sequence >= 201304L \&\& EIGEN\_MAX\_CPP\_VER >= 14}}
+\DoxyCodeLine{657 }
+\DoxyCodeLine{658 \textcolor{keyword}{using} std::integer\_sequence;}
+\DoxyCodeLine{659 \textcolor{keyword}{using} std::make\_integer\_sequence;}
+\DoxyCodeLine{660 }
+\DoxyCodeLine{661 \textcolor{keyword}{using} std::index\_sequence;}
+\DoxyCodeLine{662 \textcolor{keyword}{using} std::make\_index\_sequence;}
+\DoxyCodeLine{663 }
+\DoxyCodeLine{664 \textcolor{preprocessor}{\#else }}
+\DoxyCodeLine{665 }
+\DoxyCodeLine{666 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T, T... Ints>}
+\DoxyCodeLine{667 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1integer__sequence}{integer\_sequence}} \{}
+\DoxyCodeLine{668   \textcolor{keyword}{static} EIGEN\_CONSTEXPR \textcolor{keywordtype}{size\_t} size() EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} \textcolor{keyword}{sizeof}...(Ints); \}}
+\DoxyCodeLine{669 \};}
+\DoxyCodeLine{670 }
+\DoxyCodeLine{671 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} Sequence, T N>}
+\DoxyCodeLine{672 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1append__integer}{append\_integer}};}
+\DoxyCodeLine{673 }
+\DoxyCodeLine{674 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, T... Ints, T N>}
+\DoxyCodeLine{675 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1append__integer}{append\_integer}}<T, \mbox{\hyperlink{structEigen_1_1internal_1_1integer__sequence}{integer\_sequence}}<T, Ints...>, N> \{}
+\DoxyCodeLine{676   \textcolor{keyword}{using} \mbox{\hyperlink{structEigen_1_1internal_1_1integer__sequence}{type}} = \mbox{\hyperlink{structEigen_1_1internal_1_1integer__sequence}{integer\_sequence}}<T, Ints..., N>;}
+\DoxyCodeLine{677 \};}
+\DoxyCodeLine{678 }
+\DoxyCodeLine{679 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, \textcolor{keywordtype}{size\_t} N>}
+\DoxyCodeLine{680 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generate__integer__sequence}{generate\_integer\_sequence}} \{}
+\DoxyCodeLine{681   \textcolor{keyword}{using} type = \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1append__integer}{append\_integer}}<T, \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1generate__integer__sequence}{generate\_integer\_sequence}}<T, N-\/1>::type, N-\/1>::type;}
+\DoxyCodeLine{682 \};}
+\DoxyCodeLine{683 }
+\DoxyCodeLine{684 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{685 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generate__integer__sequence}{generate\_integer\_sequence}}<T, 0> \{}
+\DoxyCodeLine{686   \textcolor{keyword}{using} \mbox{\hyperlink{structEigen_1_1internal_1_1integer__sequence}{type}} = \mbox{\hyperlink{structEigen_1_1internal_1_1integer__sequence}{integer\_sequence<T>}};}
+\DoxyCodeLine{687 \};}
+\DoxyCodeLine{688 }
+\DoxyCodeLine{689 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T, \textcolor{keywordtype}{size\_t} N>}
+\DoxyCodeLine{690 \textcolor{keyword}{using} make\_integer\_sequence = \textcolor{keyword}{typename} generate\_integer\_sequence<T, N>::type;}
+\DoxyCodeLine{691 }
+\DoxyCodeLine{692 \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t}... Ints>}
+\DoxyCodeLine{693 \textcolor{keyword}{using} \mbox{\hyperlink{structEigen_1_1internal_1_1integer__sequence}{index\_sequence}} = \mbox{\hyperlink{structEigen_1_1internal_1_1integer__sequence}{integer\_sequence}}<size\_t, Ints...>;}
+\DoxyCodeLine{694 }
+\DoxyCodeLine{695 \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t} N>}
+\DoxyCodeLine{696 \textcolor{keyword}{using} make\_index\_sequence = make\_integer\_sequence<size\_t, N>;}
+\DoxyCodeLine{697 }
+\DoxyCodeLine{698 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{699 }
+\DoxyCodeLine{700 \textcolor{comment}{// Reduces a sequence of bools to true if all are true, false otherwise.}}
+\DoxyCodeLine{701 \textcolor{keyword}{template}<\textcolor{keywordtype}{bool}... values>}
+\DoxyCodeLine{702 \textcolor{keyword}{using} reduce\_all = std::is\_same<\mbox{\hyperlink{structEigen_1_1internal_1_1integer__sequence}{integer\_sequence}}<bool, values..., \textcolor{keyword}{true}>, \mbox{\hyperlink{structEigen_1_1internal_1_1integer__sequence}{integer\_sequence}}<bool, \textcolor{keyword}{true}, values...> >;}
+\DoxyCodeLine{703 }
+\DoxyCodeLine{704 \textcolor{comment}{// Reduces a sequence of bools to true if any are true, false if all false.}}
+\DoxyCodeLine{705 \textcolor{keyword}{template}<\textcolor{keywordtype}{bool}... values>}
+\DoxyCodeLine{706 \textcolor{keyword}{using} reduce\_any = std::integral\_constant<bool,}
+\DoxyCodeLine{707     !std::is\_same<\mbox{\hyperlink{structEigen_1_1internal_1_1integer__sequence}{integer\_sequence}}<bool, values..., \textcolor{keyword}{false}>, \mbox{\hyperlink{structEigen_1_1internal_1_1integer__sequence}{integer\_sequence}}<bool, \textcolor{keyword}{false}, values...> >::value>;}
+\DoxyCodeLine{708 }
+\DoxyCodeLine{709 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1meta__yes}{meta\_yes}} \{ \textcolor{keywordtype}{char} a[1]; \};}
+\DoxyCodeLine{710 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1meta__no}{meta\_no}}  \{ \textcolor{keywordtype}{char} a[2]; \};}
+\DoxyCodeLine{711 }
+\DoxyCodeLine{712 \textcolor{comment}{// Check whether T::ReturnType does exist}}
+\DoxyCodeLine{713 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{714 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1has__ReturnType}{has\_ReturnType}}}
+\DoxyCodeLine{715 \{}
+\DoxyCodeLine{716   \textcolor{keyword}{template} <\textcolor{keyword}{typename} C> \textcolor{keyword}{static} \mbox{\hyperlink{structEigen_1_1internal_1_1meta__yes}{meta\_yes}} testFunctor(C \textcolor{keyword}{const} *, \textcolor{keyword}{typename} C::ReturnType \textcolor{keyword}{const} * = 0);}
+\DoxyCodeLine{717   \textcolor{keyword}{template} <\textcolor{keyword}{typename} C> \textcolor{keyword}{static} \mbox{\hyperlink{structEigen_1_1internal_1_1meta__no}{meta\_no}}  testFunctor(...);}
+\DoxyCodeLine{718 }
+\DoxyCodeLine{719   \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{sizeof}(testFunctor<T>(\textcolor{keyword}{static\_cast<}T*\textcolor{keyword}{>}(0))) == \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structEigen_1_1internal_1_1meta__yes}{meta\_yes}}) \};}
+\DoxyCodeLine{720 \};}
+\DoxyCodeLine{721 }
+\DoxyCodeLine{722 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{const} T* return\_ptr();}
+\DoxyCodeLine{723 }
+\DoxyCodeLine{724 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} IndexType=Index>}
+\DoxyCodeLine{725 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1has__nullary__operator}{has\_nullary\_operator}}}
+\DoxyCodeLine{726 \{}
+\DoxyCodeLine{727   \textcolor{keyword}{template} <\textcolor{keyword}{typename} C> \textcolor{keyword}{static} \mbox{\hyperlink{structEigen_1_1internal_1_1meta__yes}{meta\_yes}} testFunctor(C \textcolor{keyword}{const} *,\textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1enable__if}{enable\_if}}<(\textcolor{keyword}{sizeof}(return\_ptr<C>()-\/>\textcolor{keyword}{operator}()())>0)>::type * = 0);}
+\DoxyCodeLine{728   \textcolor{keyword}{static} \mbox{\hyperlink{structEigen_1_1internal_1_1meta__no}{meta\_no}} testFunctor(...);}
+\DoxyCodeLine{729 }
+\DoxyCodeLine{730   \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{sizeof}(testFunctor(\textcolor{keyword}{static\_cast<}T*\textcolor{keyword}{>}(0))) == \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structEigen_1_1internal_1_1meta__yes}{meta\_yes}}) \};}
+\DoxyCodeLine{731 \};}
+\DoxyCodeLine{732 }
+\DoxyCodeLine{733 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} IndexType=Index>}
+\DoxyCodeLine{734 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1has__unary__operator}{has\_unary\_operator}}}
+\DoxyCodeLine{735 \{}
+\DoxyCodeLine{736   \textcolor{keyword}{template} <\textcolor{keyword}{typename} C> \textcolor{keyword}{static} \mbox{\hyperlink{structEigen_1_1internal_1_1meta__yes}{meta\_yes}} testFunctor(C \textcolor{keyword}{const} *,\textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1enable__if}{enable\_if}}<(\textcolor{keyword}{sizeof}(return\_ptr<C>()-\/>\textcolor{keyword}{operator}()(IndexType(0)))>0)>::type * = 0);}
+\DoxyCodeLine{737   \textcolor{keyword}{static} \mbox{\hyperlink{structEigen_1_1internal_1_1meta__no}{meta\_no}} testFunctor(...);}
+\DoxyCodeLine{738 }
+\DoxyCodeLine{739   \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{sizeof}(testFunctor(\textcolor{keyword}{static\_cast<}T*\textcolor{keyword}{>}(0))) == \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structEigen_1_1internal_1_1meta__yes}{meta\_yes}}) \};}
+\DoxyCodeLine{740 \};}
+\DoxyCodeLine{741 }
+\DoxyCodeLine{742 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} IndexType=Index>}
+\DoxyCodeLine{743 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1has__binary__operator}{has\_binary\_operator}}}
+\DoxyCodeLine{744 \{}
+\DoxyCodeLine{745   \textcolor{keyword}{template} <\textcolor{keyword}{typename} C> \textcolor{keyword}{static} \mbox{\hyperlink{structEigen_1_1internal_1_1meta__yes}{meta\_yes}} testFunctor(C \textcolor{keyword}{const} *,\textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1enable__if}{enable\_if}}<(\textcolor{keyword}{sizeof}(return\_ptr<C>()-\/>\textcolor{keyword}{operator}()(IndexType(0),IndexType(0)))>0)>::type * = 0);}
+\DoxyCodeLine{746   \textcolor{keyword}{static} \mbox{\hyperlink{structEigen_1_1internal_1_1meta__no}{meta\_no}} testFunctor(...);}
+\DoxyCodeLine{747 }
+\DoxyCodeLine{748   \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{sizeof}(testFunctor(\textcolor{keyword}{static\_cast<}T*\textcolor{keyword}{>}(0))) == \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structEigen_1_1internal_1_1meta__yes}{meta\_yes}}) \};}
+\DoxyCodeLine{749 \};}
+\DoxyCodeLine{750 }
+\DoxyCodeLine{754 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Y,}
+\DoxyCodeLine{755          \textcolor{keywordtype}{int} InfX = 0,}
+\DoxyCodeLine{756          \textcolor{keywordtype}{int} SupX = ((Y==1) ? 1 : Y/2),}
+\DoxyCodeLine{757          \textcolor{keywordtype}{bool} Done = ((SupX-\/InfX)<=1 ? \textcolor{keyword}{true} : ((SupX*SupX <= Y) \&\& ((SupX+1)*(SupX+1) > Y))) >}
+\DoxyCodeLine{758                                 \textcolor{comment}{// use ?: instead of || just to shut up a stupid gcc 4.3 warning}}
+\DoxyCodeLine{759 \textcolor{keyword}{class} \mbox{\hyperlink{classEigen_1_1internal_1_1meta__sqrt}{meta\_sqrt}}}
+\DoxyCodeLine{760 \{}
+\DoxyCodeLine{761     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{762       MidX = (InfX+SupX)/2,}
+\DoxyCodeLine{763       TakeInf = MidX*MidX > Y ? 1 : 0,}
+\DoxyCodeLine{764       NewInf = \textcolor{keywordtype}{int}(TakeInf) ? InfX : int(MidX),}
+\DoxyCodeLine{765       NewSup = int(TakeInf) ? int(MidX) : SupX}
+\DoxyCodeLine{766     \};}
+\DoxyCodeLine{767   \textcolor{keyword}{public}:}
+\DoxyCodeLine{768     \textcolor{keyword}{enum} \{ ret = \mbox{\hyperlink{classEigen_1_1internal_1_1meta__sqrt}{meta\_sqrt<Y,NewInf,NewSup>::ret}} \};}
+\DoxyCodeLine{769 \};}
+\DoxyCodeLine{770 }
+\DoxyCodeLine{771 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Y, \textcolor{keywordtype}{int} InfX, \textcolor{keywordtype}{int} SupX>}
+\DoxyCodeLine{772 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1meta__sqrt}{meta\_sqrt}}<Y, InfX, SupX, true> \{ \textcolor{keyword}{public}:  \textcolor{keyword}{enum} \{ ret = (SupX*SupX <= Y) ? SupX : InfX \}; \};}
+\DoxyCodeLine{773 }
+\DoxyCodeLine{774 }
+\DoxyCodeLine{778 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} A, \textcolor{keywordtype}{int} B, \textcolor{keywordtype}{int} K=1, \textcolor{keywordtype}{bool} Done = ((A*K)\%B)==0, \textcolor{keywordtype}{bool} Big=(A>=B)>}
+\DoxyCodeLine{779 \textcolor{keyword}{struct} \mbox{\hyperlink{structEigen_1_1internal_1_1meta__least__common__multiple}{meta\_least\_common\_multiple}}}
+\DoxyCodeLine{780 \{}
+\DoxyCodeLine{781   \textcolor{keyword}{enum} \{ ret = \mbox{\hyperlink{structEigen_1_1internal_1_1meta__least__common__multiple}{meta\_least\_common\_multiple<A,B,K+1>::ret}} \};}
+\DoxyCodeLine{782 \};}
+\DoxyCodeLine{783 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} A, \textcolor{keywordtype}{int} B, \textcolor{keywordtype}{int} K, \textcolor{keywordtype}{bool} Done>}
+\DoxyCodeLine{784 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1meta__least__common__multiple}{meta\_least\_common\_multiple}}<A,B,K,Done,false>}
+\DoxyCodeLine{785 \{}
+\DoxyCodeLine{786   \textcolor{keyword}{enum} \{ ret = \mbox{\hyperlink{structEigen_1_1internal_1_1meta__least__common__multiple}{meta\_least\_common\_multiple<B,A,K>::ret}} \};}
+\DoxyCodeLine{787 \};}
+\DoxyCodeLine{788 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} A, \textcolor{keywordtype}{int} B, \textcolor{keywordtype}{int} K>}
+\DoxyCodeLine{789 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1meta__least__common__multiple}{meta\_least\_common\_multiple}}<A,B,K,true,true>}
+\DoxyCodeLine{790 \{}
+\DoxyCodeLine{791   \textcolor{keyword}{enum} \{ ret = A*K \};}
+\DoxyCodeLine{792 \};}
+\DoxyCodeLine{793 }
+\DoxyCodeLine{794 }
+\DoxyCodeLine{796 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} U> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__product__traits}{scalar\_product\_traits}}}
+\DoxyCodeLine{797 \{}
+\DoxyCodeLine{798   \textcolor{keyword}{enum} \{ Defined = 0 \};}
+\DoxyCodeLine{799 \};}
+\DoxyCodeLine{800 }
+\DoxyCodeLine{801 \textcolor{comment}{// FIXME quick workaround around current limitation of result\_of}}
+\DoxyCodeLine{802 \textcolor{comment}{// template<typename Scalar, typename ArgType0, typename ArgType1>}}
+\DoxyCodeLine{803 \textcolor{comment}{// struct result\_of<scalar\_product\_op<Scalar>(ArgType0,ArgType1)> \{}}
+\DoxyCodeLine{804 \textcolor{comment}{// typedef typename scalar\_product\_traits<typename remove\_all<ArgType0>::type, typename remove\_all<ArgType1>::type>::ReturnType type;}}
+\DoxyCodeLine{805 \textcolor{comment}{// \};}}
+\DoxyCodeLine{806 }
+\DoxyCodeLine{810 \textcolor{keyword}{template}<\textcolor{keywordtype}{unsigned} Len, \textcolor{keywordtype}{unsigned} Align>}
+\DoxyCodeLine{811 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1aligned__storage}{aligned\_storage}} \{}
+\DoxyCodeLine{812   \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1aligned__storage_1_1type}{type}} \{}
+\DoxyCodeLine{813     EIGEN\_ALIGN\_TO\_BOUNDARY(Align) \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} data[Len];}
+\DoxyCodeLine{814   \};}
+\DoxyCodeLine{815 \};}
+\DoxyCodeLine{816 }
+\DoxyCodeLine{817 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{818 }
+\DoxyCodeLine{819 \textcolor{keyword}{namespace }numext \{}
+\DoxyCodeLine{820 }
+\DoxyCodeLine{821 \textcolor{preprocessor}{\#if defined(EIGEN\_GPU\_COMPILE\_PHASE)}}
+\DoxyCodeLine{822 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> EIGEN\_DEVICE\_FUNC   \textcolor{keywordtype}{void} swap(T \&a, T \&b) \{ T tmp = b; b = a; a = tmp; \}}
+\DoxyCodeLine{823 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{824 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} swap(T \&a, T \&b) \{ std::swap(a,b); \}}
+\DoxyCodeLine{825 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{826 }
+\DoxyCodeLine{827 \textcolor{preprocessor}{\#if defined(EIGEN\_GPU\_COMPILE\_PHASE) \&\& !EIGEN\_HAS\_CXX11}}
+\DoxyCodeLine{828 \textcolor{keyword}{using} internal::device::numeric\_limits;}
+\DoxyCodeLine{829 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{830 \textcolor{keyword}{using} std::numeric\_limits;}
+\DoxyCodeLine{831 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{832 }
+\DoxyCodeLine{833 \textcolor{comment}{// Integer division with rounding up.}}
+\DoxyCodeLine{834 \textcolor{comment}{// T is assumed to be an integer type with a>=0, and b>0}}
+\DoxyCodeLine{835 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{836 EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{837 T div\_ceil(\textcolor{keyword}{const} T \&a, \textcolor{keyword}{const} T \&b)}
+\DoxyCodeLine{838 \{}
+\DoxyCodeLine{839   \textcolor{keywordflow}{return} (a+b-\/1) / b;}
+\DoxyCodeLine{840 \}}
+\DoxyCodeLine{841 }
+\DoxyCodeLine{842 \textcolor{comment}{// The aim of the following functions is to bypass -\/Wfloat-\/equal warnings}}
+\DoxyCodeLine{843 \textcolor{comment}{// when we really want a strict equality comparison on floating points.}}
+\DoxyCodeLine{844 \textcolor{keyword}{template}<\textcolor{keyword}{typename} X, \textcolor{keyword}{typename} Y> EIGEN\_STRONG\_INLINE EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{845 \textcolor{keywordtype}{bool} equal\_strict(\textcolor{keyword}{const} X\& x,\textcolor{keyword}{const} Y\& y) \{ \textcolor{keywordflow}{return} x == y; \}}
+\DoxyCodeLine{846 }
+\DoxyCodeLine{847 \textcolor{preprocessor}{\#if !defined(EIGEN\_GPU\_COMPILE\_PHASE) || (!defined(EIGEN\_CUDA\_ARCH) \&\& defined(EIGEN\_CONSTEXPR\_ARE\_DEVICE\_FUNC))}}
+\DoxyCodeLine{848 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{849 \textcolor{keywordtype}{bool} equal\_strict(\textcolor{keyword}{const} \textcolor{keywordtype}{float}\& x,\textcolor{keyword}{const} \textcolor{keywordtype}{float}\& y) \{ \textcolor{keywordflow}{return} std::equal\_to<float>()(x,y); \}}
+\DoxyCodeLine{850 }
+\DoxyCodeLine{851 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{852 \textcolor{keywordtype}{bool} equal\_strict(\textcolor{keyword}{const} \textcolor{keywordtype}{double}\& x,\textcolor{keyword}{const} \textcolor{keywordtype}{double}\& y) \{ \textcolor{keywordflow}{return} std::equal\_to<double>()(x,y); \}}
+\DoxyCodeLine{853 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{854 }
+\DoxyCodeLine{855 \textcolor{keyword}{template}<\textcolor{keyword}{typename} X, \textcolor{keyword}{typename} Y> EIGEN\_STRONG\_INLINE EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{856 \textcolor{keywordtype}{bool} not\_equal\_strict(\textcolor{keyword}{const} X\& x,\textcolor{keyword}{const} Y\& y) \{ \textcolor{keywordflow}{return} x != y; \}}
+\DoxyCodeLine{857 }
+\DoxyCodeLine{858 \textcolor{preprocessor}{\#if !defined(EIGEN\_GPU\_COMPILE\_PHASE) || (!defined(EIGEN\_CUDA\_ARCH) \&\& defined(EIGEN\_CONSTEXPR\_ARE\_DEVICE\_FUNC))}}
+\DoxyCodeLine{859 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{860 \textcolor{keywordtype}{bool} not\_equal\_strict(\textcolor{keyword}{const} \textcolor{keywordtype}{float}\& x,\textcolor{keyword}{const} \textcolor{keywordtype}{float}\& y) \{ \textcolor{keywordflow}{return} std::not\_equal\_to<float>()(x,y); \}}
+\DoxyCodeLine{861 }
+\DoxyCodeLine{862 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{863 \textcolor{keywordtype}{bool} not\_equal\_strict(\textcolor{keyword}{const} \textcolor{keywordtype}{double}\& x,\textcolor{keyword}{const} \textcolor{keywordtype}{double}\& y) \{ \textcolor{keywordflow}{return} std::not\_equal\_to<double>()(x,y); \}}
+\DoxyCodeLine{864 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{865 }
+\DoxyCodeLine{866 \} \textcolor{comment}{// end namespace numext}}
+\DoxyCodeLine{867 }
+\DoxyCodeLine{868 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{869 }
+\DoxyCodeLine{870 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_META\_H}}
+
+\end{DoxyCode}

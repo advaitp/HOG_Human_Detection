@@ -1,0 +1,345 @@
+\hypertarget{ArithmeticSequence_8h_source}{}\doxysection{Arithmetic\+Sequence.\+h}
+\label{ArithmeticSequence_8h_source}\index{include/Eigen/src/Core/ArithmeticSequence.h@{include/Eigen/src/Core/ArithmeticSequence.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2017 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_ARITHMETIC\_SEQUENCE\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_ARITHMETIC\_SEQUENCE\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{preprocessor}{\#if (!EIGEN\_HAS\_CXX11) || !((!EIGEN\_COMP\_GNUC) || EIGEN\_COMP\_GNUC>=48)}}
+\DoxyCodeLine{20 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1aseq__negate}{aseq\_negate}} \{\};}
+\DoxyCodeLine{21 }
+\DoxyCodeLine{22 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1aseq__negate}{aseq\_negate}}<\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}> \{}
+\DoxyCodeLine{23   \textcolor{keyword}{typedef} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} type;}
+\DoxyCodeLine{24 \};}
+\DoxyCodeLine{25 }
+\DoxyCodeLine{26 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} N> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1aseq__negate}{aseq\_negate}}<\mbox{\hyperlink{classEigen_1_1internal_1_1FixedInt}{FixedInt}}<N> > \{}
+\DoxyCodeLine{27   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1internal_1_1FixedInt}{FixedInt}}<-\/N> \mbox{\hyperlink{classEigen_1_1internal_1_1FixedInt}{type}};}
+\DoxyCodeLine{28 \};}
+\DoxyCodeLine{29 }
+\DoxyCodeLine{30 \textcolor{comment}{// Compilation error in the following case:}}
+\DoxyCodeLine{31 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1aseq__negate}{aseq\_negate}}<\mbox{\hyperlink{classEigen_1_1internal_1_1FixedInt}{FixedInt}}<\mbox{\hyperlink{namespaceEigen_a73c597189a4a99127175e8167c456fff}{DynamicIndex}}> > \{\};}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstType,\textcolor{keyword}{typename} SizeType,\textcolor{keyword}{typename} IncrType,}
+\DoxyCodeLine{34          \textcolor{keywordtype}{bool} FirstIsSymbolic=\mbox{\hyperlink{structEigen_1_1symbolic_1_1is__symbolic}{symbolic::is\_symbolic<FirstType>::value}},}
+\DoxyCodeLine{35          \textcolor{keywordtype}{bool} SizeIsSymbolic =\mbox{\hyperlink{structEigen_1_1symbolic_1_1is__symbolic}{symbolic::is\_symbolic<SizeType>::value}}>}
+\DoxyCodeLine{36 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1aseq__reverse__first__type}{aseq\_reverse\_first\_type}} \{}
+\DoxyCodeLine{37   \textcolor{keyword}{typedef} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} type;}
+\DoxyCodeLine{38 \};}
+\DoxyCodeLine{39 }
+\DoxyCodeLine{40 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstType,\textcolor{keyword}{typename} SizeType,\textcolor{keyword}{typename} IncrType>}
+\DoxyCodeLine{41 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1aseq__reverse__first__type}{aseq\_reverse\_first\_type}}<FirstType,SizeType,IncrType,true,true> \{}
+\DoxyCodeLine{42   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1symbolic_1_1AddExpr}{symbolic::AddExpr}}<FirstType,}
+\DoxyCodeLine{43                             \mbox{\hyperlink{classEigen_1_1symbolic_1_1ProductExpr}{symbolic::ProductExpr}}<\mbox{\hyperlink{classEigen_1_1symbolic_1_1AddExpr}{symbolic::AddExpr}}<SizeType,\mbox{\hyperlink{classEigen_1_1symbolic_1_1ValueExpr}{symbolic::ValueExpr}}<\mbox{\hyperlink{classEigen_1_1internal_1_1FixedInt}{FixedInt}}<-\/1> > >,}
+\DoxyCodeLine{44                                                   \mbox{\hyperlink{classEigen_1_1symbolic_1_1ValueExpr}{symbolic::ValueExpr<IncrType>}} >}
+\DoxyCodeLine{45                            > \mbox{\hyperlink{classEigen_1_1symbolic_1_1AddExpr}{type}};}
+\DoxyCodeLine{46 \};}
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48 \textcolor{keyword}{template}<\textcolor{keyword}{typename} SizeType,\textcolor{keyword}{typename} IncrType,\textcolor{keyword}{typename} EnableIf = \textcolor{keywordtype}{void}>}
+\DoxyCodeLine{49 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1aseq__reverse__first__type__aux}{aseq\_reverse\_first\_type\_aux}} \{}
+\DoxyCodeLine{50   \textcolor{keyword}{typedef} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} type;}
+\DoxyCodeLine{51 \};}
+\DoxyCodeLine{52 }
+\DoxyCodeLine{53 \textcolor{keyword}{template}<\textcolor{keyword}{typename} SizeType,\textcolor{keyword}{typename} IncrType>}
+\DoxyCodeLine{54 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1aseq__reverse__first__type__aux}{aseq\_reverse\_first\_type\_aux}}<SizeType,IncrType,typename internal::\mbox{\hyperlink{structEigen_1_1internal_1_1enable__if}{enable\_if}}<bool((SizeType::value+IncrType::value)|0x1)>\mbox{\hyperlink{classEigen_1_1internal_1_1FixedInt}{::type}}> \{}
+\DoxyCodeLine{55   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1internal_1_1FixedInt}{FixedInt}}<(SizeType::value-\/1)*IncrType::value> \mbox{\hyperlink{classEigen_1_1internal_1_1FixedInt}{type}};}
+\DoxyCodeLine{56 \};}
+\DoxyCodeLine{57 }
+\DoxyCodeLine{58 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstType,\textcolor{keyword}{typename} SizeType,\textcolor{keyword}{typename} IncrType>}
+\DoxyCodeLine{59 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1aseq__reverse__first__type}{aseq\_reverse\_first\_type}}<FirstType,SizeType,IncrType,true,false> \{}
+\DoxyCodeLine{60   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} aseq\_reverse\_first\_type\_aux<SizeType,IncrType>::type Aux;}
+\DoxyCodeLine{61   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1symbolic_1_1AddExpr}{symbolic::AddExpr<FirstType,symbolic::ValueExpr<Aux>}} > \mbox{\hyperlink{classEigen_1_1symbolic_1_1AddExpr}{type}};}
+\DoxyCodeLine{62 \};}
+\DoxyCodeLine{63 }
+\DoxyCodeLine{64 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstType,\textcolor{keyword}{typename} SizeType,\textcolor{keyword}{typename} IncrType>}
+\DoxyCodeLine{65 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1aseq__reverse__first__type}{aseq\_reverse\_first\_type}}<FirstType,SizeType,IncrType,false,true> \{}
+\DoxyCodeLine{66   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1symbolic_1_1AddExpr}{symbolic::AddExpr}}<\mbox{\hyperlink{classEigen_1_1symbolic_1_1ProductExpr}{symbolic::ProductExpr}}<\mbox{\hyperlink{classEigen_1_1symbolic_1_1AddExpr}{symbolic::AddExpr}}<SizeType,\mbox{\hyperlink{classEigen_1_1symbolic_1_1ValueExpr}{symbolic::ValueExpr}}<\mbox{\hyperlink{classEigen_1_1internal_1_1FixedInt}{FixedInt}}<-\/1> > >,}
+\DoxyCodeLine{67                                                   \mbox{\hyperlink{classEigen_1_1symbolic_1_1ValueExpr}{symbolic::ValueExpr<IncrType>}} >,}
+\DoxyCodeLine{68                             \mbox{\hyperlink{classEigen_1_1symbolic_1_1ValueExpr}{symbolic::ValueExpr<>}} > \mbox{\hyperlink{classEigen_1_1symbolic_1_1AddExpr}{type}};}
+\DoxyCodeLine{69 \};}
+\DoxyCodeLine{70 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{71 }
+\DoxyCodeLine{72 \textcolor{comment}{// Helper to cleanup the type of the increment:}}
+\DoxyCodeLine{73 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1cleanup__seq__incr}{cleanup\_seq\_incr}} \{}
+\DoxyCodeLine{74   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} cleanup\_index\_type<T,DynamicIndex>::type type;}
+\DoxyCodeLine{75 \};}
+\DoxyCodeLine{76 }
+\DoxyCodeLine{77 \}  \textcolor{comment}{// namespace internal}}
+\DoxyCodeLine{78 }
+\DoxyCodeLine{79 \textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{80 \textcolor{comment}{// seq(first,last,incr) and seqN(first,size,incr)}}
+\DoxyCodeLine{81 \textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{82 }
+\DoxyCodeLine{83 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstType=Index,\textcolor{keyword}{typename} SizeType=Index,\textcolor{keyword}{typename} IncrType=\textcolor{keywordtype}{int}ernal::FixedInt<1> >}
+\DoxyCodeLine{84 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1ArithmeticSequence}{ArithmeticSequence}};}
+\DoxyCodeLine{85 }
+\DoxyCodeLine{86 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstType,\textcolor{keyword}{typename} SizeType,\textcolor{keyword}{typename} IncrType>}
+\DoxyCodeLine{87 \mbox{\hyperlink{classEigen_1_1ArithmeticSequence}{ArithmeticSequence<typename internal::cleanup\_index\_type<FirstType>::type}},}
+\DoxyCodeLine{88                    \textcolor{keyword}{typename} internal::cleanup\_index\_type<SizeType>::type,}
+\DoxyCodeLine{89                    \textcolor{keyword}{typename} internal::cleanup\_seq\_incr<IncrType>::type >}
+\DoxyCodeLine{90 \mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{seqN}}(FirstType first, SizeType size, IncrType incr);}
+\DoxyCodeLine{91 }
+\DoxyCodeLine{111 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstType,\textcolor{keyword}{typename} SizeType,\textcolor{keyword}{typename} IncrType>}
+\DoxyCodeLine{112 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1ArithmeticSequence}{ArithmeticSequence}}}
+\DoxyCodeLine{113 \{}
+\DoxyCodeLine{114 \textcolor{keyword}{public}:}
+\DoxyCodeLine{115   \mbox{\hyperlink{classEigen_1_1ArithmeticSequence}{ArithmeticSequence}}(FirstType \mbox{\hyperlink{classEigen_1_1ArithmeticSequence_a780ee27a63b77d4f34f74d8ca2381d12}{first}}, SizeType \mbox{\hyperlink{classEigen_1_1ArithmeticSequence_aef60a3585c1551c77e6dbf568b06c485}{size}}) : m\_first(\mbox{\hyperlink{classEigen_1_1ArithmeticSequence_a780ee27a63b77d4f34f74d8ca2381d12}{first}}), m\_size(\mbox{\hyperlink{classEigen_1_1ArithmeticSequence_aef60a3585c1551c77e6dbf568b06c485}{size}}) \{\}}
+\DoxyCodeLine{116   \mbox{\hyperlink{classEigen_1_1ArithmeticSequence}{ArithmeticSequence}}(FirstType \mbox{\hyperlink{classEigen_1_1ArithmeticSequence_a780ee27a63b77d4f34f74d8ca2381d12}{first}}, SizeType \mbox{\hyperlink{classEigen_1_1ArithmeticSequence_aef60a3585c1551c77e6dbf568b06c485}{size}}, IncrType incr) : m\_first(\mbox{\hyperlink{classEigen_1_1ArithmeticSequence_a780ee27a63b77d4f34f74d8ca2381d12}{first}}), m\_size(\mbox{\hyperlink{classEigen_1_1ArithmeticSequence_aef60a3585c1551c77e6dbf568b06c485}{size}}), m\_incr(incr) \{\}}
+\DoxyCodeLine{117 }
+\DoxyCodeLine{118   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{119     SizeAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1get__fixed__value}{internal::get\_fixed\_value<SizeType>::value}},}
+\DoxyCodeLine{120     IncrAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1get__fixed__value}{internal::get\_fixed\_value<IncrType,DynamicIndex>::value}}}
+\DoxyCodeLine{121   \};}
+\DoxyCodeLine{122 }
+\DoxyCodeLine{124   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \mbox{\hyperlink{classEigen_1_1ArithmeticSequence_aef60a3585c1551c77e6dbf568b06c485}{size}}()\textcolor{keyword}{  const }\{ \textcolor{keywordflow}{return} m\_size; \}}
+\DoxyCodeLine{125 }
+\DoxyCodeLine{127   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \mbox{\hyperlink{classEigen_1_1ArithmeticSequence_a780ee27a63b77d4f34f74d8ca2381d12}{first}}()\textcolor{keyword}{  const }\{ \textcolor{keywordflow}{return} m\_first; \}}
+\DoxyCodeLine{128 }
+\DoxyCodeLine{130   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \mbox{\hyperlink{classEigen_1_1ArithmeticSequence_a34a4117a3590ccc99177449f8c47740e}{operator[]}}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_first + i * m\_incr; \}}
+\DoxyCodeLine{131 }
+\DoxyCodeLine{132   \textcolor{keyword}{const} FirstType\& firstObject()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_first; \}}
+\DoxyCodeLine{133   \textcolor{keyword}{const} SizeType\&  sizeObject()\textcolor{keyword}{  const }\{ \textcolor{keywordflow}{return} m\_size; \}}
+\DoxyCodeLine{134   \textcolor{keyword}{const} IncrType\&  incrObject()\textcolor{keyword}{  const }\{ \textcolor{keywordflow}{return} m\_incr; \}}
+\DoxyCodeLine{135 }
+\DoxyCodeLine{136 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{137   FirstType m\_first;}
+\DoxyCodeLine{138   SizeType  m\_size;}
+\DoxyCodeLine{139   IncrType  m\_incr;}
+\DoxyCodeLine{140 }
+\DoxyCodeLine{141 \textcolor{keyword}{public}:}
+\DoxyCodeLine{142 }
+\DoxyCodeLine{143 \textcolor{preprocessor}{\#if EIGEN\_HAS\_CXX11 \&\& ((!EIGEN\_COMP\_GNUC) || EIGEN\_COMP\_GNUC>=48)}}
+\DoxyCodeLine{144   \textcolor{keyword}{auto} reverse() const -\/> decltype(\mbox{\hyperlink{namespaceEigen}{Eigen}}::\mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{seqN}}(m\_first+(m\_size+fix<-\/1>())*m\_incr,m\_size,-\/m\_incr)) \{}
+\DoxyCodeLine{145     \textcolor{keywordflow}{return} \mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{seqN}}(m\_first+(m\_size+fix<-\/1>())*m\_incr,m\_size,-\/m\_incr);}
+\DoxyCodeLine{146   \}}
+\DoxyCodeLine{147 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{148 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{149   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::aseq\_negate<IncrType>::type ReverseIncrType;}
+\DoxyCodeLine{150   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::aseq\_reverse\_first\_type<FirstType,SizeType,IncrType>::type ReverseFirstType;}
+\DoxyCodeLine{151 \textcolor{keyword}{public}:}
+\DoxyCodeLine{152   ArithmeticSequence<ReverseFirstType,SizeType,ReverseIncrType>}
+\DoxyCodeLine{153   reverse()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{154     \textcolor{keywordflow}{return} \mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{seqN}}(m\_first+(m\_size+fix<-\/1>())*m\_incr,m\_size,-\/m\_incr);}
+\DoxyCodeLine{155   \}}
+\DoxyCodeLine{156 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{157 \};}
+\DoxyCodeLine{158 }
+\DoxyCodeLine{162 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstType,\textcolor{keyword}{typename} SizeType,\textcolor{keyword}{typename} IncrType>}
+\DoxyCodeLine{163 ArithmeticSequence<typename internal::cleanup\_index\_type<FirstType>::type,\textcolor{keyword}{typename} internal::cleanup\_index\_type<SizeType>::type,\textcolor{keyword}{typename} internal::cleanup\_seq\_incr<IncrType>::type >}
+\DoxyCodeLine{164 \mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{seqN}}(FirstType first, SizeType size, IncrType incr)  \{}
+\DoxyCodeLine{165   \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1ArithmeticSequence}{ArithmeticSequence<typename internal::cleanup\_index\_type<FirstType>::type}},\textcolor{keyword}{typename} internal::cleanup\_index\_type<SizeType>::type,\textcolor{keyword}{typename} internal::cleanup\_seq\_incr<IncrType>::type>(first,size,incr);}
+\DoxyCodeLine{166 \}}
+\DoxyCodeLine{167 }
+\DoxyCodeLine{171 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstType,\textcolor{keyword}{typename} SizeType>}
+\DoxyCodeLine{172 ArithmeticSequence<typename internal::cleanup\_index\_type<FirstType>::type,\textcolor{keyword}{typename} internal::cleanup\_index\_type<SizeType>::type >}
+\DoxyCodeLine{173 \mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{seqN}}(FirstType first, SizeType size)  \{}
+\DoxyCodeLine{174   \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1ArithmeticSequence}{ArithmeticSequence<typename internal::cleanup\_index\_type<FirstType>::type}},\textcolor{keyword}{typename} internal::cleanup\_index\_type<SizeType>::type>(first,size);}
+\DoxyCodeLine{175 \}}
+\DoxyCodeLine{176 }
+\DoxyCodeLine{177 \textcolor{preprocessor}{\#ifdef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{178 }
+\DoxyCodeLine{188 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstType,\textcolor{keyword}{typename} LastType, \textcolor{keyword}{typename} IncrType>}
+\DoxyCodeLine{189 \textcolor{keyword}{auto} seq(FirstType f, LastType l, IncrType incr);}
+\DoxyCodeLine{190 }
+\DoxyCodeLine{200 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstType,\textcolor{keyword}{typename} LastType>}
+\DoxyCodeLine{201 \textcolor{keyword}{auto} seq(FirstType f, LastType l);}
+\DoxyCodeLine{202 }
+\DoxyCodeLine{203 \textcolor{preprocessor}{\#else }\textcolor{comment}{// EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{204 }
+\DoxyCodeLine{205 \textcolor{preprocessor}{\#if EIGEN\_HAS\_CXX11}}
+\DoxyCodeLine{206 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstType,\textcolor{keyword}{typename} LastType>}
+\DoxyCodeLine{207 \textcolor{keyword}{auto} seq(FirstType f, LastType l) -\/> \textcolor{keyword}{decltype}(\mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{seqN}}(\textcolor{keyword}{typename} internal::cleanup\_index\_type<FirstType>::type(f),}
+\DoxyCodeLine{208                                                    (  \textcolor{keyword}{typename} internal::cleanup\_index\_type<LastType>::type(l)}
+\DoxyCodeLine{209                                                     -\/ \textcolor{keyword}{typename} internal::cleanup\_index\_type<FirstType>::type(f)+fix<1>())))}
+\DoxyCodeLine{210 \{}
+\DoxyCodeLine{211   \textcolor{keywordflow}{return} \mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{seqN}}(\textcolor{keyword}{typename} internal::cleanup\_index\_type<FirstType>::type(f),}
+\DoxyCodeLine{212               (\textcolor{keyword}{typename} internal::cleanup\_index\_type<LastType>::type(l)}
+\DoxyCodeLine{213                -\/\textcolor{keyword}{typename} internal::cleanup\_index\_type<FirstType>::type(f)+fix<1>()));}
+\DoxyCodeLine{214 \}}
+\DoxyCodeLine{215 }
+\DoxyCodeLine{216 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstType,\textcolor{keyword}{typename} LastType, \textcolor{keyword}{typename} IncrType>}
+\DoxyCodeLine{217 \textcolor{keyword}{auto} seq(FirstType f, LastType l, IncrType incr)}
+\DoxyCodeLine{218   -\/> \textcolor{keyword}{decltype}(\mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{seqN}}(\textcolor{keyword}{typename} internal::cleanup\_index\_type<FirstType>::type(f),}
+\DoxyCodeLine{219                    (   \textcolor{keyword}{typename} internal::cleanup\_index\_type<LastType>::type(l)}
+\DoxyCodeLine{220                      -\/ \textcolor{keyword}{typename} internal::cleanup\_index\_type<FirstType>::type(f)+\textcolor{keyword}{typename} internal::cleanup\_seq\_incr<IncrType>::type(incr)}
+\DoxyCodeLine{221                    ) / \textcolor{keyword}{typename} internal::cleanup\_seq\_incr<IncrType>::type(incr),}
+\DoxyCodeLine{222                    \textcolor{keyword}{typename} internal::cleanup\_seq\_incr<IncrType>::type(incr)))}
+\DoxyCodeLine{223 \{}
+\DoxyCodeLine{224   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::cleanup\_seq\_incr<IncrType>::type CleanedIncrType;}
+\DoxyCodeLine{225   \textcolor{keywordflow}{return} \mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{seqN}}(\textcolor{keyword}{typename} internal::cleanup\_index\_type<FirstType>::type(f),}
+\DoxyCodeLine{226               ( \textcolor{keyword}{typename} internal::cleanup\_index\_type<LastType>::type(l)}
+\DoxyCodeLine{227                -\/\textcolor{keyword}{typename} internal::cleanup\_index\_type<FirstType>::type(f)+CleanedIncrType(incr)) / CleanedIncrType(incr),}
+\DoxyCodeLine{228               CleanedIncrType(incr));}
+\DoxyCodeLine{229 \}}
+\DoxyCodeLine{230 }
+\DoxyCodeLine{231 \textcolor{preprocessor}{\#else }\textcolor{comment}{// EIGEN\_HAS\_CXX11}}
+\DoxyCodeLine{232 }
+\DoxyCodeLine{233 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstType,\textcolor{keyword}{typename} LastType>}
+\DoxyCodeLine{234 \textcolor{keyword}{typename} internal::enable\_if<!(symbolic::is\_symbolic<FirstType>::value || symbolic::is\_symbolic<LastType>::value),}
+\DoxyCodeLine{235                              ArithmeticSequence<\textcolor{keyword}{typename} internal::cleanup\_index\_type<FirstType>::type,\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}> >::type}
+\DoxyCodeLine{236 seq(FirstType f, LastType l)}
+\DoxyCodeLine{237 \{}
+\DoxyCodeLine{238   \textcolor{keywordflow}{return} \mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{seqN}}(\textcolor{keyword}{typename} internal::cleanup\_index\_type<FirstType>::type(f),}
+\DoxyCodeLine{239               \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}((\textcolor{keyword}{typename} internal::cleanup\_index\_type<LastType>::type(l)-\/\textcolor{keyword}{typename} internal::cleanup\_index\_type<FirstType>::type(f)+fix<1>())));}
+\DoxyCodeLine{240 \}}
+\DoxyCodeLine{241 }
+\DoxyCodeLine{242 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstTypeDerived,\textcolor{keyword}{typename} LastType>}
+\DoxyCodeLine{243 \textcolor{keyword}{typename} internal::enable\_if<!symbolic::is\_symbolic<LastType>::value,}
+\DoxyCodeLine{244     ArithmeticSequence<FirstTypeDerived, symbolic::AddExpr<symbolic::AddExpr<symbolic::NegateExpr<FirstTypeDerived>,symbolic::ValueExpr<> >,}
+\DoxyCodeLine{245                                                             symbolic::ValueExpr<internal::FixedInt<1> > > > >::type}
+\DoxyCodeLine{246 seq(\textcolor{keyword}{const} symbolic::BaseExpr<FirstTypeDerived> \&f, LastType l)}
+\DoxyCodeLine{247 \{}
+\DoxyCodeLine{248   \textcolor{keywordflow}{return} \mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{seqN}}(f.derived(),(\textcolor{keyword}{typename} internal::cleanup\_index\_type<LastType>::type(l)-\/f.derived()+fix<1>()));}
+\DoxyCodeLine{249 \}}
+\DoxyCodeLine{250 }
+\DoxyCodeLine{251 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstType,\textcolor{keyword}{typename} LastTypeDerived>}
+\DoxyCodeLine{252 \textcolor{keyword}{typename} internal::enable\_if<!symbolic::is\_symbolic<FirstType>::value,}
+\DoxyCodeLine{253     ArithmeticSequence<typename internal::cleanup\_index\_type<FirstType>::type,}
+\DoxyCodeLine{254                         symbolic::AddExpr<symbolic::AddExpr<LastTypeDerived,symbolic::ValueExpr<> >,}
+\DoxyCodeLine{255                                           symbolic::ValueExpr<internal::FixedInt<1> > > > >::type}
+\DoxyCodeLine{256 seq(FirstType f, \textcolor{keyword}{const} symbolic::BaseExpr<LastTypeDerived> \&l)}
+\DoxyCodeLine{257 \{}
+\DoxyCodeLine{258   \textcolor{keywordflow}{return} \mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{seqN}}(\textcolor{keyword}{typename} internal::cleanup\_index\_type<FirstType>::type(f),(l.derived()-\/\textcolor{keyword}{typename} internal::cleanup\_index\_type<FirstType>::type(f)+fix<1>()));}
+\DoxyCodeLine{259 \}}
+\DoxyCodeLine{260 }
+\DoxyCodeLine{261 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstTypeDerived,\textcolor{keyword}{typename} LastTypeDerived>}
+\DoxyCodeLine{262 ArithmeticSequence<FirstTypeDerived,}
+\DoxyCodeLine{263                     symbolic::AddExpr<symbolic::AddExpr<LastTypeDerived,symbolic::NegateExpr<FirstTypeDerived> >,symbolic::ValueExpr<internal::FixedInt<1> > > >}
+\DoxyCodeLine{264 seq(\textcolor{keyword}{const} symbolic::BaseExpr<FirstTypeDerived> \&f, \textcolor{keyword}{const} symbolic::BaseExpr<LastTypeDerived> \&l)}
+\DoxyCodeLine{265 \{}
+\DoxyCodeLine{266   \textcolor{keywordflow}{return} \mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{seqN}}(f.derived(),(l.derived()-\/f.derived()+fix<1>()));}
+\DoxyCodeLine{267 \}}
+\DoxyCodeLine{268 }
+\DoxyCodeLine{269 }
+\DoxyCodeLine{270 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstType,\textcolor{keyword}{typename} LastType, \textcolor{keyword}{typename} IncrType>}
+\DoxyCodeLine{271 \textcolor{keyword}{typename} internal::enable\_if<!(symbolic::is\_symbolic<FirstType>::value || symbolic::is\_symbolic<LastType>::value),}
+\DoxyCodeLine{272     ArithmeticSequence<\textcolor{keyword}{typename} internal::cleanup\_index\_type<FirstType>::type,\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}},\textcolor{keyword}{typename} internal::cleanup\_seq\_incr<IncrType>::type> >::type}
+\DoxyCodeLine{273 seq(FirstType f, LastType l, IncrType incr)}
+\DoxyCodeLine{274 \{}
+\DoxyCodeLine{275   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::cleanup\_seq\_incr<IncrType>::type CleanedIncrType;}
+\DoxyCodeLine{276   \textcolor{keywordflow}{return} \mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{seqN}}(\textcolor{keyword}{typename} internal::cleanup\_index\_type<FirstType>::type(f),}
+\DoxyCodeLine{277               \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}((\textcolor{keyword}{typename} internal::cleanup\_index\_type<LastType>::type(l)-\/\textcolor{keyword}{typename} internal::cleanup\_index\_type<FirstType>::type(f)+CleanedIncrType(incr))/CleanedIncrType(incr)), incr);}
+\DoxyCodeLine{278 \}}
+\DoxyCodeLine{279 }
+\DoxyCodeLine{280 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstTypeDerived,\textcolor{keyword}{typename} LastType, \textcolor{keyword}{typename} IncrType>}
+\DoxyCodeLine{281 \textcolor{keyword}{typename} internal::enable\_if<!symbolic::is\_symbolic<LastType>::value,}
+\DoxyCodeLine{282     ArithmeticSequence<FirstTypeDerived,}
+\DoxyCodeLine{283                         symbolic::QuotientExpr<symbolic::AddExpr<symbolic::AddExpr<symbolic::NegateExpr<FirstTypeDerived>,}
+\DoxyCodeLine{284                                                                                    symbolic::ValueExpr<> >,}
+\DoxyCodeLine{285                                                                  symbolic::ValueExpr<typename internal::cleanup\_seq\_incr<IncrType>::type> >,}
+\DoxyCodeLine{286                                               symbolic::ValueExpr<typename internal::cleanup\_seq\_incr<IncrType>::type> >,}
+\DoxyCodeLine{287                         \textcolor{keyword}{typename} internal::cleanup\_seq\_incr<IncrType>::type> >::type}
+\DoxyCodeLine{288 seq(\textcolor{keyword}{const} symbolic::BaseExpr<FirstTypeDerived> \&f, LastType l, IncrType incr)}
+\DoxyCodeLine{289 \{}
+\DoxyCodeLine{290   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::cleanup\_seq\_incr<IncrType>::type CleanedIncrType;}
+\DoxyCodeLine{291   \textcolor{keywordflow}{return} \mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{seqN}}(f.derived(),(\textcolor{keyword}{typename} internal::cleanup\_index\_type<LastType>::type(l)-\/f.derived()+CleanedIncrType(incr))/CleanedIncrType(incr), incr);}
+\DoxyCodeLine{292 \}}
+\DoxyCodeLine{293 }
+\DoxyCodeLine{294 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstType,\textcolor{keyword}{typename} LastTypeDerived, \textcolor{keyword}{typename} IncrType>}
+\DoxyCodeLine{295 \textcolor{keyword}{typename} internal::enable\_if<!symbolic::is\_symbolic<FirstType>::value,}
+\DoxyCodeLine{296     ArithmeticSequence<typename internal::cleanup\_index\_type<FirstType>::type,}
+\DoxyCodeLine{297                         symbolic::QuotientExpr<symbolic::AddExpr<symbolic::AddExpr<LastTypeDerived,symbolic::ValueExpr<> >,}
+\DoxyCodeLine{298                                                                  symbolic::ValueExpr<typename internal::cleanup\_seq\_incr<IncrType>::type> >,}
+\DoxyCodeLine{299                                                symbolic::ValueExpr<typename internal::cleanup\_seq\_incr<IncrType>::type> >,}
+\DoxyCodeLine{300                         \textcolor{keyword}{typename} internal::cleanup\_seq\_incr<IncrType>::type> >::type}
+\DoxyCodeLine{301 seq(FirstType f, \textcolor{keyword}{const} symbolic::BaseExpr<LastTypeDerived> \&l, IncrType incr)}
+\DoxyCodeLine{302 \{}
+\DoxyCodeLine{303   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::cleanup\_seq\_incr<IncrType>::type CleanedIncrType;}
+\DoxyCodeLine{304   \textcolor{keywordflow}{return} \mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{seqN}}(\textcolor{keyword}{typename} internal::cleanup\_index\_type<FirstType>::type(f),}
+\DoxyCodeLine{305               (l.derived()-\/\textcolor{keyword}{typename} internal::cleanup\_index\_type<FirstType>::type(f)+CleanedIncrType(incr))/CleanedIncrType(incr), incr);}
+\DoxyCodeLine{306 \}}
+\DoxyCodeLine{307 }
+\DoxyCodeLine{308 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstTypeDerived,\textcolor{keyword}{typename} LastTypeDerived, \textcolor{keyword}{typename} IncrType>}
+\DoxyCodeLine{309 ArithmeticSequence<FirstTypeDerived,}
+\DoxyCodeLine{310                     symbolic::QuotientExpr<symbolic::AddExpr<symbolic::AddExpr<LastTypeDerived,}
+\DoxyCodeLine{311                                                                                symbolic::NegateExpr<FirstTypeDerived> >,}
+\DoxyCodeLine{312                                                              symbolic::ValueExpr<typename internal::cleanup\_seq\_incr<IncrType>::type> >,}
+\DoxyCodeLine{313                                           symbolic::ValueExpr<typename internal::cleanup\_seq\_incr<IncrType>::type> >,}
+\DoxyCodeLine{314                     \textcolor{keyword}{typename} internal::cleanup\_seq\_incr<IncrType>::type>}
+\DoxyCodeLine{315 seq(\textcolor{keyword}{const} symbolic::BaseExpr<FirstTypeDerived> \&f, \textcolor{keyword}{const} symbolic::BaseExpr<LastTypeDerived> \&l, IncrType incr)}
+\DoxyCodeLine{316 \{}
+\DoxyCodeLine{317   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::cleanup\_seq\_incr<IncrType>::type CleanedIncrType;}
+\DoxyCodeLine{318   \textcolor{keywordflow}{return} \mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{seqN}}(f.derived(),(l.derived()-\/f.derived()+CleanedIncrType(incr))/CleanedIncrType(incr), incr);}
+\DoxyCodeLine{319 \}}
+\DoxyCodeLine{320 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_HAS\_CXX11}}
+\DoxyCodeLine{321 }
+\DoxyCodeLine{322 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{323 }
+\DoxyCodeLine{324 \textcolor{keyword}{namespace }placeholders \{}
+\DoxyCodeLine{325 }
+\DoxyCodeLine{326 \textcolor{preprocessor}{\#if EIGEN\_HAS\_CXX11 || defined(EIGEN\_PARSED\_BY\_DOXYGEN)}}
+\DoxyCodeLine{333 \textcolor{keyword}{template}<\textcolor{keyword}{typename} SizeType,\textcolor{keyword}{typename} IncrType>}
+\DoxyCodeLine{334 \textcolor{keyword}{auto} lastN(SizeType size, IncrType incr)}
+\DoxyCodeLine{335 -\/> \textcolor{keyword}{decltype}(\mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{seqN}}(Eigen::placeholders::last-\/(size-\/fix<1>())*incr, size, incr))}
+\DoxyCodeLine{336 \{}
+\DoxyCodeLine{337   \textcolor{keywordflow}{return} \mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{seqN}}(Eigen::placeholders::last-\/(size-\/fix<1>())*incr, size, incr);}
+\DoxyCodeLine{338 \}}
+\DoxyCodeLine{339 }
+\DoxyCodeLine{346 \textcolor{keyword}{template}<\textcolor{keyword}{typename} SizeType>}
+\DoxyCodeLine{347 \textcolor{keyword}{auto} lastN(SizeType size)}
+\DoxyCodeLine{348 -\/> \textcolor{keyword}{decltype}(\mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{seqN}}(Eigen::placeholders::last+fix<1>()-\/size, size))}
+\DoxyCodeLine{349 \{}
+\DoxyCodeLine{350   \textcolor{keywordflow}{return} \mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{seqN}}(Eigen::placeholders::last+fix<1>()-\/size, size);}
+\DoxyCodeLine{351 \}}
+\DoxyCodeLine{352 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{353 }
+\DoxyCodeLine{354 \}  \textcolor{comment}{// namespace placeholders}}
+\DoxyCodeLine{355 }
+\DoxyCodeLine{356 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{357 }
+\DoxyCodeLine{358 \textcolor{comment}{// Convert a symbolic span into a usable one (i.e., remove last/end "{}keywords"{})}}
+\DoxyCodeLine{359 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{360 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1make__size__type}{make\_size\_type}} \{}
+\DoxyCodeLine{361   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1conditional}{internal::conditional<symbolic::is\_symbolic<T>::value}}, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}, T>\mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{::type}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{type}};}
+\DoxyCodeLine{362 \};}
+\DoxyCodeLine{363 }
+\DoxyCodeLine{364 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstType,\textcolor{keyword}{typename} SizeType,\textcolor{keyword}{typename} IncrType,\textcolor{keywordtype}{int} XprSize>}
+\DoxyCodeLine{365 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1IndexedViewCompatibleType}{IndexedViewCompatibleType}}<\mbox{\hyperlink{classEigen_1_1ArithmeticSequence}{ArithmeticSequence}}<FirstType,SizeType,IncrType>, XprSize> \{}
+\DoxyCodeLine{366   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1ArithmeticSequence}{ArithmeticSequence<Index,typename make\_size\_type<SizeType>::type}},IncrType> \mbox{\hyperlink{classEigen_1_1ArithmeticSequence}{type}};}
+\DoxyCodeLine{367 \};}
+\DoxyCodeLine{368 }
+\DoxyCodeLine{369 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstType,\textcolor{keyword}{typename} SizeType,\textcolor{keyword}{typename} IncrType>}
+\DoxyCodeLine{370 \mbox{\hyperlink{classEigen_1_1ArithmeticSequence}{ArithmeticSequence<Index,typename make\_size\_type<SizeType>::type}},IncrType>}
+\DoxyCodeLine{371 makeIndexedViewCompatible(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1ArithmeticSequence}{ArithmeticSequence<FirstType,SizeType,IncrType>}}\& ids, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size,SpecializedType) \{}
+\DoxyCodeLine{372   \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1ArithmeticSequence}{ArithmeticSequence<Index,typename make\_size\_type<SizeType>::type}},IncrType>(}
+\DoxyCodeLine{373             eval\_expr\_given\_size(ids.firstObject(),size),eval\_expr\_given\_size(ids.sizeObject(),size),ids.incrObject());}
+\DoxyCodeLine{374 \}}
+\DoxyCodeLine{375 }
+\DoxyCodeLine{376 \textcolor{keyword}{template}<\textcolor{keyword}{typename} FirstType,\textcolor{keyword}{typename} SizeType,\textcolor{keyword}{typename} IncrType>}
+\DoxyCodeLine{377 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1get__compile__time__incr}{get\_compile\_time\_incr}}<\mbox{\hyperlink{classEigen_1_1ArithmeticSequence}{ArithmeticSequence}}<FirstType,SizeType,IncrType> > \{}
+\DoxyCodeLine{378   \textcolor{keyword}{enum} \{ value = \mbox{\hyperlink{structEigen_1_1internal_1_1get__fixed__value}{get\_fixed\_value<IncrType,DynamicIndex>::value}} \};}
+\DoxyCodeLine{379 \};}
+\DoxyCodeLine{380 }
+\DoxyCodeLine{381 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{382 }
+\DoxyCodeLine{404 \textcolor{keyword}{namespace }indexing \{}
+\DoxyCodeLine{405   \textcolor{keyword}{using} Eigen::fix;}
+\DoxyCodeLine{406   \textcolor{keyword}{using} Eigen::seq;}
+\DoxyCodeLine{407   \textcolor{keyword}{using} \mbox{\hyperlink{namespaceEigen_a3a3c346d2a61d1e8e86e6fb4cf57fbda}{Eigen::seqN}};}
+\DoxyCodeLine{408   \textcolor{keyword}{using} Eigen::placeholders::all;}
+\DoxyCodeLine{409   \textcolor{keyword}{using} Eigen::placeholders::last;}
+\DoxyCodeLine{410 \textcolor{preprocessor}{  \#if EIGEN\_HAS\_CXX11}}
+\DoxyCodeLine{411   \textcolor{keyword}{using} Eigen::placeholders::lastN;}
+\DoxyCodeLine{412 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{413   \textcolor{keyword}{using} Eigen::placeholders::lastp1;}
+\DoxyCodeLine{414 \}}
+\DoxyCodeLine{415 }
+\DoxyCodeLine{416 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{417 }
+\DoxyCodeLine{418 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_ARITHMETIC\_SEQUENCE\_H}}
+
+\end{DoxyCode}

@@ -1,0 +1,1749 @@
+\hypertarget{CoreEvaluators_8h_source}{}\doxysection{Core\+Evaluators.\+h}
+\label{CoreEvaluators_8h_source}\index{include/Eigen/src/Core/CoreEvaluators.h@{include/Eigen/src/Core/CoreEvaluators.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2011 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2011-\/2014 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{6 \textcolor{comment}{// Copyright (C) 2011-\/2012 Jitse Niesen <jitse@maths.leeds.ac.uk>}}
+\DoxyCodeLine{7 \textcolor{comment}{//}}
+\DoxyCodeLine{8 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{9 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{10 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{11 }
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#ifndef EIGEN\_COREEVALUATORS\_H}}
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#define EIGEN\_COREEVALUATORS\_H}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{19 }
+\DoxyCodeLine{20 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{21 }
+\DoxyCodeLine{22 \textcolor{comment}{// This class returns the evaluator kind from the expression storage kind.}}
+\DoxyCodeLine{23 \textcolor{comment}{// Default assumes index based accessors}}
+\DoxyCodeLine{24 \textcolor{keyword}{template}<\textcolor{keyword}{typename} StorageKind>}
+\DoxyCodeLine{25 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1storage__kind__to__evaluator__kind}{storage\_kind\_to\_evaluator\_kind}} \{}
+\DoxyCodeLine{26   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{IndexBased}} \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{Kind}};}
+\DoxyCodeLine{27 \};}
+\DoxyCodeLine{28 }
+\DoxyCodeLine{29 \textcolor{comment}{// This class returns the evaluator shape from the expression storage kind.}}
+\DoxyCodeLine{30 \textcolor{comment}{// It can be Dense, Sparse, Triangular, Diagonal, SelfAdjoint, Band, etc.}}
+\DoxyCodeLine{31 \textcolor{keyword}{template}<\textcolor{keyword}{typename} StorageKind> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1storage__kind__to__shape}{storage\_kind\_to\_shape}};}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1storage__kind__to__shape}{storage\_kind\_to\_shape}}<\mbox{\hyperlink{structEigen_1_1Dense}{Dense}}>                  \{ \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}} \mbox{\hyperlink{structEigen_1_1DenseShape}{Shape}};           \};}
+\DoxyCodeLine{34 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1storage__kind__to__shape}{storage\_kind\_to\_shape}}<\mbox{\hyperlink{structEigen_1_1SolverStorage}{SolverStorage}}>          \{ \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1SolverShape}{SolverShape}} \mbox{\hyperlink{structEigen_1_1SolverShape}{Shape}};           \};}
+\DoxyCodeLine{35 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1storage__kind__to__shape}{storage\_kind\_to\_shape}}<\mbox{\hyperlink{structEigen_1_1PermutationStorage}{PermutationStorage}}>     \{ \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1PermutationShape}{PermutationShape}} \mbox{\hyperlink{structEigen_1_1PermutationShape}{Shape}};     \};}
+\DoxyCodeLine{36 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1storage__kind__to__shape}{storage\_kind\_to\_shape}}<\mbox{\hyperlink{structEigen_1_1TranspositionsStorage}{TranspositionsStorage}}>  \{ \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1TranspositionsShape}{TranspositionsShape}} \mbox{\hyperlink{structEigen_1_1TranspositionsShape}{Shape}};  \};}
+\DoxyCodeLine{37 }
+\DoxyCodeLine{38 \textcolor{comment}{// Evaluators have to be specialized with respect to various criteria such as:}}
+\DoxyCodeLine{39 \textcolor{comment}{//  -\/ storage/structure/shape}}
+\DoxyCodeLine{40 \textcolor{comment}{//  -\/ scalar type}}
+\DoxyCodeLine{41 \textcolor{comment}{//  -\/ etc.}}
+\DoxyCodeLine{42 \textcolor{comment}{// Therefore, we need specialization of evaluator providing additional template arguments for each kind of evaluators.}}
+\DoxyCodeLine{43 \textcolor{comment}{// We currently distinguish the following kind of evaluators:}}
+\DoxyCodeLine{44 \textcolor{comment}{// -\/ unary\_evaluator    for expressions taking only one arguments (CwiseUnaryOp, CwiseUnaryView, Transpose, MatrixWrapper, ArrayWrapper, Reverse, Replicate)}}
+\DoxyCodeLine{45 \textcolor{comment}{// -\/ binary\_evaluator   for expression taking two arguments (CwiseBinaryOp)}}
+\DoxyCodeLine{46 \textcolor{comment}{// -\/ ternary\_evaluator   for expression taking three arguments (CwiseTernaryOp)}}
+\DoxyCodeLine{47 \textcolor{comment}{// -\/ product\_evaluator  for linear algebra products (Product); special case of binary\_evaluator because it requires additional tags for dispatching.}}
+\DoxyCodeLine{48 \textcolor{comment}{// -\/ mapbase\_evaluator  for Map, Block, Ref}}
+\DoxyCodeLine{49 \textcolor{comment}{// -\/ block\_evaluator    for Block (special dispatching to a mapbase\_evaluator or unary\_evaluator)}}
+\DoxyCodeLine{50 }
+\DoxyCodeLine{51 \textcolor{keyword}{template}< \textcolor{keyword}{typename} T,}
+\DoxyCodeLine{52           \textcolor{keyword}{typename} Arg1Kind   = \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{evaluator\_traits<typename T::Arg1>::Kind}},}
+\DoxyCodeLine{53           \textcolor{keyword}{typename} Arg2Kind   = \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{evaluator\_traits<typename T::Arg2>::Kind}},}
+\DoxyCodeLine{54           \textcolor{keyword}{typename} Arg3Kind   = \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{evaluator\_traits<typename T::Arg3>::Kind}},}
+\DoxyCodeLine{55           \textcolor{keyword}{typename} Arg1Scalar = \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<typename T::Arg1>::Scalar}},}
+\DoxyCodeLine{56           \textcolor{keyword}{typename} Arg2Scalar = \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<typename T::Arg2>::Scalar}},}
+\DoxyCodeLine{57           \textcolor{keyword}{typename} Arg3Scalar = \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<typename T::Arg3>::Scalar}}> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1ternary__evaluator}{ternary\_evaluator}};}
+\DoxyCodeLine{58 }
+\DoxyCodeLine{59 \textcolor{keyword}{template}< \textcolor{keyword}{typename} T,}
+\DoxyCodeLine{60           \textcolor{keyword}{typename} LhsKind   = \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{evaluator\_traits<typename T::Lhs>::Kind}},}
+\DoxyCodeLine{61           \textcolor{keyword}{typename} RhsKind   = \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{evaluator\_traits<typename T::Rhs>::Kind}},}
+\DoxyCodeLine{62           \textcolor{keyword}{typename} LhsScalar = \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<typename T::Lhs>::Scalar}},}
+\DoxyCodeLine{63           \textcolor{keyword}{typename} RhsScalar = \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<typename T::Rhs>::Scalar}}> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}};}
+\DoxyCodeLine{64 }
+\DoxyCodeLine{65 \textcolor{keyword}{template}< \textcolor{keyword}{typename} T,}
+\DoxyCodeLine{66           \textcolor{keyword}{typename} Kind   = \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{evaluator\_traits<typename T::NestedExpression>::Kind}},}
+\DoxyCodeLine{67           \textcolor{keyword}{typename} Scalar = \textcolor{keyword}{typename} T::Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}};}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{69 \textcolor{comment}{// evaluator\_traits<T> contains traits for evaluator<T>}}
+\DoxyCodeLine{70 }
+\DoxyCodeLine{71 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{72 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__traits__base}{evaluator\_traits\_base}}}
+\DoxyCodeLine{73 \{}
+\DoxyCodeLine{74   \textcolor{comment}{// by default, get evaluator kind and shape from storage}}
+\DoxyCodeLine{75   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1storage__kind__to__evaluator__kind}{storage\_kind\_to\_evaluator\_kind<typename traits<T>::StorageKind}}>\mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{::Kind}} \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{Kind}};}
+\DoxyCodeLine{76   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1storage__kind__to__shape}{storage\_kind\_to\_shape<typename traits<T>::StorageKind}}>::Shape Shape;}
+\DoxyCodeLine{77 \};}
+\DoxyCodeLine{78 }
+\DoxyCodeLine{79 \textcolor{comment}{// Default evaluator traits}}
+\DoxyCodeLine{80 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{81 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__traits}{evaluator\_traits}} : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__traits__base}{evaluator\_traits\_base}}<T>}
+\DoxyCodeLine{82 \{}
+\DoxyCodeLine{83 \};}
+\DoxyCodeLine{84 }
+\DoxyCodeLine{85 template<typename T, typename Shape = typename evaluator\_traits<T>::Shape >}
+\DoxyCodeLine{86 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__assume__aliasing}{evaluator\_assume\_aliasing}} \{}
+\DoxyCodeLine{87   \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{bool} value = \textcolor{keyword}{false};}
+\DoxyCodeLine{88 \};}
+\DoxyCodeLine{89 }
+\DoxyCodeLine{90 \textcolor{comment}{// By default, we assume a unary expression:}}
+\DoxyCodeLine{91 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{92 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}} : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}<T>}
+\DoxyCodeLine{93 \{}
+\DoxyCodeLine{94   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator<T>}} \mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{Base}};}
+\DoxyCodeLine{95   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{96   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} T\& xpr) : \mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{Base}}(xpr) \{\}}
+\DoxyCodeLine{97 \};}
+\DoxyCodeLine{98 }
+\DoxyCodeLine{99 }
+\DoxyCodeLine{100 \textcolor{comment}{// TODO: Think about const-\/correctness}}
+\DoxyCodeLine{101 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{102 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<const T>}
+\DoxyCodeLine{103   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<T>}
+\DoxyCodeLine{104 \{}
+\DoxyCodeLine{105   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{106   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} T\& xpr) : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<T>}}(xpr) \{\}}
+\DoxyCodeLine{107 \};}
+\DoxyCodeLine{108 }
+\DoxyCodeLine{109 \textcolor{comment}{// -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ base class for all evaluators -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{110 }
+\DoxyCodeLine{111 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ExpressionType>}
+\DoxyCodeLine{112 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}}
+\DoxyCodeLine{113 \{}
+\DoxyCodeLine{114   \textcolor{comment}{// TODO that's not very nice to have to propagate all these traits. They are currently only needed to handle outer,inner indices.}}
+\DoxyCodeLine{115   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<ExpressionType>}} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{ExpressionTraits}};}
+\DoxyCodeLine{116 }
+\DoxyCodeLine{117   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{118     Alignment = 0}
+\DoxyCodeLine{119   \};}
+\DoxyCodeLine{120   \textcolor{comment}{// noncopyable:}}
+\DoxyCodeLine{121   \textcolor{comment}{// Don't make this class inherit noncopyable as this kills EBO (Empty Base Optimization)}}
+\DoxyCodeLine{122   \textcolor{comment}{// and make complex evaluator much larger than then should do.}}
+\DoxyCodeLine{123   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}() \{\}}
+\DoxyCodeLine{124   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{\string~evaluator\_base}}() \{\}}
+\DoxyCodeLine{125 \textcolor{keyword}{private}:}
+\DoxyCodeLine{126   EIGEN\_DEVICE\_FUNC \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}\&);}
+\DoxyCodeLine{127   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}\& operator=(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}\&);}
+\DoxyCodeLine{128 \};}
+\DoxyCodeLine{129 }
+\DoxyCodeLine{130 \textcolor{comment}{// -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ Matrix and Array -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{131 \textcolor{comment}{//}}
+\DoxyCodeLine{132 \textcolor{comment}{// evaluator<PlainObjectBase> is a common base class for the}}
+\DoxyCodeLine{133 \textcolor{comment}{// Matrix and Array evaluators.}}
+\DoxyCodeLine{134 \textcolor{comment}{// Here we directly specialize evaluator. This is not really a unary expression, and it is, by definition, dense,}}
+\DoxyCodeLine{135 \textcolor{comment}{// so no need for more sophisticated dispatching.}}
+\DoxyCodeLine{136 }
+\DoxyCodeLine{137 \textcolor{comment}{// this helper permits to completely eliminate m\_outerStride if it is known at compiletime.}}
+\DoxyCodeLine{138 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar,\textcolor{keywordtype}{int} OuterStr\textcolor{keywordtype}{id}e> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1plainobjectbase__evaluator__data}{plainobjectbase\_evaluator\_data}} \{}
+\DoxyCodeLine{139 \textcolor{keyword}{public}:}
+\DoxyCodeLine{140   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{141   \mbox{\hyperlink{classEigen_1_1internal_1_1plainobjectbase__evaluator__data}{plainobjectbase\_evaluator\_data}}(\textcolor{keyword}{const} Scalar* ptr, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outerStride) : data(ptr)}
+\DoxyCodeLine{142   \{}
+\DoxyCodeLine{143 \textcolor{preprocessor}{\#ifndef EIGEN\_INTERNAL\_DEBUGGING}}
+\DoxyCodeLine{144     EIGEN\_UNUSED\_VARIABLE(outerStride);}
+\DoxyCodeLine{145 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{146     eigen\_internal\_assert(outerStride==\mbox{\hyperlink{classEigen_1_1OuterStride}{OuterStride}});}
+\DoxyCodeLine{147   \}}
+\DoxyCodeLine{148   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE EIGEN\_CONSTEXPR}
+\DoxyCodeLine{149   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outerStride() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1OuterStride}{OuterStride}}; \}}
+\DoxyCodeLine{150   \textcolor{keyword}{const} Scalar *data;}
+\DoxyCodeLine{151 \};}
+\DoxyCodeLine{152 }
+\DoxyCodeLine{153 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1plainobjectbase__evaluator__data}{plainobjectbase\_evaluator\_data}}<Scalar,\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}> \{}
+\DoxyCodeLine{154 \textcolor{keyword}{public}:}
+\DoxyCodeLine{155   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{156   \mbox{\hyperlink{classEigen_1_1internal_1_1plainobjectbase__evaluator__data}{plainobjectbase\_evaluator\_data}}(\textcolor{keyword}{const} Scalar* ptr, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outerStride) : data(ptr), m\_outerStride(outerStride) \{\}}
+\DoxyCodeLine{157   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{158   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outerStride()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_outerStride; \}}
+\DoxyCodeLine{159   \textcolor{keyword}{const} Scalar *data;}
+\DoxyCodeLine{160 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{161   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m\_outerStride;}
+\DoxyCodeLine{162 \};}
+\DoxyCodeLine{163 }
+\DoxyCodeLine{164 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{165 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<\mbox{\hyperlink{classEigen_1_1PlainObjectBase}{PlainObjectBase}}<Derived> >}
+\DoxyCodeLine{166   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<Derived>}
+\DoxyCodeLine{167 \{}
+\DoxyCodeLine{168   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1PlainObjectBase}{PlainObjectBase<Derived>}} \mbox{\hyperlink{classEigen_1_1PlainObjectBase}{PlainObjectType}};}
+\DoxyCodeLine{169   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} PlainObjectType::Scalar Scalar;}
+\DoxyCodeLine{170   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} PlainObjectType::CoeffReturnType CoeffReturnType;}
+\DoxyCodeLine{171 }
+\DoxyCodeLine{172   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{173     IsRowMajor = PlainObjectType::IsRowMajor,}
+\DoxyCodeLine{174     IsVectorAtCompileTime = PlainObjectType::IsVectorAtCompileTime,}
+\DoxyCodeLine{175     RowsAtCompileTime = PlainObjectType::RowsAtCompileTime,}
+\DoxyCodeLine{176     ColsAtCompileTime = PlainObjectType::ColsAtCompileTime,}
+\DoxyCodeLine{177 }
+\DoxyCodeLine{178     CoeffReadCost = \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::ReadCost}},}
+\DoxyCodeLine{179     Flags = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<Derived>::EvaluatorFlags}},}
+\DoxyCodeLine{180     Alignment = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<Derived>::Alignment}}}
+\DoxyCodeLine{181   \};}
+\DoxyCodeLine{182   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{183     \textcolor{comment}{// We do not need to know the outer stride for vectors}}
+\DoxyCodeLine{184     OuterStrideAtCompileTime = IsVectorAtCompileTime  ? 0}
+\DoxyCodeLine{185                                                       : int(IsRowMajor) ? ColsAtCompileTime}
+\DoxyCodeLine{186                                                                         : RowsAtCompileTime}
+\DoxyCodeLine{187   \};}
+\DoxyCodeLine{188 }
+\DoxyCodeLine{189   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{190   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}()}
+\DoxyCodeLine{191     : m\_d(0,OuterStrideAtCompileTime)}
+\DoxyCodeLine{192   \{}
+\DoxyCodeLine{193     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(CoeffReadCost);}
+\DoxyCodeLine{194   \}}
+\DoxyCodeLine{195 }
+\DoxyCodeLine{196   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{197   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1PlainObjectBase}{PlainObjectType}}\& m)}
+\DoxyCodeLine{198     : m\_d(m.data(),IsVectorAtCompileTime ? 0 : m.outerStride())}
+\DoxyCodeLine{199   \{}
+\DoxyCodeLine{200     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(CoeffReadCost);}
+\DoxyCodeLine{201   \}}
+\DoxyCodeLine{202 }
+\DoxyCodeLine{203   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{204   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{205 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{206     \textcolor{keywordflow}{if} (IsRowMajor)}
+\DoxyCodeLine{207       \textcolor{keywordflow}{return} m\_d.data[row * m\_d.outerStride() + col];}
+\DoxyCodeLine{208     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{209       \textcolor{keywordflow}{return} m\_d.data[row + col * m\_d.outerStride()];}
+\DoxyCodeLine{210   \}}
+\DoxyCodeLine{211 }
+\DoxyCodeLine{212   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{213   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{214 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{215     \textcolor{keywordflow}{return} m\_d.data[index];}
+\DoxyCodeLine{216   \}}
+\DoxyCodeLine{217 }
+\DoxyCodeLine{218   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{219   Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)}
+\DoxyCodeLine{220   \{}
+\DoxyCodeLine{221     \textcolor{keywordflow}{if} (IsRowMajor)}
+\DoxyCodeLine{222       \textcolor{keywordflow}{return} \textcolor{keyword}{const\_cast<}Scalar*\textcolor{keyword}{>}(m\_d.data)[row * m\_d.outerStride() + col];}
+\DoxyCodeLine{223     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{224       \textcolor{keywordflow}{return} \textcolor{keyword}{const\_cast<}Scalar*\textcolor{keyword}{>}(m\_d.data)[row + col * m\_d.outerStride()];}
+\DoxyCodeLine{225   \}}
+\DoxyCodeLine{226 }
+\DoxyCodeLine{227   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{228   Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)}
+\DoxyCodeLine{229   \{}
+\DoxyCodeLine{230     \textcolor{keywordflow}{return} \textcolor{keyword}{const\_cast<}Scalar*\textcolor{keyword}{>}(m\_d.data)[index];}
+\DoxyCodeLine{231   \}}
+\DoxyCodeLine{232 }
+\DoxyCodeLine{233   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{234   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{235   PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{236 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{237     \textcolor{keywordflow}{if} (IsRowMajor)}
+\DoxyCodeLine{238       \textcolor{keywordflow}{return} ploadt<PacketType, LoadMode>(m\_d.data + row * m\_d.outerStride() + col);}
+\DoxyCodeLine{239     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{240       \textcolor{keywordflow}{return} ploadt<PacketType, LoadMode>(m\_d.data + row + col * m\_d.outerStride());}
+\DoxyCodeLine{241   \}}
+\DoxyCodeLine{242 }
+\DoxyCodeLine{243   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{244   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{245   PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{246 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{247     \textcolor{keywordflow}{return} ploadt<PacketType, LoadMode>(m\_d.data + index);}
+\DoxyCodeLine{248   \}}
+\DoxyCodeLine{249 }
+\DoxyCodeLine{250   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} StoreMode,\textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{251   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{252   \textcolor{keywordtype}{void} writePacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col, \textcolor{keyword}{const} PacketType\& x)}
+\DoxyCodeLine{253   \{}
+\DoxyCodeLine{254     \textcolor{keywordflow}{if} (IsRowMajor)}
+\DoxyCodeLine{255       \textcolor{keywordflow}{return} pstoret<Scalar, PacketType, StoreMode>}
+\DoxyCodeLine{256                 (\textcolor{keyword}{const\_cast<}Scalar*\textcolor{keyword}{>}(m\_d.data) + row * m\_d.outerStride() + col, x);}
+\DoxyCodeLine{257     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{258       \textcolor{keywordflow}{return} pstoret<Scalar, PacketType, StoreMode>}
+\DoxyCodeLine{259                     (\textcolor{keyword}{const\_cast<}Scalar*\textcolor{keyword}{>}(m\_d.data) + row + col * m\_d.outerStride(), x);}
+\DoxyCodeLine{260   \}}
+\DoxyCodeLine{261 }
+\DoxyCodeLine{262   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} StoreMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{263   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{264   \textcolor{keywordtype}{void} writePacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index, \textcolor{keyword}{const} PacketType\& x)}
+\DoxyCodeLine{265   \{}
+\DoxyCodeLine{266     \textcolor{keywordflow}{return} pstoret<Scalar, PacketType, StoreMode>(\textcolor{keyword}{const\_cast<}Scalar*\textcolor{keyword}{>}(m\_d.data) + index, x);}
+\DoxyCodeLine{267   \}}
+\DoxyCodeLine{268 }
+\DoxyCodeLine{269 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{270 }
+\DoxyCodeLine{271   \mbox{\hyperlink{classEigen_1_1internal_1_1plainobjectbase__evaluator__data}{plainobjectbase\_evaluator\_data<Scalar,OuterStrideAtCompileTime>}} m\_d;}
+\DoxyCodeLine{272 \};}
+\DoxyCodeLine{273 }
+\DoxyCodeLine{274 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keywordtype}{int} Rows, \textcolor{keywordtype}{int} Cols, \textcolor{keywordtype}{int} Options, \textcolor{keywordtype}{int} MaxRows, \textcolor{keywordtype}{int} MaxCols>}
+\DoxyCodeLine{275 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<\mbox{\hyperlink{classEigen_1_1Matrix}{Matrix}}<Scalar, Rows, Cols, Options, MaxRows, MaxCols> >}
+\DoxyCodeLine{276   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<PlainObjectBase<Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols> > >}
+\DoxyCodeLine{277 \{}
+\DoxyCodeLine{278   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols>}} \mbox{\hyperlink{classEigen_1_1Matrix}{XprType}};}
+\DoxyCodeLine{279 }
+\DoxyCodeLine{280   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{281   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}() \{\}}
+\DoxyCodeLine{282 }
+\DoxyCodeLine{283   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{284   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Matrix}{XprType}}\& m)}
+\DoxyCodeLine{285     : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<PlainObjectBase<XprType>}} >(m)}
+\DoxyCodeLine{286   \{ \}}
+\DoxyCodeLine{287 \};}
+\DoxyCodeLine{288 }
+\DoxyCodeLine{289 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keywordtype}{int} Rows, \textcolor{keywordtype}{int} Cols, \textcolor{keywordtype}{int} Options, \textcolor{keywordtype}{int} MaxRows, \textcolor{keywordtype}{int} MaxCols>}
+\DoxyCodeLine{290 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<\mbox{\hyperlink{classEigen_1_1Array}{Array}}<Scalar, Rows, Cols, Options, MaxRows, MaxCols> >}
+\DoxyCodeLine{291   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<PlainObjectBase<Array<Scalar, Rows, Cols, Options, MaxRows, MaxCols> > >}
+\DoxyCodeLine{292 \{}
+\DoxyCodeLine{293   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Array}{Array<Scalar, Rows, Cols, Options, MaxRows, MaxCols>}} \mbox{\hyperlink{classEigen_1_1Array}{XprType}};}
+\DoxyCodeLine{294 }
+\DoxyCodeLine{295   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{296   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}() \{\}}
+\DoxyCodeLine{297 }
+\DoxyCodeLine{298   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{299   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Array}{XprType}}\& m)}
+\DoxyCodeLine{300     : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<PlainObjectBase<XprType>}} >(m)}
+\DoxyCodeLine{301   \{ \}}
+\DoxyCodeLine{302 \};}
+\DoxyCodeLine{303 }
+\DoxyCodeLine{304 \textcolor{comment}{// -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ Transpose -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{305 }
+\DoxyCodeLine{306 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ArgType>}
+\DoxyCodeLine{307 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1Transpose}{Transpose}}<ArgType>, \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{IndexBased}}>}
+\DoxyCodeLine{308   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<Transpose<ArgType> >}
+\DoxyCodeLine{309 \{}
+\DoxyCodeLine{310   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Transpose}{Transpose<ArgType>}} \mbox{\hyperlink{classEigen_1_1Transpose}{XprType}};}
+\DoxyCodeLine{311 }
+\DoxyCodeLine{312   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{313     CoeffReadCost = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::CoeffReadCost}},}
+\DoxyCodeLine{314     Flags = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::Flags}} \string^ \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}},}
+\DoxyCodeLine{315     Alignment = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::Alignment}}}
+\DoxyCodeLine{316   \};}
+\DoxyCodeLine{317 }
+\DoxyCodeLine{318   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{319   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Transpose}{XprType}}\& t) : m\_argImpl(t.\mbox{\hyperlink{classEigen_1_1Transpose_ad7a6e63756170ed6bf8512f7ee795a69}{nestedExpression}}()) \{\}}
+\DoxyCodeLine{320 }
+\DoxyCodeLine{321   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Scalar Scalar;}
+\DoxyCodeLine{322   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::CoeffReturnType CoeffReturnType;}
+\DoxyCodeLine{323 }
+\DoxyCodeLine{324   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{325   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{326 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{327     \textcolor{keywordflow}{return} m\_argImpl.coeff(col, row);}
+\DoxyCodeLine{328   \}}
+\DoxyCodeLine{329 }
+\DoxyCodeLine{330   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{331   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{332 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{333     \textcolor{keywordflow}{return} m\_argImpl.coeff(index);}
+\DoxyCodeLine{334   \}}
+\DoxyCodeLine{335 }
+\DoxyCodeLine{336   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{337   Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)}
+\DoxyCodeLine{338   \{}
+\DoxyCodeLine{339     \textcolor{keywordflow}{return} m\_argImpl.coeffRef(col, row);}
+\DoxyCodeLine{340   \}}
+\DoxyCodeLine{341 }
+\DoxyCodeLine{342   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{343   \textcolor{keyword}{typename} XprType::Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)}
+\DoxyCodeLine{344   \{}
+\DoxyCodeLine{345     \textcolor{keywordflow}{return} m\_argImpl.coeffRef(index);}
+\DoxyCodeLine{346   \}}
+\DoxyCodeLine{347 }
+\DoxyCodeLine{348   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{349   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{350   PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{351 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{352     \textcolor{keywordflow}{return} m\_argImpl.template packet<LoadMode,PacketType>(col, row);}
+\DoxyCodeLine{353   \}}
+\DoxyCodeLine{354 }
+\DoxyCodeLine{355   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{356   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{357   PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{358 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{359     \textcolor{keywordflow}{return} m\_argImpl.template packet<LoadMode,PacketType>(index);}
+\DoxyCodeLine{360   \}}
+\DoxyCodeLine{361 }
+\DoxyCodeLine{362   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} StoreMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{363   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{364   \textcolor{keywordtype}{void} writePacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col, \textcolor{keyword}{const} PacketType\& x)}
+\DoxyCodeLine{365   \{}
+\DoxyCodeLine{366     m\_argImpl.template writePacket<StoreMode,PacketType>(col, row, x);}
+\DoxyCodeLine{367   \}}
+\DoxyCodeLine{368 }
+\DoxyCodeLine{369   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} StoreMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{370   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{371   \textcolor{keywordtype}{void} writePacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index, \textcolor{keyword}{const} PacketType\& x)}
+\DoxyCodeLine{372   \{}
+\DoxyCodeLine{373     m\_argImpl.template writePacket<StoreMode,PacketType>(index, x);}
+\DoxyCodeLine{374   \}}
+\DoxyCodeLine{375 }
+\DoxyCodeLine{376 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{377   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>}} m\_argImpl;}
+\DoxyCodeLine{378 \};}
+\DoxyCodeLine{379 }
+\DoxyCodeLine{380 \textcolor{comment}{// -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ CwiseNullaryOp -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{381 \textcolor{comment}{// Like Matrix and Array, this is not really a unary expression, so we directly specialize evaluator.}}
+\DoxyCodeLine{382 \textcolor{comment}{// Likewise, there is not need to more sophisticated dispatching here.}}
+\DoxyCodeLine{383 }
+\DoxyCodeLine{384 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar,\textcolor{keyword}{typename} NullaryOp,}
+\DoxyCodeLine{385          \textcolor{keywordtype}{bool} has\_nullary = \mbox{\hyperlink{structEigen_1_1internal_1_1has__nullary__operator}{has\_nullary\_operator<NullaryOp>::value}},}
+\DoxyCodeLine{386          \textcolor{keywordtype}{bool} has\_unary   = \mbox{\hyperlink{structEigen_1_1internal_1_1has__unary__operator}{has\_unary\_operator<NullaryOp>::value}},}
+\DoxyCodeLine{387          \textcolor{keywordtype}{bool} has\_binary  = \mbox{\hyperlink{structEigen_1_1internal_1_1has__binary__operator}{has\_binary\_operator<NullaryOp>::value}}>}
+\DoxyCodeLine{388 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1nullary__wrapper}{nullary\_wrapper}}}
+\DoxyCodeLine{389 \{}
+\DoxyCodeLine{390   \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{391   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE Scalar operator()(\textcolor{keyword}{const} NullaryOp\& op, IndexType i, IndexType j)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} op(i,j); \}}
+\DoxyCodeLine{392   \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{393   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE Scalar operator()(\textcolor{keyword}{const} NullaryOp\& op, IndexType i)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} op(i); \}}
+\DoxyCodeLine{394 }
+\DoxyCodeLine{395   \textcolor{keyword}{template} <\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} IndexType> EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE T packetOp(\textcolor{keyword}{const} NullaryOp\& op, IndexType i, IndexType j)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} op.template packetOp<T>(i,j); \}}
+\DoxyCodeLine{396   \textcolor{keyword}{template} <\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} IndexType> EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE T packetOp(\textcolor{keyword}{const} NullaryOp\& op, IndexType i)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} op.template packetOp<T>(i); \}}
+\DoxyCodeLine{397 \};}
+\DoxyCodeLine{398 }
+\DoxyCodeLine{399 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar,\textcolor{keyword}{typename} NullaryOp>}
+\DoxyCodeLine{400 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1nullary__wrapper}{nullary\_wrapper}}<Scalar,NullaryOp,true,false,false>}
+\DoxyCodeLine{401 \{}
+\DoxyCodeLine{402   \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{403   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE Scalar operator()(\textcolor{keyword}{const} NullaryOp\& op, IndexType=0, IndexType=0)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} op(); \}}
+\DoxyCodeLine{404   \textcolor{keyword}{template} <\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} IndexType> EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE T packetOp(\textcolor{keyword}{const} NullaryOp\& op, IndexType=0, IndexType=0)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} op.template packetOp<T>(); \}}
+\DoxyCodeLine{405 \};}
+\DoxyCodeLine{406 }
+\DoxyCodeLine{407 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar,\textcolor{keyword}{typename} NullaryOp>}
+\DoxyCodeLine{408 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1nullary__wrapper}{nullary\_wrapper}}<Scalar,NullaryOp,false,false,true>}
+\DoxyCodeLine{409 \{}
+\DoxyCodeLine{410   \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{411   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE Scalar operator()(\textcolor{keyword}{const} NullaryOp\& op, IndexType i, IndexType j=0)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} op(i,j); \}}
+\DoxyCodeLine{412   \textcolor{keyword}{template} <\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} IndexType> EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE T packetOp(\textcolor{keyword}{const} NullaryOp\& op, IndexType i, IndexType j=0)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} op.template packetOp<T>(i,j); \}}
+\DoxyCodeLine{413 \};}
+\DoxyCodeLine{414 }
+\DoxyCodeLine{415 \textcolor{comment}{// We need the following specialization for vector-\/only functors assigned to a runtime vector,}}
+\DoxyCodeLine{416 \textcolor{comment}{// for instance, using linspace and assigning a RowVectorXd to a MatrixXd or even a row of a MatrixXd.}}
+\DoxyCodeLine{417 \textcolor{comment}{// In this case, i==0 and j is used for the actual iteration.}}
+\DoxyCodeLine{418 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar,\textcolor{keyword}{typename} NullaryOp>}
+\DoxyCodeLine{419 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1nullary__wrapper}{nullary\_wrapper}}<Scalar,NullaryOp,false,true,false>}
+\DoxyCodeLine{420 \{}
+\DoxyCodeLine{421   \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{422   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE Scalar operator()(\textcolor{keyword}{const} NullaryOp\& op, IndexType i, IndexType j)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{423     eigen\_assert(i==0 || j==0);}
+\DoxyCodeLine{424     \textcolor{keywordflow}{return} op(i+j);}
+\DoxyCodeLine{425   \}}
+\DoxyCodeLine{426   \textcolor{keyword}{template} <\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} IndexType> EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE T packetOp(\textcolor{keyword}{const} NullaryOp\& op, IndexType i, IndexType j)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{427     eigen\_assert(i==0 || j==0);}
+\DoxyCodeLine{428     \textcolor{keywordflow}{return} op.template packetOp<T>(i+j);}
+\DoxyCodeLine{429   \}}
+\DoxyCodeLine{430 }
+\DoxyCodeLine{431   \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{432   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE Scalar operator()(\textcolor{keyword}{const} NullaryOp\& op, IndexType i)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} op(i); \}}
+\DoxyCodeLine{433   \textcolor{keyword}{template} <\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{434   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE T packetOp(\textcolor{keyword}{const} NullaryOp\& op, IndexType i)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} op.template packetOp<T>(i); \}}
+\DoxyCodeLine{435 \};}
+\DoxyCodeLine{436 }
+\DoxyCodeLine{437 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar,\textcolor{keyword}{typename} NullaryOp>}
+\DoxyCodeLine{438 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1nullary__wrapper}{nullary\_wrapper}}<Scalar,NullaryOp,false,false,false> \{\};}
+\DoxyCodeLine{439 }
+\DoxyCodeLine{440 \textcolor{preprocessor}{\#if 0 \&\& EIGEN\_COMP\_MSVC>0}}
+\DoxyCodeLine{441 \textcolor{comment}{// Disable this ugly workaround. This is now handled in traits<Ref>::match,}}
+\DoxyCodeLine{442 \textcolor{comment}{// but this piece of code might still become handly if some other weird compilation}}
+\DoxyCodeLine{443 \textcolor{comment}{// erros pop up again.}}
+\DoxyCodeLine{444 }
+\DoxyCodeLine{445 \textcolor{comment}{// MSVC exhibits a weird compilation error when}}
+\DoxyCodeLine{446 \textcolor{comment}{// compiling:}}
+\DoxyCodeLine{447 \textcolor{comment}{//    Eigen::MatrixXf A = MatrixXf::Random(3,3);}}
+\DoxyCodeLine{448 \textcolor{comment}{//    Ref<const MatrixXf> R = 2.f*A;}}
+\DoxyCodeLine{449 \textcolor{comment}{// and that has\_*ary\_operator<scalar\_constant\_op<float>> have not been instantiated yet.}}
+\DoxyCodeLine{450 \textcolor{comment}{// The "{}problem"{} is that evaluator<2.f*A> is instantiated by traits<Ref>::match<2.f*A>}}
+\DoxyCodeLine{451 \textcolor{comment}{// and at that time has\_*ary\_operator<T> returns true regardless of T.}}
+\DoxyCodeLine{452 \textcolor{comment}{// Then nullary\_wrapper is badly instantiated as nullary\_wrapper<.,.,true,true,true>.}}
+\DoxyCodeLine{453 \textcolor{comment}{// The trick is thus to defer the proper instantiation of nullary\_wrapper when coeff(),}}
+\DoxyCodeLine{454 \textcolor{comment}{// and packet() are really instantiated as implemented below:}}
+\DoxyCodeLine{455 }
+\DoxyCodeLine{456 \textcolor{comment}{// This is a simple wrapper around Index to enforce the re-\/instantiation of}}
+\DoxyCodeLine{457 \textcolor{comment}{// has\_*ary\_operator when needed.}}
+\DoxyCodeLine{458 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }nullary\_wrapper\_workaround\_msvc \{}
+\DoxyCodeLine{459   nullary\_wrapper\_workaround\_msvc(\textcolor{keyword}{const} T\&);}
+\DoxyCodeLine{460   \textcolor{keyword}{operator} T()\textcolor{keyword}{const};}
+\DoxyCodeLine{461 \};}
+\DoxyCodeLine{462 }
+\DoxyCodeLine{463 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar,\textcolor{keyword}{typename} NullaryOp>}
+\DoxyCodeLine{464 \textcolor{keyword}{struct }nullary\_wrapper<Scalar,NullaryOp,true,true,true>}
+\DoxyCodeLine{465 \{}
+\DoxyCodeLine{466   \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{467   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE Scalar operator()(\textcolor{keyword}{const} NullaryOp\& op, IndexType i, IndexType j)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{468     \textcolor{keywordflow}{return} nullary\_wrapper<Scalar,NullaryOp,}
+\DoxyCodeLine{469     has\_nullary\_operator<NullaryOp,nullary\_wrapper\_workaround\_msvc<IndexType> >::value,}
+\DoxyCodeLine{470     has\_unary\_operator<NullaryOp,nullary\_wrapper\_workaround\_msvc<IndexType> >::value,}
+\DoxyCodeLine{471     has\_binary\_operator<NullaryOp,nullary\_wrapper\_workaround\_msvc<IndexType> >::value>().\textcolor{keyword}{operator}()(op,i,j);}
+\DoxyCodeLine{472   \}}
+\DoxyCodeLine{473   \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{474   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE Scalar operator()(\textcolor{keyword}{const} NullaryOp\& op, IndexType i)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{475     \textcolor{keywordflow}{return} nullary\_wrapper<Scalar,NullaryOp,}
+\DoxyCodeLine{476     has\_nullary\_operator<NullaryOp,nullary\_wrapper\_workaround\_msvc<IndexType> >::value,}
+\DoxyCodeLine{477     has\_unary\_operator<NullaryOp,nullary\_wrapper\_workaround\_msvc<IndexType> >::value,}
+\DoxyCodeLine{478     has\_binary\_operator<NullaryOp,nullary\_wrapper\_workaround\_msvc<IndexType> >::value>().\textcolor{keyword}{operator}()(op,i);}
+\DoxyCodeLine{479   \}}
+\DoxyCodeLine{480 }
+\DoxyCodeLine{481   \textcolor{keyword}{template} <\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{482   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE T packetOp(\textcolor{keyword}{const} NullaryOp\& op, IndexType i, IndexType j)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{483     \textcolor{keywordflow}{return} nullary\_wrapper<Scalar,NullaryOp,}
+\DoxyCodeLine{484     has\_nullary\_operator<NullaryOp,nullary\_wrapper\_workaround\_msvc<IndexType> >::value,}
+\DoxyCodeLine{485     has\_unary\_operator<NullaryOp,nullary\_wrapper\_workaround\_msvc<IndexType> >::value,}
+\DoxyCodeLine{486     has\_binary\_operator<NullaryOp,nullary\_wrapper\_workaround\_msvc<IndexType> >::value>().\textcolor{keyword}{template} packetOp<T>(op,i,j);}
+\DoxyCodeLine{487   \}}
+\DoxyCodeLine{488   \textcolor{keyword}{template} <\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{489   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE T packetOp(\textcolor{keyword}{const} NullaryOp\& op, IndexType i)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{490     \textcolor{keywordflow}{return} nullary\_wrapper<Scalar,NullaryOp,}
+\DoxyCodeLine{491     has\_nullary\_operator<NullaryOp,nullary\_wrapper\_workaround\_msvc<IndexType> >::value,}
+\DoxyCodeLine{492     has\_unary\_operator<NullaryOp,nullary\_wrapper\_workaround\_msvc<IndexType> >::value,}
+\DoxyCodeLine{493     has\_binary\_operator<NullaryOp,nullary\_wrapper\_workaround\_msvc<IndexType> >::value>().\textcolor{keyword}{template} packetOp<T>(op,i);}
+\DoxyCodeLine{494   \}}
+\DoxyCodeLine{495 \};}
+\DoxyCodeLine{496 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// MSVC workaround}}
+\DoxyCodeLine{497 }
+\DoxyCodeLine{498 \textcolor{keyword}{template}<\textcolor{keyword}{typename} NullaryOp, \textcolor{keyword}{typename} PlainObjectType>}
+\DoxyCodeLine{499 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<\mbox{\hyperlink{classEigen_1_1CwiseNullaryOp}{CwiseNullaryOp}}<NullaryOp,PlainObjectType> >}
+\DoxyCodeLine{500   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<CwiseNullaryOp<NullaryOp,PlainObjectType> >}
+\DoxyCodeLine{501 \{}
+\DoxyCodeLine{502   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseNullaryOp}{CwiseNullaryOp<NullaryOp,PlainObjectType>}} \mbox{\hyperlink{classEigen_1_1CwiseNullaryOp}{XprType}};}
+\DoxyCodeLine{503   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<PlainObjectType>::type PlainObjectTypeCleaned;}
+\DoxyCodeLine{504 }
+\DoxyCodeLine{505   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{506     CoeffReadCost = \mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{internal::functor\_traits<NullaryOp>::Cost}},}
+\DoxyCodeLine{507 }
+\DoxyCodeLine{508     Flags = (\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<PlainObjectTypeCleaned>::Flags}}}
+\DoxyCodeLine{509           \&  (  HereditaryBits}
+\DoxyCodeLine{510               | (\mbox{\hyperlink{structEigen_1_1internal_1_1functor__has__linear__access}{functor\_has\_linear\_access<NullaryOp>::ret}}  ? \mbox{\hyperlink{group__flags_ga4b983a15d57cd55806df618ac544d09e}{LinearAccessBit}} : 0)}
+\DoxyCodeLine{511               | (\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<NullaryOp>::PacketAccess}}    ? \mbox{\hyperlink{group__flags_ga1a306a438e1ab074e8be59512e887b9f}{PacketAccessBit}} : 0)))}
+\DoxyCodeLine{512           | (\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<NullaryOp>::IsRepeatable}} ? 0 : \mbox{\hyperlink{group__flags_gaa34e83bae46a8eeae4e69ebe3aaecbed}{EvalBeforeNestingBit}}),}
+\DoxyCodeLine{513     Alignment = AlignedMax}
+\DoxyCodeLine{514   \};}
+\DoxyCodeLine{515 }
+\DoxyCodeLine{516   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseNullaryOp}{XprType}}\& n)}
+\DoxyCodeLine{517     : m\_functor(n.\mbox{\hyperlink{classEigen_1_1CwiseNullaryOp_ab3de37a85cd5df7ef22a88cefccb98c7}{functor}}()), m\_wrapper()}
+\DoxyCodeLine{518   \{}
+\DoxyCodeLine{519     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(CoeffReadCost);}
+\DoxyCodeLine{520   \}}
+\DoxyCodeLine{521 }
+\DoxyCodeLine{522   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::CoeffReturnType CoeffReturnType;}
+\DoxyCodeLine{523 }
+\DoxyCodeLine{524   \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{525   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{526   CoeffReturnType coeff(IndexType row, IndexType col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{527 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{528     \textcolor{keywordflow}{return} m\_wrapper(m\_functor, row, col);}
+\DoxyCodeLine{529   \}}
+\DoxyCodeLine{530 }
+\DoxyCodeLine{531   \textcolor{keyword}{template} <\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{532   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{533   CoeffReturnType coeff(IndexType index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{534 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{535     \textcolor{keywordflow}{return} m\_wrapper(m\_functor,index);}
+\DoxyCodeLine{536   \}}
+\DoxyCodeLine{537 }
+\DoxyCodeLine{538   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType, \textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{539   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{540   PacketType packet(IndexType row, IndexType col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{541 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{542     \textcolor{keywordflow}{return} m\_wrapper.template packetOp<PacketType>(m\_functor, row, col);}
+\DoxyCodeLine{543   \}}
+\DoxyCodeLine{544 }
+\DoxyCodeLine{545   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType, \textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{546   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{547   PacketType packet(IndexType index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{548 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{549     \textcolor{keywordflow}{return} m\_wrapper.template packetOp<PacketType>(m\_functor, index);}
+\DoxyCodeLine{550   \}}
+\DoxyCodeLine{551 }
+\DoxyCodeLine{552 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{553   \textcolor{keyword}{const} NullaryOp m\_functor;}
+\DoxyCodeLine{554   \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1nullary__wrapper}{internal::nullary\_wrapper<CoeffReturnType,NullaryOp>}} m\_wrapper;}
+\DoxyCodeLine{555 \};}
+\DoxyCodeLine{556 }
+\DoxyCodeLine{557 \textcolor{comment}{// -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ CwiseUnaryOp -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{558 }
+\DoxyCodeLine{559 \textcolor{keyword}{template}<\textcolor{keyword}{typename} UnaryOp, \textcolor{keyword}{typename} ArgType>}
+\DoxyCodeLine{560 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{CwiseUnaryOp}}<UnaryOp, ArgType>, \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{IndexBased}} >}
+\DoxyCodeLine{561   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<CwiseUnaryOp<UnaryOp, ArgType> >}
+\DoxyCodeLine{562 \{}
+\DoxyCodeLine{563   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{CwiseUnaryOp<UnaryOp, ArgType>}} \mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{XprType}};}
+\DoxyCodeLine{564 }
+\DoxyCodeLine{565   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{566     CoeffReadCost = int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::CoeffReadCost}}) + int(\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<UnaryOp>::Cost}}),}
+\DoxyCodeLine{567 }
+\DoxyCodeLine{568     Flags = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::Flags}}}
+\DoxyCodeLine{569           \& (HereditaryBits | \mbox{\hyperlink{group__flags_ga4b983a15d57cd55806df618ac544d09e}{LinearAccessBit}} | (\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<UnaryOp>::PacketAccess}} ? \mbox{\hyperlink{group__flags_ga1a306a438e1ab074e8be59512e887b9f}{PacketAccessBit}} : 0)),}
+\DoxyCodeLine{570     Alignment = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::Alignment}}}
+\DoxyCodeLine{571   \};}
+\DoxyCodeLine{572 }
+\DoxyCodeLine{573   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{574   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{XprType}}\& op) : m\_d(op)}
+\DoxyCodeLine{575   \{}
+\DoxyCodeLine{576     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<UnaryOp>::Cost}});}
+\DoxyCodeLine{577     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(CoeffReadCost);}
+\DoxyCodeLine{578   \}}
+\DoxyCodeLine{579 }
+\DoxyCodeLine{580   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::CoeffReturnType CoeffReturnType;}
+\DoxyCodeLine{581 }
+\DoxyCodeLine{582   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{583   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{584 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{585     \textcolor{keywordflow}{return} m\_d.func()(m\_d.argImpl.coeff(row, col));}
+\DoxyCodeLine{586   \}}
+\DoxyCodeLine{587 }
+\DoxyCodeLine{588   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{589   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{590 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{591     \textcolor{keywordflow}{return} m\_d.func()(m\_d.argImpl.coeff(index));}
+\DoxyCodeLine{592   \}}
+\DoxyCodeLine{593 }
+\DoxyCodeLine{594   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{595   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{596   PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{597 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{598     \textcolor{keywordflow}{return} m\_d.func().packetOp(m\_d.argImpl.template packet<LoadMode, PacketType>(row, col));}
+\DoxyCodeLine{599   \}}
+\DoxyCodeLine{600 }
+\DoxyCodeLine{601   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{602   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{603   PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{604 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{605     \textcolor{keywordflow}{return} m\_d.func().packetOp(m\_d.argImpl.template packet<LoadMode, PacketType>(index));}
+\DoxyCodeLine{606   \}}
+\DoxyCodeLine{607 }
+\DoxyCodeLine{608 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{609 }
+\DoxyCodeLine{610   \textcolor{comment}{// this helper permits to completely eliminate the functor if it is empty}}
+\DoxyCodeLine{611   \textcolor{keyword}{struct }Data}
+\DoxyCodeLine{612   \{}
+\DoxyCodeLine{613     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{614     Data(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{XprType}}\& xpr) : op(xpr.\mbox{\hyperlink{classEigen_1_1CwiseUnaryOp_a35cbdfeb47e4a4a909d0be001ffbf57c}{functor}}()), argImpl(xpr.\mbox{\hyperlink{classEigen_1_1CwiseUnaryOp_a5b22c2e851e86c801e395792708c1f7c}{nestedExpression}}()) \{\}}
+\DoxyCodeLine{615     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{616     \textcolor{keyword}{const} UnaryOp\& func()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} op; \}}
+\DoxyCodeLine{617     UnaryOp op;}
+\DoxyCodeLine{618     \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>}} argImpl;}
+\DoxyCodeLine{619   \};}
+\DoxyCodeLine{620 }
+\DoxyCodeLine{621   Data m\_d;}
+\DoxyCodeLine{622 \};}
+\DoxyCodeLine{623 }
+\DoxyCodeLine{624 \textcolor{comment}{// -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ CwiseTernaryOp -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{625 }
+\DoxyCodeLine{626 \textcolor{comment}{// this is a ternary expression}}
+\DoxyCodeLine{627 \textcolor{keyword}{template}<\textcolor{keyword}{typename} TernaryOp, \textcolor{keyword}{typename} Arg1, \textcolor{keyword}{typename} Arg2, \textcolor{keyword}{typename} Arg3>}
+\DoxyCodeLine{628 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<\mbox{\hyperlink{classEigen_1_1CwiseTernaryOp}{CwiseTernaryOp}}<TernaryOp, Arg1, Arg2, Arg3> >}
+\DoxyCodeLine{629   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1ternary__evaluator}{ternary\_evaluator}}<CwiseTernaryOp<TernaryOp, Arg1, Arg2, Arg3> >}
+\DoxyCodeLine{630 \{}
+\DoxyCodeLine{631   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseTernaryOp}{CwiseTernaryOp<TernaryOp, Arg1, Arg2, Arg3>}} \mbox{\hyperlink{classEigen_1_1CwiseTernaryOp}{XprType}};}
+\DoxyCodeLine{632   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1ternary__evaluator}{ternary\_evaluator<CwiseTernaryOp<TernaryOp, Arg1, Arg2, Arg3>}} > \mbox{\hyperlink{structEigen_1_1internal_1_1ternary__evaluator}{Base}};}
+\DoxyCodeLine{633 }
+\DoxyCodeLine{634   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseTernaryOp}{XprType}}\& xpr) : \mbox{\hyperlink{structEigen_1_1internal_1_1ternary__evaluator}{Base}}(xpr) \{\}}
+\DoxyCodeLine{635 \};}
+\DoxyCodeLine{636 }
+\DoxyCodeLine{637 \textcolor{keyword}{template}<\textcolor{keyword}{typename} TernaryOp, \textcolor{keyword}{typename} Arg1, \textcolor{keyword}{typename} Arg2, \textcolor{keyword}{typename} Arg3>}
+\DoxyCodeLine{638 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1ternary__evaluator}{ternary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1CwiseTernaryOp}{CwiseTernaryOp}}<TernaryOp, Arg1, Arg2, Arg3>, \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{IndexBased}}, \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{IndexBased}}>}
+\DoxyCodeLine{639   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<CwiseTernaryOp<TernaryOp, Arg1, Arg2, Arg3> >}
+\DoxyCodeLine{640 \{}
+\DoxyCodeLine{641   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseTernaryOp}{CwiseTernaryOp<TernaryOp, Arg1, Arg2, Arg3>}} \mbox{\hyperlink{classEigen_1_1CwiseTernaryOp}{XprType}};}
+\DoxyCodeLine{642 }
+\DoxyCodeLine{643   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{644     CoeffReadCost = int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Arg1>::CoeffReadCost}}) + int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Arg2>::CoeffReadCost}}) + int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Arg3>::CoeffReadCost}}) + int(\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<TernaryOp>::Cost}}),}
+\DoxyCodeLine{645 }
+\DoxyCodeLine{646     Arg1Flags = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Arg1>::Flags}},}
+\DoxyCodeLine{647     Arg2Flags = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Arg2>::Flags}},}
+\DoxyCodeLine{648     Arg3Flags = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Arg3>::Flags}},}
+\DoxyCodeLine{649     SameType = \mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{is\_same<typename Arg1::Scalar,typename Arg2::Scalar>::value}} \&\& \mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{is\_same<typename Arg1::Scalar,typename Arg3::Scalar>::value}},}
+\DoxyCodeLine{650     StorageOrdersAgree = (int(Arg1Flags)\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})==(\textcolor{keywordtype}{int}(Arg2Flags)\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) \&\& (\textcolor{keywordtype}{int}(Arg1Flags)\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})==(\textcolor{keywordtype}{int}(Arg3Flags)\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}),}
+\DoxyCodeLine{651     Flags0 = (\textcolor{keywordtype}{int}(Arg1Flags) | int(Arg2Flags) | int(Arg3Flags)) \& (}
+\DoxyCodeLine{652         HereditaryBits}
+\DoxyCodeLine{653         | (\textcolor{keywordtype}{int}(Arg1Flags) \& \textcolor{keywordtype}{int}(Arg2Flags) \& \textcolor{keywordtype}{int}(Arg3Flags) \&}
+\DoxyCodeLine{654            ( (StorageOrdersAgree ? \mbox{\hyperlink{group__flags_ga4b983a15d57cd55806df618ac544d09e}{LinearAccessBit}} : 0)}
+\DoxyCodeLine{655            | (\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<TernaryOp>::PacketAccess}} \&\& StorageOrdersAgree \&\& SameType ? \mbox{\hyperlink{group__flags_ga1a306a438e1ab074e8be59512e887b9f}{PacketAccessBit}} : 0)}
+\DoxyCodeLine{656            )}
+\DoxyCodeLine{657         )}
+\DoxyCodeLine{658      ),}
+\DoxyCodeLine{659     Flags = (Flags0 \& \string~\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) | (Arg1Flags \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}),}
+\DoxyCodeLine{660     Alignment = EIGEN\_PLAIN\_ENUM\_MIN(}
+\DoxyCodeLine{661         EIGEN\_PLAIN\_ENUM\_MIN(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Arg1>::Alignment}}, \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Arg2>::Alignment}}),}
+\DoxyCodeLine{662         \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Arg3>::Alignment}})}
+\DoxyCodeLine{663   \};}
+\DoxyCodeLine{664 }
+\DoxyCodeLine{665   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1ternary__evaluator}{ternary\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseTernaryOp}{XprType}}\& xpr) : m\_d(xpr)}
+\DoxyCodeLine{666   \{}
+\DoxyCodeLine{667     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<TernaryOp>::Cost}});}
+\DoxyCodeLine{668     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(CoeffReadCost);}
+\DoxyCodeLine{669   \}}
+\DoxyCodeLine{670 }
+\DoxyCodeLine{671   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::CoeffReturnType CoeffReturnType;}
+\DoxyCodeLine{672 }
+\DoxyCodeLine{673   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{674   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{675 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{676     \textcolor{keywordflow}{return} m\_d.func()(m\_d.arg1Impl.coeff(row, col), m\_d.arg2Impl.coeff(row, col), m\_d.arg3Impl.coeff(row, col));}
+\DoxyCodeLine{677   \}}
+\DoxyCodeLine{678 }
+\DoxyCodeLine{679   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{680   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{681 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{682     \textcolor{keywordflow}{return} m\_d.func()(m\_d.arg1Impl.coeff(index), m\_d.arg2Impl.coeff(index), m\_d.arg3Impl.coeff(index));}
+\DoxyCodeLine{683   \}}
+\DoxyCodeLine{684 }
+\DoxyCodeLine{685   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{686   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{687   PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{688 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{689     \textcolor{keywordflow}{return} m\_d.func().packetOp(m\_d.arg1Impl.template packet<LoadMode,PacketType>(row, col),}
+\DoxyCodeLine{690                                m\_d.arg2Impl.template packet<LoadMode,PacketType>(row, col),}
+\DoxyCodeLine{691                                m\_d.arg3Impl.template packet<LoadMode,PacketType>(row, col));}
+\DoxyCodeLine{692   \}}
+\DoxyCodeLine{693 }
+\DoxyCodeLine{694   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{695   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{696   PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{697 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{698     \textcolor{keywordflow}{return} m\_d.func().packetOp(m\_d.arg1Impl.template packet<LoadMode,PacketType>(index),}
+\DoxyCodeLine{699                                m\_d.arg2Impl.template packet<LoadMode,PacketType>(index),}
+\DoxyCodeLine{700                                m\_d.arg3Impl.template packet<LoadMode,PacketType>(index));}
+\DoxyCodeLine{701   \}}
+\DoxyCodeLine{702 }
+\DoxyCodeLine{703 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{704   \textcolor{comment}{// this helper permits to completely eliminate the functor if it is empty}}
+\DoxyCodeLine{705   \textcolor{keyword}{struct }Data}
+\DoxyCodeLine{706   \{}
+\DoxyCodeLine{707     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{708     Data(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseTernaryOp}{XprType}}\& xpr) : op(xpr.\mbox{\hyperlink{classEigen_1_1CwiseTernaryOp_aef0716e9e3b3f58b1f549379e06823d9}{functor}}()), arg1Impl(xpr.\mbox{\hyperlink{classEigen_1_1CwiseTernaryOp_a274c7a8c0b76f5b2d878c7dbd6dad75b}{arg1}}()), arg2Impl(xpr.\mbox{\hyperlink{classEigen_1_1CwiseTernaryOp_a45b72446b7a54ec2d50e6209d307fc9a}{arg2}}()), arg3Impl(xpr.\mbox{\hyperlink{classEigen_1_1CwiseTernaryOp_a5e78167a8d26ad67b2710822de40a045}{arg3}}()) \{\}}
+\DoxyCodeLine{709     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{710     \textcolor{keyword}{const} TernaryOp\& func()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} op; \}}
+\DoxyCodeLine{711     TernaryOp op;}
+\DoxyCodeLine{712     \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Arg1>}} arg1Impl;}
+\DoxyCodeLine{713     \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Arg2>}} arg2Impl;}
+\DoxyCodeLine{714     \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Arg3>}} arg3Impl;}
+\DoxyCodeLine{715   \};}
+\DoxyCodeLine{716 }
+\DoxyCodeLine{717   Data m\_d;}
+\DoxyCodeLine{718 \};}
+\DoxyCodeLine{719 }
+\DoxyCodeLine{720 \textcolor{comment}{// -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ CwiseBinaryOp -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{721 }
+\DoxyCodeLine{722 \textcolor{comment}{// this is a binary expression}}
+\DoxyCodeLine{723 \textcolor{keyword}{template}<\textcolor{keyword}{typename} BinaryOp, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{724 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}<BinaryOp, Lhs, Rhs> >}
+\DoxyCodeLine{725   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}<CwiseBinaryOp<BinaryOp, Lhs, Rhs> >}
+\DoxyCodeLine{726 \{}
+\DoxyCodeLine{727   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp<BinaryOp, Lhs, Rhs>}} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}};}
+\DoxyCodeLine{728   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs>}} > \mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{Base}};}
+\DoxyCodeLine{729 }
+\DoxyCodeLine{730   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{731   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}}\& xpr) : \mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{Base}}(xpr) \{\}}
+\DoxyCodeLine{732 \};}
+\DoxyCodeLine{733 }
+\DoxyCodeLine{734 \textcolor{keyword}{template}<\textcolor{keyword}{typename} BinaryOp, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{735 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}<BinaryOp, Lhs, Rhs>, \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{IndexBased}}, \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{IndexBased}}>}
+\DoxyCodeLine{736   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<CwiseBinaryOp<BinaryOp, Lhs, Rhs> >}
+\DoxyCodeLine{737 \{}
+\DoxyCodeLine{738   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp<BinaryOp, Lhs, Rhs>}} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}};}
+\DoxyCodeLine{739 }
+\DoxyCodeLine{740   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{741     CoeffReadCost = int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Lhs>::CoeffReadCost}}) + int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Rhs>::CoeffReadCost}}) + int(\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<BinaryOp>::Cost}}),}
+\DoxyCodeLine{742 }
+\DoxyCodeLine{743     LhsFlags = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Lhs>::Flags}},}
+\DoxyCodeLine{744     RhsFlags = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Rhs>::Flags}},}
+\DoxyCodeLine{745     SameType = \mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{is\_same<typename Lhs::Scalar,typename Rhs::Scalar>::value}},}
+\DoxyCodeLine{746     StorageOrdersAgree = (int(LhsFlags)\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})==(\textcolor{keywordtype}{int}(RhsFlags)\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}),}
+\DoxyCodeLine{747     Flags0 = (\textcolor{keywordtype}{int}(LhsFlags) | int(RhsFlags)) \& (}
+\DoxyCodeLine{748         HereditaryBits}
+\DoxyCodeLine{749       | (\textcolor{keywordtype}{int}(LhsFlags) \& \textcolor{keywordtype}{int}(RhsFlags) \&}
+\DoxyCodeLine{750            ( (StorageOrdersAgree ? \mbox{\hyperlink{group__flags_ga4b983a15d57cd55806df618ac544d09e}{LinearAccessBit}} : 0)}
+\DoxyCodeLine{751            | (\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<BinaryOp>::PacketAccess}} \&\& StorageOrdersAgree \&\& SameType ? \mbox{\hyperlink{group__flags_ga1a306a438e1ab074e8be59512e887b9f}{PacketAccessBit}} : 0)}
+\DoxyCodeLine{752            )}
+\DoxyCodeLine{753         )}
+\DoxyCodeLine{754      ),}
+\DoxyCodeLine{755     Flags = (Flags0 \& \string~\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) | (LhsFlags \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}),}
+\DoxyCodeLine{756     Alignment = EIGEN\_PLAIN\_ENUM\_MIN(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Lhs>::Alignment}},\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Rhs>::Alignment}})}
+\DoxyCodeLine{757   \};}
+\DoxyCodeLine{758 }
+\DoxyCodeLine{759   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{760   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}}\& xpr) : m\_d(xpr)}
+\DoxyCodeLine{761   \{}
+\DoxyCodeLine{762     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<BinaryOp>::Cost}});}
+\DoxyCodeLine{763     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(CoeffReadCost);}
+\DoxyCodeLine{764   \}}
+\DoxyCodeLine{765 }
+\DoxyCodeLine{766   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::CoeffReturnType CoeffReturnType;}
+\DoxyCodeLine{767 }
+\DoxyCodeLine{768   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{769   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{770 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{771     \textcolor{keywordflow}{return} m\_d.func()(m\_d.lhsImpl.coeff(row, col), m\_d.rhsImpl.coeff(row, col));}
+\DoxyCodeLine{772   \}}
+\DoxyCodeLine{773 }
+\DoxyCodeLine{774   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{775   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{776 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{777     \textcolor{keywordflow}{return} m\_d.func()(m\_d.lhsImpl.coeff(index), m\_d.rhsImpl.coeff(index));}
+\DoxyCodeLine{778   \}}
+\DoxyCodeLine{779 }
+\DoxyCodeLine{780   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{781   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{782   PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{783 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{784     \textcolor{keywordflow}{return} m\_d.func().packetOp(m\_d.lhsImpl.template packet<LoadMode,PacketType>(row, col),}
+\DoxyCodeLine{785                                m\_d.rhsImpl.template packet<LoadMode,PacketType>(row, col));}
+\DoxyCodeLine{786   \}}
+\DoxyCodeLine{787 }
+\DoxyCodeLine{788   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{789   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{790   PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{791 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{792     \textcolor{keywordflow}{return} m\_d.func().packetOp(m\_d.lhsImpl.template packet<LoadMode,PacketType>(index),}
+\DoxyCodeLine{793                                m\_d.rhsImpl.template packet<LoadMode,PacketType>(index));}
+\DoxyCodeLine{794   \}}
+\DoxyCodeLine{795 }
+\DoxyCodeLine{796 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{797 }
+\DoxyCodeLine{798   \textcolor{comment}{// this helper permits to completely eliminate the functor if it is empty}}
+\DoxyCodeLine{799   \textcolor{keyword}{struct }Data}
+\DoxyCodeLine{800   \{}
+\DoxyCodeLine{801     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{802     Data(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}}\& xpr) : op(xpr.\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp_acb2d81a45c25b654370c6447c890f9ed}{functor}}()), lhsImpl(xpr.\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp_ae42aa9e1940f262f443d0138b6e840cd}{lhs}}()), rhsImpl(xpr.\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp_a243d6e1e98290a0a57cddd7f58472b25}{rhs}}()) \{\}}
+\DoxyCodeLine{803     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{804     \textcolor{keyword}{const} BinaryOp\& func()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} op; \}}
+\DoxyCodeLine{805     BinaryOp op;}
+\DoxyCodeLine{806     \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Lhs>}} lhsImpl;}
+\DoxyCodeLine{807     \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Rhs>}} rhsImpl;}
+\DoxyCodeLine{808   \};}
+\DoxyCodeLine{809 }
+\DoxyCodeLine{810   Data m\_d;}
+\DoxyCodeLine{811 \};}
+\DoxyCodeLine{812 }
+\DoxyCodeLine{813 \textcolor{comment}{// -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ CwiseUnaryView -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{814 }
+\DoxyCodeLine{815 \textcolor{keyword}{template}<\textcolor{keyword}{typename} UnaryOp, \textcolor{keyword}{typename} ArgType>}
+\DoxyCodeLine{816 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1CwiseUnaryView}{CwiseUnaryView}}<UnaryOp, ArgType>, \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{IndexBased}}>}
+\DoxyCodeLine{817   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<CwiseUnaryView<UnaryOp, ArgType> >}
+\DoxyCodeLine{818 \{}
+\DoxyCodeLine{819   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseUnaryView}{CwiseUnaryView<UnaryOp, ArgType>}} \mbox{\hyperlink{classEigen_1_1CwiseUnaryView}{XprType}};}
+\DoxyCodeLine{820 }
+\DoxyCodeLine{821   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{822     CoeffReadCost = int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::CoeffReadCost}}) + int(\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<UnaryOp>::Cost}}),}
+\DoxyCodeLine{823 }
+\DoxyCodeLine{824     Flags = (\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::Flags}} \& (HereditaryBits | \mbox{\hyperlink{group__flags_ga4b983a15d57cd55806df618ac544d09e}{LinearAccessBit}} | \mbox{\hyperlink{group__flags_gabf1e9d0516a933445a4c307ad8f14915}{DirectAccessBit}})),}
+\DoxyCodeLine{825 }
+\DoxyCodeLine{826     Alignment = 0 \textcolor{comment}{// FIXME it is not very clear why alignment is necessarily lost...}}
+\DoxyCodeLine{827   \};}
+\DoxyCodeLine{828 }
+\DoxyCodeLine{829   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseUnaryView}{XprType}}\& op) : m\_d(op)}
+\DoxyCodeLine{830   \{}
+\DoxyCodeLine{831     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<UnaryOp>::Cost}});}
+\DoxyCodeLine{832     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(CoeffReadCost);}
+\DoxyCodeLine{833   \}}
+\DoxyCodeLine{834 }
+\DoxyCodeLine{835   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Scalar Scalar;}
+\DoxyCodeLine{836   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::CoeffReturnType CoeffReturnType;}
+\DoxyCodeLine{837 }
+\DoxyCodeLine{838   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{839   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{840 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{841     \textcolor{keywordflow}{return} m\_d.func()(m\_d.argImpl.coeff(row, col));}
+\DoxyCodeLine{842   \}}
+\DoxyCodeLine{843 }
+\DoxyCodeLine{844   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{845   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{846 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{847     \textcolor{keywordflow}{return} m\_d.func()(m\_d.argImpl.coeff(index));}
+\DoxyCodeLine{848   \}}
+\DoxyCodeLine{849 }
+\DoxyCodeLine{850   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{851   Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)}
+\DoxyCodeLine{852   \{}
+\DoxyCodeLine{853     \textcolor{keywordflow}{return} m\_d.func()(m\_d.argImpl.coeffRef(row, col));}
+\DoxyCodeLine{854   \}}
+\DoxyCodeLine{855 }
+\DoxyCodeLine{856   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{857   Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)}
+\DoxyCodeLine{858   \{}
+\DoxyCodeLine{859     \textcolor{keywordflow}{return} m\_d.func()(m\_d.argImpl.coeffRef(index));}
+\DoxyCodeLine{860   \}}
+\DoxyCodeLine{861 }
+\DoxyCodeLine{862 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{863 }
+\DoxyCodeLine{864   \textcolor{comment}{// this helper permits to completely eliminate the functor if it is empty}}
+\DoxyCodeLine{865   \textcolor{keyword}{struct }Data}
+\DoxyCodeLine{866   \{}
+\DoxyCodeLine{867     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{868     Data(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseUnaryView}{XprType}}\& xpr) : op(xpr.\mbox{\hyperlink{classEigen_1_1CwiseUnaryView_a4d75355ad31c2cf47eb8ffc31d99e732}{functor}}()), argImpl(xpr.\mbox{\hyperlink{classEigen_1_1CwiseUnaryView_a0a30de69008874fdb8802c82078215d3}{nestedExpression}}()) \{\}}
+\DoxyCodeLine{869     EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{870     \textcolor{keyword}{const} UnaryOp\& func()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} op; \}}
+\DoxyCodeLine{871     UnaryOp op;}
+\DoxyCodeLine{872     \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>}} argImpl;}
+\DoxyCodeLine{873   \};}
+\DoxyCodeLine{874 }
+\DoxyCodeLine{875   Data m\_d;}
+\DoxyCodeLine{876 \};}
+\DoxyCodeLine{877 }
+\DoxyCodeLine{878 \textcolor{comment}{// -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ Map -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{879 }
+\DoxyCodeLine{880 \textcolor{comment}{// FIXME perhaps the PlainObjectType could be provided by Derived::PlainObject ?}}
+\DoxyCodeLine{881 \textcolor{comment}{// but that might complicate template specialization}}
+\DoxyCodeLine{882 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived, \textcolor{keyword}{typename} PlainObjectType>}
+\DoxyCodeLine{883 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1mapbase__evaluator}{mapbase\_evaluator}};}
+\DoxyCodeLine{884 }
+\DoxyCodeLine{885 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived, \textcolor{keyword}{typename} PlainObjectType>}
+\DoxyCodeLine{886 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1mapbase__evaluator}{mapbase\_evaluator}} : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<Derived>}
+\DoxyCodeLine{887 \{}
+\DoxyCodeLine{888   \textcolor{keyword}{typedef} Derived  XprType;}
+\DoxyCodeLine{889   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::PointerType PointerType;}
+\DoxyCodeLine{890   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Scalar Scalar;}
+\DoxyCodeLine{891   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::CoeffReturnType CoeffReturnType;}
+\DoxyCodeLine{892 }
+\DoxyCodeLine{893   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{894     IsRowMajor = XprType::RowsAtCompileTime,}
+\DoxyCodeLine{895     ColsAtCompileTime = XprType::ColsAtCompileTime,}
+\DoxyCodeLine{896     CoeffReadCost = \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::ReadCost}}}
+\DoxyCodeLine{897   \};}
+\DoxyCodeLine{898 }
+\DoxyCodeLine{899   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{900   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1mapbase__evaluator}{mapbase\_evaluator}}(\textcolor{keyword}{const} XprType\& map)}
+\DoxyCodeLine{901     : m\_data(\textcolor{keyword}{const\_cast<}PointerType\textcolor{keyword}{>}(map.data())),}
+\DoxyCodeLine{902       m\_innerStride(map.innerStride()),}
+\DoxyCodeLine{903       m\_outerStride(map.outerStride())}
+\DoxyCodeLine{904   \{}
+\DoxyCodeLine{905     EIGEN\_STATIC\_ASSERT(EIGEN\_IMPLIES(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Derived>::Flags}}\&\mbox{\hyperlink{group__flags_ga1a306a438e1ab074e8be59512e887b9f}{PacketAccessBit}}, \mbox{\hyperlink{structEigen_1_1internal_1_1inner__stride__at__compile__time}{internal::inner\_stride\_at\_compile\_time<Derived>::ret}}==1),}
+\DoxyCodeLine{906                         PACKET\_ACCESS\_REQUIRES\_TO\_HAVE\_INNER\_STRIDE\_FIXED\_TO\_1);}
+\DoxyCodeLine{907     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(CoeffReadCost);}
+\DoxyCodeLine{908   \}}
+\DoxyCodeLine{909 }
+\DoxyCodeLine{910   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{911   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{912 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{913     \textcolor{keywordflow}{return} m\_data[col * colStride() + row * rowStride()];}
+\DoxyCodeLine{914   \}}
+\DoxyCodeLine{915 }
+\DoxyCodeLine{916   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{917   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{918 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{919     \textcolor{keywordflow}{return} m\_data[index * m\_innerStride.value()];}
+\DoxyCodeLine{920   \}}
+\DoxyCodeLine{921 }
+\DoxyCodeLine{922   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{923   Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)}
+\DoxyCodeLine{924   \{}
+\DoxyCodeLine{925     \textcolor{keywordflow}{return} m\_data[col * colStride() + row * rowStride()];}
+\DoxyCodeLine{926   \}}
+\DoxyCodeLine{927 }
+\DoxyCodeLine{928   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{929   Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)}
+\DoxyCodeLine{930   \{}
+\DoxyCodeLine{931     \textcolor{keywordflow}{return} m\_data[index * m\_innerStride.value()];}
+\DoxyCodeLine{932   \}}
+\DoxyCodeLine{933 }
+\DoxyCodeLine{934   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{935   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{936   PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{937 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{938     PointerType ptr = m\_data + row * rowStride() + col * colStride();}
+\DoxyCodeLine{939     \textcolor{keywordflow}{return} internal::ploadt<PacketType, LoadMode>(ptr);}
+\DoxyCodeLine{940   \}}
+\DoxyCodeLine{941 }
+\DoxyCodeLine{942   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{943   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{944   PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{945 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{946     \textcolor{keywordflow}{return} internal::ploadt<PacketType, LoadMode>(m\_data + index * m\_innerStride.value());}
+\DoxyCodeLine{947   \}}
+\DoxyCodeLine{948 }
+\DoxyCodeLine{949   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} StoreMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{950   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{951   \textcolor{keywordtype}{void} writePacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col, \textcolor{keyword}{const} PacketType\& x)}
+\DoxyCodeLine{952   \{}
+\DoxyCodeLine{953     PointerType ptr = m\_data + row * rowStride() + col * colStride();}
+\DoxyCodeLine{954     \textcolor{keywordflow}{return} internal::pstoret<Scalar, PacketType, StoreMode>(ptr, x);}
+\DoxyCodeLine{955   \}}
+\DoxyCodeLine{956 }
+\DoxyCodeLine{957   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} StoreMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{958   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{959   \textcolor{keywordtype}{void} writePacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index, \textcolor{keyword}{const} PacketType\& x)}
+\DoxyCodeLine{960   \{}
+\DoxyCodeLine{961     internal::pstoret<Scalar, PacketType, StoreMode>(m\_data + index * m\_innerStride.value(), x);}
+\DoxyCodeLine{962   \}}
+\DoxyCodeLine{963 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{964   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE EIGEN\_CONSTEXPR}
+\DoxyCodeLine{965   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rowStride() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{}
+\DoxyCodeLine{966     \textcolor{keywordflow}{return} XprType::IsRowMajor ? m\_outerStride.value() : m\_innerStride.value();}
+\DoxyCodeLine{967   \}}
+\DoxyCodeLine{968   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE EIGEN\_CONSTEXPR}
+\DoxyCodeLine{969   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} colStride() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{}
+\DoxyCodeLine{970      \textcolor{keywordflow}{return} XprType::IsRowMajor ? m\_innerStride.value() : m\_outerStride.value();}
+\DoxyCodeLine{971   \}}
+\DoxyCodeLine{972 }
+\DoxyCodeLine{973   PointerType m\_data;}
+\DoxyCodeLine{974   \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1variable__if__dynamic}{internal::variable\_if\_dynamic<Index, XprType::InnerStrideAtCompileTime>}} m\_innerStride;}
+\DoxyCodeLine{975   \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1variable__if__dynamic}{internal::variable\_if\_dynamic<Index, XprType::OuterStrideAtCompileTime>}} m\_outerStride;}
+\DoxyCodeLine{976 \};}
+\DoxyCodeLine{977 }
+\DoxyCodeLine{978 \textcolor{keyword}{template}<\textcolor{keyword}{typename} PlainObjectType, \textcolor{keywordtype}{int} MapOptions, \textcolor{keyword}{typename} Str\textcolor{keywordtype}{id}eType>}
+\DoxyCodeLine{979 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<\mbox{\hyperlink{classEigen_1_1Map}{Map}}<PlainObjectType, MapOptions, StrideType> >}
+\DoxyCodeLine{980   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1mapbase__evaluator}{mapbase\_evaluator}}<Map<PlainObjectType, MapOptions, StrideType>, PlainObjectType>}
+\DoxyCodeLine{981 \{}
+\DoxyCodeLine{982   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Map}{Map<PlainObjectType, MapOptions, StrideType>}} \mbox{\hyperlink{classEigen_1_1Map}{XprType}};}
+\DoxyCodeLine{983   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Scalar Scalar;}
+\DoxyCodeLine{984   \textcolor{comment}{// TODO: should check for smaller packet types once we can handle multi-\/sized packet types}}
+\DoxyCodeLine{985   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} packet\_traits<Scalar>::type PacketScalar;}
+\DoxyCodeLine{986 }
+\DoxyCodeLine{987   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{988     InnerStrideAtCompileTime = StrideType::InnerStrideAtCompileTime == 0}
+\DoxyCodeLine{989                              ? int(PlainObjectType::InnerStrideAtCompileTime)}
+\DoxyCodeLine{990                              : int(StrideType::InnerStrideAtCompileTime),}
+\DoxyCodeLine{991     OuterStrideAtCompileTime = StrideType::OuterStrideAtCompileTime == 0}
+\DoxyCodeLine{992                              ? int(PlainObjectType::OuterStrideAtCompileTime)}
+\DoxyCodeLine{993                              : int(StrideType::OuterStrideAtCompileTime),}
+\DoxyCodeLine{994     HasNoInnerStride = InnerStrideAtCompileTime == 1,}
+\DoxyCodeLine{995     HasNoOuterStride = StrideType::OuterStrideAtCompileTime == 0,}
+\DoxyCodeLine{996     HasNoStride = HasNoInnerStride \&\& HasNoOuterStride,}
+\DoxyCodeLine{997     IsDynamicSize = PlainObjectType::SizeAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}},}
+\DoxyCodeLine{998 }
+\DoxyCodeLine{999     PacketAccessMask = bool(HasNoInnerStride) ? \string~int(0) : \string~int(\mbox{\hyperlink{group__flags_ga1a306a438e1ab074e8be59512e887b9f}{PacketAccessBit}}),}
+\DoxyCodeLine{1000     LinearAccessMask = bool(HasNoStride) || bool(PlainObjectType::IsVectorAtCompileTime) ? \string~int(0) : \string~int(\mbox{\hyperlink{group__flags_ga4b983a15d57cd55806df618ac544d09e}{LinearAccessBit}}),}
+\DoxyCodeLine{1001     Flags = int( \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<PlainObjectType>::Flags}}) \& (LinearAccessMask\&PacketAccessMask),}
+\DoxyCodeLine{1002 }
+\DoxyCodeLine{1003     Alignment = \textcolor{keywordtype}{int}(MapOptions)\&int(AlignedMask)}
+\DoxyCodeLine{1004   \};}
+\DoxyCodeLine{1005 }
+\DoxyCodeLine{1006   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Map}{XprType}}\& map)}
+\DoxyCodeLine{1007     : \mbox{\hyperlink{structEigen_1_1internal_1_1mapbase__evaluator}{mapbase\_evaluator<XprType, PlainObjectType>}}(map)}
+\DoxyCodeLine{1008   \{ \}}
+\DoxyCodeLine{1009 \};}
+\DoxyCodeLine{1010 }
+\DoxyCodeLine{1011 \textcolor{comment}{// -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ Ref -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{1012 }
+\DoxyCodeLine{1013 \textcolor{keyword}{template}<\textcolor{keyword}{typename} PlainObjectType, \textcolor{keywordtype}{int} RefOptions, \textcolor{keyword}{typename} Str\textcolor{keywordtype}{id}eType>}
+\DoxyCodeLine{1014 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<\mbox{\hyperlink{classEigen_1_1Ref}{Ref}}<PlainObjectType, RefOptions, StrideType> >}
+\DoxyCodeLine{1015   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1mapbase__evaluator}{mapbase\_evaluator}}<Ref<PlainObjectType, RefOptions, StrideType>, PlainObjectType>}
+\DoxyCodeLine{1016 \{}
+\DoxyCodeLine{1017   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Ref}{Ref<PlainObjectType, RefOptions, StrideType>}} \mbox{\hyperlink{classEigen_1_1Ref}{XprType}};}
+\DoxyCodeLine{1018 }
+\DoxyCodeLine{1019   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{1020     Flags = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Map<PlainObjectType, RefOptions, StrideType>}} >::Flags,}
+\DoxyCodeLine{1021     Alignment = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Map<PlainObjectType, RefOptions, StrideType>}} >::Alignment}
+\DoxyCodeLine{1022   \};}
+\DoxyCodeLine{1023 }
+\DoxyCodeLine{1024   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1025   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Ref}{XprType}}\& ref)}
+\DoxyCodeLine{1026     : \mbox{\hyperlink{structEigen_1_1internal_1_1mapbase__evaluator}{mapbase\_evaluator<XprType, PlainObjectType>}}(ref)}
+\DoxyCodeLine{1027   \{ \}}
+\DoxyCodeLine{1028 \};}
+\DoxyCodeLine{1029 }
+\DoxyCodeLine{1030 \textcolor{comment}{// -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ Block -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{1031 }
+\DoxyCodeLine{1032 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ArgType, \textcolor{keywordtype}{int} BlockRows, \textcolor{keywordtype}{int} BlockCols, \textcolor{keywordtype}{bool} InnerPanel,}
+\DoxyCodeLine{1033          \textcolor{keywordtype}{bool} HasDirectAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1has__direct__access}{internal::has\_direct\_access<ArgType>::ret}}> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1block__evaluator}{block\_evaluator}};}
+\DoxyCodeLine{1034 }
+\DoxyCodeLine{1035 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ArgType, \textcolor{keywordtype}{int} BlockRows, \textcolor{keywordtype}{int} BlockCols, \textcolor{keywordtype}{bool} InnerPanel>}
+\DoxyCodeLine{1036 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<\mbox{\hyperlink{classEigen_1_1Block}{Block}}<ArgType, BlockRows, BlockCols, InnerPanel> >}
+\DoxyCodeLine{1037   : \mbox{\hyperlink{structEigen_1_1internal_1_1block__evaluator}{block\_evaluator}}<ArgType, BlockRows, BlockCols, InnerPanel>}
+\DoxyCodeLine{1038 \{}
+\DoxyCodeLine{1039   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Block}{Block<ArgType, BlockRows, BlockCols, InnerPanel>}} \mbox{\hyperlink{classEigen_1_1Block}{XprType}};}
+\DoxyCodeLine{1040   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Scalar Scalar;}
+\DoxyCodeLine{1041   \textcolor{comment}{// TODO: should check for smaller packet types once we can handle multi-\/sized packet types}}
+\DoxyCodeLine{1042   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} packet\_traits<Scalar>::type PacketScalar;}
+\DoxyCodeLine{1043 }
+\DoxyCodeLine{1044   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{1045     CoeffReadCost = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::CoeffReadCost}},}
+\DoxyCodeLine{1046 }
+\DoxyCodeLine{1047     RowsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<XprType>::RowsAtCompileTime}},}
+\DoxyCodeLine{1048     ColsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<XprType>::ColsAtCompileTime}},}
+\DoxyCodeLine{1049     MaxRowsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<XprType>::MaxRowsAtCompileTime}},}
+\DoxyCodeLine{1050     MaxColsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<XprType>::MaxColsAtCompileTime}},}
+\DoxyCodeLine{1051 }
+\DoxyCodeLine{1052     ArgTypeIsRowMajor = (int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::Flags}})\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) != 0,}
+\DoxyCodeLine{1053     IsRowMajor = (MaxRowsAtCompileTime==1 \&\& MaxColsAtCompileTime!=1) ? 1}
+\DoxyCodeLine{1054                : (MaxColsAtCompileTime==1 \&\& MaxRowsAtCompileTime!=1) ? 0}
+\DoxyCodeLine{1055                : ArgTypeIsRowMajor,}
+\DoxyCodeLine{1056     HasSameStorageOrderAsArgType = (IsRowMajor == ArgTypeIsRowMajor),}
+\DoxyCodeLine{1057     InnerSize = IsRowMajor ? int(ColsAtCompileTime) : int(RowsAtCompileTime),}
+\DoxyCodeLine{1058     InnerStrideAtCompileTime = HasSameStorageOrderAsArgType}
+\DoxyCodeLine{1059                              ? int(\mbox{\hyperlink{structEigen_1_1internal_1_1inner__stride__at__compile__time}{inner\_stride\_at\_compile\_time<ArgType>::ret}})}
+\DoxyCodeLine{1060                              : int(\mbox{\hyperlink{structEigen_1_1internal_1_1outer__stride__at__compile__time}{outer\_stride\_at\_compile\_time<ArgType>::ret}}),}
+\DoxyCodeLine{1061     OuterStrideAtCompileTime = HasSameStorageOrderAsArgType}
+\DoxyCodeLine{1062                              ? int(\mbox{\hyperlink{structEigen_1_1internal_1_1outer__stride__at__compile__time}{outer\_stride\_at\_compile\_time<ArgType>::ret}})}
+\DoxyCodeLine{1063                              : int(\mbox{\hyperlink{structEigen_1_1internal_1_1inner__stride__at__compile__time}{inner\_stride\_at\_compile\_time<ArgType>::ret}}),}
+\DoxyCodeLine{1064     MaskPacketAccessBit = (InnerStrideAtCompileTime == 1 || HasSameStorageOrderAsArgType) ? \mbox{\hyperlink{group__flags_ga1a306a438e1ab074e8be59512e887b9f}{PacketAccessBit}} : 0,}
+\DoxyCodeLine{1065 }
+\DoxyCodeLine{1066     FlagsLinearAccessBit = (RowsAtCompileTime == 1 || ColsAtCompileTime == 1 || (InnerPanel \&\& (\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::Flags}}\&\mbox{\hyperlink{group__flags_ga4b983a15d57cd55806df618ac544d09e}{LinearAccessBit}}))) ? \mbox{\hyperlink{group__flags_ga4b983a15d57cd55806df618ac544d09e}{LinearAccessBit}} : 0,}
+\DoxyCodeLine{1067     FlagsRowMajorBit = XprType::Flags\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}},}
+\DoxyCodeLine{1068     Flags0 = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::Flags}} \& ( (HereditaryBits \& \string~\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) |}
+\DoxyCodeLine{1069                                            \mbox{\hyperlink{group__flags_gabf1e9d0516a933445a4c307ad8f14915}{DirectAccessBit}} |}
+\DoxyCodeLine{1070                                            MaskPacketAccessBit),}
+\DoxyCodeLine{1071     Flags = Flags0 | FlagsLinearAccessBit | FlagsRowMajorBit,}
+\DoxyCodeLine{1072 }
+\DoxyCodeLine{1073     PacketAlignment = \mbox{\hyperlink{structEigen_1_1internal_1_1unpacket__traits}{unpacket\_traits<PacketScalar>::alignment}},}
+\DoxyCodeLine{1074     Alignment0 = (InnerPanel \&\& (OuterStrideAtCompileTime!=\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}})}
+\DoxyCodeLine{1075                              \&\& (OuterStrideAtCompileTime!=0)}
+\DoxyCodeLine{1076                              \&\& (((OuterStrideAtCompileTime * \textcolor{keywordtype}{int}(\textcolor{keyword}{sizeof}(Scalar))) \% \textcolor{keywordtype}{int}(PacketAlignment)) == 0)) ? int(PacketAlignment) : 0,}
+\DoxyCodeLine{1077     Alignment = EIGEN\_PLAIN\_ENUM\_MIN(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::Alignment}}, Alignment0)}
+\DoxyCodeLine{1078   \};}
+\DoxyCodeLine{1079   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1block__evaluator}{block\_evaluator<ArgType, BlockRows, BlockCols, InnerPanel>}} \mbox{\hyperlink{structEigen_1_1internal_1_1block__evaluator}{block\_evaluator\_type}};}
+\DoxyCodeLine{1080   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1081   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Block}{XprType}}\& block) : \mbox{\hyperlink{structEigen_1_1internal_1_1block__evaluator}{block\_evaluator\_type}}(block)}
+\DoxyCodeLine{1082   \{}
+\DoxyCodeLine{1083     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(CoeffReadCost);}
+\DoxyCodeLine{1084   \}}
+\DoxyCodeLine{1085 \};}
+\DoxyCodeLine{1086 }
+\DoxyCodeLine{1087 \textcolor{comment}{// no direct-\/access => dispatch to a unary evaluator}}
+\DoxyCodeLine{1088 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ArgType, \textcolor{keywordtype}{int} BlockRows, \textcolor{keywordtype}{int} BlockCols, \textcolor{keywordtype}{bool} InnerPanel>}
+\DoxyCodeLine{1089 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1block__evaluator}{block\_evaluator}}<ArgType, BlockRows, BlockCols, InnerPanel, \textcolor{comment}{/*HasDirectAccess*/} false>}
+\DoxyCodeLine{1090   : \mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}<Block<ArgType, BlockRows, BlockCols, InnerPanel> >}
+\DoxyCodeLine{1091 \{}
+\DoxyCodeLine{1092   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Block}{Block<ArgType, BlockRows, BlockCols, InnerPanel>}} \mbox{\hyperlink{classEigen_1_1Block}{XprType}};}
+\DoxyCodeLine{1093 }
+\DoxyCodeLine{1094   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1095   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1block__evaluator}{block\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Block}{XprType}}\& block)}
+\DoxyCodeLine{1096     : \mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator<XprType>}}(block)}
+\DoxyCodeLine{1097   \{\}}
+\DoxyCodeLine{1098 \};}
+\DoxyCodeLine{1099 }
+\DoxyCodeLine{1100 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ArgType, \textcolor{keywordtype}{int} BlockRows, \textcolor{keywordtype}{int} BlockCols, \textcolor{keywordtype}{bool} InnerPanel>}
+\DoxyCodeLine{1101 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1Block}{Block}}<ArgType, BlockRows, BlockCols, InnerPanel>, \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{IndexBased}}>}
+\DoxyCodeLine{1102   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<Block<ArgType, BlockRows, BlockCols, InnerPanel> >}
+\DoxyCodeLine{1103 \{}
+\DoxyCodeLine{1104   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Block}{Block<ArgType, BlockRows, BlockCols, InnerPanel>}} \mbox{\hyperlink{classEigen_1_1Block}{XprType}};}
+\DoxyCodeLine{1105 }
+\DoxyCodeLine{1106   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1107   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Block}{XprType}}\& block)}
+\DoxyCodeLine{1108     : m\_argImpl(block.nestedExpression()),}
+\DoxyCodeLine{1109       m\_startRow(block.startRow()),}
+\DoxyCodeLine{1110       m\_startCol(block.startCol()),}
+\DoxyCodeLine{1111       m\_linear\_offset(ForwardLinearAccess?(ArgType::IsRowMajor ? block.startRow()*block.nestedExpression().cols() + block.startCol() : block.startCol()*block.nestedExpression().rows() + block.startRow()):0)}
+\DoxyCodeLine{1112   \{ \}}
+\DoxyCodeLine{1113 }
+\DoxyCodeLine{1114   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Scalar Scalar;}
+\DoxyCodeLine{1115   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::CoeffReturnType CoeffReturnType;}
+\DoxyCodeLine{1116 }
+\DoxyCodeLine{1117   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{1118     RowsAtCompileTime = XprType::RowsAtCompileTime,}
+\DoxyCodeLine{1119     ForwardLinearAccess = (InnerPanel || int(XprType::IsRowMajor)==int(ArgType::IsRowMajor)) \&\& \textcolor{keywordtype}{bool}(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::Flags}}\&\mbox{\hyperlink{group__flags_ga4b983a15d57cd55806df618ac544d09e}{LinearAccessBit}})}
+\DoxyCodeLine{1120   \};}
+\DoxyCodeLine{1121 }
+\DoxyCodeLine{1122   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1123   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{1124 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1125     \textcolor{keywordflow}{return} m\_argImpl.coeff(m\_startRow.value() + row, m\_startCol.value() + col);}
+\DoxyCodeLine{1126   \}}
+\DoxyCodeLine{1127 }
+\DoxyCodeLine{1128   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1129   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{1130 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1131     \textcolor{keywordflow}{return} linear\_coeff\_impl(index, \mbox{\hyperlink{structEigen_1_1internal_1_1bool__constant}{bool\_constant<ForwardLinearAccess>}}());}
+\DoxyCodeLine{1132   \}}
+\DoxyCodeLine{1133 }
+\DoxyCodeLine{1134   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1135   Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)}
+\DoxyCodeLine{1136   \{}
+\DoxyCodeLine{1137     \textcolor{keywordflow}{return} m\_argImpl.coeffRef(m\_startRow.value() + row, m\_startCol.value() + col);}
+\DoxyCodeLine{1138   \}}
+\DoxyCodeLine{1139 }
+\DoxyCodeLine{1140   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1141   Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)}
+\DoxyCodeLine{1142   \{}
+\DoxyCodeLine{1143     \textcolor{keywordflow}{return} linear\_coeffRef\_impl(index, \mbox{\hyperlink{structEigen_1_1internal_1_1bool__constant}{bool\_constant<ForwardLinearAccess>}}());}
+\DoxyCodeLine{1144   \}}
+\DoxyCodeLine{1145 }
+\DoxyCodeLine{1146   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{1147   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1148   PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{1149 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1150     \textcolor{keywordflow}{return} m\_argImpl.template packet<LoadMode,PacketType>(m\_startRow.value() + row, m\_startCol.value() + col);}
+\DoxyCodeLine{1151   \}}
+\DoxyCodeLine{1152 }
+\DoxyCodeLine{1153   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{1154   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1155   PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{1156 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1157     \textcolor{keywordflow}{if} (ForwardLinearAccess)}
+\DoxyCodeLine{1158       \textcolor{keywordflow}{return} m\_argImpl.template packet<LoadMode,PacketType>(m\_linear\_offset.value() + index);}
+\DoxyCodeLine{1159     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{1160       \textcolor{keywordflow}{return} packet<LoadMode,PacketType>(RowsAtCompileTime == 1 ? 0 : index,}
+\DoxyCodeLine{1161                                          RowsAtCompileTime == 1 ? index : 0);}
+\DoxyCodeLine{1162   \}}
+\DoxyCodeLine{1163 }
+\DoxyCodeLine{1164   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} StoreMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{1165   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1166   \textcolor{keywordtype}{void} writePacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col, \textcolor{keyword}{const} PacketType\& x)}
+\DoxyCodeLine{1167   \{}
+\DoxyCodeLine{1168     \textcolor{keywordflow}{return} m\_argImpl.template writePacket<StoreMode,PacketType>(m\_startRow.value() + row, m\_startCol.value() + col, x);}
+\DoxyCodeLine{1169   \}}
+\DoxyCodeLine{1170 }
+\DoxyCodeLine{1171   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} StoreMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{1172   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1173   \textcolor{keywordtype}{void} writePacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index, \textcolor{keyword}{const} PacketType\& x)}
+\DoxyCodeLine{1174   \{}
+\DoxyCodeLine{1175     \textcolor{keywordflow}{if} (ForwardLinearAccess)}
+\DoxyCodeLine{1176       \textcolor{keywordflow}{return} m\_argImpl.template writePacket<StoreMode,PacketType>(m\_linear\_offset.value() + index, x);}
+\DoxyCodeLine{1177     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{1178       \textcolor{keywordflow}{return} writePacket<StoreMode,PacketType>(RowsAtCompileTime == 1 ? 0 : index,}
+\DoxyCodeLine{1179                                               RowsAtCompileTime == 1 ? index : 0,}
+\DoxyCodeLine{1180                                               x);}
+\DoxyCodeLine{1181   \}}
+\DoxyCodeLine{1182 }
+\DoxyCodeLine{1183 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{1184   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1185   CoeffReturnType linear\_coeff\_impl(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index, \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::true\_type}} \textcolor{comment}{/* ForwardLinearAccess */})\textcolor{keyword}{ const}}
+\DoxyCodeLine{1186 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1187     \textcolor{keywordflow}{return} m\_argImpl.coeff(m\_linear\_offset.value() + index);}
+\DoxyCodeLine{1188   \}}
+\DoxyCodeLine{1189   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1190   CoeffReturnType linear\_coeff\_impl(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index, \mbox{\hyperlink{structEigen_1_1internal_1_1false__type}{internal::false\_type}} \textcolor{comment}{/* not ForwardLinearAccess */})\textcolor{keyword}{ const}}
+\DoxyCodeLine{1191 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1192     \textcolor{keywordflow}{return} coeff(RowsAtCompileTime == 1 ? 0 : index, RowsAtCompileTime == 1 ? index : 0);}
+\DoxyCodeLine{1193   \}}
+\DoxyCodeLine{1194 }
+\DoxyCodeLine{1195   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1196   Scalar\& linear\_coeffRef\_impl(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index, \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::true\_type}} \textcolor{comment}{/* ForwardLinearAccess */})}
+\DoxyCodeLine{1197   \{}
+\DoxyCodeLine{1198     \textcolor{keywordflow}{return} m\_argImpl.coeffRef(m\_linear\_offset.value() + index);}
+\DoxyCodeLine{1199   \}}
+\DoxyCodeLine{1200   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1201   Scalar\& linear\_coeffRef\_impl(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index, \mbox{\hyperlink{structEigen_1_1internal_1_1false__type}{internal::false\_type}} \textcolor{comment}{/* not ForwardLinearAccess */})}
+\DoxyCodeLine{1202   \{}
+\DoxyCodeLine{1203     \textcolor{keywordflow}{return} coeffRef(RowsAtCompileTime == 1 ? 0 : index, RowsAtCompileTime == 1 ? index : 0);}
+\DoxyCodeLine{1204   \}}
+\DoxyCodeLine{1205 }
+\DoxyCodeLine{1206   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>}} m\_argImpl;}
+\DoxyCodeLine{1207   \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1variable__if__dynamic}{variable\_if\_dynamic}}<\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}, (ArgType::RowsAtCompileTime == 1 \&\& BlockRows==1) ? 0 : \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}> m\_startRow;}
+\DoxyCodeLine{1208   \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1variable__if__dynamic}{variable\_if\_dynamic}}<\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}, (ArgType::ColsAtCompileTime == 1 \&\& BlockCols==1) ? 0 : \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}> m\_startCol;}
+\DoxyCodeLine{1209   \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1variable__if__dynamic}{variable\_if\_dynamic<Index, ForwardLinearAccess ? Dynamic : 0>}} m\_linear\_offset;}
+\DoxyCodeLine{1210 \};}
+\DoxyCodeLine{1211 }
+\DoxyCodeLine{1212 \textcolor{comment}{// TODO: This evaluator does not actually use the child evaluator;}}
+\DoxyCodeLine{1213 \textcolor{comment}{// all action is via the data() as returned by the Block expression.}}
+\DoxyCodeLine{1214 }
+\DoxyCodeLine{1215 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ArgType, \textcolor{keywordtype}{int} BlockRows, \textcolor{keywordtype}{int} BlockCols, \textcolor{keywordtype}{bool} InnerPanel>}
+\DoxyCodeLine{1216 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1block__evaluator}{block\_evaluator}}<ArgType, BlockRows, BlockCols, InnerPanel, \textcolor{comment}{/* HasDirectAccess */} true>}
+\DoxyCodeLine{1217   : \mbox{\hyperlink{structEigen_1_1internal_1_1mapbase__evaluator}{mapbase\_evaluator}}<Block<ArgType, BlockRows, BlockCols, InnerPanel>,}
+\DoxyCodeLine{1218                       typename Block<ArgType, BlockRows, BlockCols, InnerPanel>::PlainObject>}
+\DoxyCodeLine{1219 \{}
+\DoxyCodeLine{1220   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Block}{Block<ArgType, BlockRows, BlockCols, InnerPanel>}} \mbox{\hyperlink{classEigen_1_1Block}{XprType}};}
+\DoxyCodeLine{1221   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Scalar Scalar;}
+\DoxyCodeLine{1222 }
+\DoxyCodeLine{1223   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1224   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1block__evaluator}{block\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Block}{XprType}}\& block)}
+\DoxyCodeLine{1225     : \mbox{\hyperlink{structEigen_1_1internal_1_1mapbase__evaluator}{mapbase\_evaluator<XprType, typename XprType::PlainObject>}}(block)}
+\DoxyCodeLine{1226   \{}
+\DoxyCodeLine{1227     \textcolor{comment}{// TODO: for the 3.3 release, this should be turned to an internal assertion, but let's keep it as is for the beta lifetime}}
+\DoxyCodeLine{1228     eigen\_assert(((internal::UIntPtr(block.data()) \% EIGEN\_PLAIN\_ENUM\_MAX(1,\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<XprType>::Alignment}})) == 0) \&\& \textcolor{stringliteral}{"{}data is not aligned"{}});}
+\DoxyCodeLine{1229   \}}
+\DoxyCodeLine{1230 \};}
+\DoxyCodeLine{1231 }
+\DoxyCodeLine{1232 }
+\DoxyCodeLine{1233 \textcolor{comment}{// -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ Select -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{1234 \textcolor{comment}{// NOTE shall we introduce a ternary\_evaluator?}}
+\DoxyCodeLine{1235 }
+\DoxyCodeLine{1236 \textcolor{comment}{// TODO enable vectorization for Select}}
+\DoxyCodeLine{1237 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ConditionMatrixType, \textcolor{keyword}{typename} ThenMatrixType, \textcolor{keyword}{typename} ElseMatrixType>}
+\DoxyCodeLine{1238 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<\mbox{\hyperlink{classEigen_1_1Select}{Select}}<ConditionMatrixType, ThenMatrixType, ElseMatrixType> >}
+\DoxyCodeLine{1239   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<Select<ConditionMatrixType, ThenMatrixType, ElseMatrixType> >}
+\DoxyCodeLine{1240 \{}
+\DoxyCodeLine{1241   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Select}{Select<ConditionMatrixType, ThenMatrixType, ElseMatrixType>}} \mbox{\hyperlink{classEigen_1_1Select}{XprType}};}
+\DoxyCodeLine{1242   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{1243     CoeffReadCost = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ConditionMatrixType>::CoeffReadCost}}}
+\DoxyCodeLine{1244                   + EIGEN\_PLAIN\_ENUM\_MAX(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ThenMatrixType>::CoeffReadCost}},}
+\DoxyCodeLine{1245                                          \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ElseMatrixType>::CoeffReadCost}}),}
+\DoxyCodeLine{1246 }
+\DoxyCodeLine{1247     Flags = (\textcolor{keywordtype}{unsigned} int)\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ThenMatrixType>::Flags}} \& \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ElseMatrixType>::Flags}} \& HereditaryBits,}
+\DoxyCodeLine{1248 }
+\DoxyCodeLine{1249     Alignment = EIGEN\_PLAIN\_ENUM\_MIN(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ThenMatrixType>::Alignment}}, \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ElseMatrixType>::Alignment}})}
+\DoxyCodeLine{1250   \};}
+\DoxyCodeLine{1251 }
+\DoxyCodeLine{1252   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1253   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Select}{XprType}}\& select)}
+\DoxyCodeLine{1254     : m\_conditionImpl(select.conditionMatrix()),}
+\DoxyCodeLine{1255       m\_thenImpl(select.thenMatrix()),}
+\DoxyCodeLine{1256       m\_elseImpl(select.elseMatrix())}
+\DoxyCodeLine{1257   \{}
+\DoxyCodeLine{1258     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(CoeffReadCost);}
+\DoxyCodeLine{1259   \}}
+\DoxyCodeLine{1260 }
+\DoxyCodeLine{1261   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::CoeffReturnType CoeffReturnType;}
+\DoxyCodeLine{1262 }
+\DoxyCodeLine{1263   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1264   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{1265 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1266     \textcolor{keywordflow}{if} (m\_conditionImpl.coeff(row, col))}
+\DoxyCodeLine{1267       \textcolor{keywordflow}{return} m\_thenImpl.coeff(row, col);}
+\DoxyCodeLine{1268     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{1269       \textcolor{keywordflow}{return} m\_elseImpl.coeff(row, col);}
+\DoxyCodeLine{1270   \}}
+\DoxyCodeLine{1271 }
+\DoxyCodeLine{1272   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1273   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{1274 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1275     \textcolor{keywordflow}{if} (m\_conditionImpl.coeff(index))}
+\DoxyCodeLine{1276       \textcolor{keywordflow}{return} m\_thenImpl.coeff(index);}
+\DoxyCodeLine{1277     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{1278       \textcolor{keywordflow}{return} m\_elseImpl.coeff(index);}
+\DoxyCodeLine{1279   \}}
+\DoxyCodeLine{1280 }
+\DoxyCodeLine{1281 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{1282   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ConditionMatrixType>}} m\_conditionImpl;}
+\DoxyCodeLine{1283   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ThenMatrixType>}} m\_thenImpl;}
+\DoxyCodeLine{1284   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ElseMatrixType>}} m\_elseImpl;}
+\DoxyCodeLine{1285 \};}
+\DoxyCodeLine{1286 }
+\DoxyCodeLine{1287 }
+\DoxyCodeLine{1288 \textcolor{comment}{// -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ Replicate -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{1289 }
+\DoxyCodeLine{1290 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ArgType, \textcolor{keywordtype}{int} RowFactor, \textcolor{keywordtype}{int} ColFactor>}
+\DoxyCodeLine{1291 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1Replicate}{Replicate}}<ArgType, RowFactor, ColFactor> >}
+\DoxyCodeLine{1292   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<Replicate<ArgType, RowFactor, ColFactor> >}
+\DoxyCodeLine{1293 \{}
+\DoxyCodeLine{1294   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Replicate}{Replicate<ArgType, RowFactor, ColFactor>}} \mbox{\hyperlink{classEigen_1_1Replicate}{XprType}};}
+\DoxyCodeLine{1295   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::CoeffReturnType CoeffReturnType;}
+\DoxyCodeLine{1296   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{1297     Factor = (RowFactor==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} || ColFactor==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}) ? \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} : RowFactor*ColFactor}
+\DoxyCodeLine{1298   \};}
+\DoxyCodeLine{1299   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::nested\_eval<ArgType,Factor>::type}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{ArgTypeNested}};}
+\DoxyCodeLine{1300   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<ArgTypeNested>::type ArgTypeNestedCleaned;}
+\DoxyCodeLine{1301 }
+\DoxyCodeLine{1302   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{1303     CoeffReadCost = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgTypeNestedCleaned>::CoeffReadCost}},}
+\DoxyCodeLine{1304     LinearAccessMask = XprType::IsVectorAtCompileTime ? \mbox{\hyperlink{group__flags_ga4b983a15d57cd55806df618ac544d09e}{LinearAccessBit}} : 0,}
+\DoxyCodeLine{1305     Flags = (\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgTypeNestedCleaned>::Flags}} \& (HereditaryBits|LinearAccessMask) \& \string~\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) | (\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<XprType>::Flags}} \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}),}
+\DoxyCodeLine{1306 }
+\DoxyCodeLine{1307     Alignment = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgTypeNestedCleaned>::Alignment}}}
+\DoxyCodeLine{1308   \};}
+\DoxyCodeLine{1309 }
+\DoxyCodeLine{1310   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1311   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Replicate}{XprType}}\& replicate)}
+\DoxyCodeLine{1312     : m\_arg(replicate.nestedExpression()),}
+\DoxyCodeLine{1313       m\_argImpl(m\_arg),}
+\DoxyCodeLine{1314       m\_rows(replicate.nestedExpression().rows()),}
+\DoxyCodeLine{1315       m\_cols(replicate.nestedExpression().cols())}
+\DoxyCodeLine{1316   \{\}}
+\DoxyCodeLine{1317 }
+\DoxyCodeLine{1318   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1319   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{1320 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1321     \textcolor{comment}{// try to avoid using modulo; this is a pure optimization strategy}}
+\DoxyCodeLine{1322     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} actual\_row = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<XprType>::RowsAtCompileTime}}==1 ? 0}
+\DoxyCodeLine{1323                            : RowFactor==1 ? row}
+\DoxyCodeLine{1324                            : row \% m\_rows.value();}
+\DoxyCodeLine{1325     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} actual\_col = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<XprType>::ColsAtCompileTime}}==1 ? 0}
+\DoxyCodeLine{1326                            : ColFactor==1 ? col}
+\DoxyCodeLine{1327                            : col \% m\_cols.value();}
+\DoxyCodeLine{1328 }
+\DoxyCodeLine{1329     \textcolor{keywordflow}{return} m\_argImpl.coeff(actual\_row, actual\_col);}
+\DoxyCodeLine{1330   \}}
+\DoxyCodeLine{1331 }
+\DoxyCodeLine{1332   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1333   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{1334 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1335     \textcolor{comment}{// try to avoid using modulo; this is a pure optimization strategy}}
+\DoxyCodeLine{1336     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} actual\_index = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<XprType>::RowsAtCompileTime}}==1}
+\DoxyCodeLine{1337                                   ? (ColFactor==1 ?  index : index\%m\_cols.value())}
+\DoxyCodeLine{1338                                   : (RowFactor==1 ?  index : index\%m\_rows.value());}
+\DoxyCodeLine{1339 }
+\DoxyCodeLine{1340     \textcolor{keywordflow}{return} m\_argImpl.coeff(actual\_index);}
+\DoxyCodeLine{1341   \}}
+\DoxyCodeLine{1342 }
+\DoxyCodeLine{1343   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{1344   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1345   PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{1346 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1347     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} actual\_row = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<XprType>::RowsAtCompileTime}}==1 ? 0}
+\DoxyCodeLine{1348                            : RowFactor==1 ? row}
+\DoxyCodeLine{1349                            : row \% m\_rows.value();}
+\DoxyCodeLine{1350     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} actual\_col = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<XprType>::ColsAtCompileTime}}==1 ? 0}
+\DoxyCodeLine{1351                            : ColFactor==1 ? col}
+\DoxyCodeLine{1352                            : col \% m\_cols.value();}
+\DoxyCodeLine{1353 }
+\DoxyCodeLine{1354     \textcolor{keywordflow}{return} m\_argImpl.template packet<LoadMode,PacketType>(actual\_row, actual\_col);}
+\DoxyCodeLine{1355   \}}
+\DoxyCodeLine{1356 }
+\DoxyCodeLine{1357   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{1358   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1359   PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{1360 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1361     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} actual\_index = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<XprType>::RowsAtCompileTime}}==1}
+\DoxyCodeLine{1362                                   ? (ColFactor==1 ?  index : index\%m\_cols.value())}
+\DoxyCodeLine{1363                                   : (RowFactor==1 ?  index : index\%m\_rows.value());}
+\DoxyCodeLine{1364 }
+\DoxyCodeLine{1365     \textcolor{keywordflow}{return} m\_argImpl.template packet<LoadMode,PacketType>(actual\_index);}
+\DoxyCodeLine{1366   \}}
+\DoxyCodeLine{1367 }
+\DoxyCodeLine{1368 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{1369   \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{ArgTypeNested}} m\_arg;}
+\DoxyCodeLine{1370   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgTypeNestedCleaned>}} m\_argImpl;}
+\DoxyCodeLine{1371   \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1variable__if__dynamic}{variable\_if\_dynamic<Index, ArgType::RowsAtCompileTime>}} m\_rows;}
+\DoxyCodeLine{1372   \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1variable__if__dynamic}{variable\_if\_dynamic<Index, ArgType::ColsAtCompileTime>}} m\_cols;}
+\DoxyCodeLine{1373 \};}
+\DoxyCodeLine{1374 }
+\DoxyCodeLine{1375 \textcolor{comment}{// -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ MatrixWrapper and ArrayWrapper -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{1376 \textcolor{comment}{//}}
+\DoxyCodeLine{1377 \textcolor{comment}{// evaluator\_wrapper\_base<T> is a common base class for the}}
+\DoxyCodeLine{1378 \textcolor{comment}{// MatrixWrapper and ArrayWrapper evaluators.}}
+\DoxyCodeLine{1379 }
+\DoxyCodeLine{1380 \textcolor{keyword}{template}<\textcolor{keyword}{typename} XprType>}
+\DoxyCodeLine{1381 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__wrapper__base}{evaluator\_wrapper\_base}}}
+\DoxyCodeLine{1382   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<XprType>}
+\DoxyCodeLine{1383 \{}
+\DoxyCodeLine{1384   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<typename XprType::NestedExpressionType>::type ArgType;}
+\DoxyCodeLine{1385   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{1386     CoeffReadCost = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::CoeffReadCost}},}
+\DoxyCodeLine{1387     Flags = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::Flags}},}
+\DoxyCodeLine{1388     Alignment = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::Alignment}}}
+\DoxyCodeLine{1389   \};}
+\DoxyCodeLine{1390 }
+\DoxyCodeLine{1391   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1392   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__wrapper__base}{evaluator\_wrapper\_base}}(\textcolor{keyword}{const} ArgType\& arg) : m\_argImpl(arg) \{\}}
+\DoxyCodeLine{1393 }
+\DoxyCodeLine{1394   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} ArgType::Scalar Scalar;}
+\DoxyCodeLine{1395   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} ArgType::CoeffReturnType CoeffReturnType;}
+\DoxyCodeLine{1396 }
+\DoxyCodeLine{1397   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1398   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{1399 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1400     \textcolor{keywordflow}{return} m\_argImpl.coeff(row, col);}
+\DoxyCodeLine{1401   \}}
+\DoxyCodeLine{1402 }
+\DoxyCodeLine{1403   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1404   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{1405 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1406     \textcolor{keywordflow}{return} m\_argImpl.coeff(index);}
+\DoxyCodeLine{1407   \}}
+\DoxyCodeLine{1408 }
+\DoxyCodeLine{1409   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1410   Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)}
+\DoxyCodeLine{1411   \{}
+\DoxyCodeLine{1412     \textcolor{keywordflow}{return} m\_argImpl.coeffRef(row, col);}
+\DoxyCodeLine{1413   \}}
+\DoxyCodeLine{1414 }
+\DoxyCodeLine{1415   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1416   Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)}
+\DoxyCodeLine{1417   \{}
+\DoxyCodeLine{1418     \textcolor{keywordflow}{return} m\_argImpl.coeffRef(index);}
+\DoxyCodeLine{1419   \}}
+\DoxyCodeLine{1420 }
+\DoxyCodeLine{1421   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{1422   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1423   PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{1424 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1425     \textcolor{keywordflow}{return} m\_argImpl.template packet<LoadMode,PacketType>(row, col);}
+\DoxyCodeLine{1426   \}}
+\DoxyCodeLine{1427 }
+\DoxyCodeLine{1428   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{1429   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1430   PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{1431 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1432     \textcolor{keywordflow}{return} m\_argImpl.template packet<LoadMode,PacketType>(index);}
+\DoxyCodeLine{1433   \}}
+\DoxyCodeLine{1434 }
+\DoxyCodeLine{1435   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} StoreMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{1436   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1437   \textcolor{keywordtype}{void} writePacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col, \textcolor{keyword}{const} PacketType\& x)}
+\DoxyCodeLine{1438   \{}
+\DoxyCodeLine{1439     m\_argImpl.template writePacket<StoreMode>(row, col, x);}
+\DoxyCodeLine{1440   \}}
+\DoxyCodeLine{1441 }
+\DoxyCodeLine{1442   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} StoreMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{1443   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1444   \textcolor{keywordtype}{void} writePacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index, \textcolor{keyword}{const} PacketType\& x)}
+\DoxyCodeLine{1445   \{}
+\DoxyCodeLine{1446     m\_argImpl.template writePacket<StoreMode>(index, x);}
+\DoxyCodeLine{1447   \}}
+\DoxyCodeLine{1448 }
+\DoxyCodeLine{1449 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{1450   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>}} m\_argImpl;}
+\DoxyCodeLine{1451 \};}
+\DoxyCodeLine{1452 }
+\DoxyCodeLine{1453 \textcolor{keyword}{template}<\textcolor{keyword}{typename} TArgType>}
+\DoxyCodeLine{1454 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1MatrixWrapper}{MatrixWrapper}}<TArgType> >}
+\DoxyCodeLine{1455   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__wrapper__base}{evaluator\_wrapper\_base}}<MatrixWrapper<TArgType> >}
+\DoxyCodeLine{1456 \{}
+\DoxyCodeLine{1457   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1MatrixWrapper}{MatrixWrapper<TArgType>}} \mbox{\hyperlink{classEigen_1_1MatrixWrapper}{XprType}};}
+\DoxyCodeLine{1458 }
+\DoxyCodeLine{1459   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1460   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixWrapper}{XprType}}\& wrapper)}
+\DoxyCodeLine{1461     : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__wrapper__base}{evaluator\_wrapper\_base<MatrixWrapper<TArgType>}} >(wrapper.nestedExpression())}
+\DoxyCodeLine{1462   \{ \}}
+\DoxyCodeLine{1463 \};}
+\DoxyCodeLine{1464 }
+\DoxyCodeLine{1465 \textcolor{keyword}{template}<\textcolor{keyword}{typename} TArgType>}
+\DoxyCodeLine{1466 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1ArrayWrapper}{ArrayWrapper}}<TArgType> >}
+\DoxyCodeLine{1467   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__wrapper__base}{evaluator\_wrapper\_base}}<ArrayWrapper<TArgType> >}
+\DoxyCodeLine{1468 \{}
+\DoxyCodeLine{1469   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1ArrayWrapper}{ArrayWrapper<TArgType>}} \mbox{\hyperlink{classEigen_1_1ArrayWrapper}{XprType}};}
+\DoxyCodeLine{1470 }
+\DoxyCodeLine{1471   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1472   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1ArrayWrapper}{XprType}}\& wrapper)}
+\DoxyCodeLine{1473     : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__wrapper__base}{evaluator\_wrapper\_base<ArrayWrapper<TArgType>}} >(wrapper.nestedExpression())}
+\DoxyCodeLine{1474   \{ \}}
+\DoxyCodeLine{1475 \};}
+\DoxyCodeLine{1476 }
+\DoxyCodeLine{1477 }
+\DoxyCodeLine{1478 \textcolor{comment}{// -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ Reverse -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{1479 }
+\DoxyCodeLine{1480 \textcolor{comment}{// defined in Reverse.h:}}
+\DoxyCodeLine{1481 \textcolor{keyword}{template}<\textcolor{keyword}{typename} PacketType, \textcolor{keywordtype}{bool} ReversePacket> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1reverse__packet__cond}{reverse\_packet\_cond}};}
+\DoxyCodeLine{1482 }
+\DoxyCodeLine{1483 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ArgType, \textcolor{keywordtype}{int} Direction>}
+\DoxyCodeLine{1484 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1Reverse}{Reverse}}<ArgType, Direction> >}
+\DoxyCodeLine{1485   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<Reverse<ArgType, Direction> >}
+\DoxyCodeLine{1486 \{}
+\DoxyCodeLine{1487   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Reverse}{Reverse<ArgType, Direction>}} \mbox{\hyperlink{classEigen_1_1Reverse}{XprType}};}
+\DoxyCodeLine{1488   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Scalar Scalar;}
+\DoxyCodeLine{1489   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::CoeffReturnType CoeffReturnType;}
+\DoxyCodeLine{1490 }
+\DoxyCodeLine{1491   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{1492     IsRowMajor = XprType::IsRowMajor,}
+\DoxyCodeLine{1493     IsColMajor = !IsRowMajor,}
+\DoxyCodeLine{1494     ReverseRow = (Direction == \mbox{\hyperlink{group__enums_ggad49a7b3738e273eb00932271b36127f7ae2efac6e74ecab5e3b0b1561c5ddf83e}{Vertical}})   || (Direction == \mbox{\hyperlink{group__enums_ggad49a7b3738e273eb00932271b36127f7a04fefd61992e941d509a57bc44c59794}{BothDirections}}),}
+\DoxyCodeLine{1495     ReverseCol = (Direction == \mbox{\hyperlink{group__enums_ggad49a7b3738e273eb00932271b36127f7a961c62410157b64033839488f4d7f7e4}{Horizontal}}) || (Direction == \mbox{\hyperlink{group__enums_ggad49a7b3738e273eb00932271b36127f7a04fefd61992e941d509a57bc44c59794}{BothDirections}}),}
+\DoxyCodeLine{1496     ReversePacket = (Direction == \mbox{\hyperlink{group__enums_ggad49a7b3738e273eb00932271b36127f7a04fefd61992e941d509a57bc44c59794}{BothDirections}})}
+\DoxyCodeLine{1497                     || ((Direction == \mbox{\hyperlink{group__enums_ggad49a7b3738e273eb00932271b36127f7ae2efac6e74ecab5e3b0b1561c5ddf83e}{Vertical}})   \&\& IsColMajor)}
+\DoxyCodeLine{1498                     || ((Direction == \mbox{\hyperlink{group__enums_ggad49a7b3738e273eb00932271b36127f7a961c62410157b64033839488f4d7f7e4}{Horizontal}}) \&\& IsRowMajor),}
+\DoxyCodeLine{1499 }
+\DoxyCodeLine{1500     CoeffReadCost = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::CoeffReadCost}},}
+\DoxyCodeLine{1501 }
+\DoxyCodeLine{1502     \textcolor{comment}{// let's enable LinearAccess only with vectorization because of the product overhead}}
+\DoxyCodeLine{1503     \textcolor{comment}{// FIXME enable DirectAccess with negative strides?}}
+\DoxyCodeLine{1504     Flags0 = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::Flags}},}
+\DoxyCodeLine{1505     LinearAccess = ( (Direction==\mbox{\hyperlink{group__enums_ggad49a7b3738e273eb00932271b36127f7a04fefd61992e941d509a57bc44c59794}{BothDirections}}) \&\& (int(Flags0)\&\mbox{\hyperlink{group__flags_ga1a306a438e1ab074e8be59512e887b9f}{PacketAccessBit}}) )}
+\DoxyCodeLine{1506                   || ((ReverseRow \&\& XprType::ColsAtCompileTime==1) || (ReverseCol \&\& XprType::RowsAtCompileTime==1))}
+\DoxyCodeLine{1507                  ? \mbox{\hyperlink{group__flags_ga4b983a15d57cd55806df618ac544d09e}{LinearAccessBit}} : 0,}
+\DoxyCodeLine{1508 }
+\DoxyCodeLine{1509     Flags = \textcolor{keywordtype}{int}(Flags0) \& (HereditaryBits | \mbox{\hyperlink{group__flags_ga1a306a438e1ab074e8be59512e887b9f}{PacketAccessBit}} | LinearAccess),}
+\DoxyCodeLine{1510 }
+\DoxyCodeLine{1511     Alignment = 0 \textcolor{comment}{// FIXME in some rare cases, Alignment could be preserved, like a Vector4f.}}
+\DoxyCodeLine{1512   \};}
+\DoxyCodeLine{1513 }
+\DoxyCodeLine{1514   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1515   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Reverse}{XprType}}\& reverse)}
+\DoxyCodeLine{1516     : m\_argImpl(reverse.nestedExpression()),}
+\DoxyCodeLine{1517       m\_rows(ReverseRow ? reverse.nestedExpression().rows() : 1),}
+\DoxyCodeLine{1518       m\_cols(ReverseCol ? reverse.nestedExpression().cols() : 1)}
+\DoxyCodeLine{1519   \{ \}}
+\DoxyCodeLine{1520 }
+\DoxyCodeLine{1521   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1522   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{1523 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1524     \textcolor{keywordflow}{return} m\_argImpl.coeff(ReverseRow ? m\_rows.value() -\/ row -\/ 1 : row,}
+\DoxyCodeLine{1525                            ReverseCol ? m\_cols.value() -\/ col -\/ 1 : col);}
+\DoxyCodeLine{1526   \}}
+\DoxyCodeLine{1527 }
+\DoxyCodeLine{1528   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1529   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{1530 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1531     \textcolor{keywordflow}{return} m\_argImpl.coeff(m\_rows.value() * m\_cols.value() -\/ index -\/ 1);}
+\DoxyCodeLine{1532   \}}
+\DoxyCodeLine{1533 }
+\DoxyCodeLine{1534   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1535   Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)}
+\DoxyCodeLine{1536   \{}
+\DoxyCodeLine{1537     \textcolor{keywordflow}{return} m\_argImpl.coeffRef(ReverseRow ? m\_rows.value() -\/ row -\/ 1 : row,}
+\DoxyCodeLine{1538                               ReverseCol ? m\_cols.value() -\/ col -\/ 1 : col);}
+\DoxyCodeLine{1539   \}}
+\DoxyCodeLine{1540 }
+\DoxyCodeLine{1541   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1542   Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)}
+\DoxyCodeLine{1543   \{}
+\DoxyCodeLine{1544     \textcolor{keywordflow}{return} m\_argImpl.coeffRef(m\_rows.value() * m\_cols.value() -\/ index -\/ 1);}
+\DoxyCodeLine{1545   \}}
+\DoxyCodeLine{1546 }
+\DoxyCodeLine{1547   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{1548   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1549   PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{1550 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1551     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{1552       PacketSize = \mbox{\hyperlink{structEigen_1_1internal_1_1unpacket__traits}{unpacket\_traits<PacketType>::size}},}
+\DoxyCodeLine{1553       OffsetRow  = ReverseRow \&\& IsColMajor ? PacketSize : 1,}
+\DoxyCodeLine{1554       OffsetCol  = ReverseCol \&\& IsRowMajor ? PacketSize : 1}
+\DoxyCodeLine{1555     \};}
+\DoxyCodeLine{1556     \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1reverse__packet__cond}{internal::reverse\_packet\_cond<PacketType,ReversePacket>}} reverse\_packet;}
+\DoxyCodeLine{1557     \textcolor{keywordflow}{return} reverse\_packet::run(m\_argImpl.template packet<LoadMode,PacketType>(}
+\DoxyCodeLine{1558                                   ReverseRow ? m\_rows.value() -\/ row -\/ OffsetRow : row,}
+\DoxyCodeLine{1559                                   ReverseCol ? m\_cols.value() -\/ col -\/ OffsetCol : col));}
+\DoxyCodeLine{1560   \}}
+\DoxyCodeLine{1561 }
+\DoxyCodeLine{1562   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{1563   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1564   PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{1565 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1566     \textcolor{keyword}{enum} \{ PacketSize = \mbox{\hyperlink{structEigen_1_1internal_1_1unpacket__traits}{unpacket\_traits<PacketType>::size}} \};}
+\DoxyCodeLine{1567     \textcolor{keywordflow}{return} preverse(m\_argImpl.template packet<LoadMode,PacketType>(m\_rows.value() * m\_cols.value() -\/ index -\/ PacketSize));}
+\DoxyCodeLine{1568   \}}
+\DoxyCodeLine{1569 }
+\DoxyCodeLine{1570   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{1571   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1572   \textcolor{keywordtype}{void} writePacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col, \textcolor{keyword}{const} PacketType\& x)}
+\DoxyCodeLine{1573   \{}
+\DoxyCodeLine{1574     \textcolor{comment}{// FIXME we could factorize some code with packet(i,j)}}
+\DoxyCodeLine{1575     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{1576       PacketSize = \mbox{\hyperlink{structEigen_1_1internal_1_1unpacket__traits}{unpacket\_traits<PacketType>::size}},}
+\DoxyCodeLine{1577       OffsetRow  = ReverseRow \&\& IsColMajor ? PacketSize : 1,}
+\DoxyCodeLine{1578       OffsetCol  = ReverseCol \&\& IsRowMajor ? PacketSize : 1}
+\DoxyCodeLine{1579     \};}
+\DoxyCodeLine{1580     \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1reverse__packet__cond}{internal::reverse\_packet\_cond<PacketType,ReversePacket>}} reverse\_packet;}
+\DoxyCodeLine{1581     m\_argImpl.template writePacket<LoadMode>(}
+\DoxyCodeLine{1582                                   ReverseRow ? m\_rows.value() -\/ row -\/ OffsetRow : row,}
+\DoxyCodeLine{1583                                   ReverseCol ? m\_cols.value() -\/ col -\/ OffsetCol : col,}
+\DoxyCodeLine{1584                                   reverse\_packet::run(x));}
+\DoxyCodeLine{1585   \}}
+\DoxyCodeLine{1586 }
+\DoxyCodeLine{1587   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{1588   EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1589   \textcolor{keywordtype}{void} writePacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index, \textcolor{keyword}{const} PacketType\& x)}
+\DoxyCodeLine{1590   \{}
+\DoxyCodeLine{1591     \textcolor{keyword}{enum} \{ PacketSize = \mbox{\hyperlink{structEigen_1_1internal_1_1unpacket__traits}{unpacket\_traits<PacketType>::size}} \};}
+\DoxyCodeLine{1592     m\_argImpl.template writePacket<LoadMode>}
+\DoxyCodeLine{1593       (m\_rows.value() * m\_cols.value() -\/ index -\/ PacketSize, preverse(x));}
+\DoxyCodeLine{1594   \}}
+\DoxyCodeLine{1595 }
+\DoxyCodeLine{1596 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{1597   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>}} m\_argImpl;}
+\DoxyCodeLine{1598 }
+\DoxyCodeLine{1599   \textcolor{comment}{// If we do not reverse rows, then we do not need to know the number of rows; same for columns}}
+\DoxyCodeLine{1600   \textcolor{comment}{// Nonetheless, in this case it is important to set to 1 such that the coeff(index) method works fine for vectors.}}
+\DoxyCodeLine{1601   \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1variable__if__dynamic}{variable\_if\_dynamic<Index, ReverseRow ? ArgType::RowsAtCompileTime : 1>}} m\_rows;}
+\DoxyCodeLine{1602   \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1variable__if__dynamic}{variable\_if\_dynamic<Index, ReverseCol ? ArgType::ColsAtCompileTime : 1>}} m\_cols;}
+\DoxyCodeLine{1603 \};}
+\DoxyCodeLine{1604 }
+\DoxyCodeLine{1605 }
+\DoxyCodeLine{1606 \textcolor{comment}{// -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ Diagonal -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{1607 }
+\DoxyCodeLine{1608 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ArgType, \textcolor{keywordtype}{int} DiagIndex>}
+\DoxyCodeLine{1609 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<\mbox{\hyperlink{classEigen_1_1Diagonal}{Diagonal}}<ArgType, DiagIndex> >}
+\DoxyCodeLine{1610   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<Diagonal<ArgType, DiagIndex> >}
+\DoxyCodeLine{1611 \{}
+\DoxyCodeLine{1612   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Diagonal}{Diagonal<ArgType, DiagIndex>}} \mbox{\hyperlink{classEigen_1_1Diagonal}{XprType}};}
+\DoxyCodeLine{1613 }
+\DoxyCodeLine{1614   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{1615     CoeffReadCost = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::CoeffReadCost}},}
+\DoxyCodeLine{1616 }
+\DoxyCodeLine{1617     Flags = (\textcolor{keywordtype}{unsigned} int)(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>::Flags}} \& (HereditaryBits | \mbox{\hyperlink{group__flags_gabf1e9d0516a933445a4c307ad8f14915}{DirectAccessBit}}) \& \string~RowMajorBit) | \mbox{\hyperlink{group__flags_ga4b983a15d57cd55806df618ac544d09e}{LinearAccessBit}},}
+\DoxyCodeLine{1618 }
+\DoxyCodeLine{1619     Alignment = 0}
+\DoxyCodeLine{1620   \};}
+\DoxyCodeLine{1621 }
+\DoxyCodeLine{1622   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1623   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Diagonal}{XprType}}\& diagonal)}
+\DoxyCodeLine{1624     : m\_argImpl(diagonal.nestedExpression()),}
+\DoxyCodeLine{1625       m\_index(diagonal.index())}
+\DoxyCodeLine{1626   \{ \}}
+\DoxyCodeLine{1627 }
+\DoxyCodeLine{1628   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Scalar Scalar;}
+\DoxyCodeLine{1629   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::CoeffReturnType CoeffReturnType;}
+\DoxyCodeLine{1630 }
+\DoxyCodeLine{1631   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1632   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}})\textcolor{keyword}{ const}}
+\DoxyCodeLine{1633 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1634     \textcolor{keywordflow}{return} m\_argImpl.coeff(row + rowOffset(), row + colOffset());}
+\DoxyCodeLine{1635   \}}
+\DoxyCodeLine{1636 }
+\DoxyCodeLine{1637   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1638   CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{1639 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1640     \textcolor{keywordflow}{return} m\_argImpl.coeff(index + rowOffset(), index + colOffset());}
+\DoxyCodeLine{1641   \}}
+\DoxyCodeLine{1642 }
+\DoxyCodeLine{1643   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1644   Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}})}
+\DoxyCodeLine{1645   \{}
+\DoxyCodeLine{1646     \textcolor{keywordflow}{return} m\_argImpl.coeffRef(row + rowOffset(), row + colOffset());}
+\DoxyCodeLine{1647   \}}
+\DoxyCodeLine{1648 }
+\DoxyCodeLine{1649   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1650   Scalar\& coeffRef(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)}
+\DoxyCodeLine{1651   \{}
+\DoxyCodeLine{1652     \textcolor{keywordflow}{return} m\_argImpl.coeffRef(index + rowOffset(), index + colOffset());}
+\DoxyCodeLine{1653   \}}
+\DoxyCodeLine{1654 }
+\DoxyCodeLine{1655 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{1656   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<ArgType>}} m\_argImpl;}
+\DoxyCodeLine{1657   \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1variable__if__dynamicindex}{internal::variable\_if\_dynamicindex<Index, XprType::DiagIndex>}} m\_index;}
+\DoxyCodeLine{1658 }
+\DoxyCodeLine{1659 \textcolor{keyword}{private}:}
+\DoxyCodeLine{1660   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE EIGEN\_CONSTEXPR}
+\DoxyCodeLine{1661   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rowOffset()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_index.value() > 0 ? 0 : -\/m\_index.value(); \}}
+\DoxyCodeLine{1662   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE EIGEN\_CONSTEXPR}
+\DoxyCodeLine{1663   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} colOffset()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_index.value() > 0 ? m\_index.value() : 0; \}}
+\DoxyCodeLine{1664 \};}
+\DoxyCodeLine{1665 }
+\DoxyCodeLine{1666 }
+\DoxyCodeLine{1667 \textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{1668 \textcolor{comment}{// deprecated code}}
+\DoxyCodeLine{1669 \textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{1670 }
+\DoxyCodeLine{1671 \textcolor{comment}{// -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ EvalToTemp -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{1672 }
+\DoxyCodeLine{1673 \textcolor{comment}{// expression class for evaluating nested expression to a temporary}}
+\DoxyCodeLine{1674 }
+\DoxyCodeLine{1675 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ArgType> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1EvalToTemp}{EvalToTemp}};}
+\DoxyCodeLine{1676 }
+\DoxyCodeLine{1677 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ArgType>}
+\DoxyCodeLine{1678 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{classEigen_1_1internal_1_1EvalToTemp}{EvalToTemp}}<ArgType> >}
+\DoxyCodeLine{1679   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<ArgType>}
+\DoxyCodeLine{1680 \{ \};}
+\DoxyCodeLine{1681 }
+\DoxyCodeLine{1682 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ArgType>}
+\DoxyCodeLine{1683 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1EvalToTemp}{EvalToTemp}}}
+\DoxyCodeLine{1684   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1dense__xpr__base}{dense\_xpr\_base}}<EvalToTemp<ArgType> >::type}
+\DoxyCodeLine{1685 \{}
+\DoxyCodeLine{1686  \textcolor{keyword}{public}:}
+\DoxyCodeLine{1687 }
+\DoxyCodeLine{1688   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1dense__xpr__base}{dense\_xpr\_base<EvalToTemp>::type}} \mbox{\hyperlink{classBase}{Base}};}
+\DoxyCodeLine{1689   EIGEN\_GENERIC\_PUBLIC\_INTERFACE(\mbox{\hyperlink{classEigen_1_1internal_1_1EvalToTemp}{EvalToTemp}})}
+\DoxyCodeLine{1690 }
+\DoxyCodeLine{1691   \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1internal_1_1EvalToTemp}{EvalToTemp}}(\textcolor{keyword}{const} ArgType\& arg)}
+\DoxyCodeLine{1692     : m\_arg(arg)}
+\DoxyCodeLine{1693   \{ \}}
+\DoxyCodeLine{1694 }
+\DoxyCodeLine{1695   \textcolor{keyword}{const} ArgType\& arg()\textcolor{keyword}{ const}}
+\DoxyCodeLine{1696 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{1697     \textcolor{keywordflow}{return} m\_arg;}
+\DoxyCodeLine{1698   \}}
+\DoxyCodeLine{1699 }
+\DoxyCodeLine{1700   EIGEN\_CONSTEXPR \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows() \textcolor{keyword}{const} EIGEN\_NOEXCEPT}
+\DoxyCodeLine{1701   \{}
+\DoxyCodeLine{1702     \textcolor{keywordflow}{return} m\_arg.rows();}
+\DoxyCodeLine{1703   \}}
+\DoxyCodeLine{1704 }
+\DoxyCodeLine{1705   EIGEN\_CONSTEXPR \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols() \textcolor{keyword}{const} EIGEN\_NOEXCEPT}
+\DoxyCodeLine{1706   \{}
+\DoxyCodeLine{1707     \textcolor{keywordflow}{return} m\_arg.cols();}
+\DoxyCodeLine{1708   \}}
+\DoxyCodeLine{1709 }
+\DoxyCodeLine{1710  \textcolor{keyword}{private}:}
+\DoxyCodeLine{1711   \textcolor{keyword}{const} ArgType\& m\_arg;}
+\DoxyCodeLine{1712 \};}
+\DoxyCodeLine{1713 }
+\DoxyCodeLine{1714 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ArgType>}
+\DoxyCodeLine{1715 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<\mbox{\hyperlink{classEigen_1_1internal_1_1EvalToTemp}{EvalToTemp}}<ArgType> >}
+\DoxyCodeLine{1716   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<typename ArgType::PlainObject>}
+\DoxyCodeLine{1717 \{}
+\DoxyCodeLine{1718   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1internal_1_1EvalToTemp}{EvalToTemp<ArgType>}}                   \mbox{\hyperlink{classEigen_1_1internal_1_1EvalToTemp}{XprType}};}
+\DoxyCodeLine{1719   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} ArgType::PlainObject         PlainObject;}
+\DoxyCodeLine{1720   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<PlainObject>}} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}};}
+\DoxyCodeLine{1721 }
+\DoxyCodeLine{1722   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1internal_1_1EvalToTemp}{XprType}}\& xpr)}
+\DoxyCodeLine{1723     : m\_result(xpr.arg())}
+\DoxyCodeLine{1724   \{}
+\DoxyCodeLine{1725     ::new (\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})) \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}(m\_result);}
+\DoxyCodeLine{1726   \}}
+\DoxyCodeLine{1727 }
+\DoxyCodeLine{1728   \textcolor{comment}{// This constructor is used when nesting an EvalTo evaluator in another evaluator}}
+\DoxyCodeLine{1729   EIGEN\_DEVICE\_FUNC \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} ArgType\& arg)}
+\DoxyCodeLine{1730     : m\_result(arg)}
+\DoxyCodeLine{1731   \{}
+\DoxyCodeLine{1732     ::new (\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})) \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}(m\_result);}
+\DoxyCodeLine{1733   \}}
+\DoxyCodeLine{1734 }
+\DoxyCodeLine{1735 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{1736   PlainObject m\_result;}
+\DoxyCodeLine{1737 \};}
+\DoxyCodeLine{1738 }
+\DoxyCodeLine{1739 \} \textcolor{comment}{// namespace internal}}
+\DoxyCodeLine{1740 }
+\DoxyCodeLine{1741 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{1742 }
+\DoxyCodeLine{1743 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_COREEVALUATORS\_H}}
+
+\end{DoxyCode}

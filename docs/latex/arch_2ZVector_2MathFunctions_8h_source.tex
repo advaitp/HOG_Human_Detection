@@ -1,0 +1,241 @@
+\hypertarget{arch_2ZVector_2MathFunctions_8h_source}{}\doxysection{Math\+Functions.\+h}
+\label{arch_2ZVector_2MathFunctions_8h_source}\index{include/Eigen/src/Core/arch/ZVector/MathFunctions.h@{include/Eigen/src/Core/arch/ZVector/MathFunctions.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2007 Julien Pommier}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{6 \textcolor{comment}{// Copyright (C) 2016 Konstantinos Margaritis <markos@freevec.org>}}
+\DoxyCodeLine{7 \textcolor{comment}{//}}
+\DoxyCodeLine{8 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{9 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{10 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{11 }
+\DoxyCodeLine{12 \textcolor{comment}{/* The sin, cos, exp, and log functions of this file come from}}
+\DoxyCodeLine{13 \textcolor{comment}{ * Julien Pommier's sse math library: http://gruntthepeon.free.fr/ssemath/}}
+\DoxyCodeLine{14 \textcolor{comment}{ */}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{preprocessor}{\#ifndef EIGEN\_MATH\_FUNCTIONS\_ALTIVEC\_H}}
+\DoxyCodeLine{17 \textcolor{preprocessor}{\#define EIGEN\_MATH\_FUNCTIONS\_ALTIVEC\_H}}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{preprocessor}{\#include "{}../../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{20 }
+\DoxyCodeLine{21 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{22 }
+\DoxyCodeLine{23 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{24 }
+\DoxyCodeLine{25 \textcolor{preprocessor}{\#if !defined(\_\_ARCH\_\_) || (defined(\_\_ARCH\_\_) \&\& \_\_ARCH\_\_ >= 12)}}
+\DoxyCodeLine{26 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(1 , 1.0f);}
+\DoxyCodeLine{27 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(half, 0.5f);}
+\DoxyCodeLine{28 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4i(0x7f, 0x7f);}
+\DoxyCodeLine{29 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4i(23, 23);}
+\DoxyCodeLine{30 }
+\DoxyCodeLine{31 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f\_FROM\_INT(inv\_mant\_mask, \string~0x7f800000);}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33 \textcolor{comment}{/* the smallest non denormalized float number */}}
+\DoxyCodeLine{34 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f\_FROM\_INT(min\_norm\_pos,  0x00800000);}
+\DoxyCodeLine{35 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f\_FROM\_INT(minus\_inf,     0xff800000); \textcolor{comment}{// -\/1.f/0.f}}
+\DoxyCodeLine{36 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f\_FROM\_INT(minus\_nan,     0xffffffff);}
+\DoxyCodeLine{37   }
+\DoxyCodeLine{38 \textcolor{comment}{/* natural logarithm computed for 4 simultaneous float}}
+\DoxyCodeLine{39 \textcolor{comment}{  return NaN for x <= 0}}
+\DoxyCodeLine{40 \textcolor{comment}{*/}}
+\DoxyCodeLine{41 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(cephes\_SQRTHF, 0.707106781186547524f);}
+\DoxyCodeLine{42 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(cephes\_log\_p0, 7.0376836292E-\/2f);}
+\DoxyCodeLine{43 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(cephes\_log\_p1, -\/ 1.1514610310E-\/1f);}
+\DoxyCodeLine{44 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(cephes\_log\_p2, 1.1676998740E-\/1f);}
+\DoxyCodeLine{45 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(cephes\_log\_p3, -\/ 1.2420140846E-\/1f);}
+\DoxyCodeLine{46 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(cephes\_log\_p4, + 1.4249322787E-\/1f);}
+\DoxyCodeLine{47 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(cephes\_log\_p5, -\/ 1.6668057665E-\/1f);}
+\DoxyCodeLine{48 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(cephes\_log\_p6, + 2.0000714765E-\/1f);}
+\DoxyCodeLine{49 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(cephes\_log\_p7, -\/ 2.4999993993E-\/1f);}
+\DoxyCodeLine{50 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(cephes\_log\_p8, + 3.3333331174E-\/1f);}
+\DoxyCodeLine{51 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(cephes\_log\_q1, -\/2.12194440e-\/4f);}
+\DoxyCodeLine{52 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(cephes\_log\_q2, 0.693359375f);}
+\DoxyCodeLine{53 }
+\DoxyCodeLine{54 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(exp\_hi,  88.3762626647950f);}
+\DoxyCodeLine{55 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(exp\_lo, -\/88.3762626647949f);}
+\DoxyCodeLine{56 }
+\DoxyCodeLine{57 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(cephes\_LOG2EF, 1.44269504088896341f);}
+\DoxyCodeLine{58 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(cephes\_exp\_C1, 0.693359375f);}
+\DoxyCodeLine{59 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(cephes\_exp\_C2, -\/2.12194440e-\/4f);}
+\DoxyCodeLine{60 }
+\DoxyCodeLine{61 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(cephes\_exp\_p0, 1.9875691500E-\/4f);}
+\DoxyCodeLine{62 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(cephes\_exp\_p1, 1.3981999507E-\/3f);}
+\DoxyCodeLine{63 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(cephes\_exp\_p2, 8.3334519073E-\/3f);}
+\DoxyCodeLine{64 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(cephes\_exp\_p3, 4.1665795894E-\/2f);}
+\DoxyCodeLine{65 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(cephes\_exp\_p4, 1.6666665459E-\/1f);}
+\DoxyCodeLine{66 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet4f(cephes\_exp\_p5, 5.0000001201E-\/1f);}
+\DoxyCodeLine{67 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{69 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet2d(1 , 1.0);}
+\DoxyCodeLine{70 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet2d(2 , 2.0);}
+\DoxyCodeLine{71 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet2d(half, 0.5);}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet2d(exp\_hi,  709.437);}
+\DoxyCodeLine{74 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet2d(exp\_lo, -\/709.436139303);}
+\DoxyCodeLine{75 }
+\DoxyCodeLine{76 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet2d(cephes\_LOG2EF, 1.4426950408889634073599);}
+\DoxyCodeLine{77 }
+\DoxyCodeLine{78 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet2d(cephes\_exp\_p0, 1.26177193074810590878e-\/4);}
+\DoxyCodeLine{79 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet2d(cephes\_exp\_p1, 3.02994407707441961300e-\/2);}
+\DoxyCodeLine{80 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet2d(cephes\_exp\_p2, 9.99999999999999999910e-\/1);}
+\DoxyCodeLine{81 }
+\DoxyCodeLine{82 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet2d(cephes\_exp\_q0, 3.00198505138664455042e-\/6);}
+\DoxyCodeLine{83 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet2d(cephes\_exp\_q1, 2.52448340349684104192e-\/3);}
+\DoxyCodeLine{84 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet2d(cephes\_exp\_q2, 2.27265548208155028766e-\/1);}
+\DoxyCodeLine{85 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet2d(cephes\_exp\_q3, 2.00000000000000000009e0);}
+\DoxyCodeLine{86 }
+\DoxyCodeLine{87 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet2d(cephes\_exp\_C1, 0.693145751953125);}
+\DoxyCodeLine{88 \textcolor{keyword}{static} \_EIGEN\_DECLARE\_CONST\_Packet2d(cephes\_exp\_C2, 1.42860682030941723212e-\/6);}
+\DoxyCodeLine{89 }
+\DoxyCodeLine{90 \textcolor{keyword}{template}<> EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED}
+\DoxyCodeLine{91 Packet2d pexp<Packet2d>(\textcolor{keyword}{const} Packet2d\& \_x)}
+\DoxyCodeLine{92 \{}
+\DoxyCodeLine{93   Packet2d x = \_x;}
+\DoxyCodeLine{94 }
+\DoxyCodeLine{95   Packet2d tmp, fx;}
+\DoxyCodeLine{96   Packet2l emm0;}
+\DoxyCodeLine{97 }
+\DoxyCodeLine{98   \textcolor{comment}{// clamp x}}
+\DoxyCodeLine{99   x = pmax(pmin(x, p2d\_exp\_hi), p2d\_exp\_lo);}
+\DoxyCodeLine{100   \textcolor{comment}{/* express exp(x) as exp(g + n*log(2)) */}}
+\DoxyCodeLine{101   fx = pmadd(p2d\_cephes\_LOG2EF, x, p2d\_half);}
+\DoxyCodeLine{102 }
+\DoxyCodeLine{103   fx = vec\_floor(fx);}
+\DoxyCodeLine{104 }
+\DoxyCodeLine{105   tmp = pmul(fx, p2d\_cephes\_exp\_C1);}
+\DoxyCodeLine{106   Packet2d z = pmul(fx, p2d\_cephes\_exp\_C2);}
+\DoxyCodeLine{107   x = psub(x, tmp);}
+\DoxyCodeLine{108   x = psub(x, z);}
+\DoxyCodeLine{109 }
+\DoxyCodeLine{110   Packet2d x2 = pmul(x,x);}
+\DoxyCodeLine{111 }
+\DoxyCodeLine{112   Packet2d px = p2d\_cephes\_exp\_p0;}
+\DoxyCodeLine{113   px = pmadd(px, x2, p2d\_cephes\_exp\_p1);}
+\DoxyCodeLine{114   px = pmadd(px, x2, p2d\_cephes\_exp\_p2);}
+\DoxyCodeLine{115   px = pmul (px, x);}
+\DoxyCodeLine{116 }
+\DoxyCodeLine{117   Packet2d qx = p2d\_cephes\_exp\_q0;}
+\DoxyCodeLine{118   qx = pmadd(qx, x2, p2d\_cephes\_exp\_q1);}
+\DoxyCodeLine{119   qx = pmadd(qx, x2, p2d\_cephes\_exp\_q2);}
+\DoxyCodeLine{120   qx = pmadd(qx, x2, p2d\_cephes\_exp\_q3);}
+\DoxyCodeLine{121 }
+\DoxyCodeLine{122   x = pdiv(px,psub(qx,px));}
+\DoxyCodeLine{123   x = pmadd(p2d\_2,x,p2d\_1);}
+\DoxyCodeLine{124 }
+\DoxyCodeLine{125   \textcolor{comment}{// build 2\string^n}}
+\DoxyCodeLine{126   emm0 = vec\_ctsl(fx, 0);}
+\DoxyCodeLine{127 }
+\DoxyCodeLine{128   \textcolor{keyword}{static} \textcolor{keyword}{const} Packet2l p2l\_1023 = \{ 1023, 1023 \};}
+\DoxyCodeLine{129   \textcolor{keyword}{static} \textcolor{keyword}{const} Packet2ul p2ul\_52 = \{ 52, 52 \};}
+\DoxyCodeLine{130 }
+\DoxyCodeLine{131   emm0 = emm0 + p2l\_1023;}
+\DoxyCodeLine{132   emm0 = emm0 << reinterpret\_cast<Packet2l>(p2ul\_52);}
+\DoxyCodeLine{133 }
+\DoxyCodeLine{134   \textcolor{comment}{// Altivec's max \& min operators just drop silent NaNs. Check NaNs in }}
+\DoxyCodeLine{135   \textcolor{comment}{// inputs and return them unmodified.}}
+\DoxyCodeLine{136   Packet2ul isnumber\_mask = \textcolor{keyword}{reinterpret\_cast<}Packet2ul\textcolor{keyword}{>}(vec\_cmpeq(\_x, \_x));}
+\DoxyCodeLine{137   \textcolor{keywordflow}{return} vec\_sel(\_x, pmax(pmul(x, \textcolor{keyword}{reinterpret\_cast<}Packet2d\textcolor{keyword}{>}(emm0)), \_x),}
+\DoxyCodeLine{138                  isnumber\_mask);}
+\DoxyCodeLine{139 \}}
+\DoxyCodeLine{140 }
+\DoxyCodeLine{141 \textcolor{keyword}{template}<> EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED}
+\DoxyCodeLine{142 Packet4f pexp<Packet4f>(\textcolor{keyword}{const} Packet4f\& \_x)}
+\DoxyCodeLine{143 \{}
+\DoxyCodeLine{144 \textcolor{preprocessor}{\#if !defined(\_\_ARCH\_\_) || (defined(\_\_ARCH\_\_) \&\& \_\_ARCH\_\_ >= 12)}}
+\DoxyCodeLine{145   Packet4f x = \_x;}
+\DoxyCodeLine{146 }
+\DoxyCodeLine{147   Packet4f tmp, fx;}
+\DoxyCodeLine{148   Packet4i emm0;}
+\DoxyCodeLine{149 }
+\DoxyCodeLine{150   \textcolor{comment}{// clamp x}}
+\DoxyCodeLine{151   x = pmax(pmin(x, p4f\_exp\_hi), p4f\_exp\_lo);}
+\DoxyCodeLine{152 }
+\DoxyCodeLine{153   \textcolor{comment}{// express exp(x) as exp(g + n*log(2))}}
+\DoxyCodeLine{154   fx = pmadd(x, p4f\_cephes\_LOG2EF, p4f\_half);}
+\DoxyCodeLine{155 }
+\DoxyCodeLine{156   fx = pfloor(fx);}
+\DoxyCodeLine{157 }
+\DoxyCodeLine{158   tmp = pmul(fx, p4f\_cephes\_exp\_C1);}
+\DoxyCodeLine{159   Packet4f z = pmul(fx, p4f\_cephes\_exp\_C2);}
+\DoxyCodeLine{160   x = psub(x, tmp);}
+\DoxyCodeLine{161   x = psub(x, z);}
+\DoxyCodeLine{162 }
+\DoxyCodeLine{163   z = pmul(x,x);}
+\DoxyCodeLine{164 }
+\DoxyCodeLine{165   Packet4f y = p4f\_cephes\_exp\_p0;}
+\DoxyCodeLine{166   y = pmadd(y, x, p4f\_cephes\_exp\_p1);}
+\DoxyCodeLine{167   y = pmadd(y, x, p4f\_cephes\_exp\_p2);}
+\DoxyCodeLine{168   y = pmadd(y, x, p4f\_cephes\_exp\_p3);}
+\DoxyCodeLine{169   y = pmadd(y, x, p4f\_cephes\_exp\_p4);}
+\DoxyCodeLine{170   y = pmadd(y, x, p4f\_cephes\_exp\_p5);}
+\DoxyCodeLine{171   y = pmadd(y, z, x);}
+\DoxyCodeLine{172   y = padd(y, p4f\_1);}
+\DoxyCodeLine{173 }
+\DoxyCodeLine{174   \textcolor{comment}{// build 2\string^n}}
+\DoxyCodeLine{175   emm0 = (Packet4i)\{ (int)fx[0], (\textcolor{keywordtype}{int})fx[1], (int)fx[2], (\textcolor{keywordtype}{int})fx[3] \};}
+\DoxyCodeLine{176   emm0 = emm0 + p4i\_0x7f;}
+\DoxyCodeLine{177   emm0 = emm0 << reinterpret\_cast<Packet4i>(p4i\_23);}
+\DoxyCodeLine{178 }
+\DoxyCodeLine{179   \textcolor{keywordflow}{return} pmax(pmul(y, \textcolor{keyword}{reinterpret\_cast<}Packet4f\textcolor{keyword}{>}(emm0)), \_x);}
+\DoxyCodeLine{180 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{181   Packet4f res;}
+\DoxyCodeLine{182   res.v4f[0] = pexp<Packet2d>(\_x.v4f[0]);}
+\DoxyCodeLine{183   res.v4f[1] = pexp<Packet2d>(\_x.v4f[1]);}
+\DoxyCodeLine{184   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{185 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{186 \}}
+\DoxyCodeLine{187 }
+\DoxyCodeLine{188 \textcolor{keyword}{template}<> EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED}
+\DoxyCodeLine{189 Packet2d psqrt<Packet2d>(\textcolor{keyword}{const} Packet2d\& x)}
+\DoxyCodeLine{190 \{}
+\DoxyCodeLine{191   \textcolor{keywordflow}{return} vec\_sqrt(x);}
+\DoxyCodeLine{192 \}}
+\DoxyCodeLine{193 }
+\DoxyCodeLine{194 \textcolor{keyword}{template}<> EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED}
+\DoxyCodeLine{195 Packet4f psqrt<Packet4f>(\textcolor{keyword}{const} Packet4f\& x)}
+\DoxyCodeLine{196 \{}
+\DoxyCodeLine{197   Packet4f res;}
+\DoxyCodeLine{198 \textcolor{preprocessor}{\#if !defined(\_\_ARCH\_\_) || (defined(\_\_ARCH\_\_) \&\& \_\_ARCH\_\_ >= 12)}}
+\DoxyCodeLine{199   res = vec\_sqrt(x);}
+\DoxyCodeLine{200 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{201   res.v4f[0] = psqrt<Packet2d>(x.v4f[0]);}
+\DoxyCodeLine{202   res.v4f[1] = psqrt<Packet2d>(x.v4f[1]);}
+\DoxyCodeLine{203 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{204   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{205 \}}
+\DoxyCodeLine{206 }
+\DoxyCodeLine{207 \textcolor{keyword}{template}<> EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED}
+\DoxyCodeLine{208 Packet2d prsqrt<Packet2d>(\textcolor{keyword}{const} Packet2d\& x) \{}
+\DoxyCodeLine{209   \textcolor{keywordflow}{return} pset1<Packet2d>(1.0) / psqrt<Packet2d>(x);}
+\DoxyCodeLine{210 \}}
+\DoxyCodeLine{211 }
+\DoxyCodeLine{212 \textcolor{keyword}{template}<> EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED}
+\DoxyCodeLine{213 Packet4f prsqrt<Packet4f>(\textcolor{keyword}{const} Packet4f\& x) \{}
+\DoxyCodeLine{214   Packet4f res;}
+\DoxyCodeLine{215 \textcolor{preprocessor}{\#if !defined(\_\_ARCH\_\_) || (defined(\_\_ARCH\_\_) \&\& \_\_ARCH\_\_ >= 12)}}
+\DoxyCodeLine{216   res = pset1<Packet4f>(1.0) / psqrt<Packet4f>(x);}
+\DoxyCodeLine{217 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{218   res.v4f[0] = prsqrt<Packet2d>(x.v4f[0]);}
+\DoxyCodeLine{219   res.v4f[1] = prsqrt<Packet2d>(x.v4f[1]);}
+\DoxyCodeLine{220 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{221   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{222 \}}
+\DoxyCodeLine{223 }
+\DoxyCodeLine{224 \textcolor{comment}{// Hyperbolic Tangent function.}}
+\DoxyCodeLine{225 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{226 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet4f}
+\DoxyCodeLine{227 ptanh<Packet4f>(\textcolor{keyword}{const} Packet4f\& x) \{}
+\DoxyCodeLine{228   \textcolor{keywordflow}{return} internal::generic\_fast\_tanh\_float(x);}
+\DoxyCodeLine{229 \}}
+\DoxyCodeLine{230 }
+\DoxyCodeLine{231 \}  \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{232 }
+\DoxyCodeLine{233 \}  \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{234 }
+\DoxyCodeLine{235 \textcolor{preprocessor}{\#endif  }\textcolor{comment}{// EIGEN\_MATH\_FUNCTIONS\_ALTIVEC\_H}}
+
+\end{DoxyCode}

@@ -1,0 +1,76 @@
+\hypertarget{Swap_8h_source}{}\doxysection{Swap.\+h}
+\label{Swap_8h_source}\index{include/Eigen/src/Core/Swap.h@{include/Eigen/src/Core/Swap.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2006-\/2008 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_SWAP\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_SWAP\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{comment}{// Overload default assignPacket behavior for swapping them}}
+\DoxyCodeLine{20 \textcolor{keyword}{template}<\textcolor{keyword}{typename} DstEvaluatorTypeT, \textcolor{keyword}{typename} SrcEvaluatorTypeT>}
+\DoxyCodeLine{21 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1generic__dense__assignment__kernel}{generic\_dense\_assignment\_kernel}}<DstEvaluatorTypeT, SrcEvaluatorTypeT, \mbox{\hyperlink{structEigen_1_1internal_1_1swap__assign__op}{swap\_assign\_op}}<typename DstEvaluatorTypeT::Scalar>, Specialized>}
+\DoxyCodeLine{22  : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1internal_1_1generic__dense__assignment__kernel}{generic\_dense\_assignment\_kernel}}<DstEvaluatorTypeT, SrcEvaluatorTypeT, swap\_assign\_op<typename DstEvaluatorTypeT::Scalar>, BuiltIn>}
+\DoxyCodeLine{23 \{}
+\DoxyCodeLine{24 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{25   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1internal_1_1generic__dense__assignment__kernel}{generic\_dense\_assignment\_kernel<DstEvaluatorTypeT, SrcEvaluatorTypeT, swap\_assign\_op<typename DstEvaluatorTypeT::Scalar>}}, BuiltIn> \mbox{\hyperlink{classEigen_1_1internal_1_1generic__dense__assignment__kernel}{Base}};}
+\DoxyCodeLine{26   \textcolor{keyword}{using} Base::m\_dst;}
+\DoxyCodeLine{27   \textcolor{keyword}{using} Base::m\_src;}
+\DoxyCodeLine{28   \textcolor{keyword}{using} Base::m\_functor;}
+\DoxyCodeLine{29   }
+\DoxyCodeLine{30 \textcolor{keyword}{public}:}
+\DoxyCodeLine{31   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::Scalar Scalar;}
+\DoxyCodeLine{32   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::DstXprType DstXprType;}
+\DoxyCodeLine{33   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1swap__assign__op}{swap\_assign\_op<Scalar>}} \mbox{\hyperlink{structEigen_1_1internal_1_1swap__assign__op}{Functor}};}
+\DoxyCodeLine{34   }
+\DoxyCodeLine{35   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{36   \mbox{\hyperlink{classEigen_1_1internal_1_1generic__dense__assignment__kernel}{generic\_dense\_assignment\_kernel}}(DstEvaluatorTypeT \&dst, \textcolor{keyword}{const} SrcEvaluatorTypeT \&src, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1swap__assign__op}{Functor}} \&func, DstXprType\& dstExpr)}
+\DoxyCodeLine{37     : \mbox{\hyperlink{classEigen_1_1internal_1_1generic__dense__assignment__kernel}{Base}}(dst, src, func, dstExpr)}
+\DoxyCodeLine{38   \{\}}
+\DoxyCodeLine{39   }
+\DoxyCodeLine{40   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} StoreMode, \textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{41   EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} assignPacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)}
+\DoxyCodeLine{42   \{}
+\DoxyCodeLine{43     \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{PacketType}} tmp = m\_src.template packet<LoadMode,PacketType>(row,col);}
+\DoxyCodeLine{44     \textcolor{keyword}{const\_cast<}SrcEvaluatorTypeT\&\textcolor{keyword}{>}(m\_src).\textcolor{keyword}{template} writePacket<LoadMode>(row,col, m\_dst.template packet<StoreMode,PacketType>(row,col));}
+\DoxyCodeLine{45     m\_dst.template writePacket<StoreMode>(row,col,tmp);}
+\DoxyCodeLine{46   \}}
+\DoxyCodeLine{47   }
+\DoxyCodeLine{48   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} StoreMode, \textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{49   EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} assignPacket(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)}
+\DoxyCodeLine{50   \{}
+\DoxyCodeLine{51     \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{PacketType}} tmp = m\_src.template packet<LoadMode,PacketType>(index);}
+\DoxyCodeLine{52     \textcolor{keyword}{const\_cast<}SrcEvaluatorTypeT\&\textcolor{keyword}{>}(m\_src).\textcolor{keyword}{template} writePacket<LoadMode>(index, m\_dst.template packet<StoreMode,PacketType>(index));}
+\DoxyCodeLine{53     m\_dst.template writePacket<StoreMode>(index,tmp);}
+\DoxyCodeLine{54   \}}
+\DoxyCodeLine{55   }
+\DoxyCodeLine{56   \textcolor{comment}{// TODO find a simple way not to have to copy/paste this function from generic\_dense\_assignment\_kernel, by simple I mean no CRTP (Gael)}}
+\DoxyCodeLine{57   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} StoreMode, \textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{58   EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} assignPacketByOuterInner(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outer, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} inner)}
+\DoxyCodeLine{59   \{}
+\DoxyCodeLine{60     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row = Base::rowIndexByOuterInner(outer, inner); }
+\DoxyCodeLine{61     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col = Base::colIndexByOuterInner(outer, inner);}
+\DoxyCodeLine{62     assignPacket<StoreMode,LoadMode,PacketType>(row, col);}
+\DoxyCodeLine{63   \}}
+\DoxyCodeLine{64 \};}
+\DoxyCodeLine{65 }
+\DoxyCodeLine{66 \} \textcolor{comment}{// namespace internal}}
+\DoxyCodeLine{67 }
+\DoxyCodeLine{68 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_SWAP\_H}}
+
+\end{DoxyCode}

@@ -1,0 +1,918 @@
+\hypertarget{UnaryFunctors_8h_source}{}\doxysection{Unary\+Functors.\+h}
+\label{UnaryFunctors_8h_source}\index{include/Eigen/src/Core/functors/UnaryFunctors.h@{include/Eigen/src/Core/functors/UnaryFunctors.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2008-\/2016 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_UNARY\_FUNCTORS\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_UNARY\_FUNCTORS\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{24 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__opposite__op}{scalar\_opposite\_op}} \{}
+\DoxyCodeLine{25   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__opposite__op}{scalar\_opposite\_op}})}
+\DoxyCodeLine{26   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} -\/a; \}}
+\DoxyCodeLine{27   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{28   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const}}
+\DoxyCodeLine{29 \textcolor{keyword}{  }\{ \textcolor{keywordflow}{return} internal::pnegate(a); \}}
+\DoxyCodeLine{30 \};}
+\DoxyCodeLine{31 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{32 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__opposite__op}{scalar\_opposite\_op}}<Scalar> >}
+\DoxyCodeLine{33 \{ \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{34     Cost = \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::AddCost}},}
+\DoxyCodeLine{35     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasNegate}} \};}
+\DoxyCodeLine{36 \};}
+\DoxyCodeLine{37 }
+\DoxyCodeLine{43 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__abs__op}{scalar\_abs\_op}} \{}
+\DoxyCodeLine{44   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__abs__op}{scalar\_abs\_op}})}
+\DoxyCodeLine{45   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}} result\_type;}
+\DoxyCodeLine{46   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} result\_type operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::abs(a); \}}
+\DoxyCodeLine{47   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{48   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const}}
+\DoxyCodeLine{49 \textcolor{keyword}{  }\{ \textcolor{keywordflow}{return} internal::pabs(a); \}}
+\DoxyCodeLine{50 \};}
+\DoxyCodeLine{51 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{52 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__abs__op}{scalar\_abs\_op}}<Scalar> >}
+\DoxyCodeLine{53 \{}
+\DoxyCodeLine{54   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{55     Cost = \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::AddCost}},}
+\DoxyCodeLine{56     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasAbs}}}
+\DoxyCodeLine{57   \};}
+\DoxyCodeLine{58 \};}
+\DoxyCodeLine{59 }
+\DoxyCodeLine{65 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__score__coeff__op}{scalar\_score\_coeff\_op}} : \mbox{\hyperlink{structEigen_1_1internal_1_1scalar__abs__op}{scalar\_abs\_op}}<Scalar>}
+\DoxyCodeLine{66 \{}
+\DoxyCodeLine{67   \textcolor{keyword}{typedef} \textcolor{keywordtype}{void} Score\_is\_abs;}
+\DoxyCodeLine{68 \};}
+\DoxyCodeLine{69 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{70 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__score__coeff__op}{scalar\_score\_coeff\_op}}<Scalar> > : \mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<scalar\_abs\_op<Scalar> > \{\};}
+\DoxyCodeLine{71 }
+\DoxyCodeLine{72 \textcolor{comment}{/* Avoid recomputing abs when we know the score and they are the same. Not a true Eigen functor.  */}}
+\DoxyCodeLine{73 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename}=\textcolor{keywordtype}{void}> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1abs__knowing__score}{abs\_knowing\_score}}}
+\DoxyCodeLine{74 \{}
+\DoxyCodeLine{75   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1abs__knowing__score}{abs\_knowing\_score}})}
+\DoxyCodeLine{76   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}} result\_type;}
+\DoxyCodeLine{77   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Score>}
+\DoxyCodeLine{78   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} result\_type operator() (\textcolor{keyword}{const} Scalar\& a, \textcolor{keyword}{const} Score\&)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::abs(a); \}}
+\DoxyCodeLine{79 \};}
+\DoxyCodeLine{80 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1abs__knowing__score}{abs\_knowing\_score}}<Scalar, typename \mbox{\hyperlink{structEigen_1_1internal_1_1scalar__score__coeff__op}{scalar\_score\_coeff\_op}}<Scalar>::Score\_is\_abs>}
+\DoxyCodeLine{81 \{}
+\DoxyCodeLine{82   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1abs__knowing__score}{abs\_knowing\_score}})}
+\DoxyCodeLine{83   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}} result\_type;}
+\DoxyCodeLine{84   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scal>}
+\DoxyCodeLine{85   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} result\_type operator() (\textcolor{keyword}{const} Scal\&, \textcolor{keyword}{const} result\_type\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} a; \}}
+\DoxyCodeLine{86 \};}
+\DoxyCodeLine{87 }
+\DoxyCodeLine{93 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__abs2__op}{scalar\_abs2\_op}} \{}
+\DoxyCodeLine{94   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__abs2__op}{scalar\_abs2\_op}})}
+\DoxyCodeLine{95   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}} result\_type;}
+\DoxyCodeLine{96   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{97   EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} result\_type operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::abs2(a); \}}
+\DoxyCodeLine{98   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{99   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const}}
+\DoxyCodeLine{100 \textcolor{keyword}{  }\{ \textcolor{keywordflow}{return} internal::pmul(a,a); \}}
+\DoxyCodeLine{101 \};}
+\DoxyCodeLine{102 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{103 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__abs2__op}{scalar\_abs2\_op}}<Scalar> >}
+\DoxyCodeLine{104 \{ \textcolor{keyword}{enum} \{ Cost = \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}}, PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasAbs2}} \}; \};}
+\DoxyCodeLine{105 }
+\DoxyCodeLine{111 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__conjugate__op}{scalar\_conjugate\_op}} \{}
+\DoxyCodeLine{112   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__conjugate__op}{scalar\_conjugate\_op}})}
+\DoxyCodeLine{113   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{114   EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::conj(a); \}}
+\DoxyCodeLine{115   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{116   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} internal::pconj(a); \}}
+\DoxyCodeLine{117 \};}
+\DoxyCodeLine{118 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{119 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__conjugate__op}{scalar\_conjugate\_op}}<Scalar> >}
+\DoxyCodeLine{120 \{}
+\DoxyCodeLine{121   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{122     Cost = 0,}
+\DoxyCodeLine{123     \textcolor{comment}{// Yes the cost is zero even for complexes because in most cases for which}}
+\DoxyCodeLine{124     \textcolor{comment}{// the cost is used, conjugation turns to be a no-\/op. Some examples:}}
+\DoxyCodeLine{125     \textcolor{comment}{//   cost(a*conj(b)) == cost(a*b)}}
+\DoxyCodeLine{126     \textcolor{comment}{//   cost(a+conj(b)) == cost(a+b)}}
+\DoxyCodeLine{127     \textcolor{comment}{//   <etc.}}
+\DoxyCodeLine{128     \textcolor{comment}{// If we don't set it to zero, then:}}
+\DoxyCodeLine{129     \textcolor{comment}{//   A.conjugate().lazyProduct(B.conjugate())}}
+\DoxyCodeLine{130     \textcolor{comment}{// will bake its operands. We definitely don't want that!}}
+\DoxyCodeLine{131     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasConj}}}
+\DoxyCodeLine{132   \};}
+\DoxyCodeLine{133 \};}
+\DoxyCodeLine{134 }
+\DoxyCodeLine{140 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__arg__op}{scalar\_arg\_op}} \{}
+\DoxyCodeLine{141   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__arg__op}{scalar\_arg\_op}})}
+\DoxyCodeLine{142   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}} result\_type;}
+\DoxyCodeLine{143   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} result\_type operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::arg(a); \}}
+\DoxyCodeLine{144   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{145   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const}}
+\DoxyCodeLine{146 \textcolor{keyword}{  }\{ \textcolor{keywordflow}{return} internal::parg(a); \}}
+\DoxyCodeLine{147 \};}
+\DoxyCodeLine{148 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{149 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__arg__op}{scalar\_arg\_op}}<Scalar> >}
+\DoxyCodeLine{150 \{}
+\DoxyCodeLine{151   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{152     Cost = \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::IsComplex}} ? 5 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}} : \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::AddCost}},}
+\DoxyCodeLine{153     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasArg}}}
+\DoxyCodeLine{154   \};}
+\DoxyCodeLine{155 \};}
+\DoxyCodeLine{161 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} NewType>}
+\DoxyCodeLine{162 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__cast__op}{scalar\_cast\_op}} \{}
+\DoxyCodeLine{163   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__cast__op}{scalar\_cast\_op}})}
+\DoxyCodeLine{164   \textcolor{keyword}{typedef} NewType result\_type;}
+\DoxyCodeLine{165   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} NewType operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} cast<Scalar, NewType>(a); \}}
+\DoxyCodeLine{166 \};}
+\DoxyCodeLine{167 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} NewType>}
+\DoxyCodeLine{168 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__cast__op}{scalar\_cast\_op}}<Scalar,NewType> >}
+\DoxyCodeLine{169 \{ \textcolor{keyword}{enum} \{ Cost = \mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{is\_same<Scalar, NewType>::value}} ? 0 : \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<NewType>::AddCost}}, PacketAccess = \textcolor{keyword}{false} \}; \};}
+\DoxyCodeLine{170 }
+\DoxyCodeLine{176 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keywordtype}{int} N>}
+\DoxyCodeLine{177 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__shift__right__op}{scalar\_shift\_right\_op}} \{}
+\DoxyCodeLine{178   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__shift__right__op}{scalar\_shift\_right\_op}})}
+\DoxyCodeLine{179 }
+\DoxyCodeLine{180   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const}}
+\DoxyCodeLine{181 \textcolor{keyword}{  }\{ \textcolor{keywordflow}{return} a >> N; \}}
+\DoxyCodeLine{182   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{183   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const}}
+\DoxyCodeLine{184 \textcolor{keyword}{  }\{ \textcolor{keywordflow}{return} internal::parithmetic\_shift\_right<N>(a); \}}
+\DoxyCodeLine{185 \};}
+\DoxyCodeLine{186 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keywordtype}{int} N>}
+\DoxyCodeLine{187 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__shift__right__op}{scalar\_shift\_right\_op}}<Scalar,N> >}
+\DoxyCodeLine{188 \{ \textcolor{keyword}{enum} \{ Cost = \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::AddCost}}, PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasShift}} \}; \};}
+\DoxyCodeLine{189 }
+\DoxyCodeLine{195 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keywordtype}{int} N>}
+\DoxyCodeLine{196 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__shift__left__op}{scalar\_shift\_left\_op}} \{}
+\DoxyCodeLine{197   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__shift__left__op}{scalar\_shift\_left\_op}})}
+\DoxyCodeLine{198 }
+\DoxyCodeLine{199   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const}}
+\DoxyCodeLine{200 \textcolor{keyword}{  }\{ \textcolor{keywordflow}{return} a << N; \}}
+\DoxyCodeLine{201   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{202   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const}}
+\DoxyCodeLine{203 \textcolor{keyword}{  }\{ \textcolor{keywordflow}{return} internal::plogical\_shift\_left<N>(a); \}}
+\DoxyCodeLine{204 \};}
+\DoxyCodeLine{205 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keywordtype}{int} N>}
+\DoxyCodeLine{206 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__shift__left__op}{scalar\_shift\_left\_op}}<Scalar,N> >}
+\DoxyCodeLine{207 \{ \textcolor{keyword}{enum} \{ Cost = \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::AddCost}}, PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasShift}} \}; \};}
+\DoxyCodeLine{208 }
+\DoxyCodeLine{214 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{215 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__real__op}{scalar\_real\_op}} \{}
+\DoxyCodeLine{216   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__real__op}{scalar\_real\_op}})}
+\DoxyCodeLine{217   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}} result\_type;}
+\DoxyCodeLine{218   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{219   EIGEN\_STRONG\_INLINE result\_type operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::real(a); \}}
+\DoxyCodeLine{220 \};}
+\DoxyCodeLine{221 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{222 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__real__op}{scalar\_real\_op}}<Scalar> >}
+\DoxyCodeLine{223 \{ \textcolor{keyword}{enum} \{ Cost = 0, PacketAccess = \textcolor{keyword}{false} \}; \};}
+\DoxyCodeLine{224 }
+\DoxyCodeLine{230 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{231 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__imag__op}{scalar\_imag\_op}} \{}
+\DoxyCodeLine{232   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__imag__op}{scalar\_imag\_op}})}
+\DoxyCodeLine{233   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}} result\_type;}
+\DoxyCodeLine{234   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{235   EIGEN\_STRONG\_INLINE result\_type operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::imag(a); \}}
+\DoxyCodeLine{236 \};}
+\DoxyCodeLine{237 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{238 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__imag__op}{scalar\_imag\_op}}<Scalar> >}
+\DoxyCodeLine{239 \{ \textcolor{keyword}{enum} \{ Cost = 0, PacketAccess = \textcolor{keyword}{false} \}; \};}
+\DoxyCodeLine{240 }
+\DoxyCodeLine{246 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{247 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__real__ref__op}{scalar\_real\_ref\_op}} \{}
+\DoxyCodeLine{248   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__real__ref__op}{scalar\_real\_ref\_op}})}
+\DoxyCodeLine{249   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}} result\_type;}
+\DoxyCodeLine{250   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{251   EIGEN\_STRONG\_INLINE result\_type\& operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::real\_ref(*\textcolor{keyword}{const\_cast<}Scalar*\textcolor{keyword}{>}(\&a)); \}}
+\DoxyCodeLine{252 \};}
+\DoxyCodeLine{253 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{254 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__real__ref__op}{scalar\_real\_ref\_op}}<Scalar> >}
+\DoxyCodeLine{255 \{ \textcolor{keyword}{enum} \{ Cost = 0, PacketAccess = \textcolor{keyword}{false} \}; \};}
+\DoxyCodeLine{256 }
+\DoxyCodeLine{262 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{263 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__imag__ref__op}{scalar\_imag\_ref\_op}} \{}
+\DoxyCodeLine{264   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__imag__ref__op}{scalar\_imag\_ref\_op}})}
+\DoxyCodeLine{265   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}} result\_type;}
+\DoxyCodeLine{266   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{267   EIGEN\_STRONG\_INLINE result\_type\& operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::imag\_ref(*\textcolor{keyword}{const\_cast<}Scalar*\textcolor{keyword}{>}(\&a)); \}}
+\DoxyCodeLine{268 \};}
+\DoxyCodeLine{269 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{270 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__imag__ref__op}{scalar\_imag\_ref\_op}}<Scalar> >}
+\DoxyCodeLine{271 \{ \textcolor{keyword}{enum} \{ Cost = 0, PacketAccess = \textcolor{keyword}{false} \}; \};}
+\DoxyCodeLine{272 }
+\DoxyCodeLine{279 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__exp__op}{scalar\_exp\_op}} \{}
+\DoxyCodeLine{280   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__exp__op}{scalar\_exp\_op}})}
+\DoxyCodeLine{281   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::exp(a); \}}
+\DoxyCodeLine{282   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{283   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} internal::pexp(a); \}}
+\DoxyCodeLine{284 \};}
+\DoxyCodeLine{285 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{286 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__exp__op}{scalar\_exp\_op}}<Scalar> > \{}
+\DoxyCodeLine{287   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{288     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasExp}},}
+\DoxyCodeLine{289     \textcolor{comment}{// The following numbers are based on the AVX implementation.}}
+\DoxyCodeLine{290 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_FMA}}
+\DoxyCodeLine{291     \textcolor{comment}{// Haswell can issue 2 add/mul/madd per cycle.}}
+\DoxyCodeLine{292     Cost =}
+\DoxyCodeLine{293     (\textcolor{keyword}{sizeof}(Scalar) == 4}
+\DoxyCodeLine{294      \textcolor{comment}{// float: 8 pmadd, 4 pmul, 2 padd/psub, 6 other}}
+\DoxyCodeLine{295      ? (8 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::AddCost}} + 6 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}})}
+\DoxyCodeLine{296      \textcolor{comment}{// double: 7 pmadd, 5 pmul, 3 padd/psub, 1 div,  13 other}}
+\DoxyCodeLine{297      : (14 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::AddCost}} +}
+\DoxyCodeLine{298         6 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}} +}
+\DoxyCodeLine{299         \mbox{\hyperlink{structEigen_1_1internal_1_1scalar__div__cost}{scalar\_div\_cost<Scalar,packet\_traits<Scalar>::HasDiv}}>::value))}
+\DoxyCodeLine{300 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{301     Cost =}
+\DoxyCodeLine{302     (\textcolor{keyword}{sizeof}(Scalar) == 4}
+\DoxyCodeLine{303      \textcolor{comment}{// float: 7 pmadd, 6 pmul, 4 padd/psub, 10 other}}
+\DoxyCodeLine{304      ? (21 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::AddCost}} + 13 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}})}
+\DoxyCodeLine{305      \textcolor{comment}{// double: 7 pmadd, 5 pmul, 3 padd/psub, 1 div,  13 other}}
+\DoxyCodeLine{306      : (23 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::AddCost}} +}
+\DoxyCodeLine{307         12 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}} +}
+\DoxyCodeLine{308         \mbox{\hyperlink{structEigen_1_1internal_1_1scalar__div__cost}{scalar\_div\_cost<Scalar,packet\_traits<Scalar>::HasDiv}}>::value))}
+\DoxyCodeLine{309 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{310   \};}
+\DoxyCodeLine{311 \};}
+\DoxyCodeLine{312 }
+\DoxyCodeLine{319 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__expm1__op}{scalar\_expm1\_op}} \{}
+\DoxyCodeLine{320   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__expm1__op}{scalar\_expm1\_op}})}
+\DoxyCodeLine{321   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::expm1(a); \}}
+\DoxyCodeLine{322   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{323   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} internal::pexpm1(a); \}}
+\DoxyCodeLine{324 \};}
+\DoxyCodeLine{325 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{326 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__expm1__op}{scalar\_expm1\_op}}<Scalar> > \{}
+\DoxyCodeLine{327   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{328     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasExpm1}},}
+\DoxyCodeLine{329     Cost = \mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<scalar\_exp\_op<Scalar>}} >::Cost \textcolor{comment}{// TODO measure cost of expm1}}
+\DoxyCodeLine{330   \};}
+\DoxyCodeLine{331 \};}
+\DoxyCodeLine{332 }
+\DoxyCodeLine{339 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__log__op}{scalar\_log\_op}} \{}
+\DoxyCodeLine{340   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__log__op}{scalar\_log\_op}})}
+\DoxyCodeLine{341   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::log(a); \}}
+\DoxyCodeLine{342   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{343   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} internal::plog(a); \}}
+\DoxyCodeLine{344 \};}
+\DoxyCodeLine{345 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{346 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__log__op}{scalar\_log\_op}}<Scalar> > \{}
+\DoxyCodeLine{347   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{348     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasLog}},}
+\DoxyCodeLine{349     Cost =}
+\DoxyCodeLine{350     (PacketAccess}
+\DoxyCodeLine{351      \textcolor{comment}{// The following numbers are based on the AVX implementation.}}
+\DoxyCodeLine{352 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_FMA}}
+\DoxyCodeLine{353      \textcolor{comment}{// 8 pmadd, 6 pmul, 8 padd/psub, 16 other, can issue 2 add/mul/madd per cycle.}}
+\DoxyCodeLine{354      ? (20 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::AddCost}} + 7 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}})}
+\DoxyCodeLine{355 \#\textcolor{keywordflow}{else}}
+\DoxyCodeLine{356      \textcolor{comment}{// 8 pmadd, 6 pmul, 8 padd/psub, 20 other}}
+\DoxyCodeLine{357      ? (36 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::AddCost}} + 14 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}})}
+\DoxyCodeLine{358 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{359      \textcolor{comment}{// Measured cost of std::log.}}
+\DoxyCodeLine{360      : \textcolor{keyword}{sizeof}(Scalar)==4 ? 40 : 85)}
+\DoxyCodeLine{361   \};}
+\DoxyCodeLine{362 \};}
+\DoxyCodeLine{363 }
+\DoxyCodeLine{370 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__log1p__op}{scalar\_log1p\_op}} \{}
+\DoxyCodeLine{371   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__log1p__op}{scalar\_log1p\_op}})}
+\DoxyCodeLine{372   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::log1p(a); \}}
+\DoxyCodeLine{373   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{374   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} internal::plog1p(a); \}}
+\DoxyCodeLine{375 \};}
+\DoxyCodeLine{376 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{377 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__log1p__op}{scalar\_log1p\_op}}<Scalar> > \{}
+\DoxyCodeLine{378   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{379     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasLog1p}},}
+\DoxyCodeLine{380     Cost = \mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<scalar\_log\_op<Scalar>}} >::Cost \textcolor{comment}{// TODO measure cost of log1p}}
+\DoxyCodeLine{381   \};}
+\DoxyCodeLine{382 \};}
+\DoxyCodeLine{383 }
+\DoxyCodeLine{390 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__log10__op}{scalar\_log10\_op}} \{}
+\DoxyCodeLine{391   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__log10__op}{scalar\_log10\_op}})}
+\DoxyCodeLine{392   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ EIGEN\_USING\_STD(log10) \textcolor{keywordflow}{return} log10(a); \}}
+\DoxyCodeLine{393   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{394   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} internal::plog10(a); \}}
+\DoxyCodeLine{395 \};}
+\DoxyCodeLine{396 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{397 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__log10__op}{scalar\_log10\_op}}<Scalar> >}
+\DoxyCodeLine{398 \{ \textcolor{keyword}{enum} \{ Cost = 5 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}}, PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasLog10}} \}; \};}
+\DoxyCodeLine{399 }
+\DoxyCodeLine{406 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__log2__op}{scalar\_log2\_op}} \{}
+\DoxyCodeLine{407   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__log2__op}{scalar\_log2\_op}})}
+\DoxyCodeLine{408   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} Scalar(EIGEN\_LOG2E) * numext::log(a); \}}
+\DoxyCodeLine{409   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{410   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} internal::plog2(a); \}}
+\DoxyCodeLine{411 \};}
+\DoxyCodeLine{412 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{413 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__log2__op}{scalar\_log2\_op}}<Scalar> >}
+\DoxyCodeLine{414 \{ \textcolor{keyword}{enum} \{ Cost = 5 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}}, PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasLog}} \}; \};}
+\DoxyCodeLine{415 }
+\DoxyCodeLine{420 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sqrt__op}{scalar\_sqrt\_op}} \{}
+\DoxyCodeLine{421   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sqrt__op}{scalar\_sqrt\_op}})}
+\DoxyCodeLine{422   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::sqrt(a); \}}
+\DoxyCodeLine{423   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{424   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} internal::psqrt(a); \}}
+\DoxyCodeLine{425 \};}
+\DoxyCodeLine{426 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{427 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sqrt__op}{scalar\_sqrt\_op}}<Scalar> > \{}
+\DoxyCodeLine{428   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{429 \textcolor{preprocessor}{\#if EIGEN\_FAST\_MATH}}
+\DoxyCodeLine{430     \textcolor{comment}{// The following numbers are based on the AVX implementation.}}
+\DoxyCodeLine{431     Cost = (\textcolor{keyword}{sizeof}(Scalar) == 8 ? 28}
+\DoxyCodeLine{432                                 \textcolor{comment}{// 4 pmul, 1 pmadd, 3 other}}
+\DoxyCodeLine{433                                 : (3 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::AddCost}} +}
+\DoxyCodeLine{434                                    5 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}})),}
+\DoxyCodeLine{435 \#\textcolor{keywordflow}{else}}
+\DoxyCodeLine{436     \textcolor{comment}{// The following numbers are based on min VSQRT throughput on Haswell.}}
+\DoxyCodeLine{437     Cost = (\textcolor{keyword}{sizeof}(Scalar) == 8 ? 28 : 14),}
+\DoxyCodeLine{438 \#endif}
+\DoxyCodeLine{439     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasSqrt}}}
+\DoxyCodeLine{440   \};}
+\DoxyCodeLine{441 \};}
+\DoxyCodeLine{442 }
+\DoxyCodeLine{443 \textcolor{comment}{// Boolean specialization to eliminate -\/Wimplicit-\/conversion-\/floating-\/point-\/to-\/bool warnings.}}
+\DoxyCodeLine{444 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sqrt__op}{scalar\_sqrt\_op}}<bool> \{}
+\DoxyCodeLine{445   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sqrt__op}{scalar\_sqrt\_op}})}
+\DoxyCodeLine{446   EIGEN\_DEPRECATED EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keywordtype}{bool} operator() (\textcolor{keyword}{const} \textcolor{keywordtype}{bool}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} a; \}}
+\DoxyCodeLine{447   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{448   EIGEN\_DEPRECATED EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} a; \}}
+\DoxyCodeLine{449 \};}
+\DoxyCodeLine{450 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{451 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sqrt__op}{scalar\_sqrt\_op}}<bool> > \{}
+\DoxyCodeLine{452   \textcolor{keyword}{enum} \{ Cost = 1, PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<bool>::Vectorizable}} \};}
+\DoxyCodeLine{453 \};}
+\DoxyCodeLine{454 }
+\DoxyCodeLine{459 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__rsqrt__op}{scalar\_rsqrt\_op}} \{}
+\DoxyCodeLine{460   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__rsqrt__op}{scalar\_rsqrt\_op}})}
+\DoxyCodeLine{461   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::rsqrt(a); \}}
+\DoxyCodeLine{462   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{463   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} internal::prsqrt(a); \}}
+\DoxyCodeLine{464 \};}
+\DoxyCodeLine{465 }
+\DoxyCodeLine{466 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{467 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__rsqrt__op}{scalar\_rsqrt\_op}}<Scalar> >}
+\DoxyCodeLine{468 \{ \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{469     Cost = 5 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}},}
+\DoxyCodeLine{470     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasRsqrt}}}
+\DoxyCodeLine{471   \};}
+\DoxyCodeLine{472 \};}
+\DoxyCodeLine{473 }
+\DoxyCodeLine{478 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__cos__op}{scalar\_cos\_op}} \{}
+\DoxyCodeLine{479   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__cos__op}{scalar\_cos\_op}})}
+\DoxyCodeLine{480   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::cos(a); \}}
+\DoxyCodeLine{481   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{482   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} internal::pcos(a); \}}
+\DoxyCodeLine{483 \};}
+\DoxyCodeLine{484 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{485 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__cos__op}{scalar\_cos\_op}}<Scalar> >}
+\DoxyCodeLine{486 \{}
+\DoxyCodeLine{487   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{488     Cost = 5 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}},}
+\DoxyCodeLine{489     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasCos}}}
+\DoxyCodeLine{490   \};}
+\DoxyCodeLine{491 \};}
+\DoxyCodeLine{492 }
+\DoxyCodeLine{497 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sin__op}{scalar\_sin\_op}} \{}
+\DoxyCodeLine{498   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sin__op}{scalar\_sin\_op}})}
+\DoxyCodeLine{499   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::sin(a); \}}
+\DoxyCodeLine{500   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{501   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} internal::psin(a); \}}
+\DoxyCodeLine{502 \};}
+\DoxyCodeLine{503 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{504 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sin__op}{scalar\_sin\_op}}<Scalar> >}
+\DoxyCodeLine{505 \{}
+\DoxyCodeLine{506   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{507     Cost = 5 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}},}
+\DoxyCodeLine{508     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasSin}}}
+\DoxyCodeLine{509   \};}
+\DoxyCodeLine{510 \};}
+\DoxyCodeLine{511 }
+\DoxyCodeLine{512 }
+\DoxyCodeLine{517 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__tan__op}{scalar\_tan\_op}} \{}
+\DoxyCodeLine{518   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__tan__op}{scalar\_tan\_op}})}
+\DoxyCodeLine{519   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::tan(a); \}}
+\DoxyCodeLine{520   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{521   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} internal::ptan(a); \}}
+\DoxyCodeLine{522 \};}
+\DoxyCodeLine{523 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{524 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__tan__op}{scalar\_tan\_op}}<Scalar> >}
+\DoxyCodeLine{525 \{}
+\DoxyCodeLine{526   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{527     Cost = 5 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}},}
+\DoxyCodeLine{528     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasTan}}}
+\DoxyCodeLine{529   \};}
+\DoxyCodeLine{530 \};}
+\DoxyCodeLine{531 }
+\DoxyCodeLine{536 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__acos__op}{scalar\_acos\_op}} \{}
+\DoxyCodeLine{537   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__acos__op}{scalar\_acos\_op}})}
+\DoxyCodeLine{538   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::acos(a); \}}
+\DoxyCodeLine{539   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{540   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} internal::pacos(a); \}}
+\DoxyCodeLine{541 \};}
+\DoxyCodeLine{542 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{543 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__acos__op}{scalar\_acos\_op}}<Scalar> >}
+\DoxyCodeLine{544 \{}
+\DoxyCodeLine{545   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{546     Cost = 5 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}},}
+\DoxyCodeLine{547     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasACos}}}
+\DoxyCodeLine{548   \};}
+\DoxyCodeLine{549 \};}
+\DoxyCodeLine{550 }
+\DoxyCodeLine{555 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__asin__op}{scalar\_asin\_op}} \{}
+\DoxyCodeLine{556   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__asin__op}{scalar\_asin\_op}})}
+\DoxyCodeLine{557   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::asin(a); \}}
+\DoxyCodeLine{558   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{559   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} internal::pasin(a); \}}
+\DoxyCodeLine{560 \};}
+\DoxyCodeLine{561 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{562 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__asin__op}{scalar\_asin\_op}}<Scalar> >}
+\DoxyCodeLine{563 \{}
+\DoxyCodeLine{564   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{565     Cost = 5 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}},}
+\DoxyCodeLine{566     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasASin}}}
+\DoxyCodeLine{567   \};}
+\DoxyCodeLine{568 \};}
+\DoxyCodeLine{569 }
+\DoxyCodeLine{570 }
+\DoxyCodeLine{575 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__atan__op}{scalar\_atan\_op}} \{}
+\DoxyCodeLine{576   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__atan__op}{scalar\_atan\_op}})}
+\DoxyCodeLine{577   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::atan(a); \}}
+\DoxyCodeLine{578   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{579   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} internal::patan(a); \}}
+\DoxyCodeLine{580 \};}
+\DoxyCodeLine{581 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{582 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__atan__op}{scalar\_atan\_op}}<Scalar> >}
+\DoxyCodeLine{583 \{}
+\DoxyCodeLine{584   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{585     Cost = 5 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}},}
+\DoxyCodeLine{586     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasATan}}}
+\DoxyCodeLine{587   \};}
+\DoxyCodeLine{588 \};}
+\DoxyCodeLine{589 }
+\DoxyCodeLine{594 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{595 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__tanh__op}{scalar\_tanh\_op}} \{}
+\DoxyCodeLine{596   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__tanh__op}{scalar\_tanh\_op}})}
+\DoxyCodeLine{597   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar operator()(\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::tanh(a); \}}
+\DoxyCodeLine{598   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{599   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& x)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} ptanh(x); \}}
+\DoxyCodeLine{600 \};}
+\DoxyCodeLine{601 }
+\DoxyCodeLine{602 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{603 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__tanh__op}{scalar\_tanh\_op}}<Scalar> > \{}
+\DoxyCodeLine{604   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{605     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasTanh}},}
+\DoxyCodeLine{606     Cost = ( (EIGEN\_FAST\_MATH \&\& \mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{is\_same<Scalar,float>::value}})}
+\DoxyCodeLine{607 \textcolor{comment}{// The following numbers are based on the AVX implementation,}}
+\DoxyCodeLine{608 \#ifdef EIGEN\_VECTORIZE\_FMA}
+\DoxyCodeLine{609                 \textcolor{comment}{// Haswell can issue 2 add/mul/madd per cycle.}}
+\DoxyCodeLine{610                 \textcolor{comment}{// 9 pmadd, 2 pmul, 1 div, 2 other}}
+\DoxyCodeLine{611                 ? (2 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::AddCost}} +}
+\DoxyCodeLine{612                    6 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}} +}
+\DoxyCodeLine{613                    \mbox{\hyperlink{structEigen_1_1internal_1_1scalar__div__cost}{scalar\_div\_cost}}<Scalar,\mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasDiv}}>::value)}
+\DoxyCodeLine{614 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{615                 ? (11 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::AddCost}} +}
+\DoxyCodeLine{616                    11 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}} +}
+\DoxyCodeLine{617                    \mbox{\hyperlink{structEigen_1_1internal_1_1scalar__div__cost}{scalar\_div\_cost<Scalar,packet\_traits<Scalar>::HasDiv}}>::value)}
+\DoxyCodeLine{618 \#endif}
+\DoxyCodeLine{619                 \textcolor{comment}{// This number assumes a naive implementation of tanh}}
+\DoxyCodeLine{620                 : (6 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::AddCost}} +}
+\DoxyCodeLine{621                    3 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}} +}
+\DoxyCodeLine{622                    2 * \mbox{\hyperlink{structEigen_1_1internal_1_1scalar__div__cost}{scalar\_div\_cost}}<Scalar,\mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasDiv}}>::value +}
+\DoxyCodeLine{623                    \mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__exp__op}{scalar\_exp\_op<Scalar>}} >::Cost))}
+\DoxyCodeLine{624   \};}
+\DoxyCodeLine{625 \};}
+\DoxyCodeLine{626 }
+\DoxyCodeLine{627 \textcolor{preprocessor}{\#if EIGEN\_HAS\_CXX11\_MATH}}
+\DoxyCodeLine{632 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{633 \textcolor{keyword}{struct }scalar\_atanh\_op \{}
+\DoxyCodeLine{634   EIGEN\_EMPTY\_STRUCT\_CTOR(scalar\_atanh\_op)}
+\DoxyCodeLine{635   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar operator()(\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::atanh(a); \}}
+\DoxyCodeLine{636 \};}
+\DoxyCodeLine{637 }
+\DoxyCodeLine{638 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{639 \textcolor{keyword}{struct }functor\_traits<scalar\_atanh\_op<Scalar> > \{}
+\DoxyCodeLine{640   \textcolor{keyword}{enum} \{ Cost = 5 * NumTraits<Scalar>::MulCost, PacketAccess = \textcolor{keyword}{false} \};}
+\DoxyCodeLine{641 \};}
+\DoxyCodeLine{642 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{643 }
+\DoxyCodeLine{648 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sinh__op}{scalar\_sinh\_op}} \{}
+\DoxyCodeLine{649   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sinh__op}{scalar\_sinh\_op}})}
+\DoxyCodeLine{650   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::sinh(a); \}}
+\DoxyCodeLine{651   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{652   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} internal::psinh(a); \}}
+\DoxyCodeLine{653 \};}
+\DoxyCodeLine{654 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{655 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sinh__op}{scalar\_sinh\_op}}<Scalar> >}
+\DoxyCodeLine{656 \{}
+\DoxyCodeLine{657   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{658     Cost = 5 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}},}
+\DoxyCodeLine{659     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasSinh}}}
+\DoxyCodeLine{660   \};}
+\DoxyCodeLine{661 \};}
+\DoxyCodeLine{662 }
+\DoxyCodeLine{663 \textcolor{preprocessor}{\#if EIGEN\_HAS\_CXX11\_MATH}}
+\DoxyCodeLine{668 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{669 \textcolor{keyword}{struct }scalar\_asinh\_op \{}
+\DoxyCodeLine{670   EIGEN\_EMPTY\_STRUCT\_CTOR(scalar\_asinh\_op)}
+\DoxyCodeLine{671   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar operator()(\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::asinh(a); \}}
+\DoxyCodeLine{672 \};}
+\DoxyCodeLine{673 }
+\DoxyCodeLine{674 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{675 \textcolor{keyword}{struct }functor\_traits<scalar\_asinh\_op<Scalar> > \{}
+\DoxyCodeLine{676   \textcolor{keyword}{enum} \{ Cost = 5 * NumTraits<Scalar>::MulCost, PacketAccess = \textcolor{keyword}{false} \};}
+\DoxyCodeLine{677 \};}
+\DoxyCodeLine{678 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{679 }
+\DoxyCodeLine{684 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__cosh__op}{scalar\_cosh\_op}} \{}
+\DoxyCodeLine{685   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__cosh__op}{scalar\_cosh\_op}})}
+\DoxyCodeLine{686   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::cosh(a); \}}
+\DoxyCodeLine{687   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{688   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} internal::pcosh(a); \}}
+\DoxyCodeLine{689 \};}
+\DoxyCodeLine{690 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{691 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__cosh__op}{scalar\_cosh\_op}}<Scalar> >}
+\DoxyCodeLine{692 \{}
+\DoxyCodeLine{693   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{694     Cost = 5 * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}},}
+\DoxyCodeLine{695     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasCosh}}}
+\DoxyCodeLine{696   \};}
+\DoxyCodeLine{697 \};}
+\DoxyCodeLine{698 }
+\DoxyCodeLine{699 \textcolor{preprocessor}{\#if EIGEN\_HAS\_CXX11\_MATH}}
+\DoxyCodeLine{704 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{705 \textcolor{keyword}{struct }scalar\_acosh\_op \{}
+\DoxyCodeLine{706   EIGEN\_EMPTY\_STRUCT\_CTOR(scalar\_acosh\_op)}
+\DoxyCodeLine{707   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar operator()(\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::acosh(a); \}}
+\DoxyCodeLine{708 \};}
+\DoxyCodeLine{709 }
+\DoxyCodeLine{710 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{711 \textcolor{keyword}{struct }functor\_traits<scalar\_acosh\_op<Scalar> > \{}
+\DoxyCodeLine{712   \textcolor{keyword}{enum} \{ Cost = 5 * NumTraits<Scalar>::MulCost, PacketAccess = \textcolor{keyword}{false} \};}
+\DoxyCodeLine{713 \};}
+\DoxyCodeLine{714 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{715 }
+\DoxyCodeLine{720 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{721 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__inverse__op}{scalar\_inverse\_op}} \{}
+\DoxyCodeLine{722   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__inverse__op}{scalar\_inverse\_op}})}
+\DoxyCodeLine{723   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} Scalar(1)/a; \}}
+\DoxyCodeLine{724   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{725   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const}}
+\DoxyCodeLine{726 \textcolor{keyword}{  }\{ \textcolor{keywordflow}{return} internal::pdiv(pset1<Packet>(Scalar(1)),a); \}}
+\DoxyCodeLine{727 \};}
+\DoxyCodeLine{728 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{729 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__inverse__op}{scalar\_inverse\_op}}<Scalar> > \{}
+\DoxyCodeLine{730   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{731     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasDiv}},}
+\DoxyCodeLine{732     Cost = \mbox{\hyperlink{structEigen_1_1internal_1_1scalar__div__cost}{scalar\_div\_cost<Scalar, PacketAccess>::value}}}
+\DoxyCodeLine{733   \};}
+\DoxyCodeLine{734 \};}
+\DoxyCodeLine{735 }
+\DoxyCodeLine{740 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{741 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__square__op}{scalar\_square\_op}} \{}
+\DoxyCodeLine{742   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__square__op}{scalar\_square\_op}})}
+\DoxyCodeLine{743   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} a*a; \}}
+\DoxyCodeLine{744   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{745   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const}}
+\DoxyCodeLine{746 \textcolor{keyword}{  }\{ \textcolor{keywordflow}{return} internal::pmul(a,a); \}}
+\DoxyCodeLine{747 \};}
+\DoxyCodeLine{748 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{749 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__square__op}{scalar\_square\_op}}<Scalar> >}
+\DoxyCodeLine{750 \{ \textcolor{keyword}{enum} \{ Cost = \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}}, PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasMul}} \}; \};}
+\DoxyCodeLine{751 }
+\DoxyCodeLine{752 \textcolor{comment}{// Boolean specialization to avoid -\/Wint-\/in-\/bool-\/context warnings on GCC.}}
+\DoxyCodeLine{753 \textcolor{keyword}{template}<>}
+\DoxyCodeLine{754 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__square__op}{scalar\_square\_op}}<bool> \{}
+\DoxyCodeLine{755   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__square__op}{scalar\_square\_op}})}
+\DoxyCodeLine{756   EIGEN\_DEPRECATED EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keywordtype}{bool} operator() (\textcolor{keyword}{const} \textcolor{keywordtype}{bool}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} a; \}}
+\DoxyCodeLine{757   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{758   EIGEN\_DEPRECATED EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const}}
+\DoxyCodeLine{759 \textcolor{keyword}{  }\{ \textcolor{keywordflow}{return} a; \}}
+\DoxyCodeLine{760 \};}
+\DoxyCodeLine{761 \textcolor{keyword}{template}<>}
+\DoxyCodeLine{762 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__square__op}{scalar\_square\_op}}<bool> >}
+\DoxyCodeLine{763 \{ \textcolor{keyword}{enum} \{ Cost = 0, PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<bool>::Vectorizable}} \}; \};}
+\DoxyCodeLine{764 }
+\DoxyCodeLine{769 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{770 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__cube__op}{scalar\_cube\_op}} \{}
+\DoxyCodeLine{771   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__cube__op}{scalar\_cube\_op}})}
+\DoxyCodeLine{772   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} a*a*a; \}}
+\DoxyCodeLine{773   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{774   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const}}
+\DoxyCodeLine{775 \textcolor{keyword}{  }\{ \textcolor{keywordflow}{return} internal::pmul(a,pmul(a,a)); \}}
+\DoxyCodeLine{776 \};}
+\DoxyCodeLine{777 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{778 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__cube__op}{scalar\_cube\_op}}<Scalar> >}
+\DoxyCodeLine{779 \{ \textcolor{keyword}{enum} \{ Cost = 2*\mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}}, PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasMul}} \}; \};}
+\DoxyCodeLine{780 }
+\DoxyCodeLine{781 \textcolor{comment}{// Boolean specialization to avoid -\/Wint-\/in-\/bool-\/context warnings on GCC.}}
+\DoxyCodeLine{782 \textcolor{keyword}{template}<>}
+\DoxyCodeLine{783 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__cube__op}{scalar\_cube\_op}}<bool> \{}
+\DoxyCodeLine{784   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__cube__op}{scalar\_cube\_op}})}
+\DoxyCodeLine{785   EIGEN\_DEPRECATED EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keywordtype}{bool} operator() (\textcolor{keyword}{const} \textcolor{keywordtype}{bool}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} a; \}}
+\DoxyCodeLine{786   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{787   EIGEN\_DEPRECATED EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const}}
+\DoxyCodeLine{788 \textcolor{keyword}{  }\{ \textcolor{keywordflow}{return} a; \}}
+\DoxyCodeLine{789 \};}
+\DoxyCodeLine{790 \textcolor{keyword}{template}<>}
+\DoxyCodeLine{791 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__cube__op}{scalar\_cube\_op}}<bool> >}
+\DoxyCodeLine{792 \{ \textcolor{keyword}{enum} \{ Cost = 0, PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<bool>::Vectorizable}} \}; \};}
+\DoxyCodeLine{793 }
+\DoxyCodeLine{798 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__round__op}{scalar\_round\_op}} \{}
+\DoxyCodeLine{799   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__round__op}{scalar\_round\_op}})}
+\DoxyCodeLine{800   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::round(a); \}}
+\DoxyCodeLine{801   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{802   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} internal::pround(a); \}}
+\DoxyCodeLine{803 \};}
+\DoxyCodeLine{804 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{805 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__round__op}{scalar\_round\_op}}<Scalar> >}
+\DoxyCodeLine{806 \{}
+\DoxyCodeLine{807   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{808     Cost = \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}},}
+\DoxyCodeLine{809     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasRound}}}
+\DoxyCodeLine{810   \};}
+\DoxyCodeLine{811 \};}
+\DoxyCodeLine{812 }
+\DoxyCodeLine{817 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__floor__op}{scalar\_floor\_op}} \{}
+\DoxyCodeLine{818   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__floor__op}{scalar\_floor\_op}})}
+\DoxyCodeLine{819   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::floor(a); \}}
+\DoxyCodeLine{820   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{821   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} internal::pfloor(a); \}}
+\DoxyCodeLine{822 \};}
+\DoxyCodeLine{823 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{824 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__floor__op}{scalar\_floor\_op}}<Scalar> >}
+\DoxyCodeLine{825 \{}
+\DoxyCodeLine{826   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{827     Cost = \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}},}
+\DoxyCodeLine{828     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasFloor}}}
+\DoxyCodeLine{829   \};}
+\DoxyCodeLine{830 \};}
+\DoxyCodeLine{831 }
+\DoxyCodeLine{836 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__rint__op}{scalar\_rint\_op}} \{}
+\DoxyCodeLine{837   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__rint__op}{scalar\_rint\_op}})}
+\DoxyCodeLine{838   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::rint(a); \}}
+\DoxyCodeLine{839   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{840   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} internal::print(a); \}}
+\DoxyCodeLine{841 \};}
+\DoxyCodeLine{842 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{843 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__rint__op}{scalar\_rint\_op}}<Scalar> >}
+\DoxyCodeLine{844 \{}
+\DoxyCodeLine{845   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{846     Cost = \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}},}
+\DoxyCodeLine{847     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasRint}}}
+\DoxyCodeLine{848   \};}
+\DoxyCodeLine{849 \};}
+\DoxyCodeLine{850 }
+\DoxyCodeLine{855 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__ceil__op}{scalar\_ceil\_op}} \{}
+\DoxyCodeLine{856   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__ceil__op}{scalar\_ceil\_op}})}
+\DoxyCodeLine{857   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::ceil(a); \}}
+\DoxyCodeLine{858   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{859   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} internal::pceil(a); \}}
+\DoxyCodeLine{860 \};}
+\DoxyCodeLine{861 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{862 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__ceil__op}{scalar\_ceil\_op}}<Scalar> >}
+\DoxyCodeLine{863 \{}
+\DoxyCodeLine{864   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{865     Cost = \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}},}
+\DoxyCodeLine{866     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasCeil}}}
+\DoxyCodeLine{867   \};}
+\DoxyCodeLine{868 \};}
+\DoxyCodeLine{869 }
+\DoxyCodeLine{874 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__isnan__op}{scalar\_isnan\_op}} \{}
+\DoxyCodeLine{875   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__isnan__op}{scalar\_isnan\_op}})}
+\DoxyCodeLine{876   \textcolor{keyword}{typedef} \textcolor{keywordtype}{bool} result\_type;}
+\DoxyCodeLine{877   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE result\_type operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{878 \textcolor{preprocessor}{\#if defined(SYCL\_DEVICE\_ONLY)}}
+\DoxyCodeLine{879     \textcolor{keywordflow}{return} numext::isnan(a);}
+\DoxyCodeLine{880 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{881     \textcolor{keywordflow}{return} (numext::isnan)(a);}
+\DoxyCodeLine{882 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{883   \}}
+\DoxyCodeLine{884 \};}
+\DoxyCodeLine{885 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{886 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__isnan__op}{scalar\_isnan\_op}}<Scalar> >}
+\DoxyCodeLine{887 \{}
+\DoxyCodeLine{888   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{889     Cost = \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}},}
+\DoxyCodeLine{890     PacketAccess = \textcolor{keyword}{false}}
+\DoxyCodeLine{891   \};}
+\DoxyCodeLine{892 \};}
+\DoxyCodeLine{893 }
+\DoxyCodeLine{898 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__isinf__op}{scalar\_isinf\_op}} \{}
+\DoxyCodeLine{899   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__isinf__op}{scalar\_isinf\_op}})}
+\DoxyCodeLine{900   \textcolor{keyword}{typedef} \textcolor{keywordtype}{bool} result\_type;}
+\DoxyCodeLine{901   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE result\_type operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{902 \textcolor{preprocessor}{\#if defined(SYCL\_DEVICE\_ONLY)}}
+\DoxyCodeLine{903     \textcolor{keywordflow}{return} numext::isinf(a);}
+\DoxyCodeLine{904 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{905     \textcolor{keywordflow}{return} (numext::isinf)(a);}
+\DoxyCodeLine{906 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{907   \}}
+\DoxyCodeLine{908 \};}
+\DoxyCodeLine{909 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{910 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__isinf__op}{scalar\_isinf\_op}}<Scalar> >}
+\DoxyCodeLine{911 \{}
+\DoxyCodeLine{912   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{913     Cost = \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}},}
+\DoxyCodeLine{914     PacketAccess = \textcolor{keyword}{false}}
+\DoxyCodeLine{915   \};}
+\DoxyCodeLine{916 \};}
+\DoxyCodeLine{917 }
+\DoxyCodeLine{922 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__isfinite__op}{scalar\_isfinite\_op}} \{}
+\DoxyCodeLine{923   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__isfinite__op}{scalar\_isfinite\_op}})}
+\DoxyCodeLine{924   \textcolor{keyword}{typedef} \textcolor{keywordtype}{bool} result\_type;}
+\DoxyCodeLine{925   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE result\_type operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{926 \textcolor{preprocessor}{\#if defined(SYCL\_DEVICE\_ONLY)}}
+\DoxyCodeLine{927     \textcolor{keywordflow}{return} numext::isfinite(a);}
+\DoxyCodeLine{928 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{929     \textcolor{keywordflow}{return} (numext::isfinite)(a);}
+\DoxyCodeLine{930 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{931   \}}
+\DoxyCodeLine{932 \};}
+\DoxyCodeLine{933 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{934 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__isfinite__op}{scalar\_isfinite\_op}}<Scalar> >}
+\DoxyCodeLine{935 \{}
+\DoxyCodeLine{936   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{937     Cost = \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}},}
+\DoxyCodeLine{938     PacketAccess = \textcolor{keyword}{false}}
+\DoxyCodeLine{939   \};}
+\DoxyCodeLine{940 \};}
+\DoxyCodeLine{941 }
+\DoxyCodeLine{947 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__boolean__not__op}{scalar\_boolean\_not\_op}} \{}
+\DoxyCodeLine{948   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__boolean__not__op}{scalar\_boolean\_not\_op}})}
+\DoxyCodeLine{949   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{bool} operator() (\textcolor{keyword}{const} \textcolor{keywordtype}{bool}\& a)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} !a; \}}
+\DoxyCodeLine{950 \};}
+\DoxyCodeLine{951 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{952 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__boolean__not__op}{scalar\_boolean\_not\_op}}<Scalar> > \{}
+\DoxyCodeLine{953   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{954     Cost = \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<bool>::AddCost}},}
+\DoxyCodeLine{955     PacketAccess = \textcolor{keyword}{false}}
+\DoxyCodeLine{956   \};}
+\DoxyCodeLine{957 \};}
+\DoxyCodeLine{958 }
+\DoxyCodeLine{963 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar,\textcolor{keywordtype}{bool} is\_complex=(NumTraits<Scalar>::IsComplex!=0), \textcolor{keywordtype}{bool} is\_\textcolor{keywordtype}{int}eger=(NumTraits<Scalar>::IsInteger!=0) > \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sign__op}{scalar\_sign\_op}};}
+\DoxyCodeLine{964 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{965 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sign__op}{scalar\_sign\_op}}<Scalar, false, true> \{}
+\DoxyCodeLine{966   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sign__op}{scalar\_sign\_op}})}
+\DoxyCodeLine{967   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const}}
+\DoxyCodeLine{968 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{969       \textcolor{keywordflow}{return} Scalar( (a>Scalar(0)) -\/ (a<Scalar(0)) );}
+\DoxyCodeLine{970   \}}
+\DoxyCodeLine{971   \textcolor{comment}{//TODO}}
+\DoxyCodeLine{972   \textcolor{comment}{//template <typename Packet>}}
+\DoxyCodeLine{973   \textcolor{comment}{//EIGEN\_DEVICE\_FUNC inline Packet packetOp(const Packet\& a) const \{ return internal::psign(a); \}}}
+\DoxyCodeLine{974 \};}
+\DoxyCodeLine{975 }
+\DoxyCodeLine{976 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{977 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sign__op}{scalar\_sign\_op}}<Scalar, false, false> \{}
+\DoxyCodeLine{978   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sign__op}{scalar\_sign\_op}})}
+\DoxyCodeLine{979   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const}}
+\DoxyCodeLine{980 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{981     \textcolor{keywordflow}{return} (numext::isnan)(a) ? a : Scalar( (a>Scalar(0)) -\/ (a<Scalar(0)) );}
+\DoxyCodeLine{982   \}}
+\DoxyCodeLine{983   \textcolor{comment}{//TODO}}
+\DoxyCodeLine{984   \textcolor{comment}{//template <typename Packet>}}
+\DoxyCodeLine{985   \textcolor{comment}{//EIGEN\_DEVICE\_FUNC inline Packet packetOp(const Packet\& a) const \{ return internal::psign(a); \}}}
+\DoxyCodeLine{986 \};}
+\DoxyCodeLine{987 }
+\DoxyCodeLine{988 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keywordtype}{bool} is\_\textcolor{keywordtype}{int}eger>}
+\DoxyCodeLine{989 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sign__op}{scalar\_sign\_op}}<Scalar,true, is\_integer> \{}
+\DoxyCodeLine{990   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sign__op}{scalar\_sign\_op}})}
+\DoxyCodeLine{991   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keyword}{const} Scalar operator() (\textcolor{keyword}{const} Scalar\& a)\textcolor{keyword}{ const}}
+\DoxyCodeLine{992 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{993     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}} real\_type;}
+\DoxyCodeLine{994     real\_type aa = numext::abs(a);}
+\DoxyCodeLine{995     \textcolor{keywordflow}{if} (aa==real\_type(0))}
+\DoxyCodeLine{996       \textcolor{keywordflow}{return} Scalar(0);}
+\DoxyCodeLine{997     aa = real\_type(1)/aa;}
+\DoxyCodeLine{998     \textcolor{keywordflow}{return} Scalar(a.real()*aa, a.imag()*aa );}
+\DoxyCodeLine{999   \}}
+\DoxyCodeLine{1000   \textcolor{comment}{//TODO}}
+\DoxyCodeLine{1001   \textcolor{comment}{//template <typename Packet>}}
+\DoxyCodeLine{1002   \textcolor{comment}{//EIGEN\_DEVICE\_FUNC inline Packet packetOp(const Packet\& a) const \{ return internal::psign(a); \}}}
+\DoxyCodeLine{1003 \};}
+\DoxyCodeLine{1004 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{1005 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sign__op}{scalar\_sign\_op}}<Scalar> >}
+\DoxyCodeLine{1006 \{ \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{1007     Cost =}
+\DoxyCodeLine{1008         \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::IsComplex}}}
+\DoxyCodeLine{1009         ? ( 8*\mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}}  ) \textcolor{comment}{// roughly}}
+\DoxyCodeLine{1010         : ( 3*\mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::AddCost}}),}
+\DoxyCodeLine{1011     PacketAccess = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::HasSign}}}
+\DoxyCodeLine{1012   \};}
+\DoxyCodeLine{1013 \};}
+\DoxyCodeLine{1014 }
+\DoxyCodeLine{1019 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{1020 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__logistic__op}{scalar\_logistic\_op}} \{}
+\DoxyCodeLine{1021   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__logistic__op}{scalar\_logistic\_op}})}
+\DoxyCodeLine{1022   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE T operator()(\textcolor{keyword}{const} T\& x)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{1023     \textcolor{keywordflow}{return} packetOp(x);}
+\DoxyCodeLine{1024   \}}
+\DoxyCodeLine{1025 }
+\DoxyCodeLine{1026   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet> EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1027   \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& x)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{1028     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} one = pset1<Packet>(T(1));}
+\DoxyCodeLine{1029     \textcolor{keywordflow}{return} pdiv(one, padd(one, pexp(pnegate(x))));}
+\DoxyCodeLine{1030   \}}
+\DoxyCodeLine{1031 \};}
+\DoxyCodeLine{1032 }
+\DoxyCodeLine{1033 \textcolor{preprocessor}{\#ifndef EIGEN\_GPU\_COMPILE\_PHASE}}
+\DoxyCodeLine{1045 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{1046 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__logistic__op}{scalar\_logistic\_op}}<float> \{}
+\DoxyCodeLine{1047   EIGEN\_EMPTY\_STRUCT\_CTOR(\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__logistic__op}{scalar\_logistic\_op}})}
+\DoxyCodeLine{1048   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{float} operator()(\textcolor{keyword}{const} \textcolor{keywordtype}{float}\& x)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{1049     \textcolor{keywordflow}{return} packetOp(x);}
+\DoxyCodeLine{1050   \}}
+\DoxyCodeLine{1051 }
+\DoxyCodeLine{1052   \textcolor{keyword}{template} <\textcolor{keyword}{typename} Packet> EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{1053   \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} packetOp(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& \_x)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{1054     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} cutoff\_lower = pset1<Packet>(-\/9.f);}
+\DoxyCodeLine{1055     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} lt\_mask = pcmp\_lt<Packet>(\_x, cutoff\_lower);}
+\DoxyCodeLine{1056     \textcolor{keyword}{const} \textcolor{keywordtype}{bool} any\_small = predux\_any(lt\_mask);}
+\DoxyCodeLine{1057 }
+\DoxyCodeLine{1058     \textcolor{comment}{// The upper cut-\/off is the smallest x for which the rational approximation evaluates to 1.}}
+\DoxyCodeLine{1059     \textcolor{comment}{// Choosing this value saves us a few instructions clamping the results at the end.}}
+\DoxyCodeLine{1060 \textcolor{preprocessor}{\#ifdef EIGEN\_VECTORIZE\_FMA}}
+\DoxyCodeLine{1061     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} cutoff\_upper = pset1<Packet>(15.7243833541870117f);}
+\DoxyCodeLine{1062 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{1063     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} cutoff\_upper = pset1<Packet>(15.6437711715698242f);}
+\DoxyCodeLine{1064 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{1065     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} x = pmin(\_x, cutoff\_upper);}
+\DoxyCodeLine{1066 }
+\DoxyCodeLine{1067     \textcolor{comment}{// The monomial coefficients of the numerator polynomial (odd).}}
+\DoxyCodeLine{1068     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} alpha\_1 = pset1<Packet>(2.48287947061529e-\/01f);}
+\DoxyCodeLine{1069     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} alpha\_3 = pset1<Packet>(8.51377133304701e-\/03f);}
+\DoxyCodeLine{1070     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} alpha\_5 = pset1<Packet>(6.08574864600143e-\/05f);}
+\DoxyCodeLine{1071     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} alpha\_7 = pset1<Packet>(1.15627324459942e-\/07f);}
+\DoxyCodeLine{1072     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} alpha\_9 = pset1<Packet>(4.37031012579801e-\/11f);}
+\DoxyCodeLine{1073 }
+\DoxyCodeLine{1074     \textcolor{comment}{// The monomial coefficients of the denominator polynomial (even).}}
+\DoxyCodeLine{1075     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} beta\_0 = pset1<Packet>(9.93151921023180e-\/01f);}
+\DoxyCodeLine{1076     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} beta\_2 = pset1<Packet>(1.16817656904453e-\/01f);}
+\DoxyCodeLine{1077     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} beta\_4 = pset1<Packet>(1.70198817374094e-\/03f);}
+\DoxyCodeLine{1078     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} beta\_6 = pset1<Packet>(6.29106785017040e-\/06f);}
+\DoxyCodeLine{1079     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} beta\_8 = pset1<Packet>(5.76102136993427e-\/09f);}
+\DoxyCodeLine{1080     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} beta\_10 = pset1<Packet>(6.10247389755681e-\/13f);}
+\DoxyCodeLine{1081 }
+\DoxyCodeLine{1082     \textcolor{comment}{// Since the polynomials are odd/even, we need x\string^2.}}
+\DoxyCodeLine{1083     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} x2 = pmul(x, x);}
+\DoxyCodeLine{1084 }
+\DoxyCodeLine{1085     \textcolor{comment}{// Evaluate the numerator polynomial p.}}
+\DoxyCodeLine{1086     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} p = pmadd(x2, alpha\_9, alpha\_7);}
+\DoxyCodeLine{1087     p = pmadd(x2, p, alpha\_5);}
+\DoxyCodeLine{1088     p = pmadd(x2, p, alpha\_3);}
+\DoxyCodeLine{1089     p = pmadd(x2, p, alpha\_1);}
+\DoxyCodeLine{1090     p = pmul(x, p);}
+\DoxyCodeLine{1091 }
+\DoxyCodeLine{1092     \textcolor{comment}{// Evaluate the denominator polynomial q.}}
+\DoxyCodeLine{1093     \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} q = pmadd(x2, beta\_10, beta\_8);}
+\DoxyCodeLine{1094     q = pmadd(x2, q, beta\_6);}
+\DoxyCodeLine{1095     q = pmadd(x2, q, beta\_4);}
+\DoxyCodeLine{1096     q = pmadd(x2, q, beta\_2);}
+\DoxyCodeLine{1097     q = pmadd(x2, q, beta\_0);}
+\DoxyCodeLine{1098     \textcolor{comment}{// Divide the numerator by the denominator and shift it up.}}
+\DoxyCodeLine{1099     \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} logistic = padd(pdiv(p, q), pset1<Packet>(0.5f));}
+\DoxyCodeLine{1100     \textcolor{keywordflow}{if} (EIGEN\_PREDICT\_FALSE(any\_small)) \{}
+\DoxyCodeLine{1101       \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} exponential = pexp(\_x);}
+\DoxyCodeLine{1102       \textcolor{keywordflow}{return} pselect(lt\_mask, exponential, logistic);}
+\DoxyCodeLine{1103     \} \textcolor{keywordflow}{else} \{}
+\DoxyCodeLine{1104       \textcolor{keywordflow}{return} logistic;}
+\DoxyCodeLine{1105     \}}
+\DoxyCodeLine{1106   \}}
+\DoxyCodeLine{1107 \};}
+\DoxyCodeLine{1108 \textcolor{preprocessor}{\#endif  }\textcolor{comment}{// \#ifndef EIGEN\_GPU\_COMPILE\_PHASE}}
+\DoxyCodeLine{1109 }
+\DoxyCodeLine{1110 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{1111 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__logistic__op}{scalar\_logistic\_op}}<T> > \{}
+\DoxyCodeLine{1112   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{1113     \textcolor{comment}{// The cost estimate for float here here is for the common(?) case where}}
+\DoxyCodeLine{1114     \textcolor{comment}{// all arguments are greater than -\/9.}}
+\DoxyCodeLine{1115     Cost = \mbox{\hyperlink{structEigen_1_1internal_1_1scalar__div__cost}{scalar\_div\_cost<T, packet\_traits<T>::HasDiv}}>::value +}
+\DoxyCodeLine{1116            (\mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{internal::is\_same<T, float>::value}}}
+\DoxyCodeLine{1117                 ? \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<T>::AddCost}} * 15 + \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<T>::MulCost}} * 11}
+\DoxyCodeLine{1118                 : \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<T>::AddCost}} * 2 +}
+\DoxyCodeLine{1119                       \mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<scalar\_exp\_op<T>}} >::Cost),}
+\DoxyCodeLine{1120     PacketAccess =}
+\DoxyCodeLine{1121         \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<T>::HasAdd}} \&\& \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<T>::HasDiv}} \&\&}
+\DoxyCodeLine{1122         (\mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{internal::is\_same<T, float>::value}}}
+\DoxyCodeLine{1123              ? \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<T>::HasMul}} \&\& \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<T>::HasMax}} \&\&}
+\DoxyCodeLine{1124                    \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<T>::HasMin}}}
+\DoxyCodeLine{1125              : \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<T>::HasNegate}} \&\& \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<T>::HasExp}})}
+\DoxyCodeLine{1126   \};}
+\DoxyCodeLine{1127 \};}
+\DoxyCodeLine{1128 }
+\DoxyCodeLine{1129 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{1130 }
+\DoxyCodeLine{1131 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{1132 }
+\DoxyCodeLine{1133 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_FUNCTORS\_H}}
+
+\end{DoxyCode}

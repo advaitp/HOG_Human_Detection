@@ -1,0 +1,125 @@
+\hypertarget{ConjHelper_8h_source}{}\doxysection{Conj\+Helper.\+h}
+\label{ConjHelper_8h_source}\index{include/Eigen/src/Core/arch/Default/ConjHelper.h@{include/Eigen/src/Core/arch/Default/ConjHelper.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 }
+\DoxyCodeLine{2 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{3 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{4 \textcolor{comment}{//}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2017 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_ARCH\_CONJ\_HELPER\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_ARCH\_CONJ\_HELPER\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#define EIGEN\_MAKE\_CONJ\_HELPER\_CPLX\_REAL(PACKET\_CPLX, PACKET\_REAL)      \(\backslash\)}}
+\DoxyCodeLine{15 \textcolor{preprocessor}{  template <>                                                           \(\backslash\)}}
+\DoxyCodeLine{16 \textcolor{preprocessor}{  struct conj\_helper<PACKET\_REAL, PACKET\_CPLX, false, false> \{          \(\backslash\)}}
+\DoxyCodeLine{17 \textcolor{preprocessor}{    EIGEN\_STRONG\_INLINE PACKET\_CPLX pmadd(const PACKET\_REAL\& x,         \(\backslash\)}}
+\DoxyCodeLine{18 \textcolor{preprocessor}{                                          const PACKET\_CPLX\& y,         \(\backslash\)}}
+\DoxyCodeLine{19 \textcolor{preprocessor}{                                          const PACKET\_CPLX\& c) const \{ \(\backslash\)}}
+\DoxyCodeLine{20 \textcolor{preprocessor}{      return padd(c, this-\/>pmul(x, y));                                 \(\backslash\)}}
+\DoxyCodeLine{21 \textcolor{preprocessor}{    \}                                                                   \(\backslash\)}}
+\DoxyCodeLine{22 \textcolor{preprocessor}{    EIGEN\_STRONG\_INLINE PACKET\_CPLX pmul(const PACKET\_REAL\& x,          \(\backslash\)}}
+\DoxyCodeLine{23 \textcolor{preprocessor}{                                         const PACKET\_CPLX\& y) const \{  \(\backslash\)}}
+\DoxyCodeLine{24 \textcolor{preprocessor}{      return PACKET\_CPLX(Eigen::internal::pmul<PACKET\_REAL>(x, y.v));   \(\backslash\)}}
+\DoxyCodeLine{25 \textcolor{preprocessor}{    \}                                                                   \(\backslash\)}}
+\DoxyCodeLine{26 \textcolor{preprocessor}{  \};                                                                    \(\backslash\)}}
+\DoxyCodeLine{27 \textcolor{preprocessor}{                                                                        \(\backslash\)}}
+\DoxyCodeLine{28 \textcolor{preprocessor}{  template <>                                                           \(\backslash\)}}
+\DoxyCodeLine{29 \textcolor{preprocessor}{  struct conj\_helper<PACKET\_CPLX, PACKET\_REAL, false, false> \{          \(\backslash\)}}
+\DoxyCodeLine{30 \textcolor{preprocessor}{    EIGEN\_STRONG\_INLINE PACKET\_CPLX pmadd(const PACKET\_CPLX\& x,         \(\backslash\)}}
+\DoxyCodeLine{31 \textcolor{preprocessor}{                                          const PACKET\_REAL\& y,         \(\backslash\)}}
+\DoxyCodeLine{32 \textcolor{preprocessor}{                                          const PACKET\_CPLX\& c) const \{ \(\backslash\)}}
+\DoxyCodeLine{33 \textcolor{preprocessor}{      return padd(c, this-\/>pmul(x, y));                                 \(\backslash\)}}
+\DoxyCodeLine{34 \textcolor{preprocessor}{    \}                                                                   \(\backslash\)}}
+\DoxyCodeLine{35 \textcolor{preprocessor}{    EIGEN\_STRONG\_INLINE PACKET\_CPLX pmul(const PACKET\_CPLX\& x,          \(\backslash\)}}
+\DoxyCodeLine{36 \textcolor{preprocessor}{                                         const PACKET\_REAL\& y) const \{  \(\backslash\)}}
+\DoxyCodeLine{37 \textcolor{preprocessor}{      return PACKET\_CPLX(Eigen::internal::pmul<PACKET\_REAL>(x.v, y));   \(\backslash\)}}
+\DoxyCodeLine{38 \textcolor{preprocessor}{    \}                                                                   \(\backslash\)}}
+\DoxyCodeLine{39 \textcolor{preprocessor}{  \};}}
+\DoxyCodeLine{40 }
+\DoxyCodeLine{41 \textcolor{preprocessor}{\#include "{}../../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{42 }
+\DoxyCodeLine{43 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{44 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{45 }
+\DoxyCodeLine{46 \textcolor{keyword}{template}<\textcolor{keywordtype}{bool} Conjugate> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1conj__if}{conj\_if}};}
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1conj__if}{conj\_if}}<true> \{}
+\DoxyCodeLine{49   \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{50   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE T operator()(\textcolor{keyword}{const} T\& x)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} numext::conj(x); \}}
+\DoxyCodeLine{51   \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{52   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE T pconj(\textcolor{keyword}{const} T\& x)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} internal::pconj(x); \}}
+\DoxyCodeLine{53 \};}
+\DoxyCodeLine{54 }
+\DoxyCodeLine{55 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1conj__if}{conj\_if}}<false> \{}
+\DoxyCodeLine{56   \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{57   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} T\& operator()(\textcolor{keyword}{const} T\& x)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} x; \}}
+\DoxyCodeLine{58   \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{59   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} T\& pconj(\textcolor{keyword}{const} T\& x)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} x; \}}
+\DoxyCodeLine{60 \};}
+\DoxyCodeLine{61 }
+\DoxyCodeLine{62 \textcolor{comment}{// Generic Implementation, assume scalars since the packet-\/version is}}
+\DoxyCodeLine{63 \textcolor{comment}{// specialized below.}}
+\DoxyCodeLine{64 \textcolor{keyword}{template}<\textcolor{keyword}{typename} LhsType, \textcolor{keyword}{typename} RhsType, \textcolor{keywordtype}{bool} ConjLhs, \textcolor{keywordtype}{bool} ConjRhs>}
+\DoxyCodeLine{65 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1conj__helper}{conj\_helper}} \{}
+\DoxyCodeLine{66   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1ScalarBinaryOpTraits}{ScalarBinaryOpTraits<LhsType, RhsType>::ReturnType}} ResultType;}
+\DoxyCodeLine{67 }
+\DoxyCodeLine{68   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE ResultType}
+\DoxyCodeLine{69   pmadd(\textcolor{keyword}{const} LhsType\& x, \textcolor{keyword}{const} RhsType\& y, \textcolor{keyword}{const} ResultType\& c)\textcolor{keyword}{ const}}
+\DoxyCodeLine{70 \textcolor{keyword}{  }\{ \textcolor{keywordflow}{return} this-\/>pmul(x, y) + c; \}}
+\DoxyCodeLine{71 }
+\DoxyCodeLine{72   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE ResultType}
+\DoxyCodeLine{73   pmul(\textcolor{keyword}{const} LhsType\& x, \textcolor{keyword}{const} RhsType\& y)\textcolor{keyword}{ const}}
+\DoxyCodeLine{74 \textcolor{keyword}{  }\{ \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1conj__if}{conj\_if<ConjLhs>}}()(x) * \mbox{\hyperlink{structEigen_1_1internal_1_1conj__if}{conj\_if<ConjRhs>}}()(y); \}}
+\DoxyCodeLine{75 \};}
+\DoxyCodeLine{76 }
+\DoxyCodeLine{77 \textcolor{keyword}{template}<\textcolor{keyword}{typename} LhsScalar, \textcolor{keyword}{typename} RhsScalar>}
+\DoxyCodeLine{78 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1conj__helper}{conj\_helper}}<LhsScalar, RhsScalar, true, true> \{}
+\DoxyCodeLine{79   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1ScalarBinaryOpTraits}{ScalarBinaryOpTraits<LhsScalar,RhsScalar>::ReturnType}} ResultType;}
+\DoxyCodeLine{80 }
+\DoxyCodeLine{81   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE ResultType}
+\DoxyCodeLine{82   pmadd(\textcolor{keyword}{const} LhsScalar\& x, \textcolor{keyword}{const} RhsScalar\& y, \textcolor{keyword}{const} ResultType\& c)\textcolor{keyword}{ const}}
+\DoxyCodeLine{83 \textcolor{keyword}{  }\{ \textcolor{keywordflow}{return} this-\/>pmul(x, y) + c; \}}
+\DoxyCodeLine{84 }
+\DoxyCodeLine{85   \textcolor{comment}{// We save a conjuation by using the identity conj(a)*conj(b) = conj(a*b).}}
+\DoxyCodeLine{86   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE ResultType}
+\DoxyCodeLine{87   pmul(\textcolor{keyword}{const} LhsScalar\& x, \textcolor{keyword}{const} RhsScalar\& y)\textcolor{keyword}{ const}}
+\DoxyCodeLine{88 \textcolor{keyword}{  }\{ \textcolor{keywordflow}{return} numext::conj(x * y); \}}
+\DoxyCodeLine{89 \};}
+\DoxyCodeLine{90 }
+\DoxyCodeLine{91 \textcolor{comment}{// Implementation with equal type, use packet operations.}}
+\DoxyCodeLine{92 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet, \textcolor{keywordtype}{bool} ConjLhs, \textcolor{keywordtype}{bool} ConjRhs>}
+\DoxyCodeLine{93 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1conj__helper}{conj\_helper}}<\mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}, ConjLhs, ConjRhs>}
+\DoxyCodeLine{94 \{}
+\DoxyCodeLine{95   \textcolor{keyword}{typedef} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{ResultType}};}
+\DoxyCodeLine{96   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} pmadd(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& x, \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& y, \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& c)\textcolor{keyword}{ const}}
+\DoxyCodeLine{97 \textcolor{keyword}{  }\{ \textcolor{keywordflow}{return} Eigen::internal::pmadd(\mbox{\hyperlink{structEigen_1_1internal_1_1conj__if}{conj\_if<ConjLhs>}}().pconj(x), \mbox{\hyperlink{structEigen_1_1internal_1_1conj__if}{conj\_if<ConjRhs>}}().pconj(y), c); \}}
+\DoxyCodeLine{98 }
+\DoxyCodeLine{99 }
+\DoxyCodeLine{100   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} pmul(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& x, \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& y)\textcolor{keyword}{ const}}
+\DoxyCodeLine{101 \textcolor{keyword}{  }\{ \textcolor{keywordflow}{return} Eigen::internal::pmul(\mbox{\hyperlink{structEigen_1_1internal_1_1conj__if}{conj\_if<ConjLhs>}}().pconj(x), \mbox{\hyperlink{structEigen_1_1internal_1_1conj__if}{conj\_if<ConjRhs>}}().pconj(y)); \}}
+\DoxyCodeLine{102 \};}
+\DoxyCodeLine{103 }
+\DoxyCodeLine{104 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Packet>}
+\DoxyCodeLine{105 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1conj__helper}{conj\_helper}}<\mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}, true, true>}
+\DoxyCodeLine{106 \{}
+\DoxyCodeLine{107   \textcolor{keyword}{typedef} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{ResultType}};}
+\DoxyCodeLine{108 }
+\DoxyCodeLine{109   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} pmadd(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& x, \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& y, \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& c)\textcolor{keyword}{ const}}
+\DoxyCodeLine{110 \textcolor{keyword}{  }\{ \textcolor{keywordflow}{return} Eigen::internal::pmadd(pconj(x), pconj(y), c); \}}
+\DoxyCodeLine{111   \textcolor{comment}{// We save a conjuation by using the identity conj(a)*conj(b) = conj(a*b).}}
+\DoxyCodeLine{112   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} pmul(\textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& x, \textcolor{keyword}{const} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& y)\textcolor{keyword}{ const}}
+\DoxyCodeLine{113 \textcolor{keyword}{  }\{ \textcolor{keywordflow}{return} pconj(Eigen::internal::pmul(x, y)); \}}
+\DoxyCodeLine{114 \};}
+\DoxyCodeLine{115 }
+\DoxyCodeLine{116 \}  \textcolor{comment}{// namespace internal}}
+\DoxyCodeLine{117 \}  \textcolor{comment}{// namespace Eigen}}
+\DoxyCodeLine{118 }
+\DoxyCodeLine{119 \textcolor{preprocessor}{\#endif  }\textcolor{comment}{// EIGEN\_ARCH\_CONJ\_HELPER\_H}}
+
+\end{DoxyCode}

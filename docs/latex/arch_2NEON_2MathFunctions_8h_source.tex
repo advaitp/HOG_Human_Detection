@@ -1,0 +1,83 @@
+\hypertarget{arch_2NEON_2MathFunctions_8h_source}{}\doxysection{Math\+Functions.\+h}
+\label{arch_2NEON_2MathFunctions_8h_source}\index{include/Eigen/src/Core/arch/NEON/MathFunctions.h@{include/Eigen/src/Core/arch/NEON/MathFunctions.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{5 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{6 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{7 }
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#ifndef EIGEN\_MATH\_FUNCTIONS\_NEON\_H}}
+\DoxyCodeLine{9 \textcolor{preprocessor}{\#define EIGEN\_MATH\_FUNCTIONS\_NEON\_H}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#include "{}../../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{template}<> EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet2f pexp<Packet2f>(\textcolor{keyword}{const} Packet2f\& x)}
+\DoxyCodeLine{18 \{ \textcolor{keywordflow}{return} pexp\_float(x); \}}
+\DoxyCodeLine{19 \textcolor{keyword}{template}<> EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet4f pexp<Packet4f>(\textcolor{keyword}{const} Packet4f\& x)}
+\DoxyCodeLine{20 \{ \textcolor{keywordflow}{return} pexp\_float(x); \}}
+\DoxyCodeLine{21 }
+\DoxyCodeLine{22 \textcolor{keyword}{template}<> EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet2f plog<Packet2f>(\textcolor{keyword}{const} Packet2f\& x)}
+\DoxyCodeLine{23 \{ \textcolor{keywordflow}{return} plog\_float(x); \}}
+\DoxyCodeLine{24 \textcolor{keyword}{template}<> EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet4f plog<Packet4f>(\textcolor{keyword}{const} Packet4f\& x)}
+\DoxyCodeLine{25 \{ \textcolor{keywordflow}{return} plog\_float(x); \}}
+\DoxyCodeLine{26 }
+\DoxyCodeLine{27 \textcolor{keyword}{template}<> EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet2f psin<Packet2f>(\textcolor{keyword}{const} Packet2f\& x)}
+\DoxyCodeLine{28 \{ \textcolor{keywordflow}{return} psin\_float(x); \}}
+\DoxyCodeLine{29 \textcolor{keyword}{template}<> EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet4f psin<Packet4f>(\textcolor{keyword}{const} Packet4f\& x)}
+\DoxyCodeLine{30 \{ \textcolor{keywordflow}{return} psin\_float(x); \}}
+\DoxyCodeLine{31 }
+\DoxyCodeLine{32 \textcolor{keyword}{template}<> EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet2f pcos<Packet2f>(\textcolor{keyword}{const} Packet2f\& x)}
+\DoxyCodeLine{33 \{ \textcolor{keywordflow}{return} pcos\_float(x); \}}
+\DoxyCodeLine{34 \textcolor{keyword}{template}<> EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet4f pcos<Packet4f>(\textcolor{keyword}{const} Packet4f\& x)}
+\DoxyCodeLine{35 \{ \textcolor{keywordflow}{return} pcos\_float(x); \}}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{37 \textcolor{comment}{// Hyperbolic Tangent function.}}
+\DoxyCodeLine{38 \textcolor{keyword}{template}<> EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet2f ptanh<Packet2f>(\textcolor{keyword}{const} Packet2f\& x)}
+\DoxyCodeLine{39 \{ \textcolor{keywordflow}{return} internal::generic\_fast\_tanh\_float(x); \}}
+\DoxyCodeLine{40 \textcolor{keyword}{template}<> EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet4f ptanh<Packet4f>(\textcolor{keyword}{const} Packet4f\& x)}
+\DoxyCodeLine{41 \{ \textcolor{keywordflow}{return} internal::generic\_fast\_tanh\_float(x); \}}
+\DoxyCodeLine{42 }
+\DoxyCodeLine{43 BF16\_PACKET\_FUNCTION(Packet4f, Packet4bf, psin)}
+\DoxyCodeLine{44 BF16\_PACKET\_FUNCTION(Packet4f, Packet4bf, pcos)}
+\DoxyCodeLine{45 BF16\_PACKET\_FUNCTION(Packet4f, Packet4bf, plog)}
+\DoxyCodeLine{46 BF16\_PACKET\_FUNCTION(Packet4f, Packet4bf, pexp)}
+\DoxyCodeLine{47 BF16\_PACKET\_FUNCTION(Packet4f, Packet4bf, ptanh)}
+\DoxyCodeLine{48 }
+\DoxyCodeLine{49 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{50 EIGEN\_STRONG\_INLINE Packet4bf pfrexp(\textcolor{keyword}{const} Packet4bf\& a, Packet4bf\& exponent) \{}
+\DoxyCodeLine{51   Packet4f fexponent;}
+\DoxyCodeLine{52   \textcolor{keyword}{const} Packet4bf out = F32ToBf16(pfrexp<Packet4f>(Bf16ToF32(a), fexponent));}
+\DoxyCodeLine{53   exponent = F32ToBf16(fexponent);}
+\DoxyCodeLine{54   \textcolor{keywordflow}{return} out;}
+\DoxyCodeLine{55 \}}
+\DoxyCodeLine{56 }
+\DoxyCodeLine{57 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{58 EIGEN\_STRONG\_INLINE Packet4bf pldexp(\textcolor{keyword}{const} Packet4bf\& a, \textcolor{keyword}{const} Packet4bf\& exponent) \{}
+\DoxyCodeLine{59   \textcolor{keywordflow}{return} F32ToBf16(pldexp<Packet4f>(Bf16ToF32(a), Bf16ToF32(exponent)));}
+\DoxyCodeLine{60 \}}
+\DoxyCodeLine{61 }
+\DoxyCodeLine{62 \textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ double -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{63 }
+\DoxyCodeLine{64 \textcolor{preprocessor}{\#if EIGEN\_ARCH\_ARM64 \&\& !EIGEN\_APPLE\_DOUBLE\_NEON\_BUG}}
+\DoxyCodeLine{65 \textcolor{keyword}{template}<> EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet2d pexp<Packet2d>(\textcolor{keyword}{const} Packet2d\& x)}
+\DoxyCodeLine{66 \{ \textcolor{keywordflow}{return} pexp\_double(x); \}}
+\DoxyCodeLine{67 }
+\DoxyCodeLine{68 \textcolor{keyword}{template}<> EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet2d plog<Packet2d>(\textcolor{keyword}{const} Packet2d\& x)}
+\DoxyCodeLine{69 \{ \textcolor{keywordflow}{return} plog\_double(x); \}}
+\DoxyCodeLine{70 }
+\DoxyCodeLine{71 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{74 }
+\DoxyCodeLine{75 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{76 }
+\DoxyCodeLine{77 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_MATH\_FUNCTIONS\_NEON\_H}}
+
+\end{DoxyCode}

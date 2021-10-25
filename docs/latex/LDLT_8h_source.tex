@@ -1,0 +1,565 @@
+\hypertarget{LDLT_8h_source}{}\doxysection{LDLT.\+h}
+\label{LDLT_8h_source}\index{include/Eigen/src/Cholesky/LDLT.h@{include/Eigen/src/Cholesky/LDLT.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2008-\/2011 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2009 Keir Mierle <mierle@gmail.com>}}
+\DoxyCodeLine{6 \textcolor{comment}{// Copyright (C) 2009 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{7 \textcolor{comment}{// Copyright (C) 2011 Timothy E. Holy <tim.holy@gmail.com >}}
+\DoxyCodeLine{8 \textcolor{comment}{//}}
+\DoxyCodeLine{9 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{10 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{11 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#ifndef EIGEN\_LDLT\_H}}
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#define EIGEN\_LDLT\_H}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{19 }
+\DoxyCodeLine{20 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{21   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_, \textcolor{keywordtype}{int} UpLo\_> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{classEigen_1_1LDLT}{LDLT}}<MatrixType\_, UpLo\_> >}
+\DoxyCodeLine{22    : \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<MatrixType\_>}
+\DoxyCodeLine{23   \{}
+\DoxyCodeLine{24     \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1MatrixXpr}{MatrixXpr}} \mbox{\hyperlink{structEigen_1_1MatrixXpr}{XprKind}};}
+\DoxyCodeLine{25     \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1SolverStorage}{SolverStorage}} \mbox{\hyperlink{structEigen_1_1SolverStorage}{StorageKind}};}
+\DoxyCodeLine{26     \textcolor{keyword}{typedef} \textcolor{keywordtype}{int} StorageIndex;}
+\DoxyCodeLine{27     \textcolor{keyword}{enum} \{ Flags = 0 \};}
+\DoxyCodeLine{28   \};}
+\DoxyCodeLine{29 }
+\DoxyCodeLine{30   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{int} UpLo> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1LDLT__Traits}{LDLT\_Traits}};}
+\DoxyCodeLine{31 }
+\DoxyCodeLine{32   \textcolor{comment}{// PositiveSemiDef means positive semi-\/definite and non-\/zero; same for NegativeSemiDef}}
+\DoxyCodeLine{33   \textcolor{keyword}{enum} SignMatrix \{ PositiveSemiDef, NegativeSemiDef, ZeroSign, Indefinite \};}
+\DoxyCodeLine{34 \}}
+\DoxyCodeLine{35 }
+\DoxyCodeLine{61 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_, \textcolor{keywordtype}{int} UpLo\_> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1LDLT}{LDLT}}}
+\DoxyCodeLine{62         : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1SolverBase}{SolverBase}}<LDLT<MatrixType\_, UpLo\_> >}
+\DoxyCodeLine{63 \{}
+\DoxyCodeLine{64   \textcolor{keyword}{public}:}
+\DoxyCodeLine{65     \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{66     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SolverBase}{SolverBase<LDLT>}} \mbox{\hyperlink{classEigen_1_1SolverBase}{Base}};}
+\DoxyCodeLine{67     \textcolor{keyword}{friend} \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1SolverBase}{SolverBase}}<\mbox{\hyperlink{classEigen_1_1LDLT}{LDLT}}>;}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{69     EIGEN\_GENERIC\_PUBLIC\_INTERFACE(\mbox{\hyperlink{classEigen_1_1LDLT}{LDLT}})}
+\DoxyCodeLine{70     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{71       MaxRowsAtCompileTime = MatrixType::MaxRowsAtCompileTime,}
+\DoxyCodeLine{72       MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime,}
+\DoxyCodeLine{73       UpLo = UpLo\_}
+\DoxyCodeLine{74     \};}
+\DoxyCodeLine{75     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar, RowsAtCompileTime, 1, 0, MaxRowsAtCompileTime, 1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{TmpMatrixType}};}
+\DoxyCodeLine{76 }
+\DoxyCodeLine{77     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Transpositions}{Transpositions<RowsAtCompileTime, MaxRowsAtCompileTime>}} \mbox{\hyperlink{classEigen_1_1Transpositions}{TranspositionType}};}
+\DoxyCodeLine{78     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationMatrix<RowsAtCompileTime, MaxRowsAtCompileTime>}} \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationType}};}
+\DoxyCodeLine{79 }
+\DoxyCodeLine{80     \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1LDLT__Traits}{internal::LDLT\_Traits<MatrixType,UpLo>}} \mbox{\hyperlink{structEigen_1_1internal_1_1LDLT__Traits}{Traits}};}
+\DoxyCodeLine{81 }
+\DoxyCodeLine{87     \mbox{\hyperlink{classEigen_1_1LDLT_a9ab5fbbe154dd5b43fe272126d69411f}{LDLT}}()}
+\DoxyCodeLine{88       : m\_matrix(),}
+\DoxyCodeLine{89         m\_transpositions(),}
+\DoxyCodeLine{90         m\_sign(internal::ZeroSign),}
+\DoxyCodeLine{91         m\_isInitialized(false)}
+\DoxyCodeLine{92     \{\}}
+\DoxyCodeLine{93 }
+\DoxyCodeLine{100     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1LDLT_abd3c8856337dfc7f4df6214b9503dcf2}{LDLT}}(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{structEigen_1_1EigenBase_a9f40726259520d7e9c5ce58d19d62e79}{size}})}
+\DoxyCodeLine{101       : m\_matrix(\mbox{\hyperlink{structEigen_1_1EigenBase_a9f40726259520d7e9c5ce58d19d62e79}{size}}, \mbox{\hyperlink{structEigen_1_1EigenBase_a9f40726259520d7e9c5ce58d19d62e79}{size}}),}
+\DoxyCodeLine{102         m\_transpositions(\mbox{\hyperlink{structEigen_1_1EigenBase_a9f40726259520d7e9c5ce58d19d62e79}{size}}),}
+\DoxyCodeLine{103         m\_temporary(\mbox{\hyperlink{structEigen_1_1EigenBase_a9f40726259520d7e9c5ce58d19d62e79}{size}}),}
+\DoxyCodeLine{104         m\_sign(internal::ZeroSign),}
+\DoxyCodeLine{105         m\_isInitialized(false)}
+\DoxyCodeLine{106     \{\}}
+\DoxyCodeLine{107 }
+\DoxyCodeLine{114     \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputType>}
+\DoxyCodeLine{115     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1LDLT_ab45453a84ebb985cb0d1d9128b7af18d}{LDLT}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<InputType>}}\& matrix)}
+\DoxyCodeLine{116       : m\_matrix(matrix.rows(), matrix.cols()),}
+\DoxyCodeLine{117         m\_transpositions(matrix.rows()),}
+\DoxyCodeLine{118         m\_temporary(matrix.rows()),}
+\DoxyCodeLine{119         m\_sign(internal::ZeroSign),}
+\DoxyCodeLine{120         m\_isInitialized(false)}
+\DoxyCodeLine{121     \{}
+\DoxyCodeLine{122       compute(matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}());}
+\DoxyCodeLine{123     \}}
+\DoxyCodeLine{124 }
+\DoxyCodeLine{131     \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputType>}
+\DoxyCodeLine{132     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1LDLT_ad2f39b7a2a17c6e982db2e4164b6dd9f}{LDLT}}(\mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<InputType>}}\& matrix)}
+\DoxyCodeLine{133       : m\_matrix(matrix.\mbox{\hyperlink{classEigen_1_1SolverBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}()),}
+\DoxyCodeLine{134         m\_transpositions(matrix.rows()),}
+\DoxyCodeLine{135         m\_temporary(matrix.rows()),}
+\DoxyCodeLine{136         m\_sign(internal::ZeroSign),}
+\DoxyCodeLine{137         m\_isInitialized(false)}
+\DoxyCodeLine{138     \{}
+\DoxyCodeLine{139       compute(matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}());}
+\DoxyCodeLine{140     \}}
+\DoxyCodeLine{141 }
+\DoxyCodeLine{145     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1LDLT_a3ed6b348086c7b4c117dbff35be1a16d}{setZero}}()}
+\DoxyCodeLine{146     \{}
+\DoxyCodeLine{147       m\_isInitialized = \textcolor{keyword}{false};}
+\DoxyCodeLine{148     \}}
+\DoxyCodeLine{149 }
+\DoxyCodeLine{151     \textcolor{keyword}{inline} \textcolor{keyword}{typename} Traits::MatrixU \mbox{\hyperlink{classEigen_1_1LDLT_ae8be83b613c7fad1ad5d0a2b44c483e0}{matrixU}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{152 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{153       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}LDLT is not initialized."{}});}
+\DoxyCodeLine{154       \textcolor{keywordflow}{return} Traits::getU(m\_matrix);}
+\DoxyCodeLine{155     \}}
+\DoxyCodeLine{156 }
+\DoxyCodeLine{158     \textcolor{keyword}{inline} \textcolor{keyword}{typename} Traits::MatrixL \mbox{\hyperlink{classEigen_1_1LDLT_a1c29cf5110c180a8fc5da40096822ed1}{matrixL}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{159 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{160       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}LDLT is not initialized."{}});}
+\DoxyCodeLine{161       \textcolor{keywordflow}{return} Traits::getL(m\_matrix);}
+\DoxyCodeLine{162     \}}
+\DoxyCodeLine{163 }
+\DoxyCodeLine{166     \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Transpositions}{TranspositionType}}\& \mbox{\hyperlink{classEigen_1_1LDLT_a014db22579445edf30b53d31e904dcf8}{transpositionsP}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{167 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{168       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}LDLT is not initialized."{}});}
+\DoxyCodeLine{169       \textcolor{keywordflow}{return} m\_transpositions;}
+\DoxyCodeLine{170     \}}
+\DoxyCodeLine{171 }
+\DoxyCodeLine{173     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Diagonal}{Diagonal<const MatrixType>}} \mbox{\hyperlink{classEigen_1_1LDLT_a1dce45793273b2f38a03df620f3406e2}{vectorD}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{174 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{175       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}LDLT is not initialized."{}});}
+\DoxyCodeLine{176       \textcolor{keywordflow}{return} m\_matrix.diagonal();}
+\DoxyCodeLine{177     \}}
+\DoxyCodeLine{178 }
+\DoxyCodeLine{180     \textcolor{keyword}{inline} \textcolor{keywordtype}{bool} \mbox{\hyperlink{classEigen_1_1LDLT_aa1294edd3e62b4b1906918abc75ae50e}{isPositive}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{181 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{182       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}LDLT is not initialized."{}});}
+\DoxyCodeLine{183       \textcolor{keywordflow}{return} m\_sign == internal::PositiveSemiDef || m\_sign == internal::ZeroSign;}
+\DoxyCodeLine{184     \}}
+\DoxyCodeLine{185 }
+\DoxyCodeLine{187     \textcolor{keyword}{inline} \textcolor{keywordtype}{bool} \mbox{\hyperlink{classEigen_1_1LDLT_a87fc4b3b96a1f432374541defad416f9}{isNegative}}(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}}
+\DoxyCodeLine{188 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{189       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}LDLT is not initialized."{}});}
+\DoxyCodeLine{190       \textcolor{keywordflow}{return} m\_sign == internal::NegativeSemiDef || m\_sign == internal::ZeroSign;}
+\DoxyCodeLine{191     \}}
+\DoxyCodeLine{192 }
+\DoxyCodeLine{193 \textcolor{preprocessor}{    \#ifdef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{209     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{210     \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Solve}{Solve<LDLT, Rhs>}}}
+\DoxyCodeLine{211     \mbox{\hyperlink{classEigen_1_1SolverBase_a943c352b597e3cd4744d5c11bfd77520}{solve}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Rhs>}}\& b) \textcolor{keyword}{const};}
+\DoxyCodeLine{212 \textcolor{preprocessor}{    \#endif}}
+\DoxyCodeLine{213 }
+\DoxyCodeLine{214     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{215     \textcolor{keywordtype}{bool} solveInPlace(\mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Derived>}} \&bAndX) \textcolor{keyword}{const};}
+\DoxyCodeLine{216 }
+\DoxyCodeLine{217     \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputType>}
+\DoxyCodeLine{218     \mbox{\hyperlink{classEigen_1_1LDLT}{LDLT}}\& compute(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<InputType>}}\& matrix);}
+\DoxyCodeLine{219 }
+\DoxyCodeLine{223     RealScalar \mbox{\hyperlink{classEigen_1_1LDLT_a69bc9dfd866eab90646ca7b74e52c8bc}{rcond}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{224 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{225       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}LDLT is not initialized."{}});}
+\DoxyCodeLine{226       \textcolor{keywordflow}{return} internal::rcond\_estimate\_helper(m\_l1\_norm, *\textcolor{keyword}{this});}
+\DoxyCodeLine{227     \}}
+\DoxyCodeLine{228 }
+\DoxyCodeLine{229     \textcolor{keyword}{template} <\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{230     \mbox{\hyperlink{classEigen_1_1LDLT}{LDLT}}\& rankUpdate(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Derived>}}\& w, \textcolor{keyword}{const} RealScalar\& alpha=1);}
+\DoxyCodeLine{231 }
+\DoxyCodeLine{236     \textcolor{keyword}{inline} \textcolor{keyword}{const} MatrixType\& \mbox{\hyperlink{classEigen_1_1LDLT_a438707c744d7206b723dd08013759013}{matrixLDLT}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{237 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{238       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}LDLT is not initialized."{}});}
+\DoxyCodeLine{239       \textcolor{keywordflow}{return} m\_matrix;}
+\DoxyCodeLine{240     \}}
+\DoxyCodeLine{241 }
+\DoxyCodeLine{242     MatrixType \mbox{\hyperlink{classEigen_1_1LDLT_adf2c9a2939f6c5f4e36a94d99d4aa49f}{reconstructedMatrix}}() \textcolor{keyword}{const};}
+\DoxyCodeLine{243 }
+\DoxyCodeLine{249     \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1LDLT}{LDLT}}\& \mbox{\hyperlink{classEigen_1_1LDLT_ae4b0e334642f4206bbcc2429f1e67961}{adjoint}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} *\textcolor{keyword}{this}; \};}
+\DoxyCodeLine{250 }
+\DoxyCodeLine{251     EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} EIGEN\_CONSTEXPR \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows() const EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_matrix.rows(); \}}
+\DoxyCodeLine{252     EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} EIGEN\_CONSTEXPR \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} cols() const EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_matrix.cols(); \}}
+\DoxyCodeLine{253 }
+\DoxyCodeLine{259     \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} \mbox{\hyperlink{classEigen_1_1LDLT_ae24d5a022e1c09d5afa0e84c356b854e}{info}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{260 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{261       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}LDLT is not initialized."{}});}
+\DoxyCodeLine{262       \textcolor{keywordflow}{return} m\_info;}
+\DoxyCodeLine{263     \}}
+\DoxyCodeLine{264 }
+\DoxyCodeLine{265 \textcolor{preprocessor}{    \#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{266     \textcolor{keyword}{template}<\textcolor{keyword}{typename} RhsType, \textcolor{keyword}{typename} DstType>}
+\DoxyCodeLine{267     \textcolor{keywordtype}{void} \_solve\_impl(\textcolor{keyword}{const} RhsType \&rhs, DstType \&dst) \textcolor{keyword}{const};}
+\DoxyCodeLine{268 }
+\DoxyCodeLine{269     \textcolor{keyword}{template}<\textcolor{keywordtype}{bool} Conjugate, \textcolor{keyword}{typename} RhsType, \textcolor{keyword}{typename} DstType>}
+\DoxyCodeLine{270     \textcolor{keywordtype}{void} \_solve\_impl\_transposed(\textcolor{keyword}{const} RhsType \&rhs, DstType \&dst) \textcolor{keyword}{const};}
+\DoxyCodeLine{271 \textcolor{preprocessor}{    \#endif}}
+\DoxyCodeLine{272 }
+\DoxyCodeLine{273   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{274 }
+\DoxyCodeLine{275     EIGEN\_STATIC\_ASSERT\_NON\_INTEGER(Scalar)}
+\DoxyCodeLine{276 }
+\DoxyCodeLine{277     }
+\DoxyCodeLine{283     MatrixType m\_matrix;}
+\DoxyCodeLine{284     RealScalar m\_l1\_norm;}
+\DoxyCodeLine{285     TranspositionType m\_transpositions;}
+\DoxyCodeLine{286     TmpMatrixType m\_temporary;}
+\DoxyCodeLine{287     internal::SignMatrix m\_sign;}
+\DoxyCodeLine{288     \textcolor{keywordtype}{bool} m\_isInitialized;}
+\DoxyCodeLine{289     \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} m\_info;}
+\DoxyCodeLine{290 \};}
+\DoxyCodeLine{291 }
+\DoxyCodeLine{292 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{293 }
+\DoxyCodeLine{294 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} UpLo> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1ldlt__inplace}{ldlt\_inplace}};}
+\DoxyCodeLine{295 }
+\DoxyCodeLine{296 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1ldlt__inplace}{ldlt\_inplace}}<\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}}>}
+\DoxyCodeLine{297 \{}
+\DoxyCodeLine{298   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keyword}{typename} TranspositionType, \textcolor{keyword}{typename} Workspace>}
+\DoxyCodeLine{299   \textcolor{keyword}{static} \textcolor{keywordtype}{bool} unblocked(MatrixType\& mat, TranspositionType\& transpositions, Workspace\& temp, SignMatrix\& sign)}
+\DoxyCodeLine{300   \{}
+\DoxyCodeLine{301     \textcolor{keyword}{using} std::abs;}
+\DoxyCodeLine{302     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar Scalar;}
+\DoxyCodeLine{303     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::RealScalar RealScalar;}
+\DoxyCodeLine{304     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} TranspositionType::StorageIndex IndexType;}
+\DoxyCodeLine{305     eigen\_assert(mat.rows()==mat.cols());}
+\DoxyCodeLine{306     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size = mat.rows();}
+\DoxyCodeLine{307     \textcolor{keywordtype}{bool} found\_zero\_pivot = \textcolor{keyword}{false};}
+\DoxyCodeLine{308     \textcolor{keywordtype}{bool} ret = \textcolor{keyword}{true};}
+\DoxyCodeLine{309 }
+\DoxyCodeLine{310     \textcolor{keywordflow}{if} (size <= 1)}
+\DoxyCodeLine{311     \{}
+\DoxyCodeLine{312       transpositions.setIdentity();}
+\DoxyCodeLine{313       \textcolor{keywordflow}{if}(size==0) sign = ZeroSign;}
+\DoxyCodeLine{314       \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (numext::real(mat.coeff(0,0)) > \textcolor{keyword}{static\_cast<}RealScalar\textcolor{keyword}{>}(0) ) sign = PositiveSemiDef;}
+\DoxyCodeLine{315       \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (numext::real(mat.coeff(0,0)) < \textcolor{keyword}{static\_cast<}RealScalar\textcolor{keyword}{>}(0)) sign = NegativeSemiDef;}
+\DoxyCodeLine{316       \textcolor{keywordflow}{else} sign = ZeroSign;}
+\DoxyCodeLine{317       \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
+\DoxyCodeLine{318     \}}
+\DoxyCodeLine{319 }
+\DoxyCodeLine{320     \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} k = 0; k < size; ++k)}
+\DoxyCodeLine{321     \{}
+\DoxyCodeLine{322       \textcolor{comment}{// Find largest diagonal element}}
+\DoxyCodeLine{323       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index\_of\_biggest\_in\_corner;}
+\DoxyCodeLine{324       mat.diagonal().tail(size-\/k).cwiseAbs().maxCoeff(\&index\_of\_biggest\_in\_corner);}
+\DoxyCodeLine{325       index\_of\_biggest\_in\_corner += k;}
+\DoxyCodeLine{326 }
+\DoxyCodeLine{327       transpositions.coeffRef(k) = IndexType(index\_of\_biggest\_in\_corner);}
+\DoxyCodeLine{328       \textcolor{keywordflow}{if}(k != index\_of\_biggest\_in\_corner)}
+\DoxyCodeLine{329       \{}
+\DoxyCodeLine{330         \textcolor{comment}{// apply the transposition while taking care to consider only}}
+\DoxyCodeLine{331         \textcolor{comment}{// the lower triangular part}}
+\DoxyCodeLine{332         \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} s = size-\/index\_of\_biggest\_in\_corner-\/1; \textcolor{comment}{// trailing size after the biggest element}}
+\DoxyCodeLine{333         mat.row(k).head(k).swap(mat.row(index\_of\_biggest\_in\_corner).head(k));}
+\DoxyCodeLine{334         mat.col(k).tail(s).swap(mat.col(index\_of\_biggest\_in\_corner).tail(s));}
+\DoxyCodeLine{335         std::swap(mat.coeffRef(k,k),mat.coeffRef(index\_of\_biggest\_in\_corner,index\_of\_biggest\_in\_corner));}
+\DoxyCodeLine{336         \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i=k+1;i<index\_of\_biggest\_in\_corner;++i)}
+\DoxyCodeLine{337         \{}
+\DoxyCodeLine{338           Scalar tmp = mat.coeffRef(i,k);}
+\DoxyCodeLine{339           mat.coeffRef(i,k) = numext::conj(mat.coeffRef(index\_of\_biggest\_in\_corner,i));}
+\DoxyCodeLine{340           mat.coeffRef(index\_of\_biggest\_in\_corner,i) = numext::conj(tmp);}
+\DoxyCodeLine{341         \}}
+\DoxyCodeLine{342         \textcolor{keywordflow}{if}(\mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::IsComplex}})}
+\DoxyCodeLine{343           mat.coeffRef(index\_of\_biggest\_in\_corner,k) = numext::conj(mat.coeff(index\_of\_biggest\_in\_corner,k));}
+\DoxyCodeLine{344       \}}
+\DoxyCodeLine{345 }
+\DoxyCodeLine{346       \textcolor{comment}{// partition the matrix:}}
+\DoxyCodeLine{347       \textcolor{comment}{//       A00 |  -\/  |  -\/}}
+\DoxyCodeLine{348       \textcolor{comment}{// lu  = A10 | A11 |  -\/}}
+\DoxyCodeLine{349       \textcolor{comment}{//       A20 | A21 | A22}}
+\DoxyCodeLine{350       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rs = size -\/ k -\/ 1;}
+\DoxyCodeLine{351       \mbox{\hyperlink{classEigen_1_1Block}{Block<MatrixType,Dynamic,1>}} A21(mat,k+1,k,rs,1);}
+\DoxyCodeLine{352       \mbox{\hyperlink{classEigen_1_1Block}{Block<MatrixType,1,Dynamic>}} A10(mat,k,0,1,k);}
+\DoxyCodeLine{353       \mbox{\hyperlink{classEigen_1_1Block}{Block<MatrixType,Dynamic,Dynamic>}} A20(mat,k+1,0,rs,k);}
+\DoxyCodeLine{354 }
+\DoxyCodeLine{355       \textcolor{keywordflow}{if}(k>0)}
+\DoxyCodeLine{356       \{}
+\DoxyCodeLine{357         temp.head(k) = mat.diagonal().real().head(k).asDiagonal() * A10.adjoint();}
+\DoxyCodeLine{358         mat.coeffRef(k,k) -\/= (A10 * temp.head(k)).value();}
+\DoxyCodeLine{359         \textcolor{keywordflow}{if}(rs>0)}
+\DoxyCodeLine{360           A21.noalias() -\/= A20 * temp.head(k);}
+\DoxyCodeLine{361       \}}
+\DoxyCodeLine{362 }
+\DoxyCodeLine{363       \textcolor{comment}{// In some previous versions of Eigen (e.g., 3.2.1), the scaling was omitted if the pivot}}
+\DoxyCodeLine{364       \textcolor{comment}{// was smaller than the cutoff value. However, since LDLT is not rank-\/revealing}}
+\DoxyCodeLine{365       \textcolor{comment}{// we should only make sure that we do not introduce INF or NaN values.}}
+\DoxyCodeLine{366       \textcolor{comment}{// Remark that LAPACK also uses 0 as the cutoff value.}}
+\DoxyCodeLine{367       RealScalar realAkk = numext::real(mat.coeffRef(k,k));}
+\DoxyCodeLine{368       \textcolor{keywordtype}{bool} pivot\_is\_valid = (abs(realAkk) > RealScalar(0));}
+\DoxyCodeLine{369 }
+\DoxyCodeLine{370       \textcolor{keywordflow}{if}(k==0 \&\& !pivot\_is\_valid)}
+\DoxyCodeLine{371       \{}
+\DoxyCodeLine{372         \textcolor{comment}{// The entire diagonal is zero, there is nothing more to do}}
+\DoxyCodeLine{373         \textcolor{comment}{// except filling the transpositions, and checking whether the matrix is zero.}}
+\DoxyCodeLine{374         sign = ZeroSign;}
+\DoxyCodeLine{375         \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j<size; ++j)}
+\DoxyCodeLine{376         \{}
+\DoxyCodeLine{377           transpositions.coeffRef(j) = IndexType(j);}
+\DoxyCodeLine{378           ret = ret \&\& (mat.col(j).tail(size-\/j-\/1).array()==Scalar(0)).all();}
+\DoxyCodeLine{379         \}}
+\DoxyCodeLine{380         \textcolor{keywordflow}{return} ret;}
+\DoxyCodeLine{381       \}}
+\DoxyCodeLine{382 }
+\DoxyCodeLine{383       \textcolor{keywordflow}{if}((rs>0) \&\& pivot\_is\_valid)}
+\DoxyCodeLine{384         A21 /= realAkk;}
+\DoxyCodeLine{385       \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(rs>0)}
+\DoxyCodeLine{386         ret = ret \&\& (A21.array()==Scalar(0)).all();}
+\DoxyCodeLine{387 }
+\DoxyCodeLine{388       \textcolor{keywordflow}{if}(found\_zero\_pivot \&\& pivot\_is\_valid) ret = \textcolor{keyword}{false}; \textcolor{comment}{// factorization failed}}
+\DoxyCodeLine{389       \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(!pivot\_is\_valid) found\_zero\_pivot = \textcolor{keyword}{true};}
+\DoxyCodeLine{390 }
+\DoxyCodeLine{391       \textcolor{keywordflow}{if} (sign == PositiveSemiDef) \{}
+\DoxyCodeLine{392         \textcolor{keywordflow}{if} (realAkk < \textcolor{keyword}{static\_cast<}RealScalar\textcolor{keyword}{>}(0)) sign = Indefinite;}
+\DoxyCodeLine{393       \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (sign == NegativeSemiDef) \{}
+\DoxyCodeLine{394         \textcolor{keywordflow}{if} (realAkk > \textcolor{keyword}{static\_cast<}RealScalar\textcolor{keyword}{>}(0)) sign = Indefinite;}
+\DoxyCodeLine{395       \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (sign == ZeroSign) \{}
+\DoxyCodeLine{396         \textcolor{keywordflow}{if} (realAkk > \textcolor{keyword}{static\_cast<}RealScalar\textcolor{keyword}{>}(0)) sign = PositiveSemiDef;}
+\DoxyCodeLine{397         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (realAkk < \textcolor{keyword}{static\_cast<}RealScalar\textcolor{keyword}{>}(0)) sign = NegativeSemiDef;}
+\DoxyCodeLine{398       \}}
+\DoxyCodeLine{399     \}}
+\DoxyCodeLine{400 }
+\DoxyCodeLine{401     \textcolor{keywordflow}{return} ret;}
+\DoxyCodeLine{402   \}}
+\DoxyCodeLine{403 }
+\DoxyCodeLine{404   \textcolor{comment}{// Reference for the algorithm: Davis and Hager, "{}Multiple Rank}}
+\DoxyCodeLine{405   \textcolor{comment}{// Modifications of a Sparse Cholesky Factorization"{} (Algorithm 1)}}
+\DoxyCodeLine{406   \textcolor{comment}{// Trivial rearrangements of their computations (Timothy E. Holy)}}
+\DoxyCodeLine{407   \textcolor{comment}{// allow their algorithm to work for rank-\/1 updates even if the}}
+\DoxyCodeLine{408   \textcolor{comment}{// original matrix is not of full rank.}}
+\DoxyCodeLine{409   \textcolor{comment}{// Here only rank-\/1 updates are implemented, to reduce the}}
+\DoxyCodeLine{410   \textcolor{comment}{// requirement for intermediate storage and improve accuracy}}
+\DoxyCodeLine{411   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keyword}{typename} WDerived>}
+\DoxyCodeLine{412   \textcolor{keyword}{static} \textcolor{keywordtype}{bool} updateInPlace(MatrixType\& mat, MatrixBase<WDerived>\& w, \textcolor{keyword}{const} \textcolor{keyword}{typename} MatrixType::RealScalar\& sigma=1)}
+\DoxyCodeLine{413   \{}
+\DoxyCodeLine{414     \textcolor{keyword}{using} numext::isfinite;}
+\DoxyCodeLine{415     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar Scalar;}
+\DoxyCodeLine{416     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::RealScalar RealScalar;}
+\DoxyCodeLine{417 }
+\DoxyCodeLine{418     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size = mat.rows();}
+\DoxyCodeLine{419     eigen\_assert(mat.cols() == size \&\& w.size()==size);}
+\DoxyCodeLine{420 }
+\DoxyCodeLine{421     RealScalar alpha = 1;}
+\DoxyCodeLine{422 }
+\DoxyCodeLine{423     \textcolor{comment}{// Apply the update}}
+\DoxyCodeLine{424     \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < size; j++)}
+\DoxyCodeLine{425     \{}
+\DoxyCodeLine{426       \textcolor{comment}{// Check for termination due to an original decomposition of low-\/rank}}
+\DoxyCodeLine{427       \textcolor{keywordflow}{if} (!(isfinite)(alpha))}
+\DoxyCodeLine{428         \textcolor{keywordflow}{break};}
+\DoxyCodeLine{429 }
+\DoxyCodeLine{430       \textcolor{comment}{// Update the diagonal terms}}
+\DoxyCodeLine{431       RealScalar dj = numext::real(mat.coeff(j,j));}
+\DoxyCodeLine{432       Scalar wj = w.coeff(j);}
+\DoxyCodeLine{433       RealScalar swj2 = sigma*numext::abs2(wj);}
+\DoxyCodeLine{434       RealScalar gamma = dj*alpha + swj2;}
+\DoxyCodeLine{435 }
+\DoxyCodeLine{436       mat.coeffRef(j,j) += swj2/alpha;}
+\DoxyCodeLine{437       alpha += swj2/dj;}
+\DoxyCodeLine{438 }
+\DoxyCodeLine{439 }
+\DoxyCodeLine{440       \textcolor{comment}{// Update the terms of L}}
+\DoxyCodeLine{441       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rs = size-\/j-\/1;}
+\DoxyCodeLine{442       w.tail(rs) -\/= wj * mat.col(j).tail(rs);}
+\DoxyCodeLine{443       \textcolor{keywordflow}{if}(gamma != 0)}
+\DoxyCodeLine{444         mat.col(j).tail(rs) += (sigma*numext::conj(wj)/gamma)*w.tail(rs);}
+\DoxyCodeLine{445     \}}
+\DoxyCodeLine{446     \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
+\DoxyCodeLine{447   \}}
+\DoxyCodeLine{448 }
+\DoxyCodeLine{449   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keyword}{typename} TranspositionType, \textcolor{keyword}{typename} Workspace, \textcolor{keyword}{typename} WType>}
+\DoxyCodeLine{450   \textcolor{keyword}{static} \textcolor{keywordtype}{bool} update(MatrixType\& mat, \textcolor{keyword}{const} TranspositionType\& transpositions, Workspace\& tmp, \textcolor{keyword}{const} WType\& w, \textcolor{keyword}{const} \textcolor{keyword}{typename} MatrixType::RealScalar\& sigma=1)}
+\DoxyCodeLine{451   \{}
+\DoxyCodeLine{452     \textcolor{comment}{// Apply the permutation to the input w}}
+\DoxyCodeLine{453     tmp = transpositions * w;}
+\DoxyCodeLine{454 }
+\DoxyCodeLine{455     \textcolor{keywordflow}{return} ldlt\_inplace<Lower>::updateInPlace(mat,tmp,sigma);}
+\DoxyCodeLine{456   \}}
+\DoxyCodeLine{457 \};}
+\DoxyCodeLine{458 }
+\DoxyCodeLine{459 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1ldlt__inplace}{ldlt\_inplace}}<\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}}>}
+\DoxyCodeLine{460 \{}
+\DoxyCodeLine{461   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keyword}{typename} TranspositionType, \textcolor{keyword}{typename} Workspace>}
+\DoxyCodeLine{462   \textcolor{keyword}{static} EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{bool} unblocked(MatrixType\& mat, TranspositionType\& transpositions, Workspace\& temp, SignMatrix\& sign)}
+\DoxyCodeLine{463   \{}
+\DoxyCodeLine{464     \mbox{\hyperlink{classEigen_1_1Transpose}{Transpose<MatrixType>}} matt(mat);}
+\DoxyCodeLine{465     \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1ldlt__inplace}{ldlt\_inplace<Lower>::unblocked}}(matt, transpositions, temp, sign);}
+\DoxyCodeLine{466   \}}
+\DoxyCodeLine{467 }
+\DoxyCodeLine{468   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keyword}{typename} TranspositionType, \textcolor{keyword}{typename} Workspace, \textcolor{keyword}{typename} WType>}
+\DoxyCodeLine{469   \textcolor{keyword}{static} EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{bool} update(MatrixType\& mat, TranspositionType\& transpositions, Workspace\& tmp, WType\& w, \textcolor{keyword}{const} \textcolor{keyword}{typename} MatrixType::RealScalar\& sigma=1)}
+\DoxyCodeLine{470   \{}
+\DoxyCodeLine{471     \mbox{\hyperlink{classEigen_1_1Transpose}{Transpose<MatrixType>}} matt(mat);}
+\DoxyCodeLine{472     \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1ldlt__inplace}{ldlt\_inplace<Lower>::update}}(matt, transpositions, tmp, w.conjugate(), sigma);}
+\DoxyCodeLine{473   \}}
+\DoxyCodeLine{474 \};}
+\DoxyCodeLine{475 }
+\DoxyCodeLine{476 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1LDLT__Traits}{LDLT\_Traits}}<MatrixType,\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}}>}
+\DoxyCodeLine{477 \{}
+\DoxyCodeLine{478   \textcolor{keyword}{typedef} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView<const MatrixType, UnitLower>}} \mbox{\hyperlink{classEigen_1_1TriangularView}{MatrixL}};}
+\DoxyCodeLine{479   \textcolor{keyword}{typedef} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView<const typename MatrixType::AdjointReturnType, UnitUpper>}} \mbox{\hyperlink{classEigen_1_1TriangularView}{MatrixU}};}
+\DoxyCodeLine{480   \textcolor{keyword}{static} \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1TriangularView}{MatrixL}} getL(\textcolor{keyword}{const} MatrixType\& m) \{ \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1TriangularView}{MatrixL}}(m); \}}
+\DoxyCodeLine{481   \textcolor{keyword}{static} \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1TriangularView}{MatrixU}} getU(\textcolor{keyword}{const} MatrixType\& m) \{ \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1TriangularView}{MatrixU}}(m.adjoint()); \}}
+\DoxyCodeLine{482 \};}
+\DoxyCodeLine{483 }
+\DoxyCodeLine{484 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1LDLT__Traits}{LDLT\_Traits}}<MatrixType,\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}}>}
+\DoxyCodeLine{485 \{}
+\DoxyCodeLine{486   \textcolor{keyword}{typedef} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView<const typename MatrixType::AdjointReturnType, UnitLower>}} \mbox{\hyperlink{classEigen_1_1TriangularView}{MatrixL}};}
+\DoxyCodeLine{487   \textcolor{keyword}{typedef} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView<const MatrixType, UnitUpper>}} \mbox{\hyperlink{classEigen_1_1TriangularView}{MatrixU}};}
+\DoxyCodeLine{488   \textcolor{keyword}{static} \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1TriangularView}{MatrixL}} getL(\textcolor{keyword}{const} MatrixType\& m) \{ \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1TriangularView}{MatrixL}}(m.adjoint()); \}}
+\DoxyCodeLine{489   \textcolor{keyword}{static} \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1TriangularView}{MatrixU}} getU(\textcolor{keyword}{const} MatrixType\& m) \{ \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1TriangularView}{MatrixU}}(m); \}}
+\DoxyCodeLine{490 \};}
+\DoxyCodeLine{491 }
+\DoxyCodeLine{492 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{493 }
+\DoxyCodeLine{496 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{int} UpLo\_>}
+\DoxyCodeLine{497 \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputType>}
+\DoxyCodeLine{498 \mbox{\hyperlink{classEigen_1_1LDLT}{LDLT<MatrixType,UpLo\_>}}\& \mbox{\hyperlink{classEigen_1_1LDLT}{LDLT<MatrixType,UpLo\_>::compute}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<InputType>}}\& a)}
+\DoxyCodeLine{499 \{}
+\DoxyCodeLine{500   eigen\_assert(a.\mbox{\hyperlink{structEigen_1_1EigenBase_af1d12fdb3361e150427e1fd94ebb1f14}{rows}}()==a.\mbox{\hyperlink{structEigen_1_1EigenBase_a50c19c45f15acdfe1cb66ab5e879b8e3}{cols}}());}
+\DoxyCodeLine{501   \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} size = a.\mbox{\hyperlink{structEigen_1_1EigenBase_af1d12fdb3361e150427e1fd94ebb1f14}{rows}}();}
+\DoxyCodeLine{502 }
+\DoxyCodeLine{503   m\_matrix = a.\mbox{\hyperlink{structEigen_1_1EigenBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}();}
+\DoxyCodeLine{504 }
+\DoxyCodeLine{505   \textcolor{comment}{// Compute matrix L1 norm = max abs column sum.}}
+\DoxyCodeLine{506   m\_l1\_norm = RealScalar(0);}
+\DoxyCodeLine{507   \textcolor{comment}{// TODO move this code to SelfAdjointView}}
+\DoxyCodeLine{508   \textcolor{keywordflow}{for} (\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} col = 0; col < size; ++col) \{}
+\DoxyCodeLine{509     RealScalar abs\_col\_sum;}
+\DoxyCodeLine{510     \textcolor{keywordflow}{if} (UpLo\_ == \mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}})}
+\DoxyCodeLine{511       abs\_col\_sum = m\_matrix.col(col).tail(size -\/ col).template lpNorm<1>() + m\_matrix.row(col).head(col).template lpNorm<1>();}
+\DoxyCodeLine{512     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{513       abs\_col\_sum = m\_matrix.col(col).head(col).template lpNorm<1>() + m\_matrix.row(col).tail(size -\/ col).template lpNorm<1>();}
+\DoxyCodeLine{514     \textcolor{keywordflow}{if} (abs\_col\_sum > m\_l1\_norm)}
+\DoxyCodeLine{515       m\_l1\_norm = abs\_col\_sum;}
+\DoxyCodeLine{516   \}}
+\DoxyCodeLine{517 }
+\DoxyCodeLine{518   m\_transpositions.resize(size);}
+\DoxyCodeLine{519   m\_isInitialized = \textcolor{keyword}{false};}
+\DoxyCodeLine{520   m\_temporary.resize(size);}
+\DoxyCodeLine{521   m\_sign = internal::ZeroSign;}
+\DoxyCodeLine{522 }
+\DoxyCodeLine{523   m\_info = \mbox{\hyperlink{structEigen_1_1internal_1_1ldlt__inplace}{internal::ldlt\_inplace<UpLo>::unblocked}}(m\_matrix, m\_transpositions, m\_temporary, m\_sign) ? \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}} : \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea1c6e20706575a629b27a105f07f1883b}{NumericalIssue}};}
+\DoxyCodeLine{524 }
+\DoxyCodeLine{525   m\_isInitialized = \textcolor{keyword}{true};}
+\DoxyCodeLine{526   \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{527 \}}
+\DoxyCodeLine{528 }
+\DoxyCodeLine{534 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{int} UpLo\_>}
+\DoxyCodeLine{535 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{536 \mbox{\hyperlink{classEigen_1_1LDLT}{LDLT<MatrixType,UpLo\_>}}\& \mbox{\hyperlink{classEigen_1_1LDLT}{LDLT<MatrixType,UpLo\_>::rankUpdate}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Derived>}}\& w, \textcolor{keyword}{const} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1LDLT}{LDLT<MatrixType,UpLo\_>::RealScalar}}\& sigma)}
+\DoxyCodeLine{537 \{}
+\DoxyCodeLine{538   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} TranspositionType::StorageIndex IndexType;}
+\DoxyCodeLine{539   \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} size = w.rows();}
+\DoxyCodeLine{540   \textcolor{keywordflow}{if} (m\_isInitialized)}
+\DoxyCodeLine{541   \{}
+\DoxyCodeLine{542     eigen\_assert(m\_matrix.rows()==size);}
+\DoxyCodeLine{543   \}}
+\DoxyCodeLine{544   \textcolor{keywordflow}{else}}
+\DoxyCodeLine{545   \{}
+\DoxyCodeLine{546     m\_matrix.resize(size,size);}
+\DoxyCodeLine{547     m\_matrix.setZero();}
+\DoxyCodeLine{548     m\_transpositions.resize(size);}
+\DoxyCodeLine{549     \textcolor{keywordflow}{for} (\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} i = 0; i < size; i++)}
+\DoxyCodeLine{550       m\_transpositions.coeffRef(i) = IndexType(i);}
+\DoxyCodeLine{551     m\_temporary.resize(size);}
+\DoxyCodeLine{552     m\_sign = sigma>=0 ? internal::PositiveSemiDef : internal::NegativeSemiDef;}
+\DoxyCodeLine{553     m\_isInitialized = \textcolor{keyword}{true};}
+\DoxyCodeLine{554   \}}
+\DoxyCodeLine{555 }
+\DoxyCodeLine{556   \mbox{\hyperlink{structEigen_1_1internal_1_1ldlt__inplace}{internal::ldlt\_inplace<UpLo>::update}}(m\_matrix, m\_transpositions, m\_temporary, w, sigma);}
+\DoxyCodeLine{557 }
+\DoxyCodeLine{558   \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{559 \}}
+\DoxyCodeLine{560 }
+\DoxyCodeLine{561 \textcolor{preprocessor}{\#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{562 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_, \textcolor{keywordtype}{int} UpLo\_>}
+\DoxyCodeLine{563 \textcolor{keyword}{template}<\textcolor{keyword}{typename} RhsType, \textcolor{keyword}{typename} DstType>}
+\DoxyCodeLine{564 \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1LDLT}{LDLT<MatrixType\_,UpLo\_>::\_solve\_impl}}(\textcolor{keyword}{const} RhsType \&rhs, DstType \&dst)\textcolor{keyword}{ const}}
+\DoxyCodeLine{565 \textcolor{keyword}{}\{}
+\DoxyCodeLine{566   \_solve\_impl\_transposed<true>(rhs, dst);}
+\DoxyCodeLine{567 \}}
+\DoxyCodeLine{568 }
+\DoxyCodeLine{569 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_,\textcolor{keywordtype}{int} UpLo\_>}
+\DoxyCodeLine{570 \textcolor{keyword}{template}<\textcolor{keywordtype}{bool} Conjugate, \textcolor{keyword}{typename} RhsType, \textcolor{keyword}{typename} DstType>}
+\DoxyCodeLine{571 \textcolor{keywordtype}{void} LDLT<MatrixType\_,UpLo\_>::\_solve\_impl\_transposed(\textcolor{keyword}{const} RhsType \&rhs, DstType \&dst)\textcolor{keyword}{ const}}
+\DoxyCodeLine{572 \textcolor{keyword}{}\{}
+\DoxyCodeLine{573   \textcolor{comment}{// dst = P b}}
+\DoxyCodeLine{574   dst = m\_transpositions * rhs;}
+\DoxyCodeLine{575 }
+\DoxyCodeLine{576   \textcolor{comment}{// dst = L\string^-\/1 (P b)}}
+\DoxyCodeLine{577   \textcolor{comment}{// dst = L\string^-\/*T (P b)}}
+\DoxyCodeLine{578   matrixL().template conjugateIf<!Conjugate>().solveInPlace(dst);}
+\DoxyCodeLine{579 }
+\DoxyCodeLine{580   \textcolor{comment}{// dst = D\string^-\/* (L\string^-\/1 P b)}}
+\DoxyCodeLine{581   \textcolor{comment}{// dst = D\string^-\/1 (L\string^-\/*T P b)}}
+\DoxyCodeLine{582   \textcolor{comment}{// more precisely, use pseudo-\/inverse of D (see bug 241)}}
+\DoxyCodeLine{583   \textcolor{keyword}{using} std::abs;}
+\DoxyCodeLine{584   \textcolor{keyword}{const} \textcolor{keyword}{typename} Diagonal<const MatrixType>::RealReturnType vecD(vectorD());}
+\DoxyCodeLine{585   \textcolor{comment}{// In some previous versions, tolerance was set to the max of 1/highest (or rather numeric\_limits::min())}}
+\DoxyCodeLine{586   \textcolor{comment}{// and the maximal diagonal entry * epsilon as motivated by LAPACK's xGELSS:}}
+\DoxyCodeLine{587   \textcolor{comment}{// RealScalar tolerance = numext::maxi(vecD.array().abs().maxCoeff() * NumTraits<RealScalar>::epsilon(),RealScalar(1) / NumTraits<RealScalar>::highest());}}
+\DoxyCodeLine{588   \textcolor{comment}{// However, LDLT is not rank revealing, and so adjusting the tolerance wrt to the highest}}
+\DoxyCodeLine{589   \textcolor{comment}{// diagonal element is not well justified and leads to numerical issues in some cases.}}
+\DoxyCodeLine{590   \textcolor{comment}{// Moreover, Lapack's xSYTRS routines use 0 for the tolerance.}}
+\DoxyCodeLine{591   \textcolor{comment}{// Using numeric\_limits::min() gives us more robustness to denormals.}}
+\DoxyCodeLine{592   RealScalar tolerance = (std::numeric\_limits<RealScalar>::min)();}
+\DoxyCodeLine{593   \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = 0; i < vecD.size(); ++i)}
+\DoxyCodeLine{594   \{}
+\DoxyCodeLine{595     \textcolor{keywordflow}{if}(abs(vecD(i)) > tolerance)}
+\DoxyCodeLine{596       dst.row(i) /= vecD(i);}
+\DoxyCodeLine{597     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{598       dst.row(i).setZero();}
+\DoxyCodeLine{599   \}}
+\DoxyCodeLine{600 }
+\DoxyCodeLine{601   \textcolor{comment}{// dst = L\string^-\/* (D\string^-\/* L\string^-\/1 P b)}}
+\DoxyCodeLine{602   \textcolor{comment}{// dst = L\string^-\/T (D\string^-\/1 L\string^-\/*T P b)}}
+\DoxyCodeLine{603   matrixL().transpose().template conjugateIf<Conjugate>().solveInPlace(dst);}
+\DoxyCodeLine{604 }
+\DoxyCodeLine{605   \textcolor{comment}{// dst = P\string^T (L\string^-\/* D\string^-\/* L\string^-\/1 P b) = A\string^-\/1 b}}
+\DoxyCodeLine{606   \textcolor{comment}{// dst = P\string^-\/T (L\string^-\/T D\string^-\/1 L\string^-\/*T P b) = A\string^-\/1 b}}
+\DoxyCodeLine{607   dst = m\_transpositions.transpose() * dst;}
+\DoxyCodeLine{608 \}}
+\DoxyCodeLine{609 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{610 }
+\DoxyCodeLine{624 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType,\textcolor{keywordtype}{int} UpLo\_>}
+\DoxyCodeLine{625 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{626 \textcolor{keywordtype}{bool} LDLT<MatrixType,UpLo\_>::solveInPlace(MatrixBase<Derived> \&bAndX)\textcolor{keyword}{ const}}
+\DoxyCodeLine{627 \textcolor{keyword}{}\{}
+\DoxyCodeLine{628   eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}LDLT is not initialized."{}});}
+\DoxyCodeLine{629   eigen\_assert(m\_matrix.rows() == bAndX.rows());}
+\DoxyCodeLine{630 }
+\DoxyCodeLine{631   bAndX = this-\/>solve(bAndX);}
+\DoxyCodeLine{632 }
+\DoxyCodeLine{633   \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
+\DoxyCodeLine{634 \}}
+\DoxyCodeLine{635 }
+\DoxyCodeLine{639 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{int} UpLo\_>}
+\DoxyCodeLine{640 MatrixType \mbox{\hyperlink{classEigen_1_1LDLT_adf2c9a2939f6c5f4e36a94d99d4aa49f}{LDLT<MatrixType,UpLo\_>::reconstructedMatrix}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{641 \textcolor{keyword}{}\{}
+\DoxyCodeLine{642   eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}LDLT is not initialized."{}});}
+\DoxyCodeLine{643   \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} size = m\_matrix.rows();}
+\DoxyCodeLine{644   MatrixType res(size,size);}
+\DoxyCodeLine{645 }
+\DoxyCodeLine{646   \textcolor{comment}{// P}}
+\DoxyCodeLine{647   res.setIdentity();}
+\DoxyCodeLine{648   res = transpositionsP() * res;}
+\DoxyCodeLine{649   \textcolor{comment}{// L\string^* P}}
+\DoxyCodeLine{650   res = matrixU() * res;}
+\DoxyCodeLine{651   \textcolor{comment}{// D(L\string^*P)}}
+\DoxyCodeLine{652   res = vectorD().real().asDiagonal() * res;}
+\DoxyCodeLine{653   \textcolor{comment}{// L(DL\string^*P)}}
+\DoxyCodeLine{654   res = matrixL() * res;}
+\DoxyCodeLine{655   \textcolor{comment}{// P\string^T (LDL\string^*P)}}
+\DoxyCodeLine{656   res = transpositionsP().transpose() * res;}
+\DoxyCodeLine{657 }
+\DoxyCodeLine{658   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{659 \}}
+\DoxyCodeLine{660 }
+\DoxyCodeLine{665 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} UpLo>}
+\DoxyCodeLine{666 \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1LDLT}{LDLT<typename SelfAdjointView<MatrixType, UpLo>::PlainObject}}, UpLo>}
+\DoxyCodeLine{667 \mbox{\hyperlink{classEigen_1_1SelfAdjointView_a644155eef17b37c95d85b9f65bb49ac4}{SelfAdjointView<MatrixType, UpLo>::ldlt}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{668 \textcolor{keyword}{}\{}
+\DoxyCodeLine{669   \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1LDLT}{LDLT<PlainObject,UpLo>}}(m\_matrix);}
+\DoxyCodeLine{670 \}}
+\DoxyCodeLine{671 }
+\DoxyCodeLine{676 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{677 \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1LDLT}{LDLT<typename MatrixBase<Derived>::PlainObject}}>}
+\DoxyCodeLine{678 \mbox{\hyperlink{classEigen_1_1MatrixBase_a0ecf058a0727a4cab8b42d79e95072e1}{MatrixBase<Derived>::ldlt}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{679 \textcolor{keyword}{}\{}
+\DoxyCodeLine{680   \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1LDLT}{LDLT<PlainObject>}}(derived());}
+\DoxyCodeLine{681 \}}
+\DoxyCodeLine{682 }
+\DoxyCodeLine{683 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{684 }
+\DoxyCodeLine{685 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_LDLT\_H}}
+
+\end{DoxyCode}

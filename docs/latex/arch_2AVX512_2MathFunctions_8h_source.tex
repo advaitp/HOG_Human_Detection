@@ -1,0 +1,370 @@
+\hypertarget{arch_2AVX512_2MathFunctions_8h_source}{}\doxysection{Math\+Functions.\+h}
+\label{arch_2AVX512_2MathFunctions_8h_source}\index{include/Eigen/src/Core/arch/AVX512/MathFunctions.h@{include/Eigen/src/Core/arch/AVX512/MathFunctions.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2016 Pedro Gonnet (pedro.gonnet@gmail.com)}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef THIRD\_PARTY\_EIGEN3\_EIGEN\_SRC\_CORE\_ARCH\_AVX512\_MATHFUNCTIONS\_H\_}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define THIRD\_PARTY\_EIGEN3\_EIGEN\_SRC\_CORE\_ARCH\_AVX512\_MATHFUNCTIONS\_H\_}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}../../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{comment}{// Disable the code for older versions of gcc that don't support many of the required avx512 instrinsics.}}
+\DoxyCodeLine{20 \textcolor{preprocessor}{\#if EIGEN\_GNUC\_AT\_LEAST(5, 3) || EIGEN\_COMP\_CLANG  || EIGEN\_COMP\_MSVC >= 1923}}
+\DoxyCodeLine{21 }
+\DoxyCodeLine{22 \textcolor{preprocessor}{\#define \_EIGEN\_DECLARE\_CONST\_Packet16f(NAME, X) \(\backslash\)}}
+\DoxyCodeLine{23 \textcolor{preprocessor}{  const Packet16f p16f\_\#\#NAME = pset1<Packet16f>(X)}}
+\DoxyCodeLine{24 }
+\DoxyCodeLine{25 \textcolor{preprocessor}{\#define \_EIGEN\_DECLARE\_CONST\_Packet16f\_FROM\_INT(NAME, X) \(\backslash\)}}
+\DoxyCodeLine{26 \textcolor{preprocessor}{  const Packet16f p16f\_\#\#NAME =  preinterpret<Packet16f,Packet16i>(pset1<Packet16i>(X))}}
+\DoxyCodeLine{27 }
+\DoxyCodeLine{28 \textcolor{preprocessor}{\#define \_EIGEN\_DECLARE\_CONST\_Packet8d(NAME, X) \(\backslash\)}}
+\DoxyCodeLine{29 \textcolor{preprocessor}{  const Packet8d p8d\_\#\#NAME = pset1<Packet8d>(X)}}
+\DoxyCodeLine{30 }
+\DoxyCodeLine{31 \textcolor{preprocessor}{\#define \_EIGEN\_DECLARE\_CONST\_Packet8d\_FROM\_INT64(NAME, X) \(\backslash\)}}
+\DoxyCodeLine{32 \textcolor{preprocessor}{  const Packet8d p8d\_\#\#NAME = \_mm512\_castsi512\_pd(\_mm512\_set1\_epi64(X))}}
+\DoxyCodeLine{33 }
+\DoxyCodeLine{34 \textcolor{preprocessor}{\#define \_EIGEN\_DECLARE\_CONST\_Packet16bf(NAME, X) \(\backslash\)}}
+\DoxyCodeLine{35 \textcolor{preprocessor}{  const Packet16bf p16bf\_\#\#NAME = pset1<Packet16bf>(X)}}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{37 \textcolor{preprocessor}{\#define \_EIGEN\_DECLARE\_CONST\_Packet16bf\_FROM\_INT(NAME, X) \(\backslash\)}}
+\DoxyCodeLine{38 \textcolor{preprocessor}{  const Packet16bf p16bf\_\#\#NAME =  preinterpret<Packet16bf,Packet16i>(pset1<Packet16i>(X))}}
+\DoxyCodeLine{39 }
+\DoxyCodeLine{40 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{41 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet16f}
+\DoxyCodeLine{42 plog<Packet16f>(\textcolor{keyword}{const} Packet16f\& \_x) \{}
+\DoxyCodeLine{43   \textcolor{keywordflow}{return} plog\_float(\_x);}
+\DoxyCodeLine{44 \}}
+\DoxyCodeLine{45 }
+\DoxyCodeLine{46 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{47 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet8d}
+\DoxyCodeLine{48 plog<Packet8d>(\textcolor{keyword}{const} Packet8d\& \_x) \{}
+\DoxyCodeLine{49   \textcolor{keywordflow}{return} plog\_double(\_x);}
+\DoxyCodeLine{50 \}}
+\DoxyCodeLine{51 }
+\DoxyCodeLine{52 F16\_PACKET\_FUNCTION(Packet16f, Packet16h, plog)}
+\DoxyCodeLine{53 BF16\_PACKET\_FUNCTION(Packet16f, Packet16bf, plog)}
+\DoxyCodeLine{54 }
+\DoxyCodeLine{55 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{56 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet16f}
+\DoxyCodeLine{57 plog2<Packet16f>(\textcolor{keyword}{const} Packet16f\& \_x) \{}
+\DoxyCodeLine{58   \textcolor{keywordflow}{return} plog2\_float(\_x);}
+\DoxyCodeLine{59 \}}
+\DoxyCodeLine{60 }
+\DoxyCodeLine{61 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{62 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet8d}
+\DoxyCodeLine{63 plog2<Packet8d>(\textcolor{keyword}{const} Packet8d\& \_x) \{}
+\DoxyCodeLine{64   \textcolor{keywordflow}{return} plog2\_double(\_x);}
+\DoxyCodeLine{65 \}}
+\DoxyCodeLine{66 }
+\DoxyCodeLine{67 F16\_PACKET\_FUNCTION(Packet16f, Packet16h, plog2)}
+\DoxyCodeLine{68 BF16\_PACKET\_FUNCTION(Packet16f, Packet16bf, plog2)}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70 \textcolor{comment}{// Exponential function. Works by writing "{}x = m*log(2) + r"{} where}}
+\DoxyCodeLine{71 \textcolor{comment}{// "{}m = floor(x/log(2)+1/2)"{} and "{}r"{} is the remainder. The result is then}}
+\DoxyCodeLine{72 \textcolor{comment}{// "{}exp(x) = 2\string^m*exp(r)"{} where exp(r) is in the range [-\/1,1).}}
+\DoxyCodeLine{73 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{74 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet16f}
+\DoxyCodeLine{75 pexp<Packet16f>(\textcolor{keyword}{const} Packet16f\& \_x) \{}
+\DoxyCodeLine{76   \_EIGEN\_DECLARE\_CONST\_Packet16f(1, 1.0f);}
+\DoxyCodeLine{77   \_EIGEN\_DECLARE\_CONST\_Packet16f(half, 0.5f);}
+\DoxyCodeLine{78   \_EIGEN\_DECLARE\_CONST\_Packet16f(127, 127.0f);}
+\DoxyCodeLine{79 }
+\DoxyCodeLine{80   \_EIGEN\_DECLARE\_CONST\_Packet16f(exp\_hi, 88.3762626647950f);}
+\DoxyCodeLine{81   \_EIGEN\_DECLARE\_CONST\_Packet16f(exp\_lo, -\/88.3762626647949f);}
+\DoxyCodeLine{82 }
+\DoxyCodeLine{83   \_EIGEN\_DECLARE\_CONST\_Packet16f(cephes\_LOG2EF, 1.44269504088896341f);}
+\DoxyCodeLine{84 }
+\DoxyCodeLine{85   \_EIGEN\_DECLARE\_CONST\_Packet16f(cephes\_exp\_p0, 1.9875691500E-\/4f);}
+\DoxyCodeLine{86   \_EIGEN\_DECLARE\_CONST\_Packet16f(cephes\_exp\_p1, 1.3981999507E-\/3f);}
+\DoxyCodeLine{87   \_EIGEN\_DECLARE\_CONST\_Packet16f(cephes\_exp\_p2, 8.3334519073E-\/3f);}
+\DoxyCodeLine{88   \_EIGEN\_DECLARE\_CONST\_Packet16f(cephes\_exp\_p3, 4.1665795894E-\/2f);}
+\DoxyCodeLine{89   \_EIGEN\_DECLARE\_CONST\_Packet16f(cephes\_exp\_p4, 1.6666665459E-\/1f);}
+\DoxyCodeLine{90   \_EIGEN\_DECLARE\_CONST\_Packet16f(cephes\_exp\_p5, 5.0000001201E-\/1f);}
+\DoxyCodeLine{91 }
+\DoxyCodeLine{92   \textcolor{comment}{// Clamp x.}}
+\DoxyCodeLine{93   Packet16f x = pmax(pmin(\_x, p16f\_exp\_hi), p16f\_exp\_lo);}
+\DoxyCodeLine{94 }
+\DoxyCodeLine{95   \textcolor{comment}{// Express exp(x) as exp(m*ln(2) + r), start by extracting}}
+\DoxyCodeLine{96   \textcolor{comment}{// m = floor(x/ln(2) + 0.5).}}
+\DoxyCodeLine{97   Packet16f m = \_mm512\_floor\_ps(pmadd(x, p16f\_cephes\_LOG2EF, p16f\_half));}
+\DoxyCodeLine{98 }
+\DoxyCodeLine{99   \textcolor{comment}{// Get r = x -\/ m*ln(2). Note that we can do this without losing more than one}}
+\DoxyCodeLine{100   \textcolor{comment}{// ulp precision due to the FMA instruction.}}
+\DoxyCodeLine{101   \_EIGEN\_DECLARE\_CONST\_Packet16f(nln2, -\/0.6931471805599453f);}
+\DoxyCodeLine{102   Packet16f r = \_mm512\_fmadd\_ps(m, p16f\_nln2, x);}
+\DoxyCodeLine{103   Packet16f r2 = pmul(r, r);}
+\DoxyCodeLine{104   Packet16f r3 = pmul(r2, r);}
+\DoxyCodeLine{105 }
+\DoxyCodeLine{106   \textcolor{comment}{// Evaluate the polynomial approximant,improved by instruction-\/level parallelism.}}
+\DoxyCodeLine{107   Packet16f y, y1, y2;}
+\DoxyCodeLine{108   y  = pmadd(p16f\_cephes\_exp\_p0, r, p16f\_cephes\_exp\_p1);}
+\DoxyCodeLine{109   y1 = pmadd(p16f\_cephes\_exp\_p3, r, p16f\_cephes\_exp\_p4);}
+\DoxyCodeLine{110   y2 = padd(r, p16f\_1);}
+\DoxyCodeLine{111   y  = pmadd(y, r, p16f\_cephes\_exp\_p2);}
+\DoxyCodeLine{112   y1 = pmadd(y1, r, p16f\_cephes\_exp\_p5);}
+\DoxyCodeLine{113   y  = pmadd(y, r3, y1);}
+\DoxyCodeLine{114   y  = pmadd(y, r2, y2);}
+\DoxyCodeLine{115 }
+\DoxyCodeLine{116   \textcolor{comment}{// Build emm0 = 2\string^m.}}
+\DoxyCodeLine{117   Packet16i emm0 = \_mm512\_cvttps\_epi32(padd(m, p16f\_127));}
+\DoxyCodeLine{118   emm0 = \_mm512\_slli\_epi32(emm0, 23);}
+\DoxyCodeLine{119 }
+\DoxyCodeLine{120   \textcolor{comment}{// Return 2\string^m * exp(r).}}
+\DoxyCodeLine{121   \textcolor{keywordflow}{return} pmax(pmul(y, \_mm512\_castsi512\_ps(emm0)), \_x);}
+\DoxyCodeLine{122 \}}
+\DoxyCodeLine{123 }
+\DoxyCodeLine{124 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{125 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet8d}
+\DoxyCodeLine{126 pexp<Packet8d>(\textcolor{keyword}{const} Packet8d\& \_x) \{}
+\DoxyCodeLine{127   \textcolor{keywordflow}{return} pexp\_double(\_x);}
+\DoxyCodeLine{128 \}}
+\DoxyCodeLine{129 }
+\DoxyCodeLine{130 F16\_PACKET\_FUNCTION(Packet16f, Packet16h, pexp)}
+\DoxyCodeLine{131 BF16\_PACKET\_FUNCTION(Packet16f, Packet16bf, pexp)}
+\DoxyCodeLine{132 }
+\DoxyCodeLine{133 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{134 EIGEN\_STRONG\_INLINE Packet16h pfrexp(\textcolor{keyword}{const} Packet16h\& a, Packet16h\& exponent) \{}
+\DoxyCodeLine{135   Packet16f fexponent;}
+\DoxyCodeLine{136   \textcolor{keyword}{const} Packet16h out = float2half(pfrexp<Packet16f>(half2float(a), fexponent));}
+\DoxyCodeLine{137   exponent = float2half(fexponent);}
+\DoxyCodeLine{138   \textcolor{keywordflow}{return} out;}
+\DoxyCodeLine{139 \}}
+\DoxyCodeLine{140 }
+\DoxyCodeLine{141 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{142 EIGEN\_STRONG\_INLINE Packet16h pldexp(\textcolor{keyword}{const} Packet16h\& a, \textcolor{keyword}{const} Packet16h\& exponent) \{}
+\DoxyCodeLine{143   \textcolor{keywordflow}{return} float2half(pldexp<Packet16f>(half2float(a), half2float(exponent)));}
+\DoxyCodeLine{144 \}}
+\DoxyCodeLine{145 }
+\DoxyCodeLine{146 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{147 EIGEN\_STRONG\_INLINE Packet16bf pfrexp(\textcolor{keyword}{const} Packet16bf\& a, Packet16bf\& exponent) \{}
+\DoxyCodeLine{148   Packet16f fexponent;}
+\DoxyCodeLine{149   \textcolor{keyword}{const} Packet16bf out = F32ToBf16(pfrexp<Packet16f>(Bf16ToF32(a), fexponent));}
+\DoxyCodeLine{150   exponent = F32ToBf16(fexponent);}
+\DoxyCodeLine{151   \textcolor{keywordflow}{return} out;}
+\DoxyCodeLine{152 \}}
+\DoxyCodeLine{153 }
+\DoxyCodeLine{154 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{155 EIGEN\_STRONG\_INLINE Packet16bf pldexp(\textcolor{keyword}{const} Packet16bf\& a, \textcolor{keyword}{const} Packet16bf\& exponent) \{}
+\DoxyCodeLine{156   \textcolor{keywordflow}{return} F32ToBf16(pldexp<Packet16f>(Bf16ToF32(a), Bf16ToF32(exponent)));}
+\DoxyCodeLine{157 \}}
+\DoxyCodeLine{158 }
+\DoxyCodeLine{159 \textcolor{comment}{// Functions for sqrt.}}
+\DoxyCodeLine{160 \textcolor{comment}{// The EIGEN\_FAST\_MATH version uses the \_mm\_rsqrt\_ps approximation and one step}}
+\DoxyCodeLine{161 \textcolor{comment}{// of Newton's method, at a cost of 1-\/2 bits of precision as opposed to the}}
+\DoxyCodeLine{162 \textcolor{comment}{// exact solution. The main advantage of this approach is not just speed, but}}
+\DoxyCodeLine{163 \textcolor{comment}{// also the fact that it can be inlined and pipelined with other computations,}}
+\DoxyCodeLine{164 \textcolor{comment}{// further reducing its effective latency.}}
+\DoxyCodeLine{165 \textcolor{preprocessor}{\#if EIGEN\_FAST\_MATH}}
+\DoxyCodeLine{166 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{167 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet16f}
+\DoxyCodeLine{168 psqrt<Packet16f>(\textcolor{keyword}{const} Packet16f\& \_x) \{}
+\DoxyCodeLine{169   Packet16f neg\_half = pmul(\_x, pset1<Packet16f>(-\/.5f));}
+\DoxyCodeLine{170   \_\_mmask16 denormal\_mask = \_mm512\_kand(}
+\DoxyCodeLine{171       \_mm512\_cmp\_ps\_mask(\_x, pset1<Packet16f>((std::numeric\_limits<float>::min)()),}
+\DoxyCodeLine{172                         \_CMP\_LT\_OQ),}
+\DoxyCodeLine{173       \_mm512\_cmp\_ps\_mask(\_x, \_mm512\_setzero\_ps(), \_CMP\_GE\_OQ));}
+\DoxyCodeLine{174 }
+\DoxyCodeLine{175   Packet16f x = \_mm512\_rsqrt14\_ps(\_x);}
+\DoxyCodeLine{176 }
+\DoxyCodeLine{177   \textcolor{comment}{// Do a single step of Newton's iteration.}}
+\DoxyCodeLine{178   x = pmul(x, pmadd(neg\_half, pmul(x, x), pset1<Packet16f>(1.5f)));}
+\DoxyCodeLine{179 }
+\DoxyCodeLine{180   \textcolor{comment}{// Flush results for denormals to zero.}}
+\DoxyCodeLine{181   \textcolor{keywordflow}{return} \_mm512\_mask\_blend\_ps(denormal\_mask, pmul(\_x,x), \_mm512\_setzero\_ps());}
+\DoxyCodeLine{182 \}}
+\DoxyCodeLine{183 }
+\DoxyCodeLine{184 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{185 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet8d}
+\DoxyCodeLine{186 psqrt<Packet8d>(\textcolor{keyword}{const} Packet8d\& \_x) \{}
+\DoxyCodeLine{187   Packet8d neg\_half = pmul(\_x, pset1<Packet8d>(-\/.5));}
+\DoxyCodeLine{188   \_\_mmask16 denormal\_mask = \_mm512\_kand(}
+\DoxyCodeLine{189       \_mm512\_cmp\_pd\_mask(\_x, pset1<Packet8d>((std::numeric\_limits<double>::min)()),}
+\DoxyCodeLine{190                         \_CMP\_LT\_OQ),}
+\DoxyCodeLine{191       \_mm512\_cmp\_pd\_mask(\_x, \_mm512\_setzero\_pd(), \_CMP\_GE\_OQ));}
+\DoxyCodeLine{192 }
+\DoxyCodeLine{193   Packet8d x = \_mm512\_rsqrt14\_pd(\_x);}
+\DoxyCodeLine{194 }
+\DoxyCodeLine{195   \textcolor{comment}{// Do a single step of Newton's iteration.}}
+\DoxyCodeLine{196   x = pmul(x, pmadd(neg\_half, pmul(x, x), pset1<Packet8d>(1.5)));}
+\DoxyCodeLine{197 }
+\DoxyCodeLine{198   \textcolor{comment}{// Do a second step of Newton's iteration.}}
+\DoxyCodeLine{199   x = pmul(x, pmadd(neg\_half, pmul(x, x), pset1<Packet8d>(1.5)));}
+\DoxyCodeLine{200 }
+\DoxyCodeLine{201   \textcolor{keywordflow}{return} \_mm512\_mask\_blend\_pd(denormal\_mask, pmul(\_x,x), \_mm512\_setzero\_pd());}
+\DoxyCodeLine{202 \}}
+\DoxyCodeLine{203 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{204 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{205 EIGEN\_STRONG\_INLINE Packet16f psqrt<Packet16f>(\textcolor{keyword}{const} Packet16f\& x) \{}
+\DoxyCodeLine{206   \textcolor{keywordflow}{return} \_mm512\_sqrt\_ps(x);}
+\DoxyCodeLine{207 \}}
+\DoxyCodeLine{208 }
+\DoxyCodeLine{209 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{210 EIGEN\_STRONG\_INLINE Packet8d psqrt<Packet8d>(\textcolor{keyword}{const} Packet8d\& x) \{}
+\DoxyCodeLine{211   \textcolor{keywordflow}{return} \_mm512\_sqrt\_pd(x);}
+\DoxyCodeLine{212 \}}
+\DoxyCodeLine{213 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{214 }
+\DoxyCodeLine{215 F16\_PACKET\_FUNCTION(Packet16f, Packet16h, psqrt)}
+\DoxyCodeLine{216 BF16\_PACKET\_FUNCTION(Packet16f, Packet16bf, psqrt)}
+\DoxyCodeLine{217 }
+\DoxyCodeLine{218 \textcolor{comment}{// prsqrt for float.}}
+\DoxyCodeLine{219 \textcolor{preprocessor}{\#if defined(EIGEN\_VECTORIZE\_AVX512ER)}}
+\DoxyCodeLine{220 }
+\DoxyCodeLine{221 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{222 EIGEN\_STRONG\_INLINE Packet16f prsqrt<Packet16f>(\textcolor{keyword}{const} Packet16f\& x) \{}
+\DoxyCodeLine{223   \textcolor{keywordflow}{return} \_mm512\_rsqrt28\_ps(x);}
+\DoxyCodeLine{224 \}}
+\DoxyCodeLine{225 \textcolor{preprocessor}{\#elif EIGEN\_FAST\_MATH}}
+\DoxyCodeLine{226 }
+\DoxyCodeLine{227 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{228 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet16f}
+\DoxyCodeLine{229 prsqrt<Packet16f>(\textcolor{keyword}{const} Packet16f\& \_x) \{}
+\DoxyCodeLine{230   \_EIGEN\_DECLARE\_CONST\_Packet16f\_FROM\_INT(inf, 0x7f800000);}
+\DoxyCodeLine{231   \_EIGEN\_DECLARE\_CONST\_Packet16f(one\_point\_five, 1.5f);}
+\DoxyCodeLine{232   \_EIGEN\_DECLARE\_CONST\_Packet16f(minus\_half, -\/0.5f);}
+\DoxyCodeLine{233 }
+\DoxyCodeLine{234   Packet16f neg\_half = pmul(\_x, p16f\_minus\_half);}
+\DoxyCodeLine{235 }
+\DoxyCodeLine{236   \textcolor{comment}{// Identity infinite, negative and denormal arguments.}}
+\DoxyCodeLine{237   \_\_mmask16 inf\_mask = \_mm512\_cmp\_ps\_mask(\_x, p16f\_inf, \_CMP\_EQ\_OQ);}
+\DoxyCodeLine{238   \_\_mmask16 not\_pos\_mask = \_mm512\_cmp\_ps\_mask(\_x, \_mm512\_setzero\_ps(), \_CMP\_LE\_OQ);}
+\DoxyCodeLine{239   \_\_mmask16 not\_finite\_pos\_mask = not\_pos\_mask | inf\_mask;}
+\DoxyCodeLine{240 }
+\DoxyCodeLine{241   \textcolor{comment}{// Compute an approximate result using the rsqrt intrinsic, forcing +inf}}
+\DoxyCodeLine{242   \textcolor{comment}{// for denormals for consistency with AVX and SSE implementations.}}
+\DoxyCodeLine{243   Packet16f y\_approx = \_mm512\_rsqrt14\_ps(\_x);}
+\DoxyCodeLine{244 }
+\DoxyCodeLine{245   \textcolor{comment}{// Do a single step of Newton-\/Raphson iteration to improve the approximation.}}
+\DoxyCodeLine{246   \textcolor{comment}{// This uses the formula y\_\{n+1\} = y\_n * (1.5 -\/ y\_n * (0.5 * x) * y\_n).}}
+\DoxyCodeLine{247   \textcolor{comment}{// It is essential to evaluate the inner term like this because forming}}
+\DoxyCodeLine{248   \textcolor{comment}{// y\_n\string^2 may over-\/ or underflow.}}
+\DoxyCodeLine{249   Packet16f y\_newton = pmul(y\_approx, pmadd(y\_approx, pmul(neg\_half, y\_approx), p16f\_one\_point\_five));}
+\DoxyCodeLine{250 }
+\DoxyCodeLine{251   \textcolor{comment}{// Select the result of the Newton-\/Raphson step for positive finite arguments.}}
+\DoxyCodeLine{252   \textcolor{comment}{// For other arguments, choose the output of the intrinsic. This will}}
+\DoxyCodeLine{253   \textcolor{comment}{// return rsqrt(+inf) = 0, rsqrt(x) = NaN if x < 0, and rsqrt(0) = +inf.}}
+\DoxyCodeLine{254   \textcolor{keywordflow}{return} \_mm512\_mask\_blend\_ps(not\_finite\_pos\_mask, y\_newton, y\_approx);}
+\DoxyCodeLine{255 \}}
+\DoxyCodeLine{256 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{257 }
+\DoxyCodeLine{258 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{259 EIGEN\_STRONG\_INLINE Packet16f prsqrt<Packet16f>(\textcolor{keyword}{const} Packet16f\& x) \{}
+\DoxyCodeLine{260   \_EIGEN\_DECLARE\_CONST\_Packet16f(one, 1.0f);}
+\DoxyCodeLine{261   \textcolor{keywordflow}{return} \_mm512\_div\_ps(p16f\_one, \_mm512\_sqrt\_ps(x));}
+\DoxyCodeLine{262 \}}
+\DoxyCodeLine{263 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{264 }
+\DoxyCodeLine{265 F16\_PACKET\_FUNCTION(Packet16f, Packet16h, prsqrt)}
+\DoxyCodeLine{266 BF16\_PACKET\_FUNCTION(Packet16f, Packet16bf, prsqrt)}
+\DoxyCodeLine{267 }
+\DoxyCodeLine{268 \textcolor{comment}{// prsqrt for double.}}
+\DoxyCodeLine{269 \textcolor{preprocessor}{\#if EIGEN\_FAST\_MATH}}
+\DoxyCodeLine{270 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{271 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet8d}
+\DoxyCodeLine{272 prsqrt<Packet8d>(\textcolor{keyword}{const} Packet8d\& \_x) \{}
+\DoxyCodeLine{273   \_EIGEN\_DECLARE\_CONST\_Packet8d(one\_point\_five, 1.5);}
+\DoxyCodeLine{274   \_EIGEN\_DECLARE\_CONST\_Packet8d(minus\_half, -\/0.5);}
+\DoxyCodeLine{275   \_EIGEN\_DECLARE\_CONST\_Packet8d\_FROM\_INT64(inf, 0x7ff0000000000000LL);}
+\DoxyCodeLine{276 }
+\DoxyCodeLine{277   Packet8d neg\_half = pmul(\_x, p8d\_minus\_half);}
+\DoxyCodeLine{278 }
+\DoxyCodeLine{279   \textcolor{comment}{// Identity infinite, negative and denormal arguments.}}
+\DoxyCodeLine{280   \_\_mmask8 inf\_mask = \_mm512\_cmp\_pd\_mask(\_x, p8d\_inf, \_CMP\_EQ\_OQ);}
+\DoxyCodeLine{281   \_\_mmask8 not\_pos\_mask = \_mm512\_cmp\_pd\_mask(\_x, \_mm512\_setzero\_pd(), \_CMP\_LE\_OQ);}
+\DoxyCodeLine{282   \_\_mmask8 not\_finite\_pos\_mask = not\_pos\_mask | inf\_mask;}
+\DoxyCodeLine{283 }
+\DoxyCodeLine{284   \textcolor{comment}{// Compute an approximate result using the rsqrt intrinsic, forcing +inf}}
+\DoxyCodeLine{285   \textcolor{comment}{// for denormals for consistency with AVX and SSE implementations.}}
+\DoxyCodeLine{286 \textcolor{preprocessor}{\#if defined(EIGEN\_VECTORIZE\_AVX512ER)}}
+\DoxyCodeLine{287   Packet8d y\_approx = \_mm512\_rsqrt28\_pd(\_x);}
+\DoxyCodeLine{288 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{289   Packet8d y\_approx = \_mm512\_rsqrt14\_pd(\_x);}
+\DoxyCodeLine{290 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{291   \textcolor{comment}{// Do one or two steps of Newton-\/Raphson's to improve the approximation, depending on the}}
+\DoxyCodeLine{292   \textcolor{comment}{// starting accuracy (either 2\string^-\/14 or 2\string^-\/28, depending on whether AVX512ER is available).}}
+\DoxyCodeLine{293   \textcolor{comment}{// The Newton-\/Raphson algorithm has quadratic convergence and roughly doubles the number}}
+\DoxyCodeLine{294   \textcolor{comment}{// of correct digits for each step.}}
+\DoxyCodeLine{295   \textcolor{comment}{// This uses the formula y\_\{n+1\} = y\_n * (1.5 -\/ y\_n * (0.5 * x) * y\_n).}}
+\DoxyCodeLine{296   \textcolor{comment}{// It is essential to evaluate the inner term like this because forming}}
+\DoxyCodeLine{297   \textcolor{comment}{// y\_n\string^2 may over-\/ or underflow.}}
+\DoxyCodeLine{298   Packet8d y\_newton = pmul(y\_approx, pmadd(neg\_half, pmul(y\_approx, y\_approx), p8d\_one\_point\_five));}
+\DoxyCodeLine{299 \textcolor{preprocessor}{\#if !defined(EIGEN\_VECTORIZE\_AVX512ER)}}
+\DoxyCodeLine{300   y\_newton = pmul(y\_newton, pmadd(y\_newton, pmul(neg\_half, y\_newton), p8d\_one\_point\_five));}
+\DoxyCodeLine{301 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{302   \textcolor{comment}{// Select the result of the Newton-\/Raphson step for positive finite arguments.}}
+\DoxyCodeLine{303   \textcolor{comment}{// For other arguments, choose the output of the intrinsic. This will}}
+\DoxyCodeLine{304   \textcolor{comment}{// return rsqrt(+inf) = 0, rsqrt(x) = NaN if x < 0, and rsqrt(0) = +inf.}}
+\DoxyCodeLine{305   \textcolor{keywordflow}{return} \_mm512\_mask\_blend\_pd(not\_finite\_pos\_mask, y\_newton, y\_approx);}
+\DoxyCodeLine{306 \}}
+\DoxyCodeLine{307 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{308 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{309 EIGEN\_STRONG\_INLINE Packet8d prsqrt<Packet8d>(\textcolor{keyword}{const} Packet8d\& x) \{}
+\DoxyCodeLine{310   \_EIGEN\_DECLARE\_CONST\_Packet8d(one, 1.0f);}
+\DoxyCodeLine{311   \textcolor{keywordflow}{return} \_mm512\_div\_pd(p8d\_one, \_mm512\_sqrt\_pd(x));}
+\DoxyCodeLine{312 \}}
+\DoxyCodeLine{313 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{314 }
+\DoxyCodeLine{315 \textcolor{keyword}{template}<> EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED}
+\DoxyCodeLine{316 Packet16f plog1p<Packet16f>(\textcolor{keyword}{const} Packet16f\& \_x) \{}
+\DoxyCodeLine{317   \textcolor{keywordflow}{return} generic\_plog1p(\_x);}
+\DoxyCodeLine{318 \}}
+\DoxyCodeLine{319 }
+\DoxyCodeLine{320 F16\_PACKET\_FUNCTION(Packet16f, Packet16h, plog1p)}
+\DoxyCodeLine{321 BF16\_PACKET\_FUNCTION(Packet16f, Packet16bf, plog1p)}
+\DoxyCodeLine{322 }
+\DoxyCodeLine{323 \textcolor{keyword}{template}<> EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED}
+\DoxyCodeLine{324 Packet16f pexpm1<Packet16f>(\textcolor{keyword}{const} Packet16f\& \_x) \{}
+\DoxyCodeLine{325   \textcolor{keywordflow}{return} generic\_expm1(\_x);}
+\DoxyCodeLine{326 \}}
+\DoxyCodeLine{327 }
+\DoxyCodeLine{328 F16\_PACKET\_FUNCTION(Packet16f, Packet16h, pexpm1)}
+\DoxyCodeLine{329 BF16\_PACKET\_FUNCTION(Packet16f, Packet16bf, pexpm1)}
+\DoxyCodeLine{330 }
+\DoxyCodeLine{331 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{332 }
+\DoxyCodeLine{333 }
+\DoxyCodeLine{334 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{335 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet16f}
+\DoxyCodeLine{336 psin<Packet16f>(\textcolor{keyword}{const} Packet16f\& \_x) \{}
+\DoxyCodeLine{337   \textcolor{keywordflow}{return} psin\_float(\_x);}
+\DoxyCodeLine{338 \}}
+\DoxyCodeLine{339 }
+\DoxyCodeLine{340 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{341 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet16f}
+\DoxyCodeLine{342 pcos<Packet16f>(\textcolor{keyword}{const} Packet16f\& \_x) \{}
+\DoxyCodeLine{343   \textcolor{keywordflow}{return} pcos\_float(\_x);}
+\DoxyCodeLine{344 \}}
+\DoxyCodeLine{345 }
+\DoxyCodeLine{346 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{347 EIGEN\_DEFINE\_FUNCTION\_ALLOWING\_MULTIPLE\_DEFINITIONS EIGEN\_UNUSED Packet16f}
+\DoxyCodeLine{348 ptanh<Packet16f>(\textcolor{keyword}{const} Packet16f\& \_x) \{}
+\DoxyCodeLine{349   \textcolor{keywordflow}{return} internal::generic\_fast\_tanh\_float(\_x);}
+\DoxyCodeLine{350 \}}
+\DoxyCodeLine{351 }
+\DoxyCodeLine{352 F16\_PACKET\_FUNCTION(Packet16f, Packet16h, psin)}
+\DoxyCodeLine{353 F16\_PACKET\_FUNCTION(Packet16f, Packet16h, pcos)}
+\DoxyCodeLine{354 F16\_PACKET\_FUNCTION(Packet16f, Packet16h, ptanh)}
+\DoxyCodeLine{355 }
+\DoxyCodeLine{356 BF16\_PACKET\_FUNCTION(Packet16f, Packet16bf, psin)}
+\DoxyCodeLine{357 BF16\_PACKET\_FUNCTION(Packet16f, Packet16bf, pcos)}
+\DoxyCodeLine{358 BF16\_PACKET\_FUNCTION(Packet16f, Packet16bf, ptanh)}
+\DoxyCodeLine{359 }
+\DoxyCodeLine{360 \}  \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{361 }
+\DoxyCodeLine{362 \}  \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{363 }
+\DoxyCodeLine{364 \textcolor{preprocessor}{\#endif  }\textcolor{comment}{// THIRD\_PARTY\_EIGEN3\_EIGEN\_SRC\_CORE\_ARCH\_AVX512\_MATHFUNCTIONS\_H\_}}
+
+\end{DoxyCode}

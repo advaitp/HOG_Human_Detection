@@ -1,0 +1,84 @@
+\hypertarget{Kernel_8h_source}{}\doxysection{Kernel.\+h}
+\label{Kernel_8h_source}\index{include/Eigen/src/misc/Kernel.h@{include/Eigen/src/misc/Kernel.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2009 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_MISC\_KERNEL\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_MISC\_KERNEL\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{22 \textcolor{keyword}{template}<\textcolor{keyword}{typename} DecompositionType>}
+\DoxyCodeLine{23 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1kernel__retval__base}{kernel\_retval\_base}}<DecompositionType> >}
+\DoxyCodeLine{24 \{}
+\DoxyCodeLine{25   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} DecompositionType::MatrixType MatrixType;}
+\DoxyCodeLine{26   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix}}<}
+\DoxyCodeLine{27     \textcolor{keyword}{typename} MatrixType::Scalar,}
+\DoxyCodeLine{28     MatrixType::ColsAtCompileTime, \textcolor{comment}{// the number of rows in the "{}kernel matrix"{}}}
+\DoxyCodeLine{29                                    \textcolor{comment}{// is the number of cols of the original matrix}}
+\DoxyCodeLine{30                                    \textcolor{comment}{// so that the product "{}matrix * kernel = zero"{} makes sense}}
+\DoxyCodeLine{31     \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}},                       \textcolor{comment}{// we don't know at compile-\/time the dimension of the kernel}}
+\DoxyCodeLine{32     MatrixType::Options,}
+\DoxyCodeLine{33     MatrixType::MaxColsAtCompileTime, \textcolor{comment}{// see explanation for 2nd template parameter}}
+\DoxyCodeLine{34     MatrixType::MaxColsAtCompileTime \textcolor{comment}{// the kernel is a subspace of the domain space,}}
+\DoxyCodeLine{35                                      \textcolor{comment}{// whose dimension is the number of columns of the original matrix}}
+\DoxyCodeLine{36   > \mbox{\hyperlink{classEigen_1_1Matrix}{ReturnType}};}
+\DoxyCodeLine{37 \};}
+\DoxyCodeLine{38 }
+\DoxyCodeLine{39 \textcolor{keyword}{template}<\textcolor{keyword}{typename} DecompositionType\_> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1kernel__retval__base}{kernel\_retval\_base}}}
+\DoxyCodeLine{40  : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1ReturnByValue}{ReturnByValue}}<kernel\_retval\_base<DecompositionType\_> >}
+\DoxyCodeLine{41 \{}
+\DoxyCodeLine{42   \textcolor{keyword}{typedef} DecompositionType\_ DecompositionType;}
+\DoxyCodeLine{43   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1ReturnByValue}{ReturnByValue<kernel\_retval\_base>}} \mbox{\hyperlink{classEigen_1_1ReturnByValue}{Base}};}
+\DoxyCodeLine{44 }
+\DoxyCodeLine{45   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1kernel__retval__base}{kernel\_retval\_base}}(\textcolor{keyword}{const} DecompositionType\& dec)}
+\DoxyCodeLine{46     : m\_dec(dec),}
+\DoxyCodeLine{47       m\_rank(dec.rank()),}
+\DoxyCodeLine{48       m\_cols(m\_rank==dec.cols() ? 1 : dec.cols() -\/ m\_rank)}
+\DoxyCodeLine{49   \{\}}
+\DoxyCodeLine{50 }
+\DoxyCodeLine{51   \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_dec.cols(); \}}
+\DoxyCodeLine{52   \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_cols; \}}
+\DoxyCodeLine{53   \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rank()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_rank; \}}
+\DoxyCodeLine{54   \textcolor{keyword}{inline} \textcolor{keyword}{const} DecompositionType\& dec()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_dec; \}}
+\DoxyCodeLine{55 }
+\DoxyCodeLine{56   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest> \textcolor{keyword}{inline} \textcolor{keywordtype}{void} evalTo(Dest\& dst)\textcolor{keyword}{ const}}
+\DoxyCodeLine{57 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{58     \textcolor{keyword}{static\_cast<}\textcolor{keyword}{const }\mbox{\hyperlink{structEigen_1_1internal_1_1kernel__retval}{kernel\_retval<DecompositionType>}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})-\/>evalTo(dst);}
+\DoxyCodeLine{59   \}}
+\DoxyCodeLine{60 }
+\DoxyCodeLine{61   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{62     \textcolor{keyword}{const} DecompositionType\& m\_dec;}
+\DoxyCodeLine{63     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m\_rank, m\_cols;}
+\DoxyCodeLine{64 \};}
+\DoxyCodeLine{65 }
+\DoxyCodeLine{66 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{67 }
+\DoxyCodeLine{68 \textcolor{preprocessor}{\#define EIGEN\_MAKE\_KERNEL\_HELPERS(DecompositionType) \(\backslash\)}}
+\DoxyCodeLine{69 \textcolor{preprocessor}{  typedef typename DecompositionType::MatrixType MatrixType; \(\backslash\)}}
+\DoxyCodeLine{70 \textcolor{preprocessor}{  typedef typename MatrixType::Scalar Scalar; \(\backslash\)}}
+\DoxyCodeLine{71 \textcolor{preprocessor}{  typedef typename MatrixType::RealScalar RealScalar; \(\backslash\)}}
+\DoxyCodeLine{72 \textcolor{preprocessor}{  typedef Eigen::internal::kernel\_retval\_base<DecompositionType> Base; \(\backslash\)}}
+\DoxyCodeLine{73 \textcolor{preprocessor}{  using Base::dec; \(\backslash\)}}
+\DoxyCodeLine{74 \textcolor{preprocessor}{  using Base::rank; \(\backslash\)}}
+\DoxyCodeLine{75 \textcolor{preprocessor}{  using Base::rows; \(\backslash\)}}
+\DoxyCodeLine{76 \textcolor{preprocessor}{  using Base::cols; \(\backslash\)}}
+\DoxyCodeLine{77 \textcolor{preprocessor}{  kernel\_retval(const DecompositionType\& dec) : Base(dec) \{\}}}
+\DoxyCodeLine{78 }
+\DoxyCodeLine{79 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{80 }
+\DoxyCodeLine{81 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_MISC\_KERNEL\_H}}
+
+\end{DoxyCode}

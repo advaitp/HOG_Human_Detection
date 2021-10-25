@@ -1,0 +1,760 @@
+\hypertarget{SVE_2PacketMath_8h_source}{}\doxysection{Packet\+Math.\+h}
+\label{SVE_2PacketMath_8h_source}\index{include/Eigen/src/Core/arch/SVE/PacketMath.h@{include/Eigen/src/Core/arch/SVE/PacketMath.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2020, Arm Limited and Contributors}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_PACKET\_MATH\_SVE\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_PACKET\_MATH\_SVE\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}../../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}}}
+\DoxyCodeLine{16 \{}
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal}
+\DoxyCodeLine{18 \{}
+\DoxyCodeLine{19 \textcolor{preprocessor}{\#ifndef EIGEN\_CACHEFRIENDLY\_PRODUCT\_THRESHOLD}}
+\DoxyCodeLine{20 \textcolor{preprocessor}{\#define EIGEN\_CACHEFRIENDLY\_PRODUCT\_THRESHOLD 8}}
+\DoxyCodeLine{21 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{22 }
+\DoxyCodeLine{23 \textcolor{preprocessor}{\#ifndef EIGEN\_HAS\_SINGLE\_INSTRUCTION\_MADD}}
+\DoxyCodeLine{24 \textcolor{preprocessor}{\#define EIGEN\_HAS\_SINGLE\_INSTRUCTION\_MADD}}
+\DoxyCodeLine{25 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{26 }
+\DoxyCodeLine{27 \textcolor{preprocessor}{\#define EIGEN\_ARCH\_DEFAULT\_NUMBER\_OF\_REGISTERS 32}}
+\DoxyCodeLine{28 }
+\DoxyCodeLine{29 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar, \textcolor{keywordtype}{int} SVEVectorLength>}
+\DoxyCodeLine{30 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1sve__packet__size__selector}{sve\_packet\_size\_selector}} \{}
+\DoxyCodeLine{31   \textcolor{keyword}{enum} \{ size = SVEVectorLength / (\textcolor{keyword}{sizeof}(Scalar) * CHAR\_BIT) \};}
+\DoxyCodeLine{32 \};}
+\DoxyCodeLine{33 }
+\DoxyCodeLine{34 \textcolor{comment}{/********************************* int32 **************************************/}}
+\DoxyCodeLine{35 \textcolor{keyword}{typedef} svint32\_t PacketXi \_\_attribute\_\_((arm\_sve\_vector\_bits(EIGEN\_ARM64\_SVE\_VL)));}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{37 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{38 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits}}<numext::int32\_t> : \mbox{\hyperlink{structEigen_1_1internal_1_1default__packet__traits}{default\_packet\_traits}} \{}
+\DoxyCodeLine{39   \textcolor{keyword}{typedef} PacketXi type;}
+\DoxyCodeLine{40   \textcolor{keyword}{typedef} PacketXi half;  \textcolor{comment}{// Half not implemented yet}}
+\DoxyCodeLine{41   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{42     Vectorizable = 1,}
+\DoxyCodeLine{43     AlignedOnScalar = 1,}
+\DoxyCodeLine{44     size = \mbox{\hyperlink{structEigen_1_1internal_1_1sve__packet__size__selector}{sve\_packet\_size\_selector<numext::int32\_t, EIGEN\_ARM64\_SVE\_VL>::size}},}
+\DoxyCodeLine{45     HasHalfPacket = 0,}
+\DoxyCodeLine{46 }
+\DoxyCodeLine{47     HasAdd = 1,}
+\DoxyCodeLine{48     HasSub = 1,}
+\DoxyCodeLine{49     HasShift = 1,}
+\DoxyCodeLine{50     HasMul = 1,}
+\DoxyCodeLine{51     HasNegate = 1,}
+\DoxyCodeLine{52     HasAbs = 1,}
+\DoxyCodeLine{53     HasArg = 0,}
+\DoxyCodeLine{54     HasAbs2 = 1,}
+\DoxyCodeLine{55     HasMin = 1,}
+\DoxyCodeLine{56     HasMax = 1,}
+\DoxyCodeLine{57     HasConj = 1,}
+\DoxyCodeLine{58     HasSetLinear = 0,}
+\DoxyCodeLine{59     HasBlend = 0,}
+\DoxyCodeLine{60     HasReduxp = 0  \textcolor{comment}{// Not implemented in SVE}}
+\DoxyCodeLine{61   \};}
+\DoxyCodeLine{62 \};}
+\DoxyCodeLine{63 }
+\DoxyCodeLine{64 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{65 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unpacket__traits}{unpacket\_traits}}<PacketXi> \{}
+\DoxyCodeLine{66   \textcolor{keyword}{typedef} numext::int32\_t type;}
+\DoxyCodeLine{67   \textcolor{keyword}{typedef} PacketXi half;  \textcolor{comment}{// Half not yet implemented}}
+\DoxyCodeLine{68   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{69     size = \mbox{\hyperlink{structEigen_1_1internal_1_1sve__packet__size__selector}{sve\_packet\_size\_selector<numext::int32\_t, EIGEN\_ARM64\_SVE\_VL>::size}},}
+\DoxyCodeLine{70     alignment = \mbox{\hyperlink{group__enums_gga45fe06e29902b7a2773de05ba27b47a1a2639cfa1e8faac751556bc0009fe95a4}{Aligned64}},}
+\DoxyCodeLine{71     vectorizable = \textcolor{keyword}{true},}
+\DoxyCodeLine{72     masked\_load\_available = \textcolor{keyword}{false},}
+\DoxyCodeLine{73     masked\_store\_available = \textcolor{keyword}{false}}
+\DoxyCodeLine{74   \};}
+\DoxyCodeLine{75 \};}
+\DoxyCodeLine{76 }
+\DoxyCodeLine{77 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{78 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} prefetch<numext::int32\_t>(\textcolor{keyword}{const} numext::int32\_t* addr)}
+\DoxyCodeLine{79 \{}
+\DoxyCodeLine{80   svprfw(svptrue\_b32(), addr, SV\_PLDL1KEEP);}
+\DoxyCodeLine{81 \}}
+\DoxyCodeLine{82 }
+\DoxyCodeLine{83 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{84 EIGEN\_STRONG\_INLINE PacketXi pset1<PacketXi>(\textcolor{keyword}{const} numext::int32\_t\& from)}
+\DoxyCodeLine{85 \{}
+\DoxyCodeLine{86   \textcolor{keywordflow}{return} svdup\_n\_s32(from);}
+\DoxyCodeLine{87 \}}
+\DoxyCodeLine{88 }
+\DoxyCodeLine{89 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{90 EIGEN\_STRONG\_INLINE PacketXi plset<PacketXi>(\textcolor{keyword}{const} numext::int32\_t\& a)}
+\DoxyCodeLine{91 \{}
+\DoxyCodeLine{92   numext::int32\_t c[packet\_traits<numext::int32\_t>::size];}
+\DoxyCodeLine{93   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < packet\_traits<numext::int32\_t>::size; i++) c[i] = i;}
+\DoxyCodeLine{94   \textcolor{keywordflow}{return} svadd\_s32\_z(svptrue\_b32(), pset1<PacketXi>(a), svld1\_s32(svptrue\_b32(), c));}
+\DoxyCodeLine{95 \}}
+\DoxyCodeLine{96 }
+\DoxyCodeLine{97 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{98 EIGEN\_STRONG\_INLINE PacketXi padd<PacketXi>(\textcolor{keyword}{const} PacketXi\& a, \textcolor{keyword}{const} PacketXi\& b)}
+\DoxyCodeLine{99 \{}
+\DoxyCodeLine{100   \textcolor{keywordflow}{return} svadd\_s32\_z(svptrue\_b32(), a, b);}
+\DoxyCodeLine{101 \}}
+\DoxyCodeLine{102 }
+\DoxyCodeLine{103 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{104 EIGEN\_STRONG\_INLINE PacketXi psub<PacketXi>(\textcolor{keyword}{const} PacketXi\& a, \textcolor{keyword}{const} PacketXi\& b)}
+\DoxyCodeLine{105 \{}
+\DoxyCodeLine{106   \textcolor{keywordflow}{return} svsub\_s32\_z(svptrue\_b32(), a, b);}
+\DoxyCodeLine{107 \}}
+\DoxyCodeLine{108 }
+\DoxyCodeLine{109 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{110 EIGEN\_STRONG\_INLINE PacketXi pnegate(\textcolor{keyword}{const} PacketXi\& a)}
+\DoxyCodeLine{111 \{}
+\DoxyCodeLine{112   \textcolor{keywordflow}{return} svneg\_s32\_z(svptrue\_b32(), a);}
+\DoxyCodeLine{113 \}}
+\DoxyCodeLine{114 }
+\DoxyCodeLine{115 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{116 EIGEN\_STRONG\_INLINE PacketXi pconj(\textcolor{keyword}{const} PacketXi\& a)}
+\DoxyCodeLine{117 \{}
+\DoxyCodeLine{118   \textcolor{keywordflow}{return} a;}
+\DoxyCodeLine{119 \}}
+\DoxyCodeLine{120 }
+\DoxyCodeLine{121 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{122 EIGEN\_STRONG\_INLINE PacketXi pmul<PacketXi>(\textcolor{keyword}{const} PacketXi\& a, \textcolor{keyword}{const} PacketXi\& b)}
+\DoxyCodeLine{123 \{}
+\DoxyCodeLine{124   \textcolor{keywordflow}{return} svmul\_s32\_z(svptrue\_b32(), a, b);}
+\DoxyCodeLine{125 \}}
+\DoxyCodeLine{126 }
+\DoxyCodeLine{127 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{128 EIGEN\_STRONG\_INLINE PacketXi pdiv<PacketXi>(\textcolor{keyword}{const} PacketXi\& a, \textcolor{keyword}{const} PacketXi\& b)}
+\DoxyCodeLine{129 \{}
+\DoxyCodeLine{130   \textcolor{keywordflow}{return} svdiv\_s32\_z(svptrue\_b32(), a, b);}
+\DoxyCodeLine{131 \}}
+\DoxyCodeLine{132 }
+\DoxyCodeLine{133 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{134 EIGEN\_STRONG\_INLINE PacketXi pmadd(\textcolor{keyword}{const} PacketXi\& a, \textcolor{keyword}{const} PacketXi\& b, \textcolor{keyword}{const} PacketXi\& c)}
+\DoxyCodeLine{135 \{}
+\DoxyCodeLine{136   \textcolor{keywordflow}{return} svmla\_s32\_z(svptrue\_b32(), c, a, b);}
+\DoxyCodeLine{137 \}}
+\DoxyCodeLine{138 }
+\DoxyCodeLine{139 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{140 EIGEN\_STRONG\_INLINE PacketXi pmin<PacketXi>(\textcolor{keyword}{const} PacketXi\& a, \textcolor{keyword}{const} PacketXi\& b)}
+\DoxyCodeLine{141 \{}
+\DoxyCodeLine{142   \textcolor{keywordflow}{return} svmin\_s32\_z(svptrue\_b32(), a, b);}
+\DoxyCodeLine{143 \}}
+\DoxyCodeLine{144 }
+\DoxyCodeLine{145 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{146 EIGEN\_STRONG\_INLINE PacketXi pmax<PacketXi>(\textcolor{keyword}{const} PacketXi\& a, \textcolor{keyword}{const} PacketXi\& b)}
+\DoxyCodeLine{147 \{}
+\DoxyCodeLine{148   \textcolor{keywordflow}{return} svmax\_s32\_z(svptrue\_b32(), a, b);}
+\DoxyCodeLine{149 \}}
+\DoxyCodeLine{150 }
+\DoxyCodeLine{151 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{152 EIGEN\_STRONG\_INLINE PacketXi pcmp\_le<PacketXi>(\textcolor{keyword}{const} PacketXi\& a, \textcolor{keyword}{const} PacketXi\& b)}
+\DoxyCodeLine{153 \{}
+\DoxyCodeLine{154   \textcolor{keywordflow}{return} svdup\_n\_s32\_z(svcmplt\_s32(svptrue\_b32(), a, b), 0xffffffffu);}
+\DoxyCodeLine{155 \}}
+\DoxyCodeLine{156 }
+\DoxyCodeLine{157 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{158 EIGEN\_STRONG\_INLINE PacketXi pcmp\_lt<PacketXi>(\textcolor{keyword}{const} PacketXi\& a, \textcolor{keyword}{const} PacketXi\& b)}
+\DoxyCodeLine{159 \{}
+\DoxyCodeLine{160   \textcolor{keywordflow}{return} svdup\_n\_s32\_z(svcmplt\_s32(svptrue\_b32(), a, b), 0xffffffffu);}
+\DoxyCodeLine{161 \}}
+\DoxyCodeLine{162 }
+\DoxyCodeLine{163 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{164 EIGEN\_STRONG\_INLINE PacketXi pcmp\_eq<PacketXi>(\textcolor{keyword}{const} PacketXi\& a, \textcolor{keyword}{const} PacketXi\& b)}
+\DoxyCodeLine{165 \{}
+\DoxyCodeLine{166   \textcolor{keywordflow}{return} svdup\_n\_s32\_z(svcmpeq\_s32(svptrue\_b32(), a, b), 0xffffffffu);}
+\DoxyCodeLine{167 \}}
+\DoxyCodeLine{168 }
+\DoxyCodeLine{169 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{170 EIGEN\_STRONG\_INLINE PacketXi ptrue<PacketXi>(\textcolor{keyword}{const} PacketXi\& \textcolor{comment}{/*a*/})}
+\DoxyCodeLine{171 \{}
+\DoxyCodeLine{172   \textcolor{keywordflow}{return} svdup\_n\_s32\_z(svptrue\_b32(), 0xffffffffu);}
+\DoxyCodeLine{173 \}}
+\DoxyCodeLine{174 }
+\DoxyCodeLine{175 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{176 EIGEN\_STRONG\_INLINE PacketXi pzero<PacketXi>(\textcolor{keyword}{const} PacketXi\& \textcolor{comment}{/*a*/})}
+\DoxyCodeLine{177 \{}
+\DoxyCodeLine{178   \textcolor{keywordflow}{return} svdup\_n\_s32\_z(svptrue\_b32(), 0);}
+\DoxyCodeLine{179 \}}
+\DoxyCodeLine{180 }
+\DoxyCodeLine{181 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{182 EIGEN\_STRONG\_INLINE PacketXi pand<PacketXi>(\textcolor{keyword}{const} PacketXi\& a, \textcolor{keyword}{const} PacketXi\& b)}
+\DoxyCodeLine{183 \{}
+\DoxyCodeLine{184   \textcolor{keywordflow}{return} svand\_s32\_z(svptrue\_b32(), a, b);}
+\DoxyCodeLine{185 \}}
+\DoxyCodeLine{186 }
+\DoxyCodeLine{187 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{188 EIGEN\_STRONG\_INLINE PacketXi por<PacketXi>(\textcolor{keyword}{const} PacketXi\& a, \textcolor{keyword}{const} PacketXi\& b)}
+\DoxyCodeLine{189 \{}
+\DoxyCodeLine{190   \textcolor{keywordflow}{return} svorr\_s32\_z(svptrue\_b32(), a, b);}
+\DoxyCodeLine{191 \}}
+\DoxyCodeLine{192 }
+\DoxyCodeLine{193 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{194 EIGEN\_STRONG\_INLINE PacketXi pxor<PacketXi>(\textcolor{keyword}{const} PacketXi\& a, \textcolor{keyword}{const} PacketXi\& b)}
+\DoxyCodeLine{195 \{}
+\DoxyCodeLine{196   \textcolor{keywordflow}{return} sveor\_s32\_z(svptrue\_b32(), a, b);}
+\DoxyCodeLine{197 \}}
+\DoxyCodeLine{198 }
+\DoxyCodeLine{199 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{200 EIGEN\_STRONG\_INLINE PacketXi pandnot<PacketXi>(\textcolor{keyword}{const} PacketXi\& a, \textcolor{keyword}{const} PacketXi\& b)}
+\DoxyCodeLine{201 \{}
+\DoxyCodeLine{202   \textcolor{keywordflow}{return} svbic\_s32\_z(svptrue\_b32(), a, b);}
+\DoxyCodeLine{203 \}}
+\DoxyCodeLine{204 }
+\DoxyCodeLine{205 \textcolor{keyword}{template} <\textcolor{keywordtype}{int} N>}
+\DoxyCodeLine{206 EIGEN\_STRONG\_INLINE PacketXi parithmetic\_shift\_right(PacketXi a)}
+\DoxyCodeLine{207 \{}
+\DoxyCodeLine{208   \textcolor{keywordflow}{return} svasrd\_n\_s32\_z(svptrue\_b32(), a, N);}
+\DoxyCodeLine{209 \}}
+\DoxyCodeLine{210 }
+\DoxyCodeLine{211 \textcolor{keyword}{template} <\textcolor{keywordtype}{int} N>}
+\DoxyCodeLine{212 EIGEN\_STRONG\_INLINE PacketXi plogical\_shift\_right(PacketXi a)}
+\DoxyCodeLine{213 \{}
+\DoxyCodeLine{214   \textcolor{keywordflow}{return} svreinterpret\_s32\_u32(svlsr\_u32\_z(svptrue\_b32(), svreinterpret\_u32\_s32(a), svdup\_n\_u32\_z(svptrue\_b32(), N)));}
+\DoxyCodeLine{215 \}}
+\DoxyCodeLine{216 }
+\DoxyCodeLine{217 \textcolor{keyword}{template} <\textcolor{keywordtype}{int} N>}
+\DoxyCodeLine{218 EIGEN\_STRONG\_INLINE PacketXi plogical\_shift\_left(PacketXi a)}
+\DoxyCodeLine{219 \{}
+\DoxyCodeLine{220   \textcolor{keywordflow}{return} svlsl\_s32\_z(svptrue\_b32(), a, svdup\_n\_u32\_z(svptrue\_b32(), N));}
+\DoxyCodeLine{221 \}}
+\DoxyCodeLine{222 }
+\DoxyCodeLine{223 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{224 EIGEN\_STRONG\_INLINE PacketXi pload<PacketXi>(\textcolor{keyword}{const} numext::int32\_t* from)}
+\DoxyCodeLine{225 \{}
+\DoxyCodeLine{226   EIGEN\_DEBUG\_ALIGNED\_LOAD \textcolor{keywordflow}{return} svld1\_s32(svptrue\_b32(), from);}
+\DoxyCodeLine{227 \}}
+\DoxyCodeLine{228 }
+\DoxyCodeLine{229 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{230 EIGEN\_STRONG\_INLINE PacketXi ploadu<PacketXi>(\textcolor{keyword}{const} numext::int32\_t* from)}
+\DoxyCodeLine{231 \{}
+\DoxyCodeLine{232   EIGEN\_DEBUG\_UNALIGNED\_LOAD \textcolor{keywordflow}{return} svld1\_s32(svptrue\_b32(), from);}
+\DoxyCodeLine{233 \}}
+\DoxyCodeLine{234 }
+\DoxyCodeLine{235 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{236 EIGEN\_STRONG\_INLINE PacketXi ploaddup<PacketXi>(\textcolor{keyword}{const} numext::int32\_t* from)}
+\DoxyCodeLine{237 \{}
+\DoxyCodeLine{238   svuint32\_t indices = svindex\_u32(0, 1);  \textcolor{comment}{// index \{base=0, base+step=1, base+step*2, ...\}}}
+\DoxyCodeLine{239   indices = svzip1\_u32(indices, indices);  \textcolor{comment}{// index in the format \{a0, a0, a1, a1, a2, a2, ...\}}}
+\DoxyCodeLine{240   \textcolor{keywordflow}{return} svld1\_gather\_u32index\_s32(svptrue\_b32(), from, indices);}
+\DoxyCodeLine{241 \}}
+\DoxyCodeLine{242 }
+\DoxyCodeLine{243 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{244 EIGEN\_STRONG\_INLINE PacketXi ploadquad<PacketXi>(\textcolor{keyword}{const} numext::int32\_t* from)}
+\DoxyCodeLine{245 \{}
+\DoxyCodeLine{246   svuint32\_t indices = svindex\_u32(0, 1);  \textcolor{comment}{// index \{base=0, base+step=1, base+step*2, ...\}}}
+\DoxyCodeLine{247   indices = svzip1\_u32(indices, indices);  \textcolor{comment}{// index in the format \{a0, a0, a1, a1, a2, a2, ...\}}}
+\DoxyCodeLine{248   indices = svzip1\_u32(indices, indices);  \textcolor{comment}{// index in the format \{a0, a0, a0, a0, a1, a1, a1, a1, ...\}}}
+\DoxyCodeLine{249   \textcolor{keywordflow}{return} svld1\_gather\_u32index\_s32(svptrue\_b32(), from, indices);}
+\DoxyCodeLine{250 \}}
+\DoxyCodeLine{251 }
+\DoxyCodeLine{252 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{253 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pstore<numext::int32\_t>(numext::int32\_t* to, \textcolor{keyword}{const} PacketXi\& from)}
+\DoxyCodeLine{254 \{}
+\DoxyCodeLine{255   EIGEN\_DEBUG\_ALIGNED\_STORE svst1\_s32(svptrue\_b32(), to, from);}
+\DoxyCodeLine{256 \}}
+\DoxyCodeLine{257 }
+\DoxyCodeLine{258 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{259 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pstoreu<numext::int32\_t>(numext::int32\_t* to, \textcolor{keyword}{const} PacketXi\& from)}
+\DoxyCodeLine{260 \{}
+\DoxyCodeLine{261   EIGEN\_DEBUG\_UNALIGNED\_STORE svst1\_s32(svptrue\_b32(), to, from);}
+\DoxyCodeLine{262 \}}
+\DoxyCodeLine{263 }
+\DoxyCodeLine{264 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{265 EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} PacketXi pgather<numext::int32\_t, PacketXi>(\textcolor{keyword}{const} numext::int32\_t* from, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride)}
+\DoxyCodeLine{266 \{}
+\DoxyCodeLine{267   \textcolor{comment}{// Indice format: \{base=0, base+stride, base+stride*2, base+stride*3, ...\}}}
+\DoxyCodeLine{268   svint32\_t indices = svindex\_s32(0, stride);}
+\DoxyCodeLine{269   \textcolor{keywordflow}{return} svld1\_gather\_s32index\_s32(svptrue\_b32(), from, indices);}
+\DoxyCodeLine{270 \}}
+\DoxyCodeLine{271 }
+\DoxyCodeLine{272 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{273 EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keywordtype}{void} pscatter<numext::int32\_t, PacketXi>(numext::int32\_t* to, \textcolor{keyword}{const} PacketXi\& from, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride)}
+\DoxyCodeLine{274 \{}
+\DoxyCodeLine{275   \textcolor{comment}{// Indice format: \{base=0, base+stride, base+stride*2, base+stride*3, ...\}}}
+\DoxyCodeLine{276   svint32\_t indices = svindex\_s32(0, stride);}
+\DoxyCodeLine{277   svst1\_scatter\_s32index\_s32(svptrue\_b32(), to, indices, from);}
+\DoxyCodeLine{278 \}}
+\DoxyCodeLine{279 }
+\DoxyCodeLine{280 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{281 EIGEN\_STRONG\_INLINE numext::int32\_t pfirst<PacketXi>(\textcolor{keyword}{const} PacketXi\& a)}
+\DoxyCodeLine{282 \{}
+\DoxyCodeLine{283   \textcolor{comment}{// svlasta returns the first element if all predicate bits are 0}}
+\DoxyCodeLine{284   \textcolor{keywordflow}{return} svlasta\_s32(svpfalse\_b(), a);}
+\DoxyCodeLine{285 \}}
+\DoxyCodeLine{286 }
+\DoxyCodeLine{287 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{288 EIGEN\_STRONG\_INLINE PacketXi preverse(\textcolor{keyword}{const} PacketXi\& a)}
+\DoxyCodeLine{289 \{}
+\DoxyCodeLine{290   \textcolor{keywordflow}{return} svrev\_s32(a);}
+\DoxyCodeLine{291 \}}
+\DoxyCodeLine{292 }
+\DoxyCodeLine{293 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{294 EIGEN\_STRONG\_INLINE PacketXi pabs(\textcolor{keyword}{const} PacketXi\& a)}
+\DoxyCodeLine{295 \{}
+\DoxyCodeLine{296   \textcolor{keywordflow}{return} svabs\_s32\_z(svptrue\_b32(), a);}
+\DoxyCodeLine{297 \}}
+\DoxyCodeLine{298 }
+\DoxyCodeLine{299 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{300 EIGEN\_STRONG\_INLINE numext::int32\_t predux<PacketXi>(\textcolor{keyword}{const} PacketXi\& a)}
+\DoxyCodeLine{301 \{}
+\DoxyCodeLine{302   \textcolor{keywordflow}{return} \textcolor{keyword}{static\_cast<}numext::int32\_t\textcolor{keyword}{>}(svaddv\_s32(svptrue\_b32(), a));}
+\DoxyCodeLine{303 \}}
+\DoxyCodeLine{304 }
+\DoxyCodeLine{305 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{306 EIGEN\_STRONG\_INLINE numext::int32\_t predux\_mul<PacketXi>(\textcolor{keyword}{const} PacketXi\& a)}
+\DoxyCodeLine{307 \{}
+\DoxyCodeLine{308   EIGEN\_STATIC\_ASSERT((EIGEN\_ARM64\_SVE\_VL \% 128 == 0),}
+\DoxyCodeLine{309                       EIGEN\_INTERNAL\_ERROR\_PLEASE\_FILE\_A\_BUG\_REPORT);}
+\DoxyCodeLine{310 }
+\DoxyCodeLine{311   \textcolor{comment}{// Multiply the vector by its reverse}}
+\DoxyCodeLine{312   svint32\_t prod = svmul\_s32\_z(svptrue\_b32(), a, svrev\_s32(a));}
+\DoxyCodeLine{313   svint32\_t half\_prod;}
+\DoxyCodeLine{314 }
+\DoxyCodeLine{315   \textcolor{comment}{// Extract the high half of the vector. Depending on the VL more reductions need to be done}}
+\DoxyCodeLine{316   \textcolor{keywordflow}{if} (EIGEN\_ARM64\_SVE\_VL >= 2048) \{}
+\DoxyCodeLine{317     half\_prod = svtbl\_s32(prod, svindex\_u32(32, 1));}
+\DoxyCodeLine{318     prod = svmul\_s32\_z(svptrue\_b32(), prod, half\_prod);}
+\DoxyCodeLine{319   \}}
+\DoxyCodeLine{320   \textcolor{keywordflow}{if} (EIGEN\_ARM64\_SVE\_VL >= 1024) \{}
+\DoxyCodeLine{321     half\_prod = svtbl\_s32(prod, svindex\_u32(16, 1));}
+\DoxyCodeLine{322     prod = svmul\_s32\_z(svptrue\_b32(), prod, half\_prod);}
+\DoxyCodeLine{323   \}}
+\DoxyCodeLine{324   \textcolor{keywordflow}{if} (EIGEN\_ARM64\_SVE\_VL >= 512) \{}
+\DoxyCodeLine{325     half\_prod = svtbl\_s32(prod, svindex\_u32(8, 1));}
+\DoxyCodeLine{326     prod = svmul\_s32\_z(svptrue\_b32(), prod, half\_prod);}
+\DoxyCodeLine{327   \}}
+\DoxyCodeLine{328   \textcolor{keywordflow}{if} (EIGEN\_ARM64\_SVE\_VL >= 256) \{}
+\DoxyCodeLine{329     half\_prod = svtbl\_s32(prod, svindex\_u32(4, 1));}
+\DoxyCodeLine{330     prod = svmul\_s32\_z(svptrue\_b32(), prod, half\_prod);}
+\DoxyCodeLine{331   \}}
+\DoxyCodeLine{332   \textcolor{comment}{// Last reduction}}
+\DoxyCodeLine{333   half\_prod = svtbl\_s32(prod, svindex\_u32(2, 1));}
+\DoxyCodeLine{334   prod = svmul\_s32\_z(svptrue\_b32(), prod, half\_prod);}
+\DoxyCodeLine{335 }
+\DoxyCodeLine{336   \textcolor{comment}{// The reduction is done to the first element.}}
+\DoxyCodeLine{337   \textcolor{keywordflow}{return} pfirst<PacketXi>(prod);}
+\DoxyCodeLine{338 \}}
+\DoxyCodeLine{339 }
+\DoxyCodeLine{340 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{341 EIGEN\_STRONG\_INLINE numext::int32\_t predux\_min<PacketXi>(\textcolor{keyword}{const} PacketXi\& a)}
+\DoxyCodeLine{342 \{}
+\DoxyCodeLine{343   \textcolor{keywordflow}{return} svminv\_s32(svptrue\_b32(), a);}
+\DoxyCodeLine{344 \}}
+\DoxyCodeLine{345 }
+\DoxyCodeLine{346 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{347 EIGEN\_STRONG\_INLINE numext::int32\_t predux\_max<PacketXi>(\textcolor{keyword}{const} PacketXi\& a)}
+\DoxyCodeLine{348 \{}
+\DoxyCodeLine{349   \textcolor{keywordflow}{return} svmaxv\_s32(svptrue\_b32(), a);}
+\DoxyCodeLine{350 \}}
+\DoxyCodeLine{351 }
+\DoxyCodeLine{352 \textcolor{keyword}{template} <\textcolor{keywordtype}{int} N>}
+\DoxyCodeLine{353 EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keywordtype}{void} ptranspose(PacketBlock<PacketXi, N>\& kernel) \{}
+\DoxyCodeLine{354   \textcolor{keywordtype}{int} buffer[packet\_traits<numext::int32\_t>::size * N] = \{0\};}
+\DoxyCodeLine{355   \textcolor{keywordtype}{int} i = 0;}
+\DoxyCodeLine{356 }
+\DoxyCodeLine{357   PacketXi stride\_index = svindex\_s32(0, N);}
+\DoxyCodeLine{358 }
+\DoxyCodeLine{359   \textcolor{keywordflow}{for} (i = 0; i < N; i++) \{}
+\DoxyCodeLine{360     svst1\_scatter\_s32index\_s32(svptrue\_b32(), buffer + i, stride\_index, kernel.packet[i]);}
+\DoxyCodeLine{361   \}}
+\DoxyCodeLine{362   \textcolor{keywordflow}{for} (i = 0; i < N; i++) \{}
+\DoxyCodeLine{363     kernel.packet[i] = svld1\_s32(svptrue\_b32(), buffer + i * packet\_traits<numext::int32\_t>::size);}
+\DoxyCodeLine{364   \}}
+\DoxyCodeLine{365 \}}
+\DoxyCodeLine{366 }
+\DoxyCodeLine{367 \textcolor{comment}{/********************************* float32 ************************************/}}
+\DoxyCodeLine{368 }
+\DoxyCodeLine{369 \textcolor{keyword}{typedef} svfloat32\_t PacketXf \_\_attribute\_\_((arm\_sve\_vector\_bits(EIGEN\_ARM64\_SVE\_VL)));}
+\DoxyCodeLine{370 }
+\DoxyCodeLine{371 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{372 \textcolor{keyword}{struct }packet\_traits<float> : default\_packet\_traits \{}
+\DoxyCodeLine{373   \textcolor{keyword}{typedef} PacketXf type;}
+\DoxyCodeLine{374   \textcolor{keyword}{typedef} PacketXf half;}
+\DoxyCodeLine{375 }
+\DoxyCodeLine{376   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{377     Vectorizable = 1,}
+\DoxyCodeLine{378     AlignedOnScalar = 1,}
+\DoxyCodeLine{379     size = sve\_packet\_size\_selector<float, EIGEN\_ARM64\_SVE\_VL>::size,}
+\DoxyCodeLine{380     HasHalfPacket = 0,}
+\DoxyCodeLine{381 }
+\DoxyCodeLine{382     HasAdd = 1,}
+\DoxyCodeLine{383     HasSub = 1,}
+\DoxyCodeLine{384     HasShift = 1,}
+\DoxyCodeLine{385     HasMul = 1,}
+\DoxyCodeLine{386     HasNegate = 1,}
+\DoxyCodeLine{387     HasAbs = 1,}
+\DoxyCodeLine{388     HasArg = 0,}
+\DoxyCodeLine{389     HasAbs2 = 1,}
+\DoxyCodeLine{390     HasMin = 1,}
+\DoxyCodeLine{391     HasMax = 1,}
+\DoxyCodeLine{392     HasConj = 1,}
+\DoxyCodeLine{393     HasSetLinear = 0,}
+\DoxyCodeLine{394     HasBlend = 0,}
+\DoxyCodeLine{395     HasReduxp = 0,  \textcolor{comment}{// Not implemented in SVE}}
+\DoxyCodeLine{396 }
+\DoxyCodeLine{397     HasDiv = 1,}
+\DoxyCodeLine{398     HasFloor = 1,}
+\DoxyCodeLine{399 }
+\DoxyCodeLine{400     HasSin = EIGEN\_FAST\_MATH,}
+\DoxyCodeLine{401     HasCos = EIGEN\_FAST\_MATH,}
+\DoxyCodeLine{402     HasLog = 1,}
+\DoxyCodeLine{403     HasExp = 1,}
+\DoxyCodeLine{404     HasSqrt = 0,}
+\DoxyCodeLine{405     HasTanh = EIGEN\_FAST\_MATH,}
+\DoxyCodeLine{406     HasErf = EIGEN\_FAST\_MATH}
+\DoxyCodeLine{407   \};}
+\DoxyCodeLine{408 \};}
+\DoxyCodeLine{409 }
+\DoxyCodeLine{410 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{411 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unpacket__traits}{unpacket\_traits}}<PacketXf> \{}
+\DoxyCodeLine{412   \textcolor{keyword}{typedef} \textcolor{keywordtype}{float} type;}
+\DoxyCodeLine{413   \textcolor{keyword}{typedef} PacketXf half;  \textcolor{comment}{// Half not yet implemented}}
+\DoxyCodeLine{414   \textcolor{keyword}{typedef} PacketXi integer\_packet;}
+\DoxyCodeLine{415 }
+\DoxyCodeLine{416   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{417     size = \mbox{\hyperlink{structEigen_1_1internal_1_1sve__packet__size__selector}{sve\_packet\_size\_selector<float, EIGEN\_ARM64\_SVE\_VL>::size}},}
+\DoxyCodeLine{418     alignment = \mbox{\hyperlink{group__enums_gga45fe06e29902b7a2773de05ba27b47a1a2639cfa1e8faac751556bc0009fe95a4}{Aligned64}},}
+\DoxyCodeLine{419     vectorizable = \textcolor{keyword}{true},}
+\DoxyCodeLine{420     masked\_load\_available = \textcolor{keyword}{false},}
+\DoxyCodeLine{421     masked\_store\_available = \textcolor{keyword}{false}}
+\DoxyCodeLine{422   \};}
+\DoxyCodeLine{423 \};}
+\DoxyCodeLine{424 }
+\DoxyCodeLine{425 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{426 EIGEN\_STRONG\_INLINE PacketXf pset1<PacketXf>(\textcolor{keyword}{const} \textcolor{keywordtype}{float}\& from)}
+\DoxyCodeLine{427 \{}
+\DoxyCodeLine{428   \textcolor{keywordflow}{return} svdup\_n\_f32(from);}
+\DoxyCodeLine{429 \}}
+\DoxyCodeLine{430 }
+\DoxyCodeLine{431 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{432 EIGEN\_STRONG\_INLINE PacketXf pset1frombits<PacketXf>(numext::uint32\_t from)}
+\DoxyCodeLine{433 \{}
+\DoxyCodeLine{434   \textcolor{keywordflow}{return} svreinterpret\_f32\_u32(svdup\_n\_u32\_z(svptrue\_b32(), from));}
+\DoxyCodeLine{435 \}}
+\DoxyCodeLine{436 }
+\DoxyCodeLine{437 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{438 EIGEN\_STRONG\_INLINE PacketXf plset<PacketXf>(\textcolor{keyword}{const} \textcolor{keywordtype}{float}\& a)}
+\DoxyCodeLine{439 \{}
+\DoxyCodeLine{440   \textcolor{keywordtype}{float} c[packet\_traits<float>::size];}
+\DoxyCodeLine{441   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < packet\_traits<float>::size; i++) c[i] = i;}
+\DoxyCodeLine{442   \textcolor{keywordflow}{return} svadd\_f32\_z(svptrue\_b32(), pset1<PacketXf>(a), svld1\_f32(svptrue\_b32(), c));}
+\DoxyCodeLine{443 \}}
+\DoxyCodeLine{444 }
+\DoxyCodeLine{445 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{446 EIGEN\_STRONG\_INLINE PacketXf padd<PacketXf>(\textcolor{keyword}{const} PacketXf\& a, \textcolor{keyword}{const} PacketXf\& b)}
+\DoxyCodeLine{447 \{}
+\DoxyCodeLine{448   \textcolor{keywordflow}{return} svadd\_f32\_z(svptrue\_b32(), a, b);}
+\DoxyCodeLine{449 \}}
+\DoxyCodeLine{450 }
+\DoxyCodeLine{451 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{452 EIGEN\_STRONG\_INLINE PacketXf psub<PacketXf>(\textcolor{keyword}{const} PacketXf\& a, \textcolor{keyword}{const} PacketXf\& b)}
+\DoxyCodeLine{453 \{}
+\DoxyCodeLine{454   \textcolor{keywordflow}{return} svsub\_f32\_z(svptrue\_b32(), a, b);}
+\DoxyCodeLine{455 \}}
+\DoxyCodeLine{456 }
+\DoxyCodeLine{457 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{458 EIGEN\_STRONG\_INLINE PacketXf pnegate(\textcolor{keyword}{const} PacketXf\& a)}
+\DoxyCodeLine{459 \{}
+\DoxyCodeLine{460   \textcolor{keywordflow}{return} svneg\_f32\_z(svptrue\_b32(), a);}
+\DoxyCodeLine{461 \}}
+\DoxyCodeLine{462 }
+\DoxyCodeLine{463 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{464 EIGEN\_STRONG\_INLINE PacketXf pconj(\textcolor{keyword}{const} PacketXf\& a)}
+\DoxyCodeLine{465 \{}
+\DoxyCodeLine{466   \textcolor{keywordflow}{return} a;}
+\DoxyCodeLine{467 \}}
+\DoxyCodeLine{468 }
+\DoxyCodeLine{469 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{470 EIGEN\_STRONG\_INLINE PacketXf pmul<PacketXf>(\textcolor{keyword}{const} PacketXf\& a, \textcolor{keyword}{const} PacketXf\& b)}
+\DoxyCodeLine{471 \{}
+\DoxyCodeLine{472   \textcolor{keywordflow}{return} svmul\_f32\_z(svptrue\_b32(), a, b);}
+\DoxyCodeLine{473 \}}
+\DoxyCodeLine{474 }
+\DoxyCodeLine{475 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{476 EIGEN\_STRONG\_INLINE PacketXf pdiv<PacketXf>(\textcolor{keyword}{const} PacketXf\& a, \textcolor{keyword}{const} PacketXf\& b)}
+\DoxyCodeLine{477 \{}
+\DoxyCodeLine{478   \textcolor{keywordflow}{return} svdiv\_f32\_z(svptrue\_b32(), a, b);}
+\DoxyCodeLine{479 \}}
+\DoxyCodeLine{480 }
+\DoxyCodeLine{481 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{482 EIGEN\_STRONG\_INLINE PacketXf pmadd(\textcolor{keyword}{const} PacketXf\& a, \textcolor{keyword}{const} PacketXf\& b, \textcolor{keyword}{const} PacketXf\& c)}
+\DoxyCodeLine{483 \{}
+\DoxyCodeLine{484   \textcolor{keywordflow}{return} svmla\_f32\_z(svptrue\_b32(), c, a, b);}
+\DoxyCodeLine{485 \}}
+\DoxyCodeLine{486 }
+\DoxyCodeLine{487 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{488 EIGEN\_STRONG\_INLINE PacketXf pmin<PacketXf>(\textcolor{keyword}{const} PacketXf\& a, \textcolor{keyword}{const} PacketXf\& b)}
+\DoxyCodeLine{489 \{}
+\DoxyCodeLine{490   \textcolor{keywordflow}{return} svmin\_f32\_z(svptrue\_b32(), a, b);}
+\DoxyCodeLine{491 \}}
+\DoxyCodeLine{492 }
+\DoxyCodeLine{493 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{494 EIGEN\_STRONG\_INLINE PacketXf pmin<PropagateNaN, PacketXf>(\textcolor{keyword}{const} PacketXf\& a, \textcolor{keyword}{const} PacketXf\& b)}
+\DoxyCodeLine{495 \{}
+\DoxyCodeLine{496   \textcolor{keywordflow}{return} pmin<PacketXf>(a, b);}
+\DoxyCodeLine{497 \}}
+\DoxyCodeLine{498 }
+\DoxyCodeLine{499 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{500 EIGEN\_STRONG\_INLINE PacketXf pmin<PropagateNumbers, PacketXf>(\textcolor{keyword}{const} PacketXf\& a, \textcolor{keyword}{const} PacketXf\& b)}
+\DoxyCodeLine{501 \{}
+\DoxyCodeLine{502   \textcolor{keywordflow}{return} svminnm\_f32\_z(svptrue\_b32(), a, b);}
+\DoxyCodeLine{503 \}}
+\DoxyCodeLine{504 }
+\DoxyCodeLine{505 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{506 EIGEN\_STRONG\_INLINE PacketXf pmax<PacketXf>(\textcolor{keyword}{const} PacketXf\& a, \textcolor{keyword}{const} PacketXf\& b)}
+\DoxyCodeLine{507 \{}
+\DoxyCodeLine{508   \textcolor{keywordflow}{return} svmax\_f32\_z(svptrue\_b32(), a, b);}
+\DoxyCodeLine{509 \}}
+\DoxyCodeLine{510 }
+\DoxyCodeLine{511 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{512 EIGEN\_STRONG\_INLINE PacketXf pmax<PropagateNaN, PacketXf>(\textcolor{keyword}{const} PacketXf\& a, \textcolor{keyword}{const} PacketXf\& b)}
+\DoxyCodeLine{513 \{}
+\DoxyCodeLine{514   \textcolor{keywordflow}{return} pmax<PacketXf>(a, b);}
+\DoxyCodeLine{515 \}}
+\DoxyCodeLine{516 }
+\DoxyCodeLine{517 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{518 EIGEN\_STRONG\_INLINE PacketXf pmax<PropagateNumbers, PacketXf>(\textcolor{keyword}{const} PacketXf\& a, \textcolor{keyword}{const} PacketXf\& b)}
+\DoxyCodeLine{519 \{}
+\DoxyCodeLine{520   \textcolor{keywordflow}{return} svmaxnm\_f32\_z(svptrue\_b32(), a, b);}
+\DoxyCodeLine{521 \}}
+\DoxyCodeLine{522 }
+\DoxyCodeLine{523 \textcolor{comment}{// Float comparisons in SVE return svbool (predicate). Use svdup to set active}}
+\DoxyCodeLine{524 \textcolor{comment}{// lanes to 1 (0xffffffffu) and inactive lanes to 0.}}
+\DoxyCodeLine{525 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{526 EIGEN\_STRONG\_INLINE PacketXf pcmp\_le<PacketXf>(\textcolor{keyword}{const} PacketXf\& a, \textcolor{keyword}{const} PacketXf\& b)}
+\DoxyCodeLine{527 \{}
+\DoxyCodeLine{528   \textcolor{keywordflow}{return} svreinterpret\_f32\_u32(svdup\_n\_u32\_z(svcmplt\_f32(svptrue\_b32(), a, b), 0xffffffffu));}
+\DoxyCodeLine{529 \}}
+\DoxyCodeLine{530 }
+\DoxyCodeLine{531 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{532 EIGEN\_STRONG\_INLINE PacketXf pcmp\_lt<PacketXf>(\textcolor{keyword}{const} PacketXf\& a, \textcolor{keyword}{const} PacketXf\& b)}
+\DoxyCodeLine{533 \{}
+\DoxyCodeLine{534   \textcolor{keywordflow}{return} svreinterpret\_f32\_u32(svdup\_n\_u32\_z(svcmplt\_f32(svptrue\_b32(), a, b), 0xffffffffu));}
+\DoxyCodeLine{535 \}}
+\DoxyCodeLine{536 }
+\DoxyCodeLine{537 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{538 EIGEN\_STRONG\_INLINE PacketXf pcmp\_eq<PacketXf>(\textcolor{keyword}{const} PacketXf\& a, \textcolor{keyword}{const} PacketXf\& b)}
+\DoxyCodeLine{539 \{}
+\DoxyCodeLine{540   \textcolor{keywordflow}{return} svreinterpret\_f32\_u32(svdup\_n\_u32\_z(svcmpeq\_f32(svptrue\_b32(), a, b), 0xffffffffu));}
+\DoxyCodeLine{541 \}}
+\DoxyCodeLine{542 }
+\DoxyCodeLine{543 \textcolor{comment}{// Do a predicate inverse (svnot\_b\_z) on the predicate resulted from the}}
+\DoxyCodeLine{544 \textcolor{comment}{// greater/equal comparison (svcmpge\_f32). Then fill a float vector with the}}
+\DoxyCodeLine{545 \textcolor{comment}{// active elements.}}
+\DoxyCodeLine{546 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{547 EIGEN\_STRONG\_INLINE PacketXf pcmp\_lt\_or\_nan<PacketXf>(\textcolor{keyword}{const} PacketXf\& a, \textcolor{keyword}{const} PacketXf\& b)}
+\DoxyCodeLine{548 \{}
+\DoxyCodeLine{549   \textcolor{keywordflow}{return} svreinterpret\_f32\_u32(svdup\_n\_u32\_z(svnot\_b\_z(svptrue\_b32(), svcmpge\_f32(svptrue\_b32(), a, b)), 0xffffffffu));}
+\DoxyCodeLine{550 \}}
+\DoxyCodeLine{551 }
+\DoxyCodeLine{552 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{553 EIGEN\_STRONG\_INLINE PacketXf pfloor<PacketXf>(\textcolor{keyword}{const} PacketXf\& a)}
+\DoxyCodeLine{554 \{}
+\DoxyCodeLine{555   \textcolor{keywordflow}{return} svrintm\_f32\_z(svptrue\_b32(), a);}
+\DoxyCodeLine{556 \}}
+\DoxyCodeLine{557 }
+\DoxyCodeLine{558 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{559 EIGEN\_STRONG\_INLINE PacketXf ptrue<PacketXf>(\textcolor{keyword}{const} PacketXf\& \textcolor{comment}{/*a*/})}
+\DoxyCodeLine{560 \{}
+\DoxyCodeLine{561   \textcolor{keywordflow}{return} svreinterpret\_f32\_u32(svdup\_n\_u32\_z(svptrue\_b32(), 0xffffffffu));}
+\DoxyCodeLine{562 \}}
+\DoxyCodeLine{563 }
+\DoxyCodeLine{564 \textcolor{comment}{// Logical Operations are not supported for float, so reinterpret casts}}
+\DoxyCodeLine{565 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{566 EIGEN\_STRONG\_INLINE PacketXf pand<PacketXf>(\textcolor{keyword}{const} PacketXf\& a, \textcolor{keyword}{const} PacketXf\& b)}
+\DoxyCodeLine{567 \{}
+\DoxyCodeLine{568   \textcolor{keywordflow}{return} svreinterpret\_f32\_u32(svand\_u32\_z(svptrue\_b32(), svreinterpret\_u32\_f32(a), svreinterpret\_u32\_f32(b)));}
+\DoxyCodeLine{569 \}}
+\DoxyCodeLine{570 }
+\DoxyCodeLine{571 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{572 EIGEN\_STRONG\_INLINE PacketXf por<PacketXf>(\textcolor{keyword}{const} PacketXf\& a, \textcolor{keyword}{const} PacketXf\& b)}
+\DoxyCodeLine{573 \{}
+\DoxyCodeLine{574   \textcolor{keywordflow}{return} svreinterpret\_f32\_u32(svorr\_u32\_z(svptrue\_b32(), svreinterpret\_u32\_f32(a), svreinterpret\_u32\_f32(b)));}
+\DoxyCodeLine{575 \}}
+\DoxyCodeLine{576 }
+\DoxyCodeLine{577 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{578 EIGEN\_STRONG\_INLINE PacketXf pxor<PacketXf>(\textcolor{keyword}{const} PacketXf\& a, \textcolor{keyword}{const} PacketXf\& b)}
+\DoxyCodeLine{579 \{}
+\DoxyCodeLine{580   \textcolor{keywordflow}{return} svreinterpret\_f32\_u32(sveor\_u32\_z(svptrue\_b32(), svreinterpret\_u32\_f32(a), svreinterpret\_u32\_f32(b)));}
+\DoxyCodeLine{581 \}}
+\DoxyCodeLine{582 }
+\DoxyCodeLine{583 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{584 EIGEN\_STRONG\_INLINE PacketXf pandnot<PacketXf>(\textcolor{keyword}{const} PacketXf\& a, \textcolor{keyword}{const} PacketXf\& b)}
+\DoxyCodeLine{585 \{}
+\DoxyCodeLine{586   \textcolor{keywordflow}{return} svreinterpret\_f32\_u32(svbic\_u32\_z(svptrue\_b32(), svreinterpret\_u32\_f32(a), svreinterpret\_u32\_f32(b)));}
+\DoxyCodeLine{587 \}}
+\DoxyCodeLine{588 }
+\DoxyCodeLine{589 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{590 EIGEN\_STRONG\_INLINE PacketXf pload<PacketXf>(\textcolor{keyword}{const} \textcolor{keywordtype}{float}* from)}
+\DoxyCodeLine{591 \{}
+\DoxyCodeLine{592   EIGEN\_DEBUG\_ALIGNED\_LOAD \textcolor{keywordflow}{return} svld1\_f32(svptrue\_b32(), from);}
+\DoxyCodeLine{593 \}}
+\DoxyCodeLine{594 }
+\DoxyCodeLine{595 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{596 EIGEN\_STRONG\_INLINE PacketXf ploadu<PacketXf>(\textcolor{keyword}{const} \textcolor{keywordtype}{float}* from)}
+\DoxyCodeLine{597 \{}
+\DoxyCodeLine{598   EIGEN\_DEBUG\_UNALIGNED\_LOAD \textcolor{keywordflow}{return} svld1\_f32(svptrue\_b32(), from);}
+\DoxyCodeLine{599 \}}
+\DoxyCodeLine{600 }
+\DoxyCodeLine{601 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{602 EIGEN\_STRONG\_INLINE PacketXf ploaddup<PacketXf>(\textcolor{keyword}{const} \textcolor{keywordtype}{float}* from)}
+\DoxyCodeLine{603 \{}
+\DoxyCodeLine{604   svuint32\_t indices = svindex\_u32(0, 1);  \textcolor{comment}{// index \{base=0, base+step=1, base+step*2, ...\}}}
+\DoxyCodeLine{605   indices = svzip1\_u32(indices, indices);  \textcolor{comment}{// index in the format \{a0, a0, a1, a1, a2, a2, ...\}}}
+\DoxyCodeLine{606   \textcolor{keywordflow}{return} svld1\_gather\_u32index\_f32(svptrue\_b32(), from, indices);}
+\DoxyCodeLine{607 \}}
+\DoxyCodeLine{608 }
+\DoxyCodeLine{609 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{610 EIGEN\_STRONG\_INLINE PacketXf ploadquad<PacketXf>(\textcolor{keyword}{const} \textcolor{keywordtype}{float}* from)}
+\DoxyCodeLine{611 \{}
+\DoxyCodeLine{612   svuint32\_t indices = svindex\_u32(0, 1);  \textcolor{comment}{// index \{base=0, base+step=1, base+step*2, ...\}}}
+\DoxyCodeLine{613   indices = svzip1\_u32(indices, indices);  \textcolor{comment}{// index in the format \{a0, a0, a1, a1, a2, a2, ...\}}}
+\DoxyCodeLine{614   indices = svzip1\_u32(indices, indices);  \textcolor{comment}{// index in the format \{a0, a0, a0, a0, a1, a1, a1, a1, ...\}}}
+\DoxyCodeLine{615   \textcolor{keywordflow}{return} svld1\_gather\_u32index\_f32(svptrue\_b32(), from, indices);}
+\DoxyCodeLine{616 \}}
+\DoxyCodeLine{617 }
+\DoxyCodeLine{618 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{619 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pstore<float>(\textcolor{keywordtype}{float}* to, \textcolor{keyword}{const} PacketXf\& from)}
+\DoxyCodeLine{620 \{}
+\DoxyCodeLine{621   EIGEN\_DEBUG\_ALIGNED\_STORE svst1\_f32(svptrue\_b32(), to, from);}
+\DoxyCodeLine{622 \}}
+\DoxyCodeLine{623 }
+\DoxyCodeLine{624 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{625 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} pstoreu<float>(\textcolor{keywordtype}{float}* to, \textcolor{keyword}{const} PacketXf\& from)}
+\DoxyCodeLine{626 \{}
+\DoxyCodeLine{627   EIGEN\_DEBUG\_UNALIGNED\_STORE svst1\_f32(svptrue\_b32(), to, from);}
+\DoxyCodeLine{628 \}}
+\DoxyCodeLine{629 }
+\DoxyCodeLine{630 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{631 EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} PacketXf pgather<float, PacketXf>(\textcolor{keyword}{const} \textcolor{keywordtype}{float}* from, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride)}
+\DoxyCodeLine{632 \{}
+\DoxyCodeLine{633   \textcolor{comment}{// Indice format: \{base=0, base+stride, base+stride*2, base+stride*3, ...\}}}
+\DoxyCodeLine{634   svint32\_t indices = svindex\_s32(0, stride);}
+\DoxyCodeLine{635   \textcolor{keywordflow}{return} svld1\_gather\_s32index\_f32(svptrue\_b32(), from, indices);}
+\DoxyCodeLine{636 \}}
+\DoxyCodeLine{637 }
+\DoxyCodeLine{638 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{639 EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keywordtype}{void} pscatter<float, PacketXf>(\textcolor{keywordtype}{float}* to, \textcolor{keyword}{const} PacketXf\& from, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} stride)}
+\DoxyCodeLine{640 \{}
+\DoxyCodeLine{641   \textcolor{comment}{// Indice format: \{base=0, base+stride, base+stride*2, base+stride*3, ...\}}}
+\DoxyCodeLine{642   svint32\_t indices = svindex\_s32(0, stride);}
+\DoxyCodeLine{643   svst1\_scatter\_s32index\_f32(svptrue\_b32(), to, indices, from);}
+\DoxyCodeLine{644 \}}
+\DoxyCodeLine{645 }
+\DoxyCodeLine{646 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{647 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{float} pfirst<PacketXf>(\textcolor{keyword}{const} PacketXf\& a)}
+\DoxyCodeLine{648 \{}
+\DoxyCodeLine{649   \textcolor{comment}{// svlasta returns the first element if all predicate bits are 0}}
+\DoxyCodeLine{650   \textcolor{keywordflow}{return} svlasta\_f32(svpfalse\_b(), a);}
+\DoxyCodeLine{651 \}}
+\DoxyCodeLine{652 }
+\DoxyCodeLine{653 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{654 EIGEN\_STRONG\_INLINE PacketXf preverse(\textcolor{keyword}{const} PacketXf\& a)}
+\DoxyCodeLine{655 \{}
+\DoxyCodeLine{656   \textcolor{keywordflow}{return} svrev\_f32(a);}
+\DoxyCodeLine{657 \}}
+\DoxyCodeLine{658 }
+\DoxyCodeLine{659 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{660 EIGEN\_STRONG\_INLINE PacketXf pabs(\textcolor{keyword}{const} PacketXf\& a)}
+\DoxyCodeLine{661 \{}
+\DoxyCodeLine{662   \textcolor{keywordflow}{return} svabs\_f32\_z(svptrue\_b32(), a);}
+\DoxyCodeLine{663 \}}
+\DoxyCodeLine{664 }
+\DoxyCodeLine{665 \textcolor{comment}{// TODO(tellenbach): Should this go into MathFunctions.h? If so, change for }}
+\DoxyCodeLine{666 \textcolor{comment}{// all vector extensions and the generic version.}}
+\DoxyCodeLine{667 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{668 EIGEN\_STRONG\_INLINE PacketXf pfrexp<PacketXf>(\textcolor{keyword}{const} PacketXf\& a, PacketXf\& exponent)}
+\DoxyCodeLine{669 \{}
+\DoxyCodeLine{670   \textcolor{keywordflow}{return} pfrexp\_generic(a, exponent);}
+\DoxyCodeLine{671 \}}
+\DoxyCodeLine{672 }
+\DoxyCodeLine{673 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{674 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{float} predux<PacketXf>(\textcolor{keyword}{const} PacketXf\& a)}
+\DoxyCodeLine{675 \{}
+\DoxyCodeLine{676   \textcolor{keywordflow}{return} svaddv\_f32(svptrue\_b32(), a);}
+\DoxyCodeLine{677 \}}
+\DoxyCodeLine{678 }
+\DoxyCodeLine{679 \textcolor{comment}{// Other reduction functions:}}
+\DoxyCodeLine{680 \textcolor{comment}{// mul}}
+\DoxyCodeLine{681 \textcolor{comment}{// Only works for SVE Vls multiple of 128}}
+\DoxyCodeLine{682 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{683 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{float} predux\_mul<PacketXf>(\textcolor{keyword}{const} PacketXf\& a)}
+\DoxyCodeLine{684 \{}
+\DoxyCodeLine{685   EIGEN\_STATIC\_ASSERT((EIGEN\_ARM64\_SVE\_VL \% 128 == 0),}
+\DoxyCodeLine{686                       EIGEN\_INTERNAL\_ERROR\_PLEASE\_FILE\_A\_BUG\_REPORT);}
+\DoxyCodeLine{687   \textcolor{comment}{// Multiply the vector by its reverse}}
+\DoxyCodeLine{688   svfloat32\_t prod = svmul\_f32\_z(svptrue\_b32(), a, svrev\_f32(a));}
+\DoxyCodeLine{689   svfloat32\_t half\_prod;}
+\DoxyCodeLine{690 }
+\DoxyCodeLine{691   \textcolor{comment}{// Extract the high half of the vector. Depending on the VL more reductions need to be done}}
+\DoxyCodeLine{692   \textcolor{keywordflow}{if} (EIGEN\_ARM64\_SVE\_VL >= 2048) \{}
+\DoxyCodeLine{693     half\_prod = svtbl\_f32(prod, svindex\_u32(32, 1));}
+\DoxyCodeLine{694     prod = svmul\_f32\_z(svptrue\_b32(), prod, half\_prod);}
+\DoxyCodeLine{695   \}}
+\DoxyCodeLine{696   \textcolor{keywordflow}{if} (EIGEN\_ARM64\_SVE\_VL >= 1024) \{}
+\DoxyCodeLine{697     half\_prod = svtbl\_f32(prod, svindex\_u32(16, 1));}
+\DoxyCodeLine{698     prod = svmul\_f32\_z(svptrue\_b32(), prod, half\_prod);}
+\DoxyCodeLine{699   \}}
+\DoxyCodeLine{700   \textcolor{keywordflow}{if} (EIGEN\_ARM64\_SVE\_VL >= 512) \{}
+\DoxyCodeLine{701     half\_prod = svtbl\_f32(prod, svindex\_u32(8, 1));}
+\DoxyCodeLine{702     prod = svmul\_f32\_z(svptrue\_b32(), prod, half\_prod);}
+\DoxyCodeLine{703   \}}
+\DoxyCodeLine{704   \textcolor{keywordflow}{if} (EIGEN\_ARM64\_SVE\_VL >= 256) \{}
+\DoxyCodeLine{705     half\_prod = svtbl\_f32(prod, svindex\_u32(4, 1));}
+\DoxyCodeLine{706     prod = svmul\_f32\_z(svptrue\_b32(), prod, half\_prod);}
+\DoxyCodeLine{707   \}}
+\DoxyCodeLine{708   \textcolor{comment}{// Last reduction}}
+\DoxyCodeLine{709   half\_prod = svtbl\_f32(prod, svindex\_u32(2, 1));}
+\DoxyCodeLine{710   prod = svmul\_f32\_z(svptrue\_b32(), prod, half\_prod);}
+\DoxyCodeLine{711 }
+\DoxyCodeLine{712   \textcolor{comment}{// The reduction is done to the first element.}}
+\DoxyCodeLine{713   \textcolor{keywordflow}{return} pfirst<PacketXf>(prod);}
+\DoxyCodeLine{714 \}}
+\DoxyCodeLine{715 }
+\DoxyCodeLine{716 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{717 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{float} predux\_min<PacketXf>(\textcolor{keyword}{const} PacketXf\& a)}
+\DoxyCodeLine{718 \{}
+\DoxyCodeLine{719   \textcolor{keywordflow}{return} svminv\_f32(svptrue\_b32(), a);}
+\DoxyCodeLine{720 \}}
+\DoxyCodeLine{721 }
+\DoxyCodeLine{722 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{723 EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{float} predux\_max<PacketXf>(\textcolor{keyword}{const} PacketXf\& a)}
+\DoxyCodeLine{724 \{}
+\DoxyCodeLine{725   \textcolor{keywordflow}{return} svmaxv\_f32(svptrue\_b32(), a);}
+\DoxyCodeLine{726 \}}
+\DoxyCodeLine{727 }
+\DoxyCodeLine{728 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} N>}
+\DoxyCodeLine{729 EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} \textcolor{keywordtype}{void} ptranspose(PacketBlock<PacketXf, N>\& kernel)}
+\DoxyCodeLine{730 \{}
+\DoxyCodeLine{731   \textcolor{keywordtype}{float} buffer[packet\_traits<float>::size * N] = \{0\};}
+\DoxyCodeLine{732   \textcolor{keywordtype}{int} i = 0;}
+\DoxyCodeLine{733 }
+\DoxyCodeLine{734   PacketXi stride\_index = svindex\_s32(0, N);}
+\DoxyCodeLine{735 }
+\DoxyCodeLine{736   \textcolor{keywordflow}{for} (i = 0; i < N; i++) \{}
+\DoxyCodeLine{737     svst1\_scatter\_s32index\_f32(svptrue\_b32(), buffer + i, stride\_index, kernel.packet[i]);}
+\DoxyCodeLine{738   \}}
+\DoxyCodeLine{739 }
+\DoxyCodeLine{740   \textcolor{keywordflow}{for} (i = 0; i < N; i++) \{}
+\DoxyCodeLine{741     kernel.packet[i] = svld1\_f32(svptrue\_b32(), buffer + i * packet\_traits<float>::size);}
+\DoxyCodeLine{742   \}}
+\DoxyCodeLine{743 \}}
+\DoxyCodeLine{744 }
+\DoxyCodeLine{745 \textcolor{keyword}{template}<>}
+\DoxyCodeLine{746 EIGEN\_STRONG\_INLINE PacketXf pldexp<PacketXf>(\textcolor{keyword}{const} PacketXf\& a, \textcolor{keyword}{const} PacketXf\& exponent)}
+\DoxyCodeLine{747 \{}
+\DoxyCodeLine{748   \textcolor{keywordflow}{return} pldexp\_generic(a, exponent);}
+\DoxyCodeLine{749 \}}
+\DoxyCodeLine{750 }
+\DoxyCodeLine{751 \}  \textcolor{comment}{// namespace internal}}
+\DoxyCodeLine{752 \}  \textcolor{comment}{// namespace Eigen}}
+\DoxyCodeLine{753 }
+\DoxyCodeLine{754 \textcolor{preprocessor}{\#endif  }\textcolor{comment}{// EIGEN\_PACKET\_MATH\_SVE\_H}}
+
+\end{DoxyCode}

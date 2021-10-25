@@ -1,0 +1,123 @@
+\hypertarget{Ordering_8h_source}{}\doxysection{Ordering.\+h}
+\label{Ordering_8h_source}\index{include/Eigen/src/OrderingMethods/Ordering.h@{include/Eigen/src/OrderingMethods/Ordering.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1  }
+\DoxyCodeLine{2 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{3 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{4 \textcolor{comment}{//}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2012  Désiré Nuentsa-\/Wakam <desire.nuentsa\_wakam@inria.fr>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_ORDERING\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_ORDERING\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{17   }
+\DoxyCodeLine{18 \textcolor{preprocessor}{\#include "{}Eigen\_Colamd.h"{}}}
+\DoxyCodeLine{19 }
+\DoxyCodeLine{20 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{21     }
+\DoxyCodeLine{28 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType> }
+\DoxyCodeLine{29 \textcolor{keywordtype}{void} ordering\_helper\_at\_plus\_a(\textcolor{keyword}{const} MatrixType\& A, MatrixType\& symmat)}
+\DoxyCodeLine{30 \{}
+\DoxyCodeLine{31   MatrixType C;}
+\DoxyCodeLine{32   C = A.transpose(); \textcolor{comment}{// NOTE: Could be  costly}}
+\DoxyCodeLine{33   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < C.rows(); i++) }
+\DoxyCodeLine{34   \{}
+\DoxyCodeLine{35       \textcolor{keywordflow}{for} (\textcolor{keyword}{typename} MatrixType::InnerIterator it(C, i); it; ++it)}
+\DoxyCodeLine{36         it.valueRef() = \textcolor{keyword}{typename} MatrixType::Scalar(0);}
+\DoxyCodeLine{37   \}}
+\DoxyCodeLine{38   symmat = C + A;}
+\DoxyCodeLine{39 \}}
+\DoxyCodeLine{40     }
+\DoxyCodeLine{41 \}}
+\DoxyCodeLine{42 }
+\DoxyCodeLine{51 \textcolor{keyword}{template} <\textcolor{keyword}{typename} StorageIndex>}
+\DoxyCodeLine{52 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1AMDOrdering}{AMDOrdering}}}
+\DoxyCodeLine{53 \{}
+\DoxyCodeLine{54   \textcolor{keyword}{public}:}
+\DoxyCodeLine{55     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationMatrix<Dynamic, Dynamic, StorageIndex>}} \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationType}};}
+\DoxyCodeLine{56     }
+\DoxyCodeLine{60     \textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{61     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1AMDOrdering_afce433557abcba9e49fa81581a58fa51}{operator()}}(\textcolor{keyword}{const} MatrixType\& mat, \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationType}}\& perm)}
+\DoxyCodeLine{62     \{}
+\DoxyCodeLine{63       \textcolor{comment}{// Compute the symmetric pattern}}
+\DoxyCodeLine{64       \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<typename MatrixType::Scalar, ColMajor, StorageIndex>}} symm;}
+\DoxyCodeLine{65       internal::ordering\_helper\_at\_plus\_a(mat,symm); }
+\DoxyCodeLine{66     }
+\DoxyCodeLine{67       \textcolor{comment}{// Call the AMD routine }}
+\DoxyCodeLine{68       \textcolor{comment}{//m\_mat.prune(keep\_diag());}}
+\DoxyCodeLine{69       internal::minimum\_degree\_ordering(symm, perm);}
+\DoxyCodeLine{70     \}}
+\DoxyCodeLine{71     }
+\DoxyCodeLine{73     \textcolor{keyword}{template} <\textcolor{keyword}{typename} SrcType, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} SrcUpLo> }
+\DoxyCodeLine{74     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1AMDOrdering_a7f3fd7224b084f0f5655c97ea8eb6466}{operator()}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SparseSelfAdjointView}{SparseSelfAdjointView<SrcType, SrcUpLo>}}\& mat, \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationType}}\& perm)}
+\DoxyCodeLine{75     \{ }
+\DoxyCodeLine{76       \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<typename SrcType::Scalar, ColMajor, StorageIndex>}} C; C = mat;}
+\DoxyCodeLine{77       }
+\DoxyCodeLine{78       \textcolor{comment}{// Call the AMD routine }}
+\DoxyCodeLine{79       \textcolor{comment}{// m\_mat.prune(keep\_diag()); //Remove the diagonal elements }}
+\DoxyCodeLine{80       internal::minimum\_degree\_ordering(C, perm);}
+\DoxyCodeLine{81     \}}
+\DoxyCodeLine{82 \};}
+\DoxyCodeLine{83 }
+\DoxyCodeLine{92 \textcolor{keyword}{template} <\textcolor{keyword}{typename} StorageIndex>}
+\DoxyCodeLine{93 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1NaturalOrdering}{NaturalOrdering}}}
+\DoxyCodeLine{94 \{}
+\DoxyCodeLine{95   \textcolor{keyword}{public}:}
+\DoxyCodeLine{96     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationMatrix<Dynamic, Dynamic, StorageIndex>}} \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationType}};}
+\DoxyCodeLine{97     }
+\DoxyCodeLine{99     \textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{100     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1NaturalOrdering_aa39e772105ed66da9e909f2a9385be37}{operator()}}(\textcolor{keyword}{const} MatrixType\& \textcolor{comment}{/*mat*/}, \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationType}}\& perm)}
+\DoxyCodeLine{101     \{}
+\DoxyCodeLine{102       perm.\mbox{\hyperlink{classEigen_1_1PermutationBase_a0e0fda6e84d69e02432e4770359bb532}{resize}}(0); }
+\DoxyCodeLine{103     \}}
+\DoxyCodeLine{104     }
+\DoxyCodeLine{105 \};}
+\DoxyCodeLine{106 }
+\DoxyCodeLine{115 \textcolor{keyword}{template}<\textcolor{keyword}{typename} StorageIndex>}
+\DoxyCodeLine{116 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1COLAMDOrdering}{COLAMDOrdering}}}
+\DoxyCodeLine{117 \{}
+\DoxyCodeLine{118   \textcolor{keyword}{public}:}
+\DoxyCodeLine{119     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationMatrix<Dynamic, Dynamic, StorageIndex>}} \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationType}}; }
+\DoxyCodeLine{120     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<StorageIndex, Dynamic, 1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}};}
+\DoxyCodeLine{121     }
+\DoxyCodeLine{125     \textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{126     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1COLAMDOrdering_a708cb20191dcd79856d922f262405946}{operator() }}(\textcolor{keyword}{const} MatrixType\& mat, \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationType}}\& perm)}
+\DoxyCodeLine{127     \{}
+\DoxyCodeLine{128       eigen\_assert(mat.isCompressed() \&\& \textcolor{stringliteral}{"{}COLAMDOrdering requires a sparse matrix in compressed mode. Call .makeCompressed() before passing it to COLAMDOrdering"{}});}
+\DoxyCodeLine{129       }
+\DoxyCodeLine{130       StorageIndex m = StorageIndex(mat.rows());}
+\DoxyCodeLine{131       StorageIndex n = StorageIndex(mat.cols());}
+\DoxyCodeLine{132       StorageIndex nnz = StorageIndex(mat.nonZeros());}
+\DoxyCodeLine{133       \textcolor{comment}{// Get the recommended value of Alen to be used by colamd}}
+\DoxyCodeLine{134       StorageIndex Alen = internal::Colamd::recommended(nnz, m, n); }
+\DoxyCodeLine{135       \textcolor{comment}{// Set the default parameters}}
+\DoxyCodeLine{136       \textcolor{keywordtype}{double} knobs [internal::Colamd::NKnobs]; }
+\DoxyCodeLine{137       StorageIndex stats [internal::Colamd::NStats];}
+\DoxyCodeLine{138       internal::Colamd::set\_defaults(knobs);}
+\DoxyCodeLine{139       }
+\DoxyCodeLine{140       \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}} p(n+1), A(Alen); }
+\DoxyCodeLine{141       \textcolor{keywordflow}{for}(StorageIndex i=0; i <= n; i++)   p(i) = mat.outerIndexPtr()[i];}
+\DoxyCodeLine{142       \textcolor{keywordflow}{for}(StorageIndex i=0; i < nnz; i++)  A(i) = mat.innerIndexPtr()[i];}
+\DoxyCodeLine{143       \textcolor{comment}{// Call Colamd routine to compute the ordering }}
+\DoxyCodeLine{144       StorageIndex info = internal::Colamd::compute\_ordering(m, n, Alen, A.data(), p.data(), knobs, stats); }
+\DoxyCodeLine{145       EIGEN\_UNUSED\_VARIABLE(info);}
+\DoxyCodeLine{146       eigen\_assert( info \&\& \textcolor{stringliteral}{"{}COLAMD failed "{}} );}
+\DoxyCodeLine{147       }
+\DoxyCodeLine{148       perm.\mbox{\hyperlink{classEigen_1_1PermutationBase_a0e0fda6e84d69e02432e4770359bb532}{resize}}(n);}
+\DoxyCodeLine{149       \textcolor{keywordflow}{for} (StorageIndex i = 0; i < n; i++) perm.\mbox{\hyperlink{classEigen_1_1PermutationMatrix_add5183846b9d0b236291b75d3d1a36d9}{indices}}()(p(i)) = i;}
+\DoxyCodeLine{150     \}}
+\DoxyCodeLine{151 \};}
+\DoxyCodeLine{152 }
+\DoxyCodeLine{153 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{154 }
+\DoxyCodeLine{155 \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

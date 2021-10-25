@@ -1,0 +1,1170 @@
+\hypertarget{ProductEvaluators_8h_source}{}\doxysection{Product\+Evaluators.\+h}
+\label{ProductEvaluators_8h_source}\index{include/Eigen/src/Core/ProductEvaluators.h@{include/Eigen/src/Core/ProductEvaluators.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2006-\/2008 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2008-\/2010 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{6 \textcolor{comment}{// Copyright (C) 2011 Jitse Niesen <jitse@maths.leeds.ac.uk>}}
+\DoxyCodeLine{7 \textcolor{comment}{//}}
+\DoxyCodeLine{8 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{9 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{10 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{11 }
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#ifndef EIGEN\_PRODUCTEVALUATORS\_H}}
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#define EIGEN\_PRODUCTEVALUATORS\_H}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{19 }
+\DoxyCodeLine{20 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{21 }
+\DoxyCodeLine{30 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} Options>}
+\DoxyCodeLine{31 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<\mbox{\hyperlink{classEigen_1_1Product}{Product}}<Lhs, Rhs, Options> >}
+\DoxyCodeLine{32  : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1product__evaluator}{product\_evaluator}}<Product<Lhs, Rhs, Options> >}
+\DoxyCodeLine{33 \{}
+\DoxyCodeLine{34   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs, Rhs, Options>}} \mbox{\hyperlink{classEigen_1_1Product}{XprType}};}
+\DoxyCodeLine{35   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1product__evaluator}{product\_evaluator<XprType>}} \mbox{\hyperlink{structEigen_1_1internal_1_1product__evaluator}{Base}};}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{37   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Product}{XprType}}\& xpr) : \mbox{\hyperlink{structEigen_1_1internal_1_1product__evaluator}{Base}}(xpr) \{\}}
+\DoxyCodeLine{38 \};}
+\DoxyCodeLine{39 }
+\DoxyCodeLine{40 \textcolor{comment}{// Catch "{}scalar * ( A * B )"{} and transform it to "{}(A*scalar) * B"{}}}
+\DoxyCodeLine{41 \textcolor{comment}{// TODO we should apply that rule only if that's really helpful}}
+\DoxyCodeLine{42 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} Scalar1, \textcolor{keyword}{typename} Scalar2, \textcolor{keyword}{typename} Plain1>}
+\DoxyCodeLine{43 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__assume__aliasing}{evaluator\_assume\_aliasing}}<\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}<internal::\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__product__op}{scalar\_product\_op}}<Scalar1,Scalar2>,}
+\DoxyCodeLine{44                                                const \mbox{\hyperlink{classEigen_1_1CwiseNullaryOp}{CwiseNullaryOp}}<internal::scalar\_constant\_op<Scalar1>, Plain1>,}
+\DoxyCodeLine{45                                                const \mbox{\hyperlink{classEigen_1_1Product}{Product}}<Lhs, Rhs, DefaultProduct> > >}
+\DoxyCodeLine{46 \{}
+\DoxyCodeLine{47   \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{bool} value = \textcolor{keyword}{true};}
+\DoxyCodeLine{48 \};}
+\DoxyCodeLine{49 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} Scalar1, \textcolor{keyword}{typename} Scalar2, \textcolor{keyword}{typename} Plain1>}
+\DoxyCodeLine{50 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}<internal::\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__product__op}{scalar\_product\_op}}<Scalar1,Scalar2>,}
+\DoxyCodeLine{51                                const \mbox{\hyperlink{classEigen_1_1CwiseNullaryOp}{CwiseNullaryOp}}<internal::scalar\_constant\_op<Scalar1>, Plain1>,}
+\DoxyCodeLine{52                                const \mbox{\hyperlink{classEigen_1_1Product}{Product}}<Lhs, Rhs, DefaultProduct> > >}
+\DoxyCodeLine{53  : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<Product<EIGEN\_SCALAR\_BINARYOP\_EXPR\_RETURN\_TYPE(Scalar1,Lhs,product), Rhs, DefaultProduct> >}
+\DoxyCodeLine{54 \{}
+\DoxyCodeLine{55   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp<internal::scalar\_product\_op<Scalar1,Scalar2>}},}
+\DoxyCodeLine{56                                \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseNullaryOp}{CwiseNullaryOp<internal::scalar\_constant\_op<Scalar1>}}, Plain1>,}
+\DoxyCodeLine{57                                \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs, Rhs, DefaultProduct>}} > \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}};}
+\DoxyCodeLine{58   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<\mbox{\hyperlink{classEigen_1_1Product}{Product}}<EIGEN\_SCALAR\_BINARYOP\_EXPR\_RETURN\_TYPE(Scalar1,Lhs,product), Rhs, DefaultProduct> > \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}};}
+\DoxyCodeLine{59 }
+\DoxyCodeLine{60   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}}\& xpr)}
+\DoxyCodeLine{61     : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}(xpr.\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp_ae42aa9e1940f262f443d0138b6e840cd}{lhs}}().functor().m\_other * xpr.\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp_a243d6e1e98290a0a57cddd7f58472b25}{rhs}}().lhs() * xpr.\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp_a243d6e1e98290a0a57cddd7f58472b25}{rhs}}().rhs())}
+\DoxyCodeLine{62   \{\}}
+\DoxyCodeLine{63 \};}
+\DoxyCodeLine{64 }
+\DoxyCodeLine{65 }
+\DoxyCodeLine{66 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} DiagIndex>}
+\DoxyCodeLine{67 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<\mbox{\hyperlink{classEigen_1_1Diagonal}{Diagonal}}<const \mbox{\hyperlink{classEigen_1_1Product}{Product}}<Lhs, Rhs, DefaultProduct>, DiagIndex> >}
+\DoxyCodeLine{68  : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<Diagonal<const Product<Lhs, Rhs, LazyProduct>, DiagIndex> >}
+\DoxyCodeLine{69 \{}
+\DoxyCodeLine{70   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Diagonal}{Diagonal<const Product<Lhs, Rhs, DefaultProduct>}}, DiagIndex> \mbox{\hyperlink{classEigen_1_1Diagonal}{XprType}};}
+\DoxyCodeLine{71   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Diagonal<const Product<Lhs, Rhs, LazyProduct>}}, DiagIndex> > \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}};}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Diagonal}{XprType}}\& xpr)}
+\DoxyCodeLine{74     : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}(\mbox{\hyperlink{classEigen_1_1Diagonal}{Diagonal}}<\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs, Rhs, LazyProduct>}}, DiagIndex>(}
+\DoxyCodeLine{75         \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs, Rhs, LazyProduct>}}(xpr.nestedExpression().lhs(), xpr.nestedExpression().rhs()),}
+\DoxyCodeLine{76         xpr.index() ))}
+\DoxyCodeLine{77   \{\}}
+\DoxyCodeLine{78 \};}
+\DoxyCodeLine{79 }
+\DoxyCodeLine{80 }
+\DoxyCodeLine{81 \textcolor{comment}{// Helper class to perform a matrix product with the destination at hand.}}
+\DoxyCodeLine{82 \textcolor{comment}{// Depending on the sizes of the factors, there are different evaluation strategies}}
+\DoxyCodeLine{83 \textcolor{comment}{// as controlled by internal::product\_type.}}
+\DoxyCodeLine{84 \textcolor{keyword}{template}< \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs,}
+\DoxyCodeLine{85           \textcolor{keyword}{typename} LhsShape = \textcolor{keyword}{typename} evaluator\_traits<Lhs>::Shape,}
+\DoxyCodeLine{86           \textcolor{keyword}{typename} RhsShape = \textcolor{keyword}{typename} evaluator\_traits<Rhs>::Shape,}
+\DoxyCodeLine{87           \textcolor{keywordtype}{int} ProductType = \mbox{\hyperlink{structEigen_1_1internal_1_1product__type}{internal::product\_type<Lhs,Rhs>::value}}>}
+\DoxyCodeLine{88 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl}};}
+\DoxyCodeLine{89 }
+\DoxyCodeLine{90 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{91 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__assume__aliasing}{evaluator\_assume\_aliasing}}<\mbox{\hyperlink{classEigen_1_1Product}{Product}}<Lhs, Rhs, DefaultProduct> > \{}
+\DoxyCodeLine{92   \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{bool} value = \textcolor{keyword}{true};}
+\DoxyCodeLine{93 \};}
+\DoxyCodeLine{94 }
+\DoxyCodeLine{95 \textcolor{comment}{// This is the default evaluator implementation for products:}}
+\DoxyCodeLine{96 \textcolor{comment}{// It creates a temporary and call generic\_product\_impl}}
+\DoxyCodeLine{97 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} Options, \textcolor{keywordtype}{int} ProductTag, \textcolor{keyword}{typename} LhsShape, \textcolor{keyword}{typename} RhsShape>}
+\DoxyCodeLine{98 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1product__evaluator}{product\_evaluator}}<\mbox{\hyperlink{classEigen_1_1Product}{Product}}<Lhs, Rhs, Options>, ProductTag, LhsShape, RhsShape>}
+\DoxyCodeLine{99   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<typename Product<Lhs, Rhs, Options>::PlainObject>}
+\DoxyCodeLine{100 \{}
+\DoxyCodeLine{101   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs, Rhs, Options>}} \mbox{\hyperlink{classEigen_1_1Product}{XprType}};}
+\DoxyCodeLine{102   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::PlainObject PlainObject;}
+\DoxyCodeLine{103   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<PlainObject>}} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}};}
+\DoxyCodeLine{104   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{105     Flags = Base::Flags | \mbox{\hyperlink{group__flags_gaa34e83bae46a8eeae4e69ebe3aaecbed}{EvalBeforeNestingBit}}}
+\DoxyCodeLine{106   \};}
+\DoxyCodeLine{107 }
+\DoxyCodeLine{108   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{109   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1product__evaluator}{product\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Product}{XprType}}\& xpr)}
+\DoxyCodeLine{110     : m\_result(xpr.rows(), xpr.cols())}
+\DoxyCodeLine{111   \{}
+\DoxyCodeLine{112     ::new (\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})) \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}(m\_result);}
+\DoxyCodeLine{113 }
+\DoxyCodeLine{114 \textcolor{comment}{// FIXME shall we handle nested\_eval here?,}}
+\DoxyCodeLine{115 \textcolor{comment}{// if so, then we must take care at removing the call to nested\_eval in the specializations (e.g., in permutation\_matrix\_product, transposition\_matrix\_product, etc.)}}
+\DoxyCodeLine{116 \textcolor{comment}{//     typedef typename internal::nested\_eval<Lhs,Rhs::ColsAtCompileTime>::type LhsNested;}}
+\DoxyCodeLine{117 \textcolor{comment}{//     typedef typename internal::nested\_eval<Rhs,Lhs::RowsAtCompileTime>::type RhsNested;}}
+\DoxyCodeLine{118 \textcolor{comment}{//     typedef typename internal::remove\_all<LhsNested>::type LhsNestedCleaned;}}
+\DoxyCodeLine{119 \textcolor{comment}{//     typedef typename internal::remove\_all<RhsNested>::type RhsNestedCleaned;}}
+\DoxyCodeLine{120 \textcolor{comment}{//}}
+\DoxyCodeLine{121 \textcolor{comment}{//     const LhsNested lhs(xpr.lhs());}}
+\DoxyCodeLine{122 \textcolor{comment}{//     const RhsNested rhs(xpr.rhs());}}
+\DoxyCodeLine{123 \textcolor{comment}{//}}
+\DoxyCodeLine{124 \textcolor{comment}{//     generic\_product\_impl<LhsNestedCleaned, RhsNestedCleaned>::evalTo(m\_result, lhs, rhs);}}
+\DoxyCodeLine{125 }
+\DoxyCodeLine{126     \mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl<Lhs, Rhs, LhsShape, RhsShape, ProductTag>::evalTo}}(m\_result, xpr.lhs(), xpr.rhs());}
+\DoxyCodeLine{127   \}}
+\DoxyCodeLine{128 }
+\DoxyCodeLine{129 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{130   PlainObject m\_result;}
+\DoxyCodeLine{131 \};}
+\DoxyCodeLine{132 }
+\DoxyCodeLine{133 \textcolor{comment}{// The following three shortcuts are enabled only if the scalar types match exactly.}}
+\DoxyCodeLine{134 \textcolor{comment}{// TODO: we could enable them for different scalar types when the product is not vectorized.}}
+\DoxyCodeLine{135 }
+\DoxyCodeLine{136 \textcolor{comment}{// Dense = Product}}
+\DoxyCodeLine{137 \textcolor{keyword}{template}< \textcolor{keyword}{typename} DstXprType, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} Options, \textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{138 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1Assignment}{Assignment}}<DstXprType, \mbox{\hyperlink{classEigen_1_1Product}{Product}}<Lhs,Rhs,Options>, internal::\mbox{\hyperlink{structEigen_1_1internal_1_1assign__op}{assign\_op}}<Scalar,Scalar>, \mbox{\hyperlink{structEigen_1_1internal_1_1Dense2Dense}{Dense2Dense}},}
+\DoxyCodeLine{139   typename \mbox{\hyperlink{structEigen_1_1internal_1_1enable__if}{enable\_if}}<(Options==DefaultProduct || Options==AliasFreeProduct)>::type>}
+\DoxyCodeLine{140 \{}
+\DoxyCodeLine{141   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs,Rhs,Options>}} \mbox{\hyperlink{classEigen_1_1Product}{SrcXprType}};}
+\DoxyCodeLine{142   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{143   \textcolor{keywordtype}{void} run(DstXprType \&dst, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Product}{SrcXprType}} \&src, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1assign__op}{internal::assign\_op<Scalar,Scalar>}} \&)}
+\DoxyCodeLine{144   \{}
+\DoxyCodeLine{145     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} dstRows = src.rows();}
+\DoxyCodeLine{146     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} dstCols = src.cols();}
+\DoxyCodeLine{147     \textcolor{keywordflow}{if}((dst.rows()!=dstRows) || (dst.cols()!=dstCols))}
+\DoxyCodeLine{148       dst.resize(dstRows, dstCols);}
+\DoxyCodeLine{149     \textcolor{comment}{// FIXME shall we handle nested\_eval here?}}
+\DoxyCodeLine{150     \mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl<Lhs, Rhs>::evalTo}}(dst, src.lhs(), src.rhs());}
+\DoxyCodeLine{151   \}}
+\DoxyCodeLine{152 \};}
+\DoxyCodeLine{153 }
+\DoxyCodeLine{154 \textcolor{comment}{// Dense += Product}}
+\DoxyCodeLine{155 \textcolor{keyword}{template}< \textcolor{keyword}{typename} DstXprType, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} Options, \textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{156 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1Assignment}{Assignment}}<DstXprType, \mbox{\hyperlink{classEigen_1_1Product}{Product}}<Lhs,Rhs,Options>, internal::\mbox{\hyperlink{structEigen_1_1internal_1_1add__assign__op}{add\_assign\_op}}<Scalar,Scalar>, \mbox{\hyperlink{structEigen_1_1internal_1_1Dense2Dense}{Dense2Dense}},}
+\DoxyCodeLine{157   typename \mbox{\hyperlink{structEigen_1_1internal_1_1enable__if}{enable\_if}}<(Options==DefaultProduct || Options==AliasFreeProduct)>::type>}
+\DoxyCodeLine{158 \{}
+\DoxyCodeLine{159   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs,Rhs,Options>}} \mbox{\hyperlink{classEigen_1_1Product}{SrcXprType}};}
+\DoxyCodeLine{160   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{161   \textcolor{keywordtype}{void} run(DstXprType \&dst, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Product}{SrcXprType}} \&src, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1add__assign__op}{internal::add\_assign\_op<Scalar,Scalar>}} \&)}
+\DoxyCodeLine{162   \{}
+\DoxyCodeLine{163     eigen\_assert(dst.rows() == src.rows() \&\& dst.cols() == src.cols());}
+\DoxyCodeLine{164     \textcolor{comment}{// FIXME shall we handle nested\_eval here?}}
+\DoxyCodeLine{165     \mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl<Lhs, Rhs>::addTo}}(dst, src.lhs(), src.rhs());}
+\DoxyCodeLine{166   \}}
+\DoxyCodeLine{167 \};}
+\DoxyCodeLine{168 }
+\DoxyCodeLine{169 \textcolor{comment}{// Dense -\/= Product}}
+\DoxyCodeLine{170 \textcolor{keyword}{template}< \textcolor{keyword}{typename} DstXprType, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} Options, \textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{171 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1Assignment}{Assignment}}<DstXprType, \mbox{\hyperlink{classEigen_1_1Product}{Product}}<Lhs,Rhs,Options>, internal::\mbox{\hyperlink{structEigen_1_1internal_1_1sub__assign__op}{sub\_assign\_op}}<Scalar,Scalar>, \mbox{\hyperlink{structEigen_1_1internal_1_1Dense2Dense}{Dense2Dense}},}
+\DoxyCodeLine{172   typename \mbox{\hyperlink{structEigen_1_1internal_1_1enable__if}{enable\_if}}<(Options==DefaultProduct || Options==AliasFreeProduct)>::type>}
+\DoxyCodeLine{173 \{}
+\DoxyCodeLine{174   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs,Rhs,Options>}} \mbox{\hyperlink{classEigen_1_1Product}{SrcXprType}};}
+\DoxyCodeLine{175   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{176   \textcolor{keywordtype}{void} run(DstXprType \&dst, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Product}{SrcXprType}} \&src, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1sub__assign__op}{internal::sub\_assign\_op<Scalar,Scalar>}} \&)}
+\DoxyCodeLine{177   \{}
+\DoxyCodeLine{178     eigen\_assert(dst.rows() == src.rows() \&\& dst.cols() == src.cols());}
+\DoxyCodeLine{179     \textcolor{comment}{// FIXME shall we handle nested\_eval here?}}
+\DoxyCodeLine{180     \mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl<Lhs, Rhs>::subTo}}(dst, src.lhs(), src.rhs());}
+\DoxyCodeLine{181   \}}
+\DoxyCodeLine{182 \};}
+\DoxyCodeLine{183 }
+\DoxyCodeLine{184 }
+\DoxyCodeLine{185 \textcolor{comment}{// Dense ?= scalar * Product}}
+\DoxyCodeLine{186 \textcolor{comment}{// TODO we should apply that rule if that's really helpful}}
+\DoxyCodeLine{187 \textcolor{comment}{// for instance, this is not good for inner products}}
+\DoxyCodeLine{188 \textcolor{keyword}{template}< \textcolor{keyword}{typename} DstXprType, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} AssignFunc, \textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} ScalarBis, \textcolor{keyword}{typename} Plain>}
+\DoxyCodeLine{189 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1Assignment}{Assignment}}<DstXprType, \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}<internal::\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__product__op}{scalar\_product\_op}}<ScalarBis,Scalar>, const \mbox{\hyperlink{classEigen_1_1CwiseNullaryOp}{CwiseNullaryOp}}<internal::scalar\_constant\_op<ScalarBis>,Plain>,}
+\DoxyCodeLine{190                                            const \mbox{\hyperlink{classEigen_1_1Product}{Product}}<Lhs,Rhs,DefaultProduct> >, AssignFunc, \mbox{\hyperlink{structEigen_1_1internal_1_1Dense2Dense}{Dense2Dense}}>}
+\DoxyCodeLine{191 \{}
+\DoxyCodeLine{192   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp<internal::scalar\_product\_op<ScalarBis,Scalar>}},}
+\DoxyCodeLine{193                         \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseNullaryOp}{CwiseNullaryOp<internal::scalar\_constant\_op<ScalarBis>}},Plain>,}
+\DoxyCodeLine{194                         \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs,Rhs,DefaultProduct>}} > \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{SrcXprType}};}
+\DoxyCodeLine{195   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{196   \textcolor{keywordtype}{void} run(DstXprType \&dst, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{SrcXprType}} \&src, \textcolor{keyword}{const} AssignFunc\& func)}
+\DoxyCodeLine{197   \{}
+\DoxyCodeLine{198     call\_assignment\_no\_alias(dst, (src.\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp_ae42aa9e1940f262f443d0138b6e840cd}{lhs}}().functor().m\_other * src.\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp_a243d6e1e98290a0a57cddd7f58472b25}{rhs}}().lhs())*src.\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp_a243d6e1e98290a0a57cddd7f58472b25}{rhs}}().rhs(), func);}
+\DoxyCodeLine{199   \}}
+\DoxyCodeLine{200 \};}
+\DoxyCodeLine{201 }
+\DoxyCodeLine{202 \textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{203 \textcolor{comment}{// Catch "{}Dense ?= xpr + Product<>"{} expression to save one temporary}}
+\DoxyCodeLine{204 \textcolor{comment}{// FIXME we could probably enable these rules for any product, i.e., not only Dense and DefaultProduct}}
+\DoxyCodeLine{205 }
+\DoxyCodeLine{206 \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherXpr, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{207 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__assume__aliasing}{evaluator\_assume\_aliasing}}<\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}<internal::\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sum__op}{scalar\_sum\_op}}<typename OtherXpr::Scalar,typename Product<Lhs,Rhs,DefaultProduct>::Scalar>, const OtherXpr,}
+\DoxyCodeLine{208                                                const \mbox{\hyperlink{classEigen_1_1Product}{Product}}<Lhs,Rhs,DefaultProduct> >, \mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}} > \{}
+\DoxyCodeLine{209   \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{bool} value = \textcolor{keyword}{true};}
+\DoxyCodeLine{210 \};}
+\DoxyCodeLine{211 }
+\DoxyCodeLine{212 \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherXpr, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{213 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__assume__aliasing}{evaluator\_assume\_aliasing}}<\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}<internal::\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__difference__op}{scalar\_difference\_op}}<typename OtherXpr::Scalar,typename Product<Lhs,Rhs,DefaultProduct>::Scalar>, const OtherXpr,}
+\DoxyCodeLine{214                                                const \mbox{\hyperlink{classEigen_1_1Product}{Product}}<Lhs,Rhs,DefaultProduct> >, \mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}} > \{}
+\DoxyCodeLine{215   \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{bool} value = \textcolor{keyword}{true};}
+\DoxyCodeLine{216 \};}
+\DoxyCodeLine{217 }
+\DoxyCodeLine{218 \textcolor{keyword}{template}<\textcolor{keyword}{typename} DstXprType, \textcolor{keyword}{typename} OtherXpr, \textcolor{keyword}{typename} ProductType, \textcolor{keyword}{typename} Func1, \textcolor{keyword}{typename} Func2>}
+\DoxyCodeLine{219 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1assignment__from__xpr__op__product}{assignment\_from\_xpr\_op\_product}}}
+\DoxyCodeLine{220 \{}
+\DoxyCodeLine{221   \textcolor{keyword}{template}<\textcolor{keyword}{typename} SrcXprType, \textcolor{keyword}{typename} InitialFunc>}
+\DoxyCodeLine{222   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{223   \textcolor{keywordtype}{void} run(DstXprType \&dst, \textcolor{keyword}{const} SrcXprType \&src, \textcolor{keyword}{const} InitialFunc\& \textcolor{comment}{/*func*/})}
+\DoxyCodeLine{224   \{}
+\DoxyCodeLine{225     call\_assignment\_no\_alias(dst, src.lhs(), Func1());}
+\DoxyCodeLine{226     call\_assignment\_no\_alias(dst, src.rhs(), Func2());}
+\DoxyCodeLine{227   \}}
+\DoxyCodeLine{228 \};}
+\DoxyCodeLine{229 }
+\DoxyCodeLine{230 \textcolor{preprocessor}{\#define EIGEN\_CATCH\_ASSIGN\_XPR\_OP\_PRODUCT(ASSIGN\_OP,BINOP,ASSIGN\_OP2) \(\backslash\)}}
+\DoxyCodeLine{231 \textcolor{preprocessor}{  template< typename DstXprType, typename OtherXpr, typename Lhs, typename Rhs, typename DstScalar, typename SrcScalar, typename OtherScalar,typename ProdScalar> \(\backslash\)}}
+\DoxyCodeLine{232 \textcolor{preprocessor}{  struct Assignment<DstXprType, CwiseBinaryOp<internal::BINOP<OtherScalar,ProdScalar>, const OtherXpr, \(\backslash\)}}
+\DoxyCodeLine{233 \textcolor{preprocessor}{                                            const Product<Lhs,Rhs,DefaultProduct> >, internal::ASSIGN\_OP<DstScalar,SrcScalar>, Dense2Dense> \(\backslash\)}}
+\DoxyCodeLine{234 \textcolor{preprocessor}{    : assignment\_from\_xpr\_op\_product<DstXprType, OtherXpr, Product<Lhs,Rhs,DefaultProduct>, internal::ASSIGN\_OP<DstScalar,OtherScalar>, internal::ASSIGN\_OP2<DstScalar,ProdScalar> > \(\backslash\)}}
+\DoxyCodeLine{235 \textcolor{preprocessor}{  \{\}}}
+\DoxyCodeLine{236 }
+\DoxyCodeLine{237 EIGEN\_CATCH\_ASSIGN\_XPR\_OP\_PRODUCT(\mbox{\hyperlink{structEigen_1_1internal_1_1assign__op}{assign\_op}},    \mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sum__op}{scalar\_sum\_op}},\mbox{\hyperlink{structEigen_1_1internal_1_1add__assign__op}{add\_assign\_op}});}
+\DoxyCodeLine{238 EIGEN\_CATCH\_ASSIGN\_XPR\_OP\_PRODUCT(\mbox{\hyperlink{structEigen_1_1internal_1_1add__assign__op}{add\_assign\_op}},\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sum__op}{scalar\_sum\_op}},\mbox{\hyperlink{structEigen_1_1internal_1_1add__assign__op}{add\_assign\_op}});}
+\DoxyCodeLine{239 EIGEN\_CATCH\_ASSIGN\_XPR\_OP\_PRODUCT(\mbox{\hyperlink{structEigen_1_1internal_1_1sub__assign__op}{sub\_assign\_op}},\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__sum__op}{scalar\_sum\_op}},\mbox{\hyperlink{structEigen_1_1internal_1_1sub__assign__op}{sub\_assign\_op}});}
+\DoxyCodeLine{240 }
+\DoxyCodeLine{241 EIGEN\_CATCH\_ASSIGN\_XPR\_OP\_PRODUCT(\mbox{\hyperlink{structEigen_1_1internal_1_1assign__op}{assign\_op}},    \mbox{\hyperlink{structEigen_1_1internal_1_1scalar__difference__op}{scalar\_difference\_op}},\mbox{\hyperlink{structEigen_1_1internal_1_1sub__assign__op}{sub\_assign\_op}});}
+\DoxyCodeLine{242 EIGEN\_CATCH\_ASSIGN\_XPR\_OP\_PRODUCT(\mbox{\hyperlink{structEigen_1_1internal_1_1add__assign__op}{add\_assign\_op}},\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__difference__op}{scalar\_difference\_op}},\mbox{\hyperlink{structEigen_1_1internal_1_1sub__assign__op}{sub\_assign\_op}});}
+\DoxyCodeLine{243 EIGEN\_CATCH\_ASSIGN\_XPR\_OP\_PRODUCT(\mbox{\hyperlink{structEigen_1_1internal_1_1sub__assign__op}{sub\_assign\_op}},\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__difference__op}{scalar\_difference\_op}},\mbox{\hyperlink{structEigen_1_1internal_1_1add__assign__op}{add\_assign\_op}});}
+\DoxyCodeLine{244 }
+\DoxyCodeLine{245 \textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{246 }
+\DoxyCodeLine{247 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{248 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl}}<Lhs,Rhs,\mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}},\mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}},InnerProduct>}
+\DoxyCodeLine{249 \{}
+\DoxyCodeLine{250   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst>}
+\DoxyCodeLine{251   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} evalTo(Dst\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{252   \{}
+\DoxyCodeLine{253     dst.coeffRef(0,0) = (lhs.transpose().cwiseProduct(rhs)).sum();}
+\DoxyCodeLine{254   \}}
+\DoxyCodeLine{255 }
+\DoxyCodeLine{256   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst>}
+\DoxyCodeLine{257   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} addTo(Dst\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{258   \{}
+\DoxyCodeLine{259     dst.coeffRef(0,0) += (lhs.transpose().cwiseProduct(rhs)).sum();}
+\DoxyCodeLine{260   \}}
+\DoxyCodeLine{261 }
+\DoxyCodeLine{262   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst>}
+\DoxyCodeLine{263   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} subTo(Dst\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{264   \{ dst.coeffRef(0,0) -\/= (lhs.transpose().cwiseProduct(rhs)).sum(); \}}
+\DoxyCodeLine{265 \};}
+\DoxyCodeLine{266 }
+\DoxyCodeLine{267 }
+\DoxyCodeLine{268 \textcolor{comment}{/***********************************************************************}}
+\DoxyCodeLine{269 \textcolor{comment}{*  Implementation of outer dense * dense vector product}}
+\DoxyCodeLine{270 \textcolor{comment}{***********************************************************************/}}
+\DoxyCodeLine{271 }
+\DoxyCodeLine{272 \textcolor{comment}{// Column major result}}
+\DoxyCodeLine{273 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} Func>}
+\DoxyCodeLine{274 \textcolor{keywordtype}{void} EIGEN\_DEVICE\_FUNC outer\_product\_selector\_run(Dst\& dst, \textcolor{keyword}{const} Lhs \&lhs, \textcolor{keyword}{const} Rhs \&rhs, \textcolor{keyword}{const} Func\& func, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1false__type}{false\_type}}\&)}
+\DoxyCodeLine{275 \{}
+\DoxyCodeLine{276   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Rhs>}} rhsEval(rhs);}
+\DoxyCodeLine{277   ei\_declare\_local\_nested\_eval(Lhs,lhs,Rhs::SizeAtCompileTime,actual\_lhs);}
+\DoxyCodeLine{278   \textcolor{comment}{// FIXME if cols is large enough, then it might be useful to make sure that lhs is sequentially stored}}
+\DoxyCodeLine{279   \textcolor{comment}{// FIXME not very good if rhs is real and lhs complex while alpha is real too}}
+\DoxyCodeLine{280   \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols = dst.cols();}
+\DoxyCodeLine{281   \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j=0; j<cols; ++j)}
+\DoxyCodeLine{282     func(dst.col(j), rhsEval.coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}(0),j) * actual\_lhs);}
+\DoxyCodeLine{283 \}}
+\DoxyCodeLine{284 }
+\DoxyCodeLine{285 \textcolor{comment}{// Row major result}}
+\DoxyCodeLine{286 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} Func>}
+\DoxyCodeLine{287 \textcolor{keywordtype}{void} EIGEN\_DEVICE\_FUNC outer\_product\_selector\_run(Dst\& dst, \textcolor{keyword}{const} Lhs \&lhs, \textcolor{keyword}{const} Rhs \&rhs, \textcolor{keyword}{const} Func\& func, \textcolor{keyword}{const} true\_type\&)}
+\DoxyCodeLine{288 \{}
+\DoxyCodeLine{289   evaluator<Lhs> lhsEval(lhs);}
+\DoxyCodeLine{290   ei\_declare\_local\_nested\_eval(Rhs,rhs,Lhs::SizeAtCompileTime,actual\_rhs);}
+\DoxyCodeLine{291   \textcolor{comment}{// FIXME if rows is large enough, then it might be useful to make sure that rhs is sequentially stored}}
+\DoxyCodeLine{292   \textcolor{comment}{// FIXME not very good if lhs is real and rhs complex while alpha is real too}}
+\DoxyCodeLine{293   \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows = dst.rows();}
+\DoxyCodeLine{294   \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i=0; i<rows; ++i)}
+\DoxyCodeLine{295     func(dst.row(i), lhsEval.coeff(i,\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}(0)) * actual\_rhs);}
+\DoxyCodeLine{296 \}}
+\DoxyCodeLine{297 }
+\DoxyCodeLine{298 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{299 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl}}<Lhs,Rhs,\mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}},\mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}},OuterProduct>}
+\DoxyCodeLine{300 \{}
+\DoxyCodeLine{301   \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }is\_row\_major : \mbox{\hyperlink{structEigen_1_1internal_1_1conditional}{internal::conditional}}<(int(T::Flags)\&RowMajorBit), internal::true\_type, internal::false\_type>::type \{\};}
+\DoxyCodeLine{302   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs,Rhs>::Scalar}} Scalar;}
+\DoxyCodeLine{303 }
+\DoxyCodeLine{304   \textcolor{comment}{// TODO it would be nice to be able to exploit our *\_assign\_op functors for that purpose}}
+\DoxyCodeLine{305   \textcolor{keyword}{struct }set  \{ \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst, \textcolor{keyword}{typename} Src> EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{void} operator()(\textcolor{keyword}{const} Dst\& dst, \textcolor{keyword}{const} Src\& src)\textcolor{keyword}{ const }\{ dst.const\_cast\_derived()  = src; \} \};}
+\DoxyCodeLine{306   \textcolor{keyword}{struct }add  \{ \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst, \textcolor{keyword}{typename} Src> EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{void} operator()(\textcolor{keyword}{const} Dst\& dst, \textcolor{keyword}{const} Src\& src)\textcolor{keyword}{ const }\{ dst.const\_cast\_derived() += src; \} \};}
+\DoxyCodeLine{307   \textcolor{keyword}{struct }sub  \{ \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst, \textcolor{keyword}{typename} Src> EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{void} operator()(\textcolor{keyword}{const} Dst\& dst, \textcolor{keyword}{const} Src\& src)\textcolor{keyword}{ const }\{ dst.const\_cast\_derived() -\/= src; \} \};}
+\DoxyCodeLine{308   \textcolor{keyword}{struct }adds \{}
+\DoxyCodeLine{309     Scalar m\_scale;}
+\DoxyCodeLine{310     \textcolor{keyword}{explicit} adds(\textcolor{keyword}{const} Scalar\& s) : m\_scale(s) \{\}}
+\DoxyCodeLine{311     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst, \textcolor{keyword}{typename} Src> \textcolor{keywordtype}{void} EIGEN\_DEVICE\_FUNC operator()(\textcolor{keyword}{const} Dst\& dst, \textcolor{keyword}{const} Src\& src)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{312       dst.const\_cast\_derived() += m\_scale * src;}
+\DoxyCodeLine{313     \}}
+\DoxyCodeLine{314   \};}
+\DoxyCodeLine{315 }
+\DoxyCodeLine{316   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst>}
+\DoxyCodeLine{317   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} evalTo(Dst\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{318   \{}
+\DoxyCodeLine{319     internal::outer\_product\_selector\_run(dst, lhs, rhs, set(), is\_row\_major<Dst>());}
+\DoxyCodeLine{320   \}}
+\DoxyCodeLine{321 }
+\DoxyCodeLine{322   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst>}
+\DoxyCodeLine{323   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} addTo(Dst\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{324   \{}
+\DoxyCodeLine{325     internal::outer\_product\_selector\_run(dst, lhs, rhs, add(), is\_row\_major<Dst>());}
+\DoxyCodeLine{326   \}}
+\DoxyCodeLine{327 }
+\DoxyCodeLine{328   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst>}
+\DoxyCodeLine{329   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} subTo(Dst\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{330   \{}
+\DoxyCodeLine{331     internal::outer\_product\_selector\_run(dst, lhs, rhs, sub(), is\_row\_major<Dst>());}
+\DoxyCodeLine{332   \}}
+\DoxyCodeLine{333 }
+\DoxyCodeLine{334   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst>}
+\DoxyCodeLine{335   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} scaleAndAddTo(Dst\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, \textcolor{keyword}{const} Scalar\& alpha)}
+\DoxyCodeLine{336   \{}
+\DoxyCodeLine{337     internal::outer\_product\_selector\_run(dst, lhs, rhs, adds(alpha), is\_row\_major<Dst>());}
+\DoxyCodeLine{338   \}}
+\DoxyCodeLine{339 }
+\DoxyCodeLine{340 \};}
+\DoxyCodeLine{341 }
+\DoxyCodeLine{342 }
+\DoxyCodeLine{343 \textcolor{comment}{// This base class provides default implementations for evalTo, addTo, subTo, in terms of scaleAndAddTo}}
+\DoxyCodeLine{344 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{345 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl__base}{generic\_product\_impl\_base}}}
+\DoxyCodeLine{346 \{}
+\DoxyCodeLine{347   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs,Rhs>::Scalar}} Scalar;}
+\DoxyCodeLine{348 }
+\DoxyCodeLine{349   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst>}
+\DoxyCodeLine{350   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} evalTo(Dst\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{351   \{ dst.setZero(); scaleAndAddTo(dst, lhs, rhs, Scalar(1)); \}}
+\DoxyCodeLine{352 }
+\DoxyCodeLine{353   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst>}
+\DoxyCodeLine{354   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} addTo(Dst\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{355   \{ scaleAndAddTo(dst,lhs, rhs, Scalar(1)); \}}
+\DoxyCodeLine{356 }
+\DoxyCodeLine{357   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst>}
+\DoxyCodeLine{358   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} subTo(Dst\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{359   \{ scaleAndAddTo(dst, lhs, rhs, Scalar(-\/1)); \}}
+\DoxyCodeLine{360 }
+\DoxyCodeLine{361   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst>}
+\DoxyCodeLine{362   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} scaleAndAddTo(Dst\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, \textcolor{keyword}{const} Scalar\& alpha)}
+\DoxyCodeLine{363   \{ Derived::scaleAndAddTo(dst,lhs,rhs,alpha); \}}
+\DoxyCodeLine{364 }
+\DoxyCodeLine{365 \};}
+\DoxyCodeLine{366 }
+\DoxyCodeLine{367 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{368 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl}}<Lhs,Rhs,\mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}},\mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}},GemvProduct>}
+\DoxyCodeLine{369   : \mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl__base}{generic\_product\_impl\_base}}<Lhs,Rhs,generic\_product\_impl<Lhs,Rhs,DenseShape,DenseShape,GemvProduct> >}
+\DoxyCodeLine{370 \{}
+\DoxyCodeLine{371   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{nested\_eval<Lhs,1>::type}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{LhsNested}};}
+\DoxyCodeLine{372   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{nested\_eval<Rhs,1>::type}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{RhsNested}};}
+\DoxyCodeLine{373   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs,Rhs>::Scalar}} Scalar;}
+\DoxyCodeLine{374   \textcolor{keyword}{enum} \{ Side = Lhs::IsVectorAtCompileTime ? \mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba21b30a61e9cb10c967aec17567804007}{OnTheLeft}} : \mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba329fc3a54ceb2b6e0e73b400998b8a82}{OnTheRight}} \};}
+\DoxyCodeLine{375   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1remove__all}{internal::remove\_all}}<\textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1conditional}{internal::conditional}}<int(Side)==\mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba329fc3a54ceb2b6e0e73b400998b8a82}{OnTheRight}},\mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{LhsNested}},\mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{RhsNested}}>::type>::type MatrixType;}
+\DoxyCodeLine{376 }
+\DoxyCodeLine{377   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{378   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} scaleAndAddTo(Dest\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, \textcolor{keyword}{const} Scalar\& alpha)}
+\DoxyCodeLine{379   \{}
+\DoxyCodeLine{380     \textcolor{comment}{// Fallback to inner product if both the lhs and rhs is a runtime vector.}}
+\DoxyCodeLine{381     \textcolor{keywordflow}{if} (lhs.rows() == 1 \&\& rhs.cols() == 1) \{}
+\DoxyCodeLine{382       dst.coeffRef(0,0) += alpha * lhs.row(0).conjugate().dot(rhs.col(0));}
+\DoxyCodeLine{383       \textcolor{keywordflow}{return};}
+\DoxyCodeLine{384     \}}
+\DoxyCodeLine{385     \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{LhsNested}} actual\_lhs(lhs);}
+\DoxyCodeLine{386     \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{RhsNested}} actual\_rhs(rhs);}
+\DoxyCodeLine{387     \mbox{\hyperlink{structEigen_1_1internal_1_1gemv__dense__selector}{internal::gemv\_dense\_selector}}<Side,}
+\DoxyCodeLine{388                             (int(MatrixType::Flags)\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) ? \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}} : \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}},}
+\DoxyCodeLine{389                             \textcolor{keywordtype}{bool}(\mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{internal::blas\_traits<MatrixType>::HasUsableDirectAccess}})}
+\DoxyCodeLine{390                            >::run(actual\_lhs, actual\_rhs, dst, alpha);}
+\DoxyCodeLine{391   \}}
+\DoxyCodeLine{392 \};}
+\DoxyCodeLine{393 }
+\DoxyCodeLine{394 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{395 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl}}<Lhs,Rhs,\mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}},\mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}},CoeffBasedProductMode>}
+\DoxyCodeLine{396 \{}
+\DoxyCodeLine{397   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs,Rhs>::Scalar}} Scalar;}
+\DoxyCodeLine{398 }
+\DoxyCodeLine{399   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst>}
+\DoxyCodeLine{400   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} evalTo(Dst\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{401   \{}
+\DoxyCodeLine{402     \textcolor{comment}{// Same as: dst.noalias() = lhs.lazyProduct(rhs);}}
+\DoxyCodeLine{403     \textcolor{comment}{// but easier on the compiler side}}
+\DoxyCodeLine{404     call\_assignment\_no\_alias(dst, lhs.lazyProduct(rhs), \mbox{\hyperlink{structEigen_1_1internal_1_1assign__op}{internal::assign\_op<typename Dst::Scalar,Scalar>}}());}
+\DoxyCodeLine{405   \}}
+\DoxyCodeLine{406 }
+\DoxyCodeLine{407   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst>}
+\DoxyCodeLine{408   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} addTo(Dst\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{409   \{}
+\DoxyCodeLine{410     \textcolor{comment}{// dst.noalias() += lhs.lazyProduct(rhs);}}
+\DoxyCodeLine{411     call\_assignment\_no\_alias(dst, lhs.lazyProduct(rhs), \mbox{\hyperlink{structEigen_1_1internal_1_1add__assign__op}{internal::add\_assign\_op<typename Dst::Scalar,Scalar>}}());}
+\DoxyCodeLine{412   \}}
+\DoxyCodeLine{413 }
+\DoxyCodeLine{414   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst>}
+\DoxyCodeLine{415   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} subTo(Dst\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{416   \{}
+\DoxyCodeLine{417     \textcolor{comment}{// dst.noalias() -\/= lhs.lazyProduct(rhs);}}
+\DoxyCodeLine{418     call\_assignment\_no\_alias(dst, lhs.lazyProduct(rhs), \mbox{\hyperlink{structEigen_1_1internal_1_1sub__assign__op}{internal::sub\_assign\_op<typename Dst::Scalar,Scalar>}}());}
+\DoxyCodeLine{419   \}}
+\DoxyCodeLine{420 }
+\DoxyCodeLine{421   \textcolor{comment}{// This is a special evaluation path called from generic\_product\_impl<...,GemmProduct> in file GeneralMatrixMatrix.h}}
+\DoxyCodeLine{422   \textcolor{comment}{// This variant tries to extract scalar multiples from both the LHS and RHS and factor them out. For instance:}}
+\DoxyCodeLine{423   \textcolor{comment}{//   dst \{,+,-\/\}= (s1*A)*(B*s2)}}
+\DoxyCodeLine{424   \textcolor{comment}{// will be rewritten as:}}
+\DoxyCodeLine{425   \textcolor{comment}{//   dst \{,+,-\/\}= (s1*s2) * (A.lazyProduct(B))}}
+\DoxyCodeLine{426   \textcolor{comment}{// There are at least four benefits of doing so:}}
+\DoxyCodeLine{427   \textcolor{comment}{//  1 -\/ huge performance gain for heap-\/allocated matrix types as it save costly allocations.}}
+\DoxyCodeLine{428   \textcolor{comment}{//  2 -\/ it is faster than simply by-\/passing the heap allocation through stack allocation.}}
+\DoxyCodeLine{429   \textcolor{comment}{//  3 -\/ it makes this fallback consistent with the heavy GEMM routine.}}
+\DoxyCodeLine{430   \textcolor{comment}{//  4 -\/ it fully by-\/passes huge stack allocation attempts when multiplying huge fixed-\/size matrices.}}
+\DoxyCodeLine{431   \textcolor{comment}{//      (see https://stackoverflow.com/questions/54738495)}}
+\DoxyCodeLine{432   \textcolor{comment}{// For small fixed sizes matrices, however, the gains are less obvious, it is sometimes x2 faster, but sometimes x3 slower,}}
+\DoxyCodeLine{433   \textcolor{comment}{// and the behavior depends also a lot on the compiler... This is why this re-\/writing strategy is currently}}
+\DoxyCodeLine{434   \textcolor{comment}{// enabled only when falling back from the main GEMM.}}
+\DoxyCodeLine{435   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst, \textcolor{keyword}{typename} Func>}
+\DoxyCodeLine{436   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{437   \textcolor{keywordtype}{void} eval\_dynamic(Dst\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, \textcolor{keyword}{const} Func \&func)}
+\DoxyCodeLine{438   \{}
+\DoxyCodeLine{439     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{440       HasScalarFactor = \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits<Lhs>::HasScalarFactor}} || \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits<Rhs>::HasScalarFactor}},}
+\DoxyCodeLine{441       ConjLhs = \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits<Lhs>::NeedToConjugate}},}
+\DoxyCodeLine{442       ConjRhs = \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits<Rhs>::NeedToConjugate}}}
+\DoxyCodeLine{443     \};}
+\DoxyCodeLine{444     \textcolor{comment}{// FIXME: in c++11 this should be auto, and extractScalarFactor should also return auto}}
+\DoxyCodeLine{445     \textcolor{comment}{//        this is important for real*complex\_mat}}
+\DoxyCodeLine{446     Scalar actualAlpha = combine\_scalar\_factors<Scalar>(lhs, rhs);}
+\DoxyCodeLine{447 }
+\DoxyCodeLine{448     eval\_dynamic\_impl(dst,}
+\DoxyCodeLine{449                       \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits<Lhs>::extract}}(lhs).\textcolor{keyword}{template} conjugateIf<ConjLhs>(),}
+\DoxyCodeLine{450                       \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits<Rhs>::extract}}(rhs).\textcolor{keyword}{template} conjugateIf<ConjRhs>(),}
+\DoxyCodeLine{451                       func,}
+\DoxyCodeLine{452                       actualAlpha,}
+\DoxyCodeLine{453                       \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{conditional<HasScalarFactor,true\_type,false\_type>::type}}());}
+\DoxyCodeLine{454   \}}
+\DoxyCodeLine{455 }
+\DoxyCodeLine{456 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{457 }
+\DoxyCodeLine{458   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst, \textcolor{keyword}{typename} LhsT, \textcolor{keyword}{typename} RhsT, \textcolor{keyword}{typename} Func, \textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{459   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{460   \textcolor{keywordtype}{void} eval\_dynamic\_impl(Dst\& dst, \textcolor{keyword}{const} LhsT\& lhs, \textcolor{keyword}{const} RhsT\& rhs, \textcolor{keyword}{const} Func \&func, \textcolor{keyword}{const} Scalar\&  s \textcolor{comment}{/* == 1 */}, \mbox{\hyperlink{structEigen_1_1internal_1_1false__type}{false\_type}})}
+\DoxyCodeLine{461   \{}
+\DoxyCodeLine{462     EIGEN\_UNUSED\_VARIABLE(s);}
+\DoxyCodeLine{463     eigen\_internal\_assert(s==Scalar(1));}
+\DoxyCodeLine{464     call\_restricted\_packet\_assignment\_no\_alias(dst, lhs.lazyProduct(rhs), func);}
+\DoxyCodeLine{465   \}}
+\DoxyCodeLine{466 }
+\DoxyCodeLine{467   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dst, \textcolor{keyword}{typename} LhsT, \textcolor{keyword}{typename} RhsT, \textcolor{keyword}{typename} Func, \textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{468   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{469   \textcolor{keywordtype}{void} eval\_dynamic\_impl(Dst\& dst, \textcolor{keyword}{const} LhsT\& lhs, \textcolor{keyword}{const} RhsT\& rhs, \textcolor{keyword}{const} Func \&func, \textcolor{keyword}{const} Scalar\& s, \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{true\_type}})}
+\DoxyCodeLine{470   \{}
+\DoxyCodeLine{471     call\_restricted\_packet\_assignment\_no\_alias(dst, s * lhs.lazyProduct(rhs), func);}
+\DoxyCodeLine{472   \}}
+\DoxyCodeLine{473 \};}
+\DoxyCodeLine{474 }
+\DoxyCodeLine{475 \textcolor{comment}{// This specialization enforces the use of a coefficient-\/based evaluation strategy}}
+\DoxyCodeLine{476 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{477 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl}}<Lhs,Rhs,\mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}},\mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}},LazyCoeffBasedProductMode>}
+\DoxyCodeLine{478   : \mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl}}<Lhs,Rhs,DenseShape,DenseShape,CoeffBasedProductMode> \{\};}
+\DoxyCodeLine{479 }
+\DoxyCodeLine{480 \textcolor{comment}{// Case 2: Evaluate coeff by coeff}}
+\DoxyCodeLine{481 \textcolor{comment}{//}}
+\DoxyCodeLine{482 \textcolor{comment}{// This is mostly taken from CoeffBasedProduct.h}}
+\DoxyCodeLine{483 \textcolor{comment}{// The main difference is that we add an extra argument to the etor\_product\_*\_impl::run() function}}
+\DoxyCodeLine{484 \textcolor{comment}{// for the inner dimension of the product, because evaluator object do not know their size.}}
+\DoxyCodeLine{485 }
+\DoxyCodeLine{486 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Traversal, \textcolor{keywordtype}{int} UnrollingIndex, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} RetScalar>}
+\DoxyCodeLine{487 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1etor__product__coeff__impl}{etor\_product\_coeff\_impl}};}
+\DoxyCodeLine{488 }
+\DoxyCodeLine{489 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} StorageOrder, \textcolor{keywordtype}{int} UnrollingIndex, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} Packet, \textcolor{keywordtype}{int} LoadMode>}
+\DoxyCodeLine{490 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1etor__product__packet__impl}{etor\_product\_packet\_impl}};}
+\DoxyCodeLine{491 }
+\DoxyCodeLine{492 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} ProductTag>}
+\DoxyCodeLine{493 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1product__evaluator}{product\_evaluator}}<\mbox{\hyperlink{classEigen_1_1Product}{Product}}<Lhs, Rhs, LazyProduct>, ProductTag, \mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}}, \mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}}>}
+\DoxyCodeLine{494     : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<Product<Lhs, Rhs, LazyProduct> >}
+\DoxyCodeLine{495 \{}
+\DoxyCodeLine{496   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs, Rhs, LazyProduct>}} \mbox{\hyperlink{classEigen_1_1Product}{XprType}};}
+\DoxyCodeLine{497   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Scalar Scalar;}
+\DoxyCodeLine{498   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::CoeffReturnType CoeffReturnType;}
+\DoxyCodeLine{499 }
+\DoxyCodeLine{500   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{501   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1product__evaluator}{product\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Product}{XprType}}\& xpr)}
+\DoxyCodeLine{502     : m\_lhs(xpr.lhs()),}
+\DoxyCodeLine{503       m\_rhs(xpr.rhs()),}
+\DoxyCodeLine{504       m\_lhsImpl(m\_lhs),     \textcolor{comment}{// FIXME the creation of the evaluator objects should result in a no-\/op, but check that!}}
+\DoxyCodeLine{505       m\_rhsImpl(m\_rhs),     \textcolor{comment}{//       Moreover, they are only useful for the packet path, so we could completely disable them when not needed,}}
+\DoxyCodeLine{506                             \textcolor{comment}{//       or perhaps declare them on the fly on the packet method... We have experiment to check what's best.}}
+\DoxyCodeLine{507       m\_innerDim(xpr.lhs().cols())}
+\DoxyCodeLine{508   \{}
+\DoxyCodeLine{509     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(\mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}});}
+\DoxyCodeLine{510     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(\mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::AddCost}});}
+\DoxyCodeLine{511     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(CoeffReadCost);}
+\DoxyCodeLine{512 \textcolor{preprocessor}{\#if 0}}
+\DoxyCodeLine{513     std::cerr << \textcolor{stringliteral}{"{}LhsOuterStrideBytes=  "{}} << LhsOuterStrideBytes << \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{514     std::cerr << \textcolor{stringliteral}{"{}RhsOuterStrideBytes=  "{}} << RhsOuterStrideBytes << \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{515     std::cerr << \textcolor{stringliteral}{"{}LhsAlignment=         "{}} << LhsAlignment << \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{516     std::cerr << \textcolor{stringliteral}{"{}RhsAlignment=         "{}} << RhsAlignment << \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{517     std::cerr << \textcolor{stringliteral}{"{}CanVectorizeLhs=      "{}} << CanVectorizeLhs << \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{518     std::cerr << \textcolor{stringliteral}{"{}CanVectorizeRhs=      "{}} << CanVectorizeRhs << \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{519     std::cerr << \textcolor{stringliteral}{"{}CanVectorizeInner=    "{}} << CanVectorizeInner << \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{520     std::cerr << \textcolor{stringliteral}{"{}EvalToRowMajor=       "{}} << EvalToRowMajor << \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{521     std::cerr << \textcolor{stringliteral}{"{}Alignment=            "{}} << Alignment << \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{522     std::cerr << \textcolor{stringliteral}{"{}Flags=                "{}} << Flags << \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{523 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{524   \}}
+\DoxyCodeLine{525 }
+\DoxyCodeLine{526   \textcolor{comment}{// Everything below here is taken from CoeffBasedProduct.h}}
+\DoxyCodeLine{527 }
+\DoxyCodeLine{528   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::nested\_eval<Lhs,Rhs::ColsAtCompileTime>::type}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{LhsNested}};}
+\DoxyCodeLine{529   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::nested\_eval<Rhs,Lhs::RowsAtCompileTime>::type}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{RhsNested}};}
+\DoxyCodeLine{530 }
+\DoxyCodeLine{531   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<LhsNested>::type LhsNestedCleaned;}
+\DoxyCodeLine{532   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<RhsNested>::type RhsNestedCleaned;}
+\DoxyCodeLine{533 }
+\DoxyCodeLine{534   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<LhsNestedCleaned>}} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{LhsEtorType}};}
+\DoxyCodeLine{535   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<RhsNestedCleaned>}} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{RhsEtorType}};}
+\DoxyCodeLine{536 }
+\DoxyCodeLine{537   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{538     RowsAtCompileTime = LhsNestedCleaned::RowsAtCompileTime,}
+\DoxyCodeLine{539     ColsAtCompileTime = RhsNestedCleaned::ColsAtCompileTime,}
+\DoxyCodeLine{540     InnerSize = EIGEN\_SIZE\_MIN\_PREFER\_FIXED(LhsNestedCleaned::ColsAtCompileTime, RhsNestedCleaned::RowsAtCompileTime),}
+\DoxyCodeLine{541     MaxRowsAtCompileTime = LhsNestedCleaned::MaxRowsAtCompileTime,}
+\DoxyCodeLine{542     MaxColsAtCompileTime = RhsNestedCleaned::MaxColsAtCompileTime}
+\DoxyCodeLine{543   \};}
+\DoxyCodeLine{544 }
+\DoxyCodeLine{545   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} find\_best\_packet<Scalar,RowsAtCompileTime>::type LhsVecPacketType;}
+\DoxyCodeLine{546   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} find\_best\_packet<Scalar,ColsAtCompileTime>::type RhsVecPacketType;}
+\DoxyCodeLine{547 }
+\DoxyCodeLine{548   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{549 }
+\DoxyCodeLine{550     LhsCoeffReadCost = LhsEtorType::CoeffReadCost,}
+\DoxyCodeLine{551     RhsCoeffReadCost = RhsEtorType::CoeffReadCost,}
+\DoxyCodeLine{552     CoeffReadCost = InnerSize==0 ? \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::ReadCost}}}
+\DoxyCodeLine{553                   : InnerSize == \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} ? \mbox{\hyperlink{namespaceEigen_a3163430a1c13173faffde69016b48aaf}{HugeCost}}}
+\DoxyCodeLine{554                     : InnerSize * (\mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}} + int(LhsCoeffReadCost) + int(RhsCoeffReadCost))}
+\DoxyCodeLine{555                     + (InnerSize -\/ 1) * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::AddCost}},}
+\DoxyCodeLine{556 }
+\DoxyCodeLine{557     Unroll = CoeffReadCost <= EIGEN\_UNROLLING\_LIMIT,}
+\DoxyCodeLine{558 }
+\DoxyCodeLine{559     LhsFlags = LhsEtorType::Flags,}
+\DoxyCodeLine{560     RhsFlags = RhsEtorType::Flags,}
+\DoxyCodeLine{561 }
+\DoxyCodeLine{562     LhsRowMajor = LhsFlags \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}},}
+\DoxyCodeLine{563     RhsRowMajor = RhsFlags \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}},}
+\DoxyCodeLine{564 }
+\DoxyCodeLine{565     LhsVecPacketSize = \mbox{\hyperlink{structEigen_1_1internal_1_1unpacket__traits}{unpacket\_traits<LhsVecPacketType>::size}},}
+\DoxyCodeLine{566     RhsVecPacketSize = \mbox{\hyperlink{structEigen_1_1internal_1_1unpacket__traits}{unpacket\_traits<RhsVecPacketType>::size}},}
+\DoxyCodeLine{567 }
+\DoxyCodeLine{568     \textcolor{comment}{// Here, we don't care about alignment larger than the usable packet size.}}
+\DoxyCodeLine{569     LhsAlignment = EIGEN\_PLAIN\_ENUM\_MIN(LhsEtorType::Alignment,LhsVecPacketSize*\textcolor{keywordtype}{int}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename} LhsNestedCleaned::Scalar))),}
+\DoxyCodeLine{570     RhsAlignment = EIGEN\_PLAIN\_ENUM\_MIN(RhsEtorType::Alignment,RhsVecPacketSize*\textcolor{keywordtype}{int}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename} RhsNestedCleaned::Scalar))),}
+\DoxyCodeLine{571 }
+\DoxyCodeLine{572     SameType = \mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{is\_same<typename LhsNestedCleaned::Scalar,typename RhsNestedCleaned::Scalar>::value}},}
+\DoxyCodeLine{573 }
+\DoxyCodeLine{574     CanVectorizeRhs = bool(RhsRowMajor) \&\& (RhsFlags \& \mbox{\hyperlink{group__flags_ga1a306a438e1ab074e8be59512e887b9f}{PacketAccessBit}}) \&\& (ColsAtCompileTime!=1),}
+\DoxyCodeLine{575     CanVectorizeLhs = (!LhsRowMajor) \&\& (LhsFlags \& \mbox{\hyperlink{group__flags_ga1a306a438e1ab074e8be59512e887b9f}{PacketAccessBit}}) \&\& (RowsAtCompileTime!=1),}
+\DoxyCodeLine{576 }
+\DoxyCodeLine{577     EvalToRowMajor = (MaxRowsAtCompileTime==1\&\&MaxColsAtCompileTime!=1) ? 1}
+\DoxyCodeLine{578                     : (MaxColsAtCompileTime==1\&\&MaxRowsAtCompileTime!=1) ? 0}
+\DoxyCodeLine{579                     : (\textcolor{keywordtype}{bool}(RhsRowMajor) \&\& !CanVectorizeLhs),}
+\DoxyCodeLine{580 }
+\DoxyCodeLine{581     Flags = ((\textcolor{keywordtype}{int}(LhsFlags) | int(RhsFlags)) \& HereditaryBits \& \string~\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})}
+\DoxyCodeLine{582           | (EvalToRowMajor ? \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}} : 0)}
+\DoxyCodeLine{583           \textcolor{comment}{// TODO enable vectorization for mixed types}}
+\DoxyCodeLine{584           | (SameType \&\& (CanVectorizeLhs || CanVectorizeRhs) ? \mbox{\hyperlink{group__flags_ga1a306a438e1ab074e8be59512e887b9f}{PacketAccessBit}} : 0)}
+\DoxyCodeLine{585           | (XprType::IsVectorAtCompileTime ? \mbox{\hyperlink{group__flags_ga4b983a15d57cd55806df618ac544d09e}{LinearAccessBit}} : 0),}
+\DoxyCodeLine{586 }
+\DoxyCodeLine{587     LhsOuterStrideBytes = int(LhsNestedCleaned::OuterStrideAtCompileTime) * int(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename} LhsNestedCleaned::Scalar)),}
+\DoxyCodeLine{588     RhsOuterStrideBytes = int(RhsNestedCleaned::OuterStrideAtCompileTime) * int(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename} RhsNestedCleaned::Scalar)),}
+\DoxyCodeLine{589 }
+\DoxyCodeLine{590     Alignment = bool(CanVectorizeLhs) ? (LhsOuterStrideBytes<=0 || (int(LhsOuterStrideBytes) \% EIGEN\_PLAIN\_ENUM\_MAX(1,LhsAlignment))!=0 ? 0 : LhsAlignment)}
+\DoxyCodeLine{591               : bool(CanVectorizeRhs) ? (RhsOuterStrideBytes<=0 || (int(RhsOuterStrideBytes) \% EIGEN\_PLAIN\_ENUM\_MAX(1,RhsAlignment))!=0 ? 0 : RhsAlignment)}
+\DoxyCodeLine{592               : 0,}
+\DoxyCodeLine{593 }
+\DoxyCodeLine{594     \textcolor{comment}{/* CanVectorizeInner deserves special explanation. It does not affect the product flags. It is not used outside}}
+\DoxyCodeLine{595 \textcolor{comment}{     * of Product. If the Product itself is not a packet-\/access expression, there is still a chance that the inner}}
+\DoxyCodeLine{596 \textcolor{comment}{     * loop of the product might be vectorized. This is the meaning of CanVectorizeInner. Since it doesn't affect}}
+\DoxyCodeLine{597 \textcolor{comment}{     * the Flags, it is safe to make this value depend on ActualPacketAccessBit, that doesn't affect the ABI.}}
+\DoxyCodeLine{598 \textcolor{comment}{     */}}
+\DoxyCodeLine{599     CanVectorizeInner =    SameType}
+\DoxyCodeLine{600                         \&\& LhsRowMajor}
+\DoxyCodeLine{601                         \&\& (!RhsRowMajor)}
+\DoxyCodeLine{602                         \&\& (\textcolor{keywordtype}{int}(LhsFlags) \& int(RhsFlags) \& ActualPacketAccessBit)}
+\DoxyCodeLine{603                         \&\& (\textcolor{keywordtype}{int}(InnerSize) \% \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::size}} == 0)}
+\DoxyCodeLine{604   \};}
+\DoxyCodeLine{605 }
+\DoxyCodeLine{606   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{607 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{608     \textcolor{keywordflow}{return} (m\_lhs.row(row).transpose().cwiseProduct( m\_rhs.col(col) )).sum();}
+\DoxyCodeLine{609   \}}
+\DoxyCodeLine{610 }
+\DoxyCodeLine{611   \textcolor{comment}{/* Allow index-\/based non-\/packet access. It is impossible though to allow index-\/based packed access,}}
+\DoxyCodeLine{612 \textcolor{comment}{   * which is why we don't set the LinearAccessBit.}}
+\DoxyCodeLine{613 \textcolor{comment}{   * TODO: this seems possible when the result is a vector}}
+\DoxyCodeLine{614 \textcolor{comment}{   */}}
+\DoxyCodeLine{615   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{616   \textcolor{keyword}{const} CoeffReturnType coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{617 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{618     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row = (RowsAtCompileTime == 1 || MaxRowsAtCompileTime==1) ? 0 : index;}
+\DoxyCodeLine{619     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col = (RowsAtCompileTime == 1 || MaxRowsAtCompileTime==1) ? index : 0;}
+\DoxyCodeLine{620     \textcolor{keywordflow}{return} (m\_lhs.row(row).transpose().cwiseProduct( m\_rhs.col(col) )).sum();}
+\DoxyCodeLine{621   \}}
+\DoxyCodeLine{622 }
+\DoxyCodeLine{623   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{624   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{625   \textcolor{keyword}{const} PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{626 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{627     PacketType res;}
+\DoxyCodeLine{628     \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1etor__product__packet__impl}{etor\_product\_packet\_impl}}<bool(\textcolor{keywordtype}{int}(Flags)\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) ? \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}} : \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}},}
+\DoxyCodeLine{629                                      Unroll ? int(InnerSize) : \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}},}
+\DoxyCodeLine{630                                      \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{LhsEtorType}}, \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{RhsEtorType}}, PacketType, LoadMode> PacketImpl;}
+\DoxyCodeLine{631     PacketImpl::run(row, col, m\_lhsImpl, m\_rhsImpl, m\_innerDim, res);}
+\DoxyCodeLine{632     \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{633   \}}
+\DoxyCodeLine{634 }
+\DoxyCodeLine{635   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode, \textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{636   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{637   \textcolor{keyword}{const} PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} index)\textcolor{keyword}{ const}}
+\DoxyCodeLine{638 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{639     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row = (RowsAtCompileTime == 1 || MaxRowsAtCompileTime==1) ? 0 : index;}
+\DoxyCodeLine{640     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col = (RowsAtCompileTime == 1 || MaxRowsAtCompileTime==1) ? index : 0;}
+\DoxyCodeLine{641     \textcolor{keywordflow}{return} packet<LoadMode,PacketType>(row,col);}
+\DoxyCodeLine{642   \}}
+\DoxyCodeLine{643 }
+\DoxyCodeLine{644 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{645   \textcolor{keyword}{typename} internal::add\_const\_on\_value\_type<LhsNested>::type m\_lhs;}
+\DoxyCodeLine{646   \textcolor{keyword}{typename} internal::add\_const\_on\_value\_type<RhsNested>::type m\_rhs;}
+\DoxyCodeLine{647 }
+\DoxyCodeLine{648   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{LhsEtorType}} m\_lhsImpl;}
+\DoxyCodeLine{649   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{RhsEtorType}} m\_rhsImpl;}
+\DoxyCodeLine{650 }
+\DoxyCodeLine{651   \textcolor{comment}{// TODO: Get rid of m\_innerDim if known at compile time}}
+\DoxyCodeLine{652   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m\_innerDim;}
+\DoxyCodeLine{653 \};}
+\DoxyCodeLine{654 }
+\DoxyCodeLine{655 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{656 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1product__evaluator}{product\_evaluator}}<\mbox{\hyperlink{classEigen_1_1Product}{Product}}<Lhs, Rhs, DefaultProduct>, LazyCoeffBasedProductMode, \mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}}, \mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}}>}
+\DoxyCodeLine{657   : \mbox{\hyperlink{structEigen_1_1internal_1_1product__evaluator}{product\_evaluator}}<Product<Lhs, Rhs, LazyProduct>, CoeffBasedProductMode, DenseShape, DenseShape>}
+\DoxyCodeLine{658 \{}
+\DoxyCodeLine{659   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs, Rhs, DefaultProduct>}} \mbox{\hyperlink{classEigen_1_1Product}{XprType}};}
+\DoxyCodeLine{660   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs, Rhs, LazyProduct>}} \mbox{\hyperlink{classEigen_1_1Product}{BaseProduct}};}
+\DoxyCodeLine{661   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1product__evaluator}{product\_evaluator<BaseProduct, CoeffBasedProductMode, DenseShape, DenseShape>}} \mbox{\hyperlink{structEigen_1_1internal_1_1product__evaluator}{Base}};}
+\DoxyCodeLine{662   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{663     Flags = Base::Flags | \mbox{\hyperlink{group__flags_gaa34e83bae46a8eeae4e69ebe3aaecbed}{EvalBeforeNestingBit}}}
+\DoxyCodeLine{664   \};}
+\DoxyCodeLine{665   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{666   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1product__evaluator}{product\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Product}{XprType}}\& xpr)}
+\DoxyCodeLine{667     : \mbox{\hyperlink{structEigen_1_1internal_1_1product__evaluator}{Base}}(\mbox{\hyperlink{classEigen_1_1Product}{BaseProduct}}(xpr.lhs(),xpr.rhs()))}
+\DoxyCodeLine{668   \{\}}
+\DoxyCodeLine{669 \};}
+\DoxyCodeLine{670 }
+\DoxyCodeLine{671 \textcolor{comment}{/****************************************}}
+\DoxyCodeLine{672 \textcolor{comment}{*** Coeff based product, Packet path  ***}}
+\DoxyCodeLine{673 \textcolor{comment}{****************************************/}}
+\DoxyCodeLine{674 }
+\DoxyCodeLine{675 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} UnrollingIndex, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} Packet, \textcolor{keywordtype}{int} LoadMode>}
+\DoxyCodeLine{676 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1etor__product__packet__impl}{etor\_product\_packet\_impl}}<\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}}, UnrollingIndex, Lhs, Rhs, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}, LoadMode>}
+\DoxyCodeLine{677 \{}
+\DoxyCodeLine{678   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} run(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} innerDim, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} \&res)}
+\DoxyCodeLine{679   \{}
+\DoxyCodeLine{680     \mbox{\hyperlink{structEigen_1_1internal_1_1etor__product__packet__impl}{etor\_product\_packet\_impl<RowMajor, UnrollingIndex-\/1, Lhs, Rhs, Packet, LoadMode>::run}}(row, col, lhs, rhs, innerDim, res);}
+\DoxyCodeLine{681     res =  pmadd(pset1<Packet>(lhs.coeff(row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}(UnrollingIndex-\/1))), rhs.template packet<LoadMode,Packet>(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}(UnrollingIndex-\/1), col), res);}
+\DoxyCodeLine{682   \}}
+\DoxyCodeLine{683 \};}
+\DoxyCodeLine{684 }
+\DoxyCodeLine{685 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} UnrollingIndex, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} Packet, \textcolor{keywordtype}{int} LoadMode>}
+\DoxyCodeLine{686 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1etor__product__packet__impl}{etor\_product\_packet\_impl}}<\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}, UnrollingIndex, Lhs, Rhs, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}, LoadMode>}
+\DoxyCodeLine{687 \{}
+\DoxyCodeLine{688   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} run(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} innerDim, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} \&res)}
+\DoxyCodeLine{689   \{}
+\DoxyCodeLine{690     \mbox{\hyperlink{structEigen_1_1internal_1_1etor__product__packet__impl}{etor\_product\_packet\_impl<ColMajor, UnrollingIndex-\/1, Lhs, Rhs, Packet, LoadMode>::run}}(row, col, lhs, rhs, innerDim, res);}
+\DoxyCodeLine{691     res =  pmadd(lhs.template packet<LoadMode,Packet>(row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}(UnrollingIndex-\/1)), pset1<Packet>(rhs.coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}(UnrollingIndex-\/1), col)), res);}
+\DoxyCodeLine{692   \}}
+\DoxyCodeLine{693 \};}
+\DoxyCodeLine{694 }
+\DoxyCodeLine{695 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} Packet, \textcolor{keywordtype}{int} LoadMode>}
+\DoxyCodeLine{696 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1etor__product__packet__impl}{etor\_product\_packet\_impl}}<\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}}, 1, Lhs, Rhs, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}, LoadMode>}
+\DoxyCodeLine{697 \{}
+\DoxyCodeLine{698   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} run(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \textcolor{comment}{/*innerDim*/}, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} \&res)}
+\DoxyCodeLine{699   \{}
+\DoxyCodeLine{700     res = pmul(pset1<Packet>(lhs.coeff(row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}(0))),rhs.template packet<LoadMode,Packet>(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}(0), col));}
+\DoxyCodeLine{701   \}}
+\DoxyCodeLine{702 \};}
+\DoxyCodeLine{703 }
+\DoxyCodeLine{704 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} Packet, \textcolor{keywordtype}{int} LoadMode>}
+\DoxyCodeLine{705 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1etor__product__packet__impl}{etor\_product\_packet\_impl}}<\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}, 1, Lhs, Rhs, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}, LoadMode>}
+\DoxyCodeLine{706 \{}
+\DoxyCodeLine{707   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} run(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \textcolor{comment}{/*innerDim*/}, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} \&res)}
+\DoxyCodeLine{708   \{}
+\DoxyCodeLine{709     res = pmul(lhs.template packet<LoadMode,Packet>(row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}(0)), pset1<Packet>(rhs.coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}(0), col)));}
+\DoxyCodeLine{710   \}}
+\DoxyCodeLine{711 \};}
+\DoxyCodeLine{712 }
+\DoxyCodeLine{713 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} Packet, \textcolor{keywordtype}{int} LoadMode>}
+\DoxyCodeLine{714 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1etor__product__packet__impl}{etor\_product\_packet\_impl}}<\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}}, 0, Lhs, Rhs, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}, LoadMode>}
+\DoxyCodeLine{715 \{}
+\DoxyCodeLine{716   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} run(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \textcolor{comment}{/*row*/}, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \textcolor{comment}{/*col*/}, \textcolor{keyword}{const} Lhs\& \textcolor{comment}{/*lhs*/}, \textcolor{keyword}{const} Rhs\& \textcolor{comment}{/*rhs*/}, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \textcolor{comment}{/*innerDim*/}, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} \&res)}
+\DoxyCodeLine{717   \{}
+\DoxyCodeLine{718     res = pset1<Packet>(\textcolor{keyword}{typename} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{unpacket\_traits<Packet>::type}}(0));}
+\DoxyCodeLine{719   \}}
+\DoxyCodeLine{720 \};}
+\DoxyCodeLine{721 }
+\DoxyCodeLine{722 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} Packet, \textcolor{keywordtype}{int} LoadMode>}
+\DoxyCodeLine{723 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1etor__product__packet__impl}{etor\_product\_packet\_impl}}<\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}, 0, Lhs, Rhs, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}, LoadMode>}
+\DoxyCodeLine{724 \{}
+\DoxyCodeLine{725   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} run(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \textcolor{comment}{/*row*/}, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \textcolor{comment}{/*col*/}, \textcolor{keyword}{const} Lhs\& \textcolor{comment}{/*lhs*/}, \textcolor{keyword}{const} Rhs\& \textcolor{comment}{/*rhs*/}, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \textcolor{comment}{/*innerDim*/}, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} \&res)}
+\DoxyCodeLine{726   \{}
+\DoxyCodeLine{727     res = pset1<Packet>(\textcolor{keyword}{typename} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{unpacket\_traits<Packet>::type}}(0));}
+\DoxyCodeLine{728   \}}
+\DoxyCodeLine{729 \};}
+\DoxyCodeLine{730 }
+\DoxyCodeLine{731 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} Packet, \textcolor{keywordtype}{int} LoadMode>}
+\DoxyCodeLine{732 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1etor__product__packet__impl}{etor\_product\_packet\_impl}}<\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}}, \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}, Lhs, Rhs, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}, LoadMode>}
+\DoxyCodeLine{733 \{}
+\DoxyCodeLine{734   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} run(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} innerDim, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& res)}
+\DoxyCodeLine{735   \{}
+\DoxyCodeLine{736     res = pset1<Packet>(\textcolor{keyword}{typename} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{unpacket\_traits<Packet>::type}}(0));}
+\DoxyCodeLine{737     \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = 0; i < innerDim; ++i)}
+\DoxyCodeLine{738       res =  pmadd(pset1<Packet>(lhs.coeff(row, i)), rhs.template packet<LoadMode,Packet>(i, col), res);}
+\DoxyCodeLine{739   \}}
+\DoxyCodeLine{740 \};}
+\DoxyCodeLine{741 }
+\DoxyCodeLine{742 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} Packet, \textcolor{keywordtype}{int} LoadMode>}
+\DoxyCodeLine{743 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1etor__product__packet__impl}{etor\_product\_packet\_impl}}<\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}, \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}, Lhs, Rhs, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}, LoadMode>}
+\DoxyCodeLine{744 \{}
+\DoxyCodeLine{745   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} run(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} innerDim, \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}}\& res)}
+\DoxyCodeLine{746   \{}
+\DoxyCodeLine{747     res = pset1<Packet>(\textcolor{keyword}{typename} \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{unpacket\_traits<Packet>::type}}(0));}
+\DoxyCodeLine{748     \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = 0; i < innerDim; ++i)}
+\DoxyCodeLine{749       res =  pmadd(lhs.template packet<LoadMode,Packet>(row, i), pset1<Packet>(rhs.coeff(i, col)), res);}
+\DoxyCodeLine{750   \}}
+\DoxyCodeLine{751 \};}
+\DoxyCodeLine{752 }
+\DoxyCodeLine{753 }
+\DoxyCodeLine{754 \textcolor{comment}{/***************************************************************************}}
+\DoxyCodeLine{755 \textcolor{comment}{* Triangular products}}
+\DoxyCodeLine{756 \textcolor{comment}{***************************************************************************/}}
+\DoxyCodeLine{757 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Mode, \textcolor{keywordtype}{bool} LhsIsTriangular,}
+\DoxyCodeLine{758          \textcolor{keyword}{typename} Lhs, \textcolor{keywordtype}{bool} LhsIsVector,}
+\DoxyCodeLine{759          \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{bool} RhsIsVector>}
+\DoxyCodeLine{760 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1triangular__product__impl}{triangular\_product\_impl}};}
+\DoxyCodeLine{761 }
+\DoxyCodeLine{762 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} ProductTag>}
+\DoxyCodeLine{763 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl}}<Lhs,Rhs,\mbox{\hyperlink{structEigen_1_1TriangularShape}{TriangularShape}},\mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}},ProductTag>}
+\DoxyCodeLine{764   : \mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl__base}{generic\_product\_impl\_base}}<Lhs,Rhs,generic\_product\_impl<Lhs,Rhs,TriangularShape,DenseShape,ProductTag> >}
+\DoxyCodeLine{765 \{}
+\DoxyCodeLine{766   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs,Rhs>::Scalar}} Scalar;}
+\DoxyCodeLine{767 }
+\DoxyCodeLine{768   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{769   \textcolor{keyword}{static} \textcolor{keywordtype}{void} scaleAndAddTo(Dest\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, \textcolor{keyword}{const} Scalar\& alpha)}
+\DoxyCodeLine{770   \{}
+\DoxyCodeLine{771     \mbox{\hyperlink{structEigen_1_1internal_1_1triangular__product__impl}{triangular\_product\_impl<Lhs::Mode,true,typename Lhs::MatrixType,false,Rhs, Rhs::ColsAtCompileTime==1>}}}
+\DoxyCodeLine{772 \mbox{\hyperlink{structEigen_1_1internal_1_1triangular__product__impl}{        ::run}}(dst, lhs.nestedExpression(), rhs, alpha);}
+\DoxyCodeLine{773   \}}
+\DoxyCodeLine{774 \};}
+\DoxyCodeLine{775 }
+\DoxyCodeLine{776 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} ProductTag>}
+\DoxyCodeLine{777 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl}}<Lhs,Rhs,\mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}},\mbox{\hyperlink{structEigen_1_1TriangularShape}{TriangularShape}},ProductTag>}
+\DoxyCodeLine{778 : \mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl__base}{generic\_product\_impl\_base}}<Lhs,Rhs,generic\_product\_impl<Lhs,Rhs,DenseShape,TriangularShape,ProductTag> >}
+\DoxyCodeLine{779 \{}
+\DoxyCodeLine{780   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs,Rhs>::Scalar}} Scalar;}
+\DoxyCodeLine{781 }
+\DoxyCodeLine{782   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{783   \textcolor{keyword}{static} \textcolor{keywordtype}{void} scaleAndAddTo(Dest\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, \textcolor{keyword}{const} Scalar\& alpha)}
+\DoxyCodeLine{784   \{}
+\DoxyCodeLine{785     \mbox{\hyperlink{structEigen_1_1internal_1_1triangular__product__impl}{triangular\_product\_impl<Rhs::Mode,false,Lhs,Lhs::RowsAtCompileTime==1, typename Rhs::MatrixType, false>::run}}(dst, lhs, rhs.nestedExpression(), alpha);}
+\DoxyCodeLine{786   \}}
+\DoxyCodeLine{787 \};}
+\DoxyCodeLine{788 }
+\DoxyCodeLine{789 }
+\DoxyCodeLine{790 \textcolor{comment}{/***************************************************************************}}
+\DoxyCodeLine{791 \textcolor{comment}{* SelfAdjoint products}}
+\DoxyCodeLine{792 \textcolor{comment}{***************************************************************************/}}
+\DoxyCodeLine{793 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Lhs, \textcolor{keywordtype}{int} LhsMode, \textcolor{keywordtype}{bool} LhsIsVector,}
+\DoxyCodeLine{794           \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} RhsMode, \textcolor{keywordtype}{bool} RhsIsVector>}
+\DoxyCodeLine{795 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1selfadjoint__product__impl}{selfadjoint\_product\_impl}};}
+\DoxyCodeLine{796 }
+\DoxyCodeLine{797 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} ProductTag>}
+\DoxyCodeLine{798 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl}}<Lhs,Rhs,\mbox{\hyperlink{structEigen_1_1SelfAdjointShape}{SelfAdjointShape}},\mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}},ProductTag>}
+\DoxyCodeLine{799   : \mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl__base}{generic\_product\_impl\_base}}<Lhs,Rhs,generic\_product\_impl<Lhs,Rhs,SelfAdjointShape,DenseShape,ProductTag> >}
+\DoxyCodeLine{800 \{}
+\DoxyCodeLine{801   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs,Rhs>::Scalar}} Scalar;}
+\DoxyCodeLine{802 }
+\DoxyCodeLine{803   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{804   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{805   \textcolor{keywordtype}{void} scaleAndAddTo(Dest\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, \textcolor{keyword}{const} Scalar\& alpha)}
+\DoxyCodeLine{806   \{}
+\DoxyCodeLine{807     \mbox{\hyperlink{structEigen_1_1internal_1_1selfadjoint__product__impl}{selfadjoint\_product\_impl<typename Lhs::MatrixType,Lhs::Mode,false,Rhs,0,Rhs::IsVectorAtCompileTime>::run}}(dst, lhs.nestedExpression(), rhs, alpha);}
+\DoxyCodeLine{808   \}}
+\DoxyCodeLine{809 \};}
+\DoxyCodeLine{810 }
+\DoxyCodeLine{811 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} ProductTag>}
+\DoxyCodeLine{812 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl}}<Lhs,Rhs,\mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}},\mbox{\hyperlink{structEigen_1_1SelfAdjointShape}{SelfAdjointShape}},ProductTag>}
+\DoxyCodeLine{813 : \mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl__base}{generic\_product\_impl\_base}}<Lhs,Rhs,generic\_product\_impl<Lhs,Rhs,DenseShape,SelfAdjointShape,ProductTag> >}
+\DoxyCodeLine{814 \{}
+\DoxyCodeLine{815   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs,Rhs>::Scalar}} Scalar;}
+\DoxyCodeLine{816 }
+\DoxyCodeLine{817   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{818   \textcolor{keyword}{static} \textcolor{keywordtype}{void} scaleAndAddTo(Dest\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, \textcolor{keyword}{const} Scalar\& alpha)}
+\DoxyCodeLine{819   \{}
+\DoxyCodeLine{820     \mbox{\hyperlink{structEigen_1_1internal_1_1selfadjoint__product__impl}{selfadjoint\_product\_impl<Lhs,0,Lhs::IsVectorAtCompileTime,typename Rhs::MatrixType,Rhs::Mode,false>::run}}(dst, lhs, rhs.nestedExpression(), alpha);}
+\DoxyCodeLine{821   \}}
+\DoxyCodeLine{822 \};}
+\DoxyCodeLine{823 }
+\DoxyCodeLine{824 }
+\DoxyCodeLine{825 \textcolor{comment}{/***************************************************************************}}
+\DoxyCodeLine{826 \textcolor{comment}{* Diagonal products}}
+\DoxyCodeLine{827 \textcolor{comment}{***************************************************************************/}}
+\DoxyCodeLine{828 }
+\DoxyCodeLine{829 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keyword}{typename} DiagonalType, \textcolor{keyword}{typename} Derived, \textcolor{keywordtype}{int} ProductOrder>}
+\DoxyCodeLine{830 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1diagonal__product__evaluator__base}{diagonal\_product\_evaluator\_base}}}
+\DoxyCodeLine{831   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<Derived>}
+\DoxyCodeLine{832 \{}
+\DoxyCodeLine{833    \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1ScalarBinaryOpTraits}{ScalarBinaryOpTraits<typename MatrixType::Scalar, typename DiagonalType::Scalar>::ReturnType}} Scalar;}
+\DoxyCodeLine{834 \textcolor{keyword}{public}:}
+\DoxyCodeLine{835   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{836     CoeffReadCost = int(\mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}}) + int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<MatrixType>::CoeffReadCost}}) + int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<DiagonalType>::CoeffReadCost}}),}
+\DoxyCodeLine{837 }
+\DoxyCodeLine{838     MatrixFlags = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<MatrixType>::Flags}},}
+\DoxyCodeLine{839     DiagFlags = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<DiagonalType>::Flags}},}
+\DoxyCodeLine{840 }
+\DoxyCodeLine{841     StorageOrder\_ = (Derived::MaxRowsAtCompileTime==1 \&\& Derived::MaxColsAtCompileTime!=1) ? \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}}}
+\DoxyCodeLine{842                   : (Derived::MaxColsAtCompileTime==1 \&\& Derived::MaxRowsAtCompileTime!=1) ? \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}}
+\DoxyCodeLine{843                   : MatrixFlags \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}} ? \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}} : \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}},}
+\DoxyCodeLine{844     \_SameStorageOrder = StorageOrder\_ == (MatrixFlags \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}} ? \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}} : \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}),}
+\DoxyCodeLine{845 }
+\DoxyCodeLine{846     \_ScalarAccessOnDiag =  !((\textcolor{keywordtype}{int}(StorageOrder\_) == \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}} \&\& int(ProductOrder) == \mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba21b30a61e9cb10c967aec17567804007}{OnTheLeft}})}
+\DoxyCodeLine{847                            ||(\textcolor{keywordtype}{int}(StorageOrder\_) == \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}} \&\& int(ProductOrder) == \mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba329fc3a54ceb2b6e0e73b400998b8a82}{OnTheRight}})),}
+\DoxyCodeLine{848     \_SameTypes = \mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{is\_same<typename MatrixType::Scalar, typename DiagonalType::Scalar>::value}},}
+\DoxyCodeLine{849     \textcolor{comment}{// FIXME currently we need same types, but in the future the next rule should be the one}}
+\DoxyCodeLine{850     \textcolor{comment}{//\_Vectorizable = bool(int(MatrixFlags)\&PacketAccessBit) \&\& ((!\_PacketOnDiag) || (\_SameTypes \&\& bool(int(DiagFlags)\&PacketAccessBit))),}}
+\DoxyCodeLine{851     \_Vectorizable =   bool(\textcolor{keywordtype}{int}(MatrixFlags)\&\mbox{\hyperlink{group__flags_ga1a306a438e1ab074e8be59512e887b9f}{PacketAccessBit}})}
+\DoxyCodeLine{852                   \&\&  \_SameTypes}
+\DoxyCodeLine{853                   \&\& (\_SameStorageOrder || (MatrixFlags\&\mbox{\hyperlink{group__flags_ga4b983a15d57cd55806df618ac544d09e}{LinearAccessBit}})==\mbox{\hyperlink{group__flags_ga4b983a15d57cd55806df618ac544d09e}{LinearAccessBit}})}
+\DoxyCodeLine{854                   \&\& (\_ScalarAccessOnDiag || (bool(\textcolor{keywordtype}{int}(DiagFlags)\&\mbox{\hyperlink{group__flags_ga1a306a438e1ab074e8be59512e887b9f}{PacketAccessBit}}))),}
+\DoxyCodeLine{855     \_LinearAccessMask = (MatrixType::RowsAtCompileTime==1 || MatrixType::ColsAtCompileTime==1) ? \mbox{\hyperlink{group__flags_ga4b983a15d57cd55806df618ac544d09e}{LinearAccessBit}} : 0,}
+\DoxyCodeLine{856     Flags = ((HereditaryBits|\_LinearAccessMask) \& (\textcolor{keywordtype}{unsigned} int)(MatrixFlags)) | (\_Vectorizable ? \mbox{\hyperlink{group__flags_ga1a306a438e1ab074e8be59512e887b9f}{PacketAccessBit}} : 0),}
+\DoxyCodeLine{857     Alignment = \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<MatrixType>::Alignment}},}
+\DoxyCodeLine{858 }
+\DoxyCodeLine{859     AsScalarProduct =     (DiagonalType::SizeAtCompileTime==1)}
+\DoxyCodeLine{860                       ||  (DiagonalType::SizeAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} \&\& MatrixType::RowsAtCompileTime==1 \&\& ProductOrder==\mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba21b30a61e9cb10c967aec17567804007}{OnTheLeft}})}
+\DoxyCodeLine{861                       ||  (DiagonalType::SizeAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} \&\& MatrixType::ColsAtCompileTime==1 \&\& ProductOrder==\mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba329fc3a54ceb2b6e0e73b400998b8a82}{OnTheRight}})}
+\DoxyCodeLine{862   \};}
+\DoxyCodeLine{863 }
+\DoxyCodeLine{864   EIGEN\_DEVICE\_FUNC \mbox{\hyperlink{structEigen_1_1internal_1_1diagonal__product__evaluator__base}{diagonal\_product\_evaluator\_base}}(\textcolor{keyword}{const} MatrixType \&mat, \textcolor{keyword}{const} DiagonalType \&diag)}
+\DoxyCodeLine{865     : m\_diagImpl(diag), m\_matImpl(mat)}
+\DoxyCodeLine{866   \{}
+\DoxyCodeLine{867     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(\mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::MulCost}});}
+\DoxyCodeLine{868     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(CoeffReadCost);}
+\DoxyCodeLine{869   \}}
+\DoxyCodeLine{870 }
+\DoxyCodeLine{871   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} Scalar coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} idx)\textcolor{keyword}{ const}}
+\DoxyCodeLine{872 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{873     \textcolor{keywordflow}{if}(AsScalarProduct)}
+\DoxyCodeLine{874       \textcolor{keywordflow}{return} m\_diagImpl.coeff(0) * m\_matImpl.coeff(idx);}
+\DoxyCodeLine{875     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{876       \textcolor{keywordflow}{return} m\_diagImpl.coeff(idx) * m\_matImpl.coeff(idx);}
+\DoxyCodeLine{877   \}}
+\DoxyCodeLine{878 }
+\DoxyCodeLine{879 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{880   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode,\textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{881   EIGEN\_STRONG\_INLINE PacketType packet\_impl(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \textcolor{keywordtype}{id}, \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::true\_type}})\textcolor{keyword}{ const}}
+\DoxyCodeLine{882 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{883     \textcolor{keywordflow}{return} internal::pmul(m\_matImpl.template packet<LoadMode,PacketType>(row, col),}
+\DoxyCodeLine{884                           internal::pset1<PacketType>(m\_diagImpl.coeff(\textcolor{keywordtype}{id})));}
+\DoxyCodeLine{885   \}}
+\DoxyCodeLine{886 }
+\DoxyCodeLine{887   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode,\textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{888   EIGEN\_STRONG\_INLINE PacketType packet\_impl(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \textcolor{keywordtype}{id}, \mbox{\hyperlink{structEigen_1_1internal_1_1false__type}{internal::false\_type}})\textcolor{keyword}{ const}}
+\DoxyCodeLine{889 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{890     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{891       InnerSize = (MatrixType::Flags \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) ? MatrixType::ColsAtCompileTime : MatrixType::RowsAtCompileTime,}
+\DoxyCodeLine{892       DiagonalPacketLoadMode = EIGEN\_PLAIN\_ENUM\_MIN(LoadMode,((InnerSize\%16) == 0) ? int(\mbox{\hyperlink{group__enums_gga45fe06e29902b7a2773de05ba27b47a1ad0b140cd97bc74365b51843d28379655}{Aligned16}}) : int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<DiagonalType>::Alignment}})) \textcolor{comment}{// FIXME hardcoded 16!!}}
+\DoxyCodeLine{893     \};}
+\DoxyCodeLine{894     \textcolor{keywordflow}{return} internal::pmul(m\_matImpl.template packet<LoadMode,PacketType>(row, col),}
+\DoxyCodeLine{895                           m\_diagImpl.template packet<DiagonalPacketLoadMode,PacketType>(\textcolor{keywordtype}{id}));}
+\DoxyCodeLine{896   \}}
+\DoxyCodeLine{897 }
+\DoxyCodeLine{898   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<DiagonalType>}} m\_diagImpl;}
+\DoxyCodeLine{899   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<MatrixType>}}   m\_matImpl;}
+\DoxyCodeLine{900 \};}
+\DoxyCodeLine{901 }
+\DoxyCodeLine{902 \textcolor{comment}{// diagonal * dense}}
+\DoxyCodeLine{903 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} ProductKind, \textcolor{keywordtype}{int} ProductTag>}
+\DoxyCodeLine{904 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1product__evaluator}{product\_evaluator}}<\mbox{\hyperlink{classEigen_1_1Product}{Product}}<Lhs, Rhs, ProductKind>, ProductTag, \mbox{\hyperlink{structEigen_1_1DiagonalShape}{DiagonalShape}}, \mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}}>}
+\DoxyCodeLine{905   : \mbox{\hyperlink{structEigen_1_1internal_1_1diagonal__product__evaluator__base}{diagonal\_product\_evaluator\_base}}<Rhs, typename Lhs::DiagonalVectorType, Product<Lhs, Rhs, LazyProduct>, OnTheLeft>}
+\DoxyCodeLine{906 \{}
+\DoxyCodeLine{907   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1diagonal__product__evaluator__base}{diagonal\_product\_evaluator\_base<Rhs, typename Lhs::DiagonalVectorType, Product<Lhs, Rhs, LazyProduct>}}, \mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba21b30a61e9cb10c967aec17567804007}{OnTheLeft}}> \mbox{\hyperlink{structEigen_1_1internal_1_1diagonal__product__evaluator__base}{Base}};}
+\DoxyCodeLine{908   \textcolor{keyword}{using} Base::m\_diagImpl;}
+\DoxyCodeLine{909   \textcolor{keyword}{using} Base::m\_matImpl;}
+\DoxyCodeLine{910   \textcolor{keyword}{using} Base::coeff;}
+\DoxyCodeLine{911   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::Scalar Scalar;}
+\DoxyCodeLine{912 }
+\DoxyCodeLine{913   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs, Rhs, ProductKind>}} \mbox{\hyperlink{classEigen_1_1Product}{XprType}};}
+\DoxyCodeLine{914   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::PlainObject PlainObject;}
+\DoxyCodeLine{915   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Lhs::DiagonalVectorType DiagonalType;}
+\DoxyCodeLine{916 }
+\DoxyCodeLine{917 }
+\DoxyCodeLine{918   \textcolor{keyword}{enum} \{ StorageOrder = Base::StorageOrder\_ \};}
+\DoxyCodeLine{919 }
+\DoxyCodeLine{920   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1product__evaluator}{product\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Product}{XprType}}\& xpr)}
+\DoxyCodeLine{921     : \mbox{\hyperlink{structEigen_1_1internal_1_1diagonal__product__evaluator__base}{Base}}(xpr.rhs(), xpr.lhs().diagonal())}
+\DoxyCodeLine{922   \{}
+\DoxyCodeLine{923   \}}
+\DoxyCodeLine{924 }
+\DoxyCodeLine{925   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} Scalar coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{926 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{927     \textcolor{keywordflow}{return} m\_diagImpl.coeff(row) * m\_matImpl.coeff(row, col);}
+\DoxyCodeLine{928   \}}
+\DoxyCodeLine{929 }
+\DoxyCodeLine{930 \textcolor{preprocessor}{\#ifndef EIGEN\_GPUCC}}
+\DoxyCodeLine{931   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode,\textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{932   EIGEN\_STRONG\_INLINE PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{933 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{934     \textcolor{comment}{// FIXME: NVCC used to complain about the template keyword, but we have to check whether this is still the case.}}
+\DoxyCodeLine{935     \textcolor{comment}{// See also similar calls below.}}
+\DoxyCodeLine{936     \textcolor{keywordflow}{return} this-\/>\textcolor{keyword}{template} packet\_impl<LoadMode,PacketType>(row,col, row,}
+\DoxyCodeLine{937                                  \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1conditional}{internal::conditional}}<\textcolor{keywordtype}{int}(StorageOrder)==\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}}, \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::true\_type}}, \mbox{\hyperlink{structEigen_1_1internal_1_1false__type}{internal::false\_type}}>::type());}
+\DoxyCodeLine{938   \}}
+\DoxyCodeLine{939 }
+\DoxyCodeLine{940   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode,\textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{941   EIGEN\_STRONG\_INLINE PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} idx)\textcolor{keyword}{ const}}
+\DoxyCodeLine{942 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{943     \textcolor{keywordflow}{return} packet<LoadMode,PacketType>(\textcolor{keywordtype}{int}(StorageOrder)==\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}?idx:0,\textcolor{keywordtype}{int}(StorageOrder)==\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}?0:idx);}
+\DoxyCodeLine{944   \}}
+\DoxyCodeLine{945 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{946 \};}
+\DoxyCodeLine{947 }
+\DoxyCodeLine{948 \textcolor{comment}{// dense * diagonal}}
+\DoxyCodeLine{949 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} ProductKind, \textcolor{keywordtype}{int} ProductTag>}
+\DoxyCodeLine{950 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1product__evaluator}{product\_evaluator<Product<Lhs, Rhs, ProductKind>}}, ProductTag, \mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}}, \mbox{\hyperlink{structEigen_1_1DiagonalShape}{DiagonalShape}}>}
+\DoxyCodeLine{951   : \mbox{\hyperlink{structEigen_1_1internal_1_1diagonal__product__evaluator__base}{diagonal\_product\_evaluator\_base<Lhs, typename Rhs::DiagonalVectorType, Product<Lhs, Rhs, LazyProduct>}}, \mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba329fc3a54ceb2b6e0e73b400998b8a82}{OnTheRight}}>}
+\DoxyCodeLine{952 \{}
+\DoxyCodeLine{953   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1diagonal__product__evaluator__base}{diagonal\_product\_evaluator\_base<Lhs, typename Rhs::DiagonalVectorType, Product<Lhs, Rhs, LazyProduct>}}, \mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba329fc3a54ceb2b6e0e73b400998b8a82}{OnTheRight}}> \mbox{\hyperlink{structEigen_1_1internal_1_1diagonal__product__evaluator__base}{Base}};}
+\DoxyCodeLine{954   \textcolor{keyword}{using} Base::m\_diagImpl;}
+\DoxyCodeLine{955   \textcolor{keyword}{using} Base::m\_matImpl;}
+\DoxyCodeLine{956   \textcolor{keyword}{using} Base::coeff;}
+\DoxyCodeLine{957   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::Scalar Scalar;}
+\DoxyCodeLine{958 }
+\DoxyCodeLine{959   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs, Rhs, ProductKind>}} \mbox{\hyperlink{classEigen_1_1Product}{XprType}};}
+\DoxyCodeLine{960   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::PlainObject PlainObject;}
+\DoxyCodeLine{961 }
+\DoxyCodeLine{962   \textcolor{keyword}{enum} \{ StorageOrder = Base::StorageOrder\_ \};}
+\DoxyCodeLine{963 }
+\DoxyCodeLine{964   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1product__evaluator}{product\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Product}{XprType}}\& xpr)}
+\DoxyCodeLine{965     : \mbox{\hyperlink{structEigen_1_1internal_1_1diagonal__product__evaluator__base}{Base}}(xpr.lhs(), xpr.rhs().diagonal())}
+\DoxyCodeLine{966   \{}
+\DoxyCodeLine{967   \}}
+\DoxyCodeLine{968 }
+\DoxyCodeLine{969   EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} Scalar coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{970 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{971     \textcolor{keywordflow}{return} m\_matImpl.coeff(row, col) * m\_diagImpl.coeff(col);}
+\DoxyCodeLine{972   \}}
+\DoxyCodeLine{973 }
+\DoxyCodeLine{974 \textcolor{preprocessor}{\#ifndef EIGEN\_GPUCC}}
+\DoxyCodeLine{975   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode,\textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{976   EIGEN\_STRONG\_INLINE PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{977 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{978     \textcolor{keywordflow}{return} this-\/>\textcolor{keyword}{template} packet\_impl<LoadMode,PacketType>(row,col, col,}
+\DoxyCodeLine{979                                  \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1conditional}{internal::conditional}}<\textcolor{keywordtype}{int}(StorageOrder)==\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}, \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::true\_type}}, \mbox{\hyperlink{structEigen_1_1internal_1_1false__type}{internal::false\_type}}>::type());}
+\DoxyCodeLine{980   \}}
+\DoxyCodeLine{981 }
+\DoxyCodeLine{982   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} LoadMode,\textcolor{keyword}{typename} PacketType>}
+\DoxyCodeLine{983   EIGEN\_STRONG\_INLINE PacketType packet(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} idx)\textcolor{keyword}{ const}}
+\DoxyCodeLine{984 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{985     \textcolor{keywordflow}{return} packet<LoadMode,PacketType>(\textcolor{keywordtype}{int}(StorageOrder)==\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}?idx:0,\textcolor{keywordtype}{int}(StorageOrder)==\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}?0:idx);}
+\DoxyCodeLine{986   \}}
+\DoxyCodeLine{987 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{988 \};}
+\DoxyCodeLine{989 }
+\DoxyCodeLine{990 \textcolor{comment}{/***************************************************************************}}
+\DoxyCodeLine{991 \textcolor{comment}{* Products with permutation matrices}}
+\DoxyCodeLine{992 \textcolor{comment}{***************************************************************************/}}
+\DoxyCodeLine{993 }
+\DoxyCodeLine{999 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ExpressionType, \textcolor{keywordtype}{int} S\textcolor{keywordtype}{id}e, \textcolor{keywordtype}{bool} Transposed, \textcolor{keyword}{typename} ExpressionShape>}
+\DoxyCodeLine{1000 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1permutation__matrix__product}{permutation\_matrix\_product}};}
+\DoxyCodeLine{1001 }
+\DoxyCodeLine{1002 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ExpressionType, \textcolor{keywordtype}{int} S\textcolor{keywordtype}{id}e, \textcolor{keywordtype}{bool} Transposed>}
+\DoxyCodeLine{1003 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1permutation__matrix__product_3_01ExpressionType_00_01Side_00_01Transposed_00_01DenseShape_01_4}{permutation\_matrix\_product<ExpressionType, Side, Transposed, DenseShape>}}}
+\DoxyCodeLine{1004 \{}
+\DoxyCodeLine{1005     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{nested\_eval<ExpressionType, 1>::type}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{MatrixType}};}
+\DoxyCodeLine{1006     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<MatrixType>::type MatrixTypeCleaned;}
+\DoxyCodeLine{1007 }
+\DoxyCodeLine{1008     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest, \textcolor{keyword}{typename} PermutationType>}
+\DoxyCodeLine{1009     \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} run(Dest\& dst, \textcolor{keyword}{const} PermutationType\& perm, \textcolor{keyword}{const} ExpressionType\& xpr)}
+\DoxyCodeLine{1010     \{}
+\DoxyCodeLine{1011       \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{MatrixType}} mat(xpr);}
+\DoxyCodeLine{1012       \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} n = Side==\mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba21b30a61e9cb10c967aec17567804007}{OnTheLeft}} ? mat.rows() : mat.cols();}
+\DoxyCodeLine{1013       \textcolor{comment}{// FIXME we need an is\_same for expression that is not sensitive to constness. For instance}}
+\DoxyCodeLine{1014       \textcolor{comment}{// is\_same\_xpr<Block<const Matrix>, Block<Matrix> >::value should be true.}}
+\DoxyCodeLine{1015       \textcolor{comment}{//if(is\_same<MatrixTypeCleaned,Dest>::value \&\& extract\_data(dst) == extract\_data(mat))}}
+\DoxyCodeLine{1016       \textcolor{keywordflow}{if}(is\_same\_dense(dst, mat))}
+\DoxyCodeLine{1017       \{}
+\DoxyCodeLine{1018         \textcolor{comment}{// apply the permutation inplace}}
+\DoxyCodeLine{1019         \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<bool,PermutationType::RowsAtCompileTime,1,0,PermutationType::MaxRowsAtCompileTime>}} mask(perm.size());}
+\DoxyCodeLine{1020         mask.fill(\textcolor{keyword}{false});}
+\DoxyCodeLine{1021         \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} r = 0;}
+\DoxyCodeLine{1022         \textcolor{keywordflow}{while}(r < perm.size())}
+\DoxyCodeLine{1023         \{}
+\DoxyCodeLine{1024           \textcolor{comment}{// search for the next seed}}
+\DoxyCodeLine{1025           \textcolor{keywordflow}{while}(r<perm.size() \&\& mask[r]) r++;}
+\DoxyCodeLine{1026           \textcolor{keywordflow}{if}(r>=perm.size())}
+\DoxyCodeLine{1027             \textcolor{keywordflow}{break};}
+\DoxyCodeLine{1028           \textcolor{comment}{// we got one, let's follow it until we are back to the seed}}
+\DoxyCodeLine{1029           \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} k0 = r++;}
+\DoxyCodeLine{1030           \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} kPrev = k0;}
+\DoxyCodeLine{1031           mask.coeffRef(k0) = \textcolor{keyword}{true};}
+\DoxyCodeLine{1032           \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} k=perm.indices().coeff(k0); k!=k0; k=perm.indices().coeff(k))}
+\DoxyCodeLine{1033           \{}
+\DoxyCodeLine{1034                   \mbox{\hyperlink{classEigen_1_1Block}{Block<Dest, Side==OnTheLeft ? 1 : Dest::RowsAtCompileTime, Side==OnTheRight ? 1 : Dest::ColsAtCompileTime>}}(dst, k)}
+\DoxyCodeLine{1035             .swap(\mbox{\hyperlink{classEigen_1_1Block}{Block<Dest, Side==OnTheLeft ? 1 : Dest::RowsAtCompileTime, Side==OnTheRight ? 1 : Dest::ColsAtCompileTime>}}}
+\DoxyCodeLine{1036                        (dst,((Side==\mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba21b30a61e9cb10c967aec17567804007}{OnTheLeft}}) \string^ Transposed) ? k0 : kPrev));}
+\DoxyCodeLine{1037 }
+\DoxyCodeLine{1038             mask.coeffRef(k) = \textcolor{keyword}{true};}
+\DoxyCodeLine{1039             kPrev = k;}
+\DoxyCodeLine{1040           \}}
+\DoxyCodeLine{1041         \}}
+\DoxyCodeLine{1042       \}}
+\DoxyCodeLine{1043       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{1044       \{}
+\DoxyCodeLine{1045         \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = 0; i < n; ++i)}
+\DoxyCodeLine{1046         \{}
+\DoxyCodeLine{1047           \mbox{\hyperlink{classEigen_1_1Block}{Block<Dest, Side==OnTheLeft ? 1 : Dest::RowsAtCompileTime, Side==OnTheRight ? 1 : Dest::ColsAtCompileTime>}}}
+\DoxyCodeLine{1048                (dst, ((Side==\mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba21b30a61e9cb10c967aec17567804007}{OnTheLeft}}) \string^ Transposed) ? perm.indices().coeff(i) : i)}
+\DoxyCodeLine{1049 }
+\DoxyCodeLine{1050           =}
+\DoxyCodeLine{1051 }
+\DoxyCodeLine{1052           \mbox{\hyperlink{classEigen_1_1Block}{Block<const MatrixTypeCleaned,Side==OnTheLeft ? 1 : MatrixTypeCleaned::RowsAtCompileTime,Side==OnTheRight ? 1 : MatrixTypeCleaned::ColsAtCompileTime>}}}
+\DoxyCodeLine{1053                (mat, ((Side==\mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba329fc3a54ceb2b6e0e73b400998b8a82}{OnTheRight}}) \string^ Transposed) ? perm.indices().coeff(i) : i);}
+\DoxyCodeLine{1054         \}}
+\DoxyCodeLine{1055       \}}
+\DoxyCodeLine{1056     \}}
+\DoxyCodeLine{1057 \};}
+\DoxyCodeLine{1058 }
+\DoxyCodeLine{1059 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} ProductTag, \textcolor{keyword}{typename} MatrixShape>}
+\DoxyCodeLine{1060 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl_3_01Lhs_00_01Rhs_00_01PermutationShape_00_01MatrixShape_00_01ProductTag_01_4}{generic\_product\_impl<Lhs, Rhs, PermutationShape, MatrixShape, ProductTag>}}}
+\DoxyCodeLine{1061 \{}
+\DoxyCodeLine{1062   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{1063   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} evalTo(Dest\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{1064   \{}
+\DoxyCodeLine{1065     \mbox{\hyperlink{structEigen_1_1internal_1_1permutation__matrix__product}{permutation\_matrix\_product<Rhs, OnTheLeft, false, MatrixShape>::run}}(dst, lhs, rhs);}
+\DoxyCodeLine{1066   \}}
+\DoxyCodeLine{1067 \};}
+\DoxyCodeLine{1068 }
+\DoxyCodeLine{1069 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} ProductTag, \textcolor{keyword}{typename} MatrixShape>}
+\DoxyCodeLine{1070 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl_3_01Lhs_00_01Rhs_00_01MatrixShape_00_01PermutationShape_00_01ProductTag_01_4}{generic\_product\_impl<Lhs, Rhs, MatrixShape, PermutationShape, ProductTag>}}}
+\DoxyCodeLine{1071 \{}
+\DoxyCodeLine{1072   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{1073   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} evalTo(Dest\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{1074   \{}
+\DoxyCodeLine{1075     \mbox{\hyperlink{structEigen_1_1internal_1_1permutation__matrix__product}{permutation\_matrix\_product<Lhs, OnTheRight, false, MatrixShape>::run}}(dst, rhs, lhs);}
+\DoxyCodeLine{1076   \}}
+\DoxyCodeLine{1077 \};}
+\DoxyCodeLine{1078 }
+\DoxyCodeLine{1079 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} ProductTag, \textcolor{keyword}{typename} MatrixShape>}
+\DoxyCodeLine{1080 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl<Inverse<Lhs>}}, Rhs, \mbox{\hyperlink{structEigen_1_1PermutationShape}{PermutationShape}}, MatrixShape, ProductTag>}
+\DoxyCodeLine{1081 \{}
+\DoxyCodeLine{1082   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{1083   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} evalTo(Dest\& dst, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Inverse}{Inverse<Lhs>}}\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{1084   \{}
+\DoxyCodeLine{1085     \mbox{\hyperlink{structEigen_1_1internal_1_1permutation__matrix__product}{permutation\_matrix\_product<Rhs, OnTheLeft, true, MatrixShape>::run}}(dst, lhs.nestedExpression(), rhs);}
+\DoxyCodeLine{1086   \}}
+\DoxyCodeLine{1087 \};}
+\DoxyCodeLine{1088 }
+\DoxyCodeLine{1089 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} ProductTag, \textcolor{keyword}{typename} MatrixShape>}
+\DoxyCodeLine{1090 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl}}<Lhs, \mbox{\hyperlink{classEigen_1_1Inverse}{Inverse}}<Rhs>, MatrixShape, \mbox{\hyperlink{structEigen_1_1PermutationShape}{PermutationShape}}, ProductTag>}
+\DoxyCodeLine{1091 \{}
+\DoxyCodeLine{1092   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{1093   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} evalTo(Dest\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Inverse}{Inverse<Rhs>}}\& rhs)}
+\DoxyCodeLine{1094   \{}
+\DoxyCodeLine{1095     \mbox{\hyperlink{structEigen_1_1internal_1_1permutation__matrix__product}{permutation\_matrix\_product<Lhs, OnTheRight, true, MatrixShape>::run}}(dst, rhs.nestedExpression(), lhs);}
+\DoxyCodeLine{1096   \}}
+\DoxyCodeLine{1097 \};}
+\DoxyCodeLine{1098 }
+\DoxyCodeLine{1099 }
+\DoxyCodeLine{1100 \textcolor{comment}{/***************************************************************************}}
+\DoxyCodeLine{1101 \textcolor{comment}{* Products with transpositions matrices}}
+\DoxyCodeLine{1102 \textcolor{comment}{***************************************************************************/}}
+\DoxyCodeLine{1103 }
+\DoxyCodeLine{1104 \textcolor{comment}{// FIXME could we unify Transpositions and Permutation into a single "{}shape"{}??}}
+\DoxyCodeLine{1105 }
+\DoxyCodeLine{1110 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ExpressionType, \textcolor{keywordtype}{int} S\textcolor{keywordtype}{id}e, \textcolor{keywordtype}{bool} Transposed, \textcolor{keyword}{typename} ExpressionShape>}
+\DoxyCodeLine{1111 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1transposition__matrix__product}{transposition\_matrix\_product}}}
+\DoxyCodeLine{1112 \{}
+\DoxyCodeLine{1113   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{nested\_eval<ExpressionType, 1>::type}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{MatrixType}};}
+\DoxyCodeLine{1114   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<MatrixType>::type MatrixTypeCleaned;}
+\DoxyCodeLine{1115 }
+\DoxyCodeLine{1116   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest, \textcolor{keyword}{typename} TranspositionType>}
+\DoxyCodeLine{1117   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} run(Dest\& dst, \textcolor{keyword}{const} TranspositionType\& tr, \textcolor{keyword}{const} ExpressionType\& xpr)}
+\DoxyCodeLine{1118   \{}
+\DoxyCodeLine{1119     \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{MatrixType}} mat(xpr);}
+\DoxyCodeLine{1120     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} TranspositionType::StorageIndex StorageIndex;}
+\DoxyCodeLine{1121     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size = tr.size();}
+\DoxyCodeLine{1122     StorageIndex j = 0;}
+\DoxyCodeLine{1123 }
+\DoxyCodeLine{1124     \textcolor{keywordflow}{if}(!is\_same\_dense(dst,mat))}
+\DoxyCodeLine{1125       dst = mat;}
+\DoxyCodeLine{1126 }
+\DoxyCodeLine{1127     \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} k=(Transposed?size-\/1:0) ; Transposed?k>=0:k<size ; Transposed?-\/-\/k:++k)}
+\DoxyCodeLine{1128       \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}(j=tr.coeff(k))!=k)}
+\DoxyCodeLine{1129       \{}
+\DoxyCodeLine{1130         \textcolor{keywordflow}{if}(Side==\mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba21b30a61e9cb10c967aec17567804007}{OnTheLeft}})        dst.row(k).swap(dst.row(j));}
+\DoxyCodeLine{1131         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(Side==\mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba329fc3a54ceb2b6e0e73b400998b8a82}{OnTheRight}})  dst.col(k).swap(dst.col(j));}
+\DoxyCodeLine{1132       \}}
+\DoxyCodeLine{1133   \}}
+\DoxyCodeLine{1134 \};}
+\DoxyCodeLine{1135 }
+\DoxyCodeLine{1136 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} ProductTag, \textcolor{keyword}{typename} MatrixShape>}
+\DoxyCodeLine{1137 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl}}<Lhs, Rhs, \mbox{\hyperlink{structEigen_1_1TranspositionsShape}{TranspositionsShape}}, MatrixShape, ProductTag>}
+\DoxyCodeLine{1138 \{}
+\DoxyCodeLine{1139   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{1140   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} evalTo(Dest\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{1141   \{}
+\DoxyCodeLine{1142     \mbox{\hyperlink{structEigen_1_1internal_1_1transposition__matrix__product}{transposition\_matrix\_product<Rhs, OnTheLeft, false, MatrixShape>::run}}(dst, lhs, rhs);}
+\DoxyCodeLine{1143   \}}
+\DoxyCodeLine{1144 \};}
+\DoxyCodeLine{1145 }
+\DoxyCodeLine{1146 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} ProductTag, \textcolor{keyword}{typename} MatrixShape>}
+\DoxyCodeLine{1147 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl}}<Lhs, Rhs, MatrixShape, \mbox{\hyperlink{structEigen_1_1TranspositionsShape}{TranspositionsShape}}, ProductTag>}
+\DoxyCodeLine{1148 \{}
+\DoxyCodeLine{1149   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{1150   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} evalTo(Dest\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{1151   \{}
+\DoxyCodeLine{1152     \mbox{\hyperlink{structEigen_1_1internal_1_1transposition__matrix__product}{transposition\_matrix\_product<Lhs, OnTheRight, false, MatrixShape>::run}}(dst, rhs, lhs);}
+\DoxyCodeLine{1153   \}}
+\DoxyCodeLine{1154 \};}
+\DoxyCodeLine{1155 }
+\DoxyCodeLine{1156 }
+\DoxyCodeLine{1157 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} ProductTag, \textcolor{keyword}{typename} MatrixShape>}
+\DoxyCodeLine{1158 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl}}<\mbox{\hyperlink{classEigen_1_1Transpose}{Transpose}}<Lhs>, Rhs, \mbox{\hyperlink{structEigen_1_1TranspositionsShape}{TranspositionsShape}}, MatrixShape, ProductTag>}
+\DoxyCodeLine{1159 \{}
+\DoxyCodeLine{1160   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{1161   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} evalTo(Dest\& dst, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Transpose}{Transpose<Lhs>}}\& lhs, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{1162   \{}
+\DoxyCodeLine{1163     \mbox{\hyperlink{structEigen_1_1internal_1_1transposition__matrix__product}{transposition\_matrix\_product<Rhs, OnTheLeft, true, MatrixShape>::run}}(dst, lhs.\mbox{\hyperlink{classEigen_1_1Transpose_ad7a6e63756170ed6bf8512f7ee795a69}{nestedExpression}}(), rhs);}
+\DoxyCodeLine{1164   \}}
+\DoxyCodeLine{1165 \};}
+\DoxyCodeLine{1166 }
+\DoxyCodeLine{1167 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} ProductTag, \textcolor{keyword}{typename} MatrixShape>}
+\DoxyCodeLine{1168 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl}}<Lhs, \mbox{\hyperlink{classEigen_1_1Transpose}{Transpose}}<Rhs>, MatrixShape, \mbox{\hyperlink{structEigen_1_1TranspositionsShape}{TranspositionsShape}}, ProductTag>}
+\DoxyCodeLine{1169 \{}
+\DoxyCodeLine{1170   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{1171   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} evalTo(Dest\& dst, \textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Transpose}{Transpose<Rhs>}}\& rhs)}
+\DoxyCodeLine{1172   \{}
+\DoxyCodeLine{1173     \mbox{\hyperlink{structEigen_1_1internal_1_1transposition__matrix__product}{transposition\_matrix\_product<Lhs, OnTheRight, true, MatrixShape>::run}}(dst, rhs.\mbox{\hyperlink{classEigen_1_1Transpose_ad7a6e63756170ed6bf8512f7ee795a69}{nestedExpression}}(), lhs);}
+\DoxyCodeLine{1174   \}}
+\DoxyCodeLine{1175 \};}
+\DoxyCodeLine{1176 }
+\DoxyCodeLine{1177 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{1178 }
+\DoxyCodeLine{1179 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{1180 }
+\DoxyCodeLine{1181 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_PRODUCT\_EVALUATORS\_H}}
+
+\end{DoxyCode}

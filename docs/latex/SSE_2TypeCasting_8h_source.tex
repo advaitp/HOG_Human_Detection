@@ -1,0 +1,150 @@
+\hypertarget{SSE_2TypeCasting_8h_source}{}\doxysection{Type\+Casting.\+h}
+\label{SSE_2TypeCasting_8h_source}\index{include/Eigen/src/Core/arch/SSE/TypeCasting.h@{include/Eigen/src/Core/arch/SSE/TypeCasting.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2015 Benoit Steiner <benoit.steiner.goog@gmail.com>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_TYPE\_CASTING\_SSE\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_TYPE\_CASTING\_SSE\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}../../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{preprocessor}{\#ifndef EIGEN\_VECTORIZE\_AVX}}
+\DoxyCodeLine{20 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{21 \textcolor{keyword}{struct }type\_casting\_traits<float, int> \{}
+\DoxyCodeLine{22   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{23     VectorizedCast = 1,}
+\DoxyCodeLine{24     SrcCoeffRatio = 1,}
+\DoxyCodeLine{25     TgtCoeffRatio = 1}
+\DoxyCodeLine{26   \};}
+\DoxyCodeLine{27 \};}
+\DoxyCodeLine{28 }
+\DoxyCodeLine{29 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{30 \textcolor{keyword}{struct }type\_casting\_traits<int, float> \{}
+\DoxyCodeLine{31   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{32     VectorizedCast = 1,}
+\DoxyCodeLine{33     SrcCoeffRatio = 1,}
+\DoxyCodeLine{34     TgtCoeffRatio = 1}
+\DoxyCodeLine{35   \};}
+\DoxyCodeLine{36 \};}
+\DoxyCodeLine{37 }
+\DoxyCodeLine{38 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{39 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<double, float> \{}
+\DoxyCodeLine{40   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{41     VectorizedCast = 1,}
+\DoxyCodeLine{42     SrcCoeffRatio = 2,}
+\DoxyCodeLine{43     TgtCoeffRatio = 1}
+\DoxyCodeLine{44   \};}
+\DoxyCodeLine{45 \};}
+\DoxyCodeLine{46 }
+\DoxyCodeLine{47 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{48 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1type__casting__traits}{type\_casting\_traits}}<float, double> \{}
+\DoxyCodeLine{49   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{50     VectorizedCast = 1,}
+\DoxyCodeLine{51     SrcCoeffRatio = 1,}
+\DoxyCodeLine{52     TgtCoeffRatio = 2}
+\DoxyCodeLine{53   \};}
+\DoxyCodeLine{54 \};}
+\DoxyCodeLine{55 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{56 }
+\DoxyCodeLine{57 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4i pcast<Packet4f, Packet4i>(\textcolor{keyword}{const} Packet4f\& a) \{}
+\DoxyCodeLine{58   \textcolor{keywordflow}{return} \_mm\_cvttps\_epi32(a);}
+\DoxyCodeLine{59 \}}
+\DoxyCodeLine{60 }
+\DoxyCodeLine{61 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4f pcast<Packet4i, Packet4f>(\textcolor{keyword}{const} Packet4i\& a) \{}
+\DoxyCodeLine{62   \textcolor{keywordflow}{return} \_mm\_cvtepi32\_ps(a);}
+\DoxyCodeLine{63 \}}
+\DoxyCodeLine{64 }
+\DoxyCodeLine{65 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4f pcast<Packet2d, Packet4f>(\textcolor{keyword}{const} Packet2d\& a, \textcolor{keyword}{const} Packet2d\& b) \{}
+\DoxyCodeLine{66   \textcolor{keywordflow}{return} \_mm\_shuffle\_ps(\_mm\_cvtpd\_ps(a), \_mm\_cvtpd\_ps(b), (1 << 2) | (1 << 6));}
+\DoxyCodeLine{67 \}}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{69 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2d pcast<Packet4f, Packet2d>(\textcolor{keyword}{const} Packet4f\& a) \{}
+\DoxyCodeLine{70   \textcolor{comment}{// Simply discard the second half of the input}}
+\DoxyCodeLine{71   \textcolor{keywordflow}{return} \_mm\_cvtps\_pd(a);}
+\DoxyCodeLine{72 \}}
+\DoxyCodeLine{73 }
+\DoxyCodeLine{74 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4i preinterpret<Packet4i,Packet4f>(\textcolor{keyword}{const} Packet4f\& a) \{}
+\DoxyCodeLine{75   \textcolor{keywordflow}{return} \_mm\_castps\_si128(a);}
+\DoxyCodeLine{76 \}}
+\DoxyCodeLine{77 }
+\DoxyCodeLine{78 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4f preinterpret<Packet4f,Packet4i>(\textcolor{keyword}{const} Packet4i\& a) \{}
+\DoxyCodeLine{79   \textcolor{keywordflow}{return} \_mm\_castsi128\_ps(a);}
+\DoxyCodeLine{80 \}}
+\DoxyCodeLine{81 }
+\DoxyCodeLine{82 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet2d preinterpret<Packet2d,Packet4i>(\textcolor{keyword}{const} Packet4i\& a) \{}
+\DoxyCodeLine{83   \textcolor{keywordflow}{return} \_mm\_castsi128\_pd(a);}
+\DoxyCodeLine{84 \}}
+\DoxyCodeLine{85 }
+\DoxyCodeLine{86 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4i preinterpret<Packet4i,Packet2d>(\textcolor{keyword}{const} Packet2d\& a) \{}
+\DoxyCodeLine{87   \textcolor{keywordflow}{return} \_mm\_castpd\_si128(a);}
+\DoxyCodeLine{88 \}}
+\DoxyCodeLine{89 }
+\DoxyCodeLine{90 \textcolor{comment}{// Disable the following code since it's broken on too many platforms / compilers.}}
+\DoxyCodeLine{91 \textcolor{comment}{//\#elif defined(EIGEN\_VECTORIZE\_SSE) \&\& (!EIGEN\_ARCH\_x86\_64) \&\& (!EIGEN\_COMP\_MSVC)}}
+\DoxyCodeLine{92 \textcolor{preprocessor}{\#if 0}}
+\DoxyCodeLine{93 }
+\DoxyCodeLine{94 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{95 \textcolor{keyword}{struct }type\_casting\_traits<\mbox{\hyperlink{namespaceEigen}{Eigen}}::half, float> \{}
+\DoxyCodeLine{96   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{97     VectorizedCast = 1,}
+\DoxyCodeLine{98     SrcCoeffRatio = 1,}
+\DoxyCodeLine{99     TgtCoeffRatio = 1}
+\DoxyCodeLine{100   \};}
+\DoxyCodeLine{101 \};}
+\DoxyCodeLine{102 }
+\DoxyCodeLine{103 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4f pcast<Packet4h, Packet4f>(\textcolor{keyword}{const} Packet4h\& a) \{}
+\DoxyCodeLine{104   \_\_int64\_t a64 = \_mm\_cvtm64\_si64(a.x);}
+\DoxyCodeLine{105   \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}} h = raw\_uint16\_to\_half(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short}\textcolor{keyword}{>}(a64));}
+\DoxyCodeLine{106   \textcolor{keywordtype}{float} f1 = \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(h);}
+\DoxyCodeLine{107   h = raw\_uint16\_to\_half(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short}\textcolor{keyword}{>}(a64 >> 16));}
+\DoxyCodeLine{108   \textcolor{keywordtype}{float} f2 = \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(h);}
+\DoxyCodeLine{109   h = raw\_uint16\_to\_half(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short}\textcolor{keyword}{>}(a64 >> 32));}
+\DoxyCodeLine{110   \textcolor{keywordtype}{float} f3 = \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(h);}
+\DoxyCodeLine{111   h = raw\_uint16\_to\_half(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short}\textcolor{keyword}{>}(a64 >> 48));}
+\DoxyCodeLine{112   \textcolor{keywordtype}{float} f4 = \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(h);}
+\DoxyCodeLine{113   \textcolor{keywordflow}{return} \_mm\_set\_ps(f4, f3, f2, f1);}
+\DoxyCodeLine{114 \}}
+\DoxyCodeLine{115 }
+\DoxyCodeLine{116 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{117 \textcolor{keyword}{struct }type\_casting\_traits<float, \mbox{\hyperlink{namespaceEigen}{Eigen}}::half> \{}
+\DoxyCodeLine{118   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{119     VectorizedCast = 1,}
+\DoxyCodeLine{120     SrcCoeffRatio = 1,}
+\DoxyCodeLine{121     TgtCoeffRatio = 1}
+\DoxyCodeLine{122   \};}
+\DoxyCodeLine{123 \};}
+\DoxyCodeLine{124 }
+\DoxyCodeLine{125 \textcolor{keyword}{template}<> EIGEN\_STRONG\_INLINE Packet4h pcast<Packet4f, Packet4h>(\textcolor{keyword}{const} Packet4f\& a) \{}
+\DoxyCodeLine{126   EIGEN\_ALIGN16 \textcolor{keywordtype}{float} aux[4];}
+\DoxyCodeLine{127   pstore(aux, a);}
+\DoxyCodeLine{128   \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}} h0(aux[0]);}
+\DoxyCodeLine{129   \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}} h1(aux[1]);}
+\DoxyCodeLine{130   \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}} h2(aux[2]);}
+\DoxyCodeLine{131   \mbox{\hyperlink{structEigen_1_1half}{Eigen::half}} h3(aux[3]);}
+\DoxyCodeLine{132 }
+\DoxyCodeLine{133   Packet4h result;}
+\DoxyCodeLine{134   result.x = \_mm\_set\_pi16(h3.x, h2.x, h1.x, h0.x);}
+\DoxyCodeLine{135   \textcolor{keywordflow}{return} result;}
+\DoxyCodeLine{136 \}}
+\DoxyCodeLine{137 }
+\DoxyCodeLine{138 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{139 }
+\DoxyCodeLine{140 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{141 }
+\DoxyCodeLine{142 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{143 }
+\DoxyCodeLine{144 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_TYPE\_CASTING\_SSE\_H}}
+
+\end{DoxyCode}

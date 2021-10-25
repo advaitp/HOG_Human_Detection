@@ -1,0 +1,93 @@
+\hypertarget{SYCL_2TypeCasting_8h_source}{}\doxysection{Type\+Casting.\+h}
+\label{SYCL_2TypeCasting_8h_source}\index{include/Eigen/src/Core/arch/SYCL/TypeCasting.h@{include/Eigen/src/Core/arch/SYCL/TypeCasting.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Mehdi Goli    Codeplay Software Ltd.}}
+\DoxyCodeLine{5 \textcolor{comment}{// Ralph Potter  Codeplay Software Ltd.}}
+\DoxyCodeLine{6 \textcolor{comment}{// Luke Iwanski  Codeplay Software Ltd.}}
+\DoxyCodeLine{7 \textcolor{comment}{// Contact: <eigen@codeplay.com>}}
+\DoxyCodeLine{8 \textcolor{comment}{//}}
+\DoxyCodeLine{9 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{10 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{11 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{comment}{/*****************************************************************}}
+\DoxyCodeLine{14 \textcolor{comment}{ * TypeCasting.h}}
+\DoxyCodeLine{15 \textcolor{comment}{ *}}
+\DoxyCodeLine{16 \textcolor{comment}{ * \(\backslash\)brief:}}
+\DoxyCodeLine{17 \textcolor{comment}{ *  TypeCasting}}
+\DoxyCodeLine{18 \textcolor{comment}{ *}}
+\DoxyCodeLine{19 \textcolor{comment}{ *****************************************************************/}}
+\DoxyCodeLine{20 }
+\DoxyCodeLine{21 \textcolor{preprocessor}{\#ifndef EIGEN\_TYPE\_CASTING\_SYCL\_H}}
+\DoxyCodeLine{22 \textcolor{preprocessor}{\#define EIGEN\_TYPE\_CASTING\_SYCL\_H}}
+\DoxyCodeLine{23 }
+\DoxyCodeLine{24 \textcolor{preprocessor}{\#include "{}../../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{25 }
+\DoxyCodeLine{26 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{27 }
+\DoxyCodeLine{28 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{29 \textcolor{preprocessor}{\#ifdef SYCL\_DEVICE\_ONLY}}
+\DoxyCodeLine{30 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{31 \textcolor{keyword}{struct }type\_casting\_traits<float, int> \{}
+\DoxyCodeLine{32   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{33 \};}
+\DoxyCodeLine{34 }
+\DoxyCodeLine{35 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{36 EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE cl::sycl::cl\_int4}
+\DoxyCodeLine{37 pcast<cl::sycl::cl\_float4, cl::sycl::cl\_int4>(\textcolor{keyword}{const} cl::sycl::cl\_float4\& a) \{}
+\DoxyCodeLine{38   \textcolor{keywordflow}{return} a}
+\DoxyCodeLine{39       .template convert<cl::sycl::cl\_int, cl::sycl::rounding\_mode::automatic>();}
+\DoxyCodeLine{40 \}}
+\DoxyCodeLine{41 }
+\DoxyCodeLine{42 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{43 \textcolor{keyword}{struct }type\_casting\_traits<int, float> \{}
+\DoxyCodeLine{44   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{45 \};}
+\DoxyCodeLine{46 }
+\DoxyCodeLine{47 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{48 EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE cl::sycl::cl\_float4}
+\DoxyCodeLine{49 pcast<cl::sycl::cl\_int4, cl::sycl::cl\_float4>(\textcolor{keyword}{const} cl::sycl::cl\_int4\& a) \{}
+\DoxyCodeLine{50   \textcolor{keywordflow}{return} a.template convert<cl::sycl::cl\_float,}
+\DoxyCodeLine{51                             cl::sycl::rounding\_mode::automatic>();}
+\DoxyCodeLine{52 \}}
+\DoxyCodeLine{53 }
+\DoxyCodeLine{54 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{55 \textcolor{keyword}{struct }type\_casting\_traits<double, float> \{}
+\DoxyCodeLine{56   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 2, TgtCoeffRatio = 1 \};}
+\DoxyCodeLine{57 \};}
+\DoxyCodeLine{58 }
+\DoxyCodeLine{59 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{60 EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE cl::sycl::cl\_float4}
+\DoxyCodeLine{61 pcast<cl::sycl::cl\_double2, cl::sycl::cl\_float4>(}
+\DoxyCodeLine{62     \textcolor{keyword}{const} cl::sycl::cl\_double2\& a, \textcolor{keyword}{const} cl::sycl::cl\_double2\& b) \{}
+\DoxyCodeLine{63   \textcolor{keyword}{auto} a1 = a.template convert<cl::sycl::cl\_float,}
+\DoxyCodeLine{64                                cl::sycl::rounding\_mode::automatic>();}
+\DoxyCodeLine{65   \textcolor{keyword}{auto} b1 = b.template convert<cl::sycl::cl\_float,}
+\DoxyCodeLine{66                                cl::sycl::rounding\_mode::automatic>();}
+\DoxyCodeLine{67   \textcolor{keywordflow}{return} cl::sycl::float4(a1.x(), a1.y(), b1.x(), b1.y());}
+\DoxyCodeLine{68 \}}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{71 \textcolor{keyword}{struct }type\_casting\_traits<float, double> \{}
+\DoxyCodeLine{72   \textcolor{keyword}{enum} \{ VectorizedCast = 1, SrcCoeffRatio = 1, TgtCoeffRatio = 2 \};}
+\DoxyCodeLine{73 \};}
+\DoxyCodeLine{74 }
+\DoxyCodeLine{75 \textcolor{keyword}{template} <>}
+\DoxyCodeLine{76 EIGEN\_DEVICE\_FUNC EIGEN\_ALWAYS\_INLINE cl::sycl::cl\_double2}
+\DoxyCodeLine{77 pcast<cl::sycl::cl\_float4, cl::sycl::cl\_double2>(\textcolor{keyword}{const} cl::sycl::cl\_float4\& a) \{}
+\DoxyCodeLine{78   \textcolor{comment}{// Simply discard the second half of the input}}
+\DoxyCodeLine{79   \textcolor{keywordflow}{return} cl::sycl::cl\_double2(a.x(), a.y());}
+\DoxyCodeLine{80 \}}
+\DoxyCodeLine{81 }
+\DoxyCodeLine{82 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{83 \}  \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{84 }
+\DoxyCodeLine{85 \}  \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{86 }
+\DoxyCodeLine{87 \textcolor{preprocessor}{\#endif  }\textcolor{comment}{// EIGEN\_TYPE\_CASTING\_SYCL\_H}}
+
+\end{DoxyCode}

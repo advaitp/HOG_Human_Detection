@@ -1,0 +1,282 @@
+\hypertarget{SparseLU__gemm__kernel_8h_source}{}\doxysection{Sparse\+LU\+\_\+gemm\+\_\+kernel.\+h}
+\label{SparseLU__gemm__kernel_8h_source}\index{include/Eigen/src/SparseLU/SparseLU\_gemm\_kernel.h@{include/Eigen/src/SparseLU/SparseLU\_gemm\_kernel.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2012 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_SPARSELU\_GEMM\_KERNEL\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_SPARSELU\_GEMM\_KERNEL\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 }
+\DoxyCodeLine{26 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{27 EIGEN\_DONT\_INLINE}
+\DoxyCodeLine{28 \textcolor{keywordtype}{void} sparselu\_gemm(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} n, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} d, \textcolor{keyword}{const} Scalar* A, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} lda, \textcolor{keyword}{const} Scalar* B, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} ldb, Scalar* C, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} ldc)}
+\DoxyCodeLine{29 \{}
+\DoxyCodeLine{30   \textcolor{keyword}{using namespace }Eigen::internal;}
+\DoxyCodeLine{31   }
+\DoxyCodeLine{32   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} packet\_traits<Scalar>::type \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}};}
+\DoxyCodeLine{33   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{34     NumberOfRegisters = EIGEN\_ARCH\_DEFAULT\_NUMBER\_OF\_REGISTERS,}
+\DoxyCodeLine{35     PacketSize = \mbox{\hyperlink{structEigen_1_1internal_1_1packet__traits}{packet\_traits<Scalar>::size}},}
+\DoxyCodeLine{36     PM = 8,                             \textcolor{comment}{// peeling in M}}
+\DoxyCodeLine{37     RN = 2,                             \textcolor{comment}{// register blocking}}
+\DoxyCodeLine{38     RK = NumberOfRegisters>=16 ? 4 : 2, \textcolor{comment}{// register blocking}}
+\DoxyCodeLine{39     BM = 4096/\textcolor{keyword}{sizeof}(Scalar),           \textcolor{comment}{// number of rows of A-\/C per chunk}}
+\DoxyCodeLine{40     SM = PM*PacketSize                  \textcolor{comment}{// step along M}}
+\DoxyCodeLine{41   \};}
+\DoxyCodeLine{42   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} d\_end = (d/RK)*RK;    \textcolor{comment}{// number of columns of A (rows of B) suitable for full register blocking}}
+\DoxyCodeLine{43   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} n\_end = (n/RN)*RN;    \textcolor{comment}{// number of columns of B-\/C suitable for processing RN columns at once}}
+\DoxyCodeLine{44   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i0 = internal::first\_default\_aligned(A,m);}
+\DoxyCodeLine{45   }
+\DoxyCodeLine{46   eigen\_internal\_assert(((lda\%PacketSize)==0) \&\& ((ldc\%PacketSize)==0) \&\& (i0==internal::first\_default\_aligned(C,m)));}
+\DoxyCodeLine{47   }
+\DoxyCodeLine{48   \textcolor{comment}{// handle the non aligned rows of A and C without any optimization:}}
+\DoxyCodeLine{49   \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i=0; i<i0; ++i)}
+\DoxyCodeLine{50   \{}
+\DoxyCodeLine{51     \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j=0; j<n; ++j)}
+\DoxyCodeLine{52     \{}
+\DoxyCodeLine{53       Scalar c = C[i+j*ldc];}
+\DoxyCodeLine{54       \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} k=0; k<d; ++k)}
+\DoxyCodeLine{55         c += B[k+j*ldb] * A[i+k*lda];}
+\DoxyCodeLine{56       C[i+j*ldc] = c;}
+\DoxyCodeLine{57     \}}
+\DoxyCodeLine{58   \}}
+\DoxyCodeLine{59   \textcolor{comment}{// process the remaining rows per chunk of BM rows}}
+\DoxyCodeLine{60   \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} ib=i0; ib<m; ib+=BM)}
+\DoxyCodeLine{61   \{}
+\DoxyCodeLine{62     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} actual\_b = std::min<Index>(BM, m-\/ib);                 \textcolor{comment}{// actual number of rows}}
+\DoxyCodeLine{63     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} actual\_b\_end1 = (actual\_b/SM)*SM;                   \textcolor{comment}{// actual number of rows suitable for peeling}}
+\DoxyCodeLine{64     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} actual\_b\_end2 = (actual\_b/PacketSize)*PacketSize;   \textcolor{comment}{// actual number of rows suitable for vectorization}}
+\DoxyCodeLine{65     }
+\DoxyCodeLine{66     \textcolor{comment}{// Let's process two columns of B-\/C at once}}
+\DoxyCodeLine{67     \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j=0; j<n\_end; j+=RN)}
+\DoxyCodeLine{68     \{}
+\DoxyCodeLine{69       \textcolor{keyword}{const} Scalar* Bc0 = B+(j+0)*ldb;}
+\DoxyCodeLine{70       \textcolor{keyword}{const} Scalar* Bc1 = B+(j+1)*ldb;}
+\DoxyCodeLine{71       }
+\DoxyCodeLine{72       \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} k=0; k<d\_end; k+=RK)}
+\DoxyCodeLine{73       \{}
+\DoxyCodeLine{74         }
+\DoxyCodeLine{75         \textcolor{comment}{// load and expand a RN x RK block of B}}
+\DoxyCodeLine{76         \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} b00, b10, b20, b30, b01, b11, b21, b31;}
+\DoxyCodeLine{77                   \{ b00 = pset1<Packet>(Bc0[0]); \}}
+\DoxyCodeLine{78                   \{ b10 = pset1<Packet>(Bc0[1]); \}}
+\DoxyCodeLine{79         \textcolor{keywordflow}{if}(RK==4) \{ b20 = pset1<Packet>(Bc0[2]); \}}
+\DoxyCodeLine{80         \textcolor{keywordflow}{if}(RK==4) \{ b30 = pset1<Packet>(Bc0[3]); \}}
+\DoxyCodeLine{81                   \{ b01 = pset1<Packet>(Bc1[0]); \}}
+\DoxyCodeLine{82                   \{ b11 = pset1<Packet>(Bc1[1]); \}}
+\DoxyCodeLine{83         \textcolor{keywordflow}{if}(RK==4) \{ b21 = pset1<Packet>(Bc1[2]); \}}
+\DoxyCodeLine{84         \textcolor{keywordflow}{if}(RK==4) \{ b31 = pset1<Packet>(Bc1[3]); \}}
+\DoxyCodeLine{85         }
+\DoxyCodeLine{86         \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} a0, a1, a2, a3, c0, c1, t0, t1;}
+\DoxyCodeLine{87         }
+\DoxyCodeLine{88         \textcolor{keyword}{const} Scalar* A0 = A+ib+(k+0)*lda;}
+\DoxyCodeLine{89         \textcolor{keyword}{const} Scalar* A1 = A+ib+(k+1)*lda;}
+\DoxyCodeLine{90         \textcolor{keyword}{const} Scalar* A2 = A+ib+(k+2)*lda;}
+\DoxyCodeLine{91         \textcolor{keyword}{const} Scalar* A3 = A+ib+(k+3)*lda;}
+\DoxyCodeLine{92         }
+\DoxyCodeLine{93         Scalar* C0 = C+ib+(j+0)*ldc;}
+\DoxyCodeLine{94         Scalar* C1 = C+ib+(j+1)*ldc;}
+\DoxyCodeLine{95         }
+\DoxyCodeLine{96                   a0 = pload<Packet>(A0);}
+\DoxyCodeLine{97                   a1 = pload<Packet>(A1);}
+\DoxyCodeLine{98         \textcolor{keywordflow}{if}(RK==4)}
+\DoxyCodeLine{99         \{}
+\DoxyCodeLine{100           a2 = pload<Packet>(A2);}
+\DoxyCodeLine{101           a3 = pload<Packet>(A3);}
+\DoxyCodeLine{102         \}}
+\DoxyCodeLine{103         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{104         \{}
+\DoxyCodeLine{105           \textcolor{comment}{// workaround "{}may be used uninitialized in this function"{} warning}}
+\DoxyCodeLine{106           a2 = a3 = a0;}
+\DoxyCodeLine{107         \}}
+\DoxyCodeLine{108         }
+\DoxyCodeLine{109 \textcolor{preprocessor}{\#define KMADD(c, a, b, tmp) \{tmp = b; tmp = pmul(a,tmp); c = padd(c,tmp);\}}}
+\DoxyCodeLine{110 \textcolor{preprocessor}{\#define WORK(I)  \(\backslash\)}}
+\DoxyCodeLine{111 \textcolor{preprocessor}{                     c0 = pload<Packet>(C0+i+(I)*PacketSize);    \(\backslash\)}}
+\DoxyCodeLine{112 \textcolor{preprocessor}{                     c1 = pload<Packet>(C1+i+(I)*PacketSize);    \(\backslash\)}}
+\DoxyCodeLine{113 \textcolor{preprocessor}{                     KMADD(c0, a0, b00, t0)                      \(\backslash\)}}
+\DoxyCodeLine{114 \textcolor{preprocessor}{                     KMADD(c1, a0, b01, t1)                      \(\backslash\)}}
+\DoxyCodeLine{115 \textcolor{preprocessor}{                     a0 = pload<Packet>(A0+i+(I+1)*PacketSize);  \(\backslash\)}}
+\DoxyCodeLine{116 \textcolor{preprocessor}{                     KMADD(c0, a1, b10, t0)                      \(\backslash\)}}
+\DoxyCodeLine{117 \textcolor{preprocessor}{                     KMADD(c1, a1, b11, t1)                      \(\backslash\)}}
+\DoxyCodeLine{118 \textcolor{preprocessor}{                     a1 = pload<Packet>(A1+i+(I+1)*PacketSize);  \(\backslash\)}}
+\DoxyCodeLine{119 \textcolor{preprocessor}{          if(RK==4)\{ KMADD(c0, a2, b20, t0)                     \}\(\backslash\)}}
+\DoxyCodeLine{120 \textcolor{preprocessor}{          if(RK==4)\{ KMADD(c1, a2, b21, t1)                     \}\(\backslash\)}}
+\DoxyCodeLine{121 \textcolor{preprocessor}{          if(RK==4)\{ a2 = pload<Packet>(A2+i+(I+1)*PacketSize); \}\(\backslash\)}}
+\DoxyCodeLine{122 \textcolor{preprocessor}{          if(RK==4)\{ KMADD(c0, a3, b30, t0)                     \}\(\backslash\)}}
+\DoxyCodeLine{123 \textcolor{preprocessor}{          if(RK==4)\{ KMADD(c1, a3, b31, t1)                     \}\(\backslash\)}}
+\DoxyCodeLine{124 \textcolor{preprocessor}{          if(RK==4)\{ a3 = pload<Packet>(A3+i+(I+1)*PacketSize); \}\(\backslash\)}}
+\DoxyCodeLine{125 \textcolor{preprocessor}{                     pstore(C0+i+(I)*PacketSize, c0);            \(\backslash\)}}
+\DoxyCodeLine{126 \textcolor{preprocessor}{                     pstore(C1+i+(I)*PacketSize, c1)}}
+\DoxyCodeLine{127         }
+\DoxyCodeLine{128         \textcolor{comment}{// process rows of A' -\/ C' with aggressive vectorization and peeling }}
+\DoxyCodeLine{129         \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i=0; i<actual\_b\_end1; i+=PacketSize*8)}
+\DoxyCodeLine{130         \{}
+\DoxyCodeLine{131           EIGEN\_ASM\_COMMENT(\textcolor{stringliteral}{"{}SPARSELU\_GEMML\_KERNEL1"{}});}
+\DoxyCodeLine{132                     prefetch((A0+i+(5)*PacketSize));}
+\DoxyCodeLine{133                     prefetch((A1+i+(5)*PacketSize));}
+\DoxyCodeLine{134           \textcolor{keywordflow}{if}(RK==4) prefetch((A2+i+(5)*PacketSize));}
+\DoxyCodeLine{135           \textcolor{keywordflow}{if}(RK==4) prefetch((A3+i+(5)*PacketSize));}
+\DoxyCodeLine{136 }
+\DoxyCodeLine{137           WORK(0);}
+\DoxyCodeLine{138           WORK(1);}
+\DoxyCodeLine{139           WORK(2);}
+\DoxyCodeLine{140           WORK(3);}
+\DoxyCodeLine{141           WORK(4);}
+\DoxyCodeLine{142           WORK(5);}
+\DoxyCodeLine{143           WORK(6);}
+\DoxyCodeLine{144           WORK(7);}
+\DoxyCodeLine{145         \}}
+\DoxyCodeLine{146         \textcolor{comment}{// process the remaining rows with vectorization only}}
+\DoxyCodeLine{147         \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i=actual\_b\_end1; i<actual\_b\_end2; i+=PacketSize)}
+\DoxyCodeLine{148         \{}
+\DoxyCodeLine{149           WORK(0);}
+\DoxyCodeLine{150         \}}
+\DoxyCodeLine{151 \textcolor{preprocessor}{\#undef WORK}}
+\DoxyCodeLine{152         \textcolor{comment}{// process the remaining rows without vectorization}}
+\DoxyCodeLine{153         \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i=actual\_b\_end2; i<actual\_b; ++i)}
+\DoxyCodeLine{154         \{}
+\DoxyCodeLine{155           \textcolor{keywordflow}{if}(RK==4)}
+\DoxyCodeLine{156           \{}
+\DoxyCodeLine{157             C0[i] += A0[i]*Bc0[0]+A1[i]*Bc0[1]+A2[i]*Bc0[2]+A3[i]*Bc0[3];}
+\DoxyCodeLine{158             C1[i] += A0[i]*Bc1[0]+A1[i]*Bc1[1]+A2[i]*Bc1[2]+A3[i]*Bc1[3];}
+\DoxyCodeLine{159           \}}
+\DoxyCodeLine{160           \textcolor{keywordflow}{else}}
+\DoxyCodeLine{161           \{}
+\DoxyCodeLine{162             C0[i] += A0[i]*Bc0[0]+A1[i]*Bc0[1];}
+\DoxyCodeLine{163             C1[i] += A0[i]*Bc1[0]+A1[i]*Bc1[1];}
+\DoxyCodeLine{164           \}}
+\DoxyCodeLine{165         \}}
+\DoxyCodeLine{166         }
+\DoxyCodeLine{167         Bc0 += RK;}
+\DoxyCodeLine{168         Bc1 += RK;}
+\DoxyCodeLine{169       \} \textcolor{comment}{// peeled loop on k}}
+\DoxyCodeLine{170     \} \textcolor{comment}{// peeled loop on the columns j}}
+\DoxyCodeLine{171     \textcolor{comment}{// process the last column (we now perform a matrix-\/vector product)}}
+\DoxyCodeLine{172     \textcolor{keywordflow}{if}((n-\/n\_end)>0)}
+\DoxyCodeLine{173     \{}
+\DoxyCodeLine{174       \textcolor{keyword}{const} Scalar* Bc0 = B+(n-\/1)*ldb;}
+\DoxyCodeLine{175       }
+\DoxyCodeLine{176       \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} k=0; k<d\_end; k+=RK)}
+\DoxyCodeLine{177       \{}
+\DoxyCodeLine{178         }
+\DoxyCodeLine{179         \textcolor{comment}{// load and expand a 1 x RK block of B}}
+\DoxyCodeLine{180         \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} b00, b10, b20, b30;}
+\DoxyCodeLine{181                   b00 = pset1<Packet>(Bc0[0]);}
+\DoxyCodeLine{182                   b10 = pset1<Packet>(Bc0[1]);}
+\DoxyCodeLine{183         \textcolor{keywordflow}{if}(RK==4) b20 = pset1<Packet>(Bc0[2]);}
+\DoxyCodeLine{184         \textcolor{keywordflow}{if}(RK==4) b30 = pset1<Packet>(Bc0[3]);}
+\DoxyCodeLine{185         }
+\DoxyCodeLine{186         \mbox{\hyperlink{unionEigen_1_1internal_1_1Packet}{Packet}} a0, a1, a2, a3, c0, t0\textcolor{comment}{/*, t1*/};}
+\DoxyCodeLine{187         }
+\DoxyCodeLine{188         \textcolor{keyword}{const} Scalar* A0 = A+ib+(k+0)*lda;}
+\DoxyCodeLine{189         \textcolor{keyword}{const} Scalar* A1 = A+ib+(k+1)*lda;}
+\DoxyCodeLine{190         \textcolor{keyword}{const} Scalar* A2 = A+ib+(k+2)*lda;}
+\DoxyCodeLine{191         \textcolor{keyword}{const} Scalar* A3 = A+ib+(k+3)*lda;}
+\DoxyCodeLine{192         }
+\DoxyCodeLine{193         Scalar* C0 = C+ib+(n\_end)*ldc;}
+\DoxyCodeLine{194         }
+\DoxyCodeLine{195                   a0 = pload<Packet>(A0);}
+\DoxyCodeLine{196                   a1 = pload<Packet>(A1);}
+\DoxyCodeLine{197         \textcolor{keywordflow}{if}(RK==4)}
+\DoxyCodeLine{198         \{}
+\DoxyCodeLine{199           a2 = pload<Packet>(A2);}
+\DoxyCodeLine{200           a3 = pload<Packet>(A3);}
+\DoxyCodeLine{201         \}}
+\DoxyCodeLine{202         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{203         \{}
+\DoxyCodeLine{204           \textcolor{comment}{// workaround "{}may be used uninitialized in this function"{} warning}}
+\DoxyCodeLine{205           a2 = a3 = a0;}
+\DoxyCodeLine{206         \}}
+\DoxyCodeLine{207         }
+\DoxyCodeLine{208 \textcolor{preprocessor}{\#define WORK(I) \(\backslash\)}}
+\DoxyCodeLine{209 \textcolor{preprocessor}{                   c0 = pload<Packet>(C0+i+(I)*PacketSize);     \(\backslash\)}}
+\DoxyCodeLine{210 \textcolor{preprocessor}{                   KMADD(c0, a0, b00, t0)                       \(\backslash\)}}
+\DoxyCodeLine{211 \textcolor{preprocessor}{                   a0 = pload<Packet>(A0+i+(I+1)*PacketSize);   \(\backslash\)}}
+\DoxyCodeLine{212 \textcolor{preprocessor}{                   KMADD(c0, a1, b10, t0)                       \(\backslash\)}}
+\DoxyCodeLine{213 \textcolor{preprocessor}{                   a1 = pload<Packet>(A1+i+(I+1)*PacketSize);   \(\backslash\)}}
+\DoxyCodeLine{214 \textcolor{preprocessor}{        if(RK==4)\{ KMADD(c0, a2, b20, t0)                      \}\(\backslash\)}}
+\DoxyCodeLine{215 \textcolor{preprocessor}{        if(RK==4)\{ a2 = pload<Packet>(A2+i+(I+1)*PacketSize);  \}\(\backslash\)}}
+\DoxyCodeLine{216 \textcolor{preprocessor}{        if(RK==4)\{ KMADD(c0, a3, b30, t0)                      \}\(\backslash\)}}
+\DoxyCodeLine{217 \textcolor{preprocessor}{        if(RK==4)\{ a3 = pload<Packet>(A3+i+(I+1)*PacketSize);  \}\(\backslash\)}}
+\DoxyCodeLine{218 \textcolor{preprocessor}{                   pstore(C0+i+(I)*PacketSize, c0);}}
+\DoxyCodeLine{219         }
+\DoxyCodeLine{220         \textcolor{comment}{// aggressive vectorization and peeling}}
+\DoxyCodeLine{221         \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i=0; i<actual\_b\_end1; i+=PacketSize*8)}
+\DoxyCodeLine{222         \{}
+\DoxyCodeLine{223           EIGEN\_ASM\_COMMENT(\textcolor{stringliteral}{"{}SPARSELU\_GEMML\_KERNEL2"{}});}
+\DoxyCodeLine{224           WORK(0);}
+\DoxyCodeLine{225           WORK(1);}
+\DoxyCodeLine{226           WORK(2);}
+\DoxyCodeLine{227           WORK(3);}
+\DoxyCodeLine{228           WORK(4);}
+\DoxyCodeLine{229           WORK(5);}
+\DoxyCodeLine{230           WORK(6);}
+\DoxyCodeLine{231           WORK(7);}
+\DoxyCodeLine{232         \}}
+\DoxyCodeLine{233         \textcolor{comment}{// vectorization only}}
+\DoxyCodeLine{234         \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i=actual\_b\_end1; i<actual\_b\_end2; i+=PacketSize)}
+\DoxyCodeLine{235         \{}
+\DoxyCodeLine{236           WORK(0);}
+\DoxyCodeLine{237         \}}
+\DoxyCodeLine{238         \textcolor{comment}{// remaining scalars}}
+\DoxyCodeLine{239         \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i=actual\_b\_end2; i<actual\_b; ++i)}
+\DoxyCodeLine{240         \{}
+\DoxyCodeLine{241           \textcolor{keywordflow}{if}(RK==4) }
+\DoxyCodeLine{242             C0[i] += A0[i]*Bc0[0]+A1[i]*Bc0[1]+A2[i]*Bc0[2]+A3[i]*Bc0[3];}
+\DoxyCodeLine{243           \textcolor{keywordflow}{else}}
+\DoxyCodeLine{244             C0[i] += A0[i]*Bc0[0]+A1[i]*Bc0[1];}
+\DoxyCodeLine{245         \}}
+\DoxyCodeLine{246         }
+\DoxyCodeLine{247         Bc0 += RK;}
+\DoxyCodeLine{248 \textcolor{preprocessor}{\#undef WORK}}
+\DoxyCodeLine{249       \}}
+\DoxyCodeLine{250     \}}
+\DoxyCodeLine{251     }
+\DoxyCodeLine{252     \textcolor{comment}{// process the last columns of A, corresponding to the last rows of B}}
+\DoxyCodeLine{253     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rd = d-\/d\_end;}
+\DoxyCodeLine{254     \textcolor{keywordflow}{if}(rd>0)}
+\DoxyCodeLine{255     \{}
+\DoxyCodeLine{256       \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j=0; j<n; ++j)}
+\DoxyCodeLine{257       \{}
+\DoxyCodeLine{258         \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{259           Alignment = PacketSize>1 ? \mbox{\hyperlink{group__enums_gga45fe06e29902b7a2773de05ba27b47a1ae12d0f8f869c40c76128260af2242bc8}{Aligned}} : 0}
+\DoxyCodeLine{260         \};}
+\DoxyCodeLine{261         \textcolor{keyword}{typedef} Map<Matrix<Scalar,Dynamic,1>, Alignment > MapVector;}
+\DoxyCodeLine{262         \textcolor{keyword}{typedef} Map<const Matrix<Scalar,Dynamic,1>, Alignment > ConstMapVector;}
+\DoxyCodeLine{263         \textcolor{keywordflow}{if}(rd==1)       MapVector(C+j*ldc+ib,actual\_b) += B[0+d\_end+j*ldb] * ConstMapVector(A+(d\_end+0)*lda+ib, actual\_b);}
+\DoxyCodeLine{264         }
+\DoxyCodeLine{265         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(rd==2)  MapVector(C+j*ldc+ib,actual\_b) += B[0+d\_end+j*ldb] * ConstMapVector(A+(d\_end+0)*lda+ib, actual\_b)}
+\DoxyCodeLine{266                                                         + B[1+d\_end+j*ldb] * ConstMapVector(A+(d\_end+1)*lda+ib, actual\_b);}
+\DoxyCodeLine{267         }
+\DoxyCodeLine{268         \textcolor{keywordflow}{else}            MapVector(C+j*ldc+ib,actual\_b) += B[0+d\_end+j*ldb] * ConstMapVector(A+(d\_end+0)*lda+ib, actual\_b)}
+\DoxyCodeLine{269                                                         + B[1+d\_end+j*ldb] * ConstMapVector(A+(d\_end+1)*lda+ib, actual\_b)}
+\DoxyCodeLine{270                                                         + B[2+d\_end+j*ldb] * ConstMapVector(A+(d\_end+2)*lda+ib, actual\_b);}
+\DoxyCodeLine{271       \}}
+\DoxyCodeLine{272     \}}
+\DoxyCodeLine{273   }
+\DoxyCodeLine{274   \} \textcolor{comment}{// blocking on the rows of A and C}}
+\DoxyCodeLine{275 \}}
+\DoxyCodeLine{276 \textcolor{preprocessor}{\#undef KMADD}}
+\DoxyCodeLine{277 }
+\DoxyCodeLine{278 \} \textcolor{comment}{// namespace internal}}
+\DoxyCodeLine{279 }
+\DoxyCodeLine{280 \} \textcolor{comment}{// namespace Eigen}}
+\DoxyCodeLine{281 }
+\DoxyCodeLine{282 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_SPARSELU\_GEMM\_KERNEL\_H}}
+
+\end{DoxyCode}
