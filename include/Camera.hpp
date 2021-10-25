@@ -39,7 +39,7 @@
 class Camera{
  public :
   Camera();
-  Camera(int x);
+  explicit Camera(int x);
   // variable to hold each frame of video
   cv::Mat frame;
   int webcam;

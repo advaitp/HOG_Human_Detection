@@ -27,8 +27,8 @@
  * SOFTWARE.
  */
 
-#include<Camera.hpp>
 #include <gtest/gtest.h>
+#include<Camera.hpp>
 
 TEST(CameraTest1, testboxparameterconstructor) {
   Camera cam(3);

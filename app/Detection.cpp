@@ -138,8 +138,7 @@ void Detection :: drawboxes(cv::Mat frame) {
 
 bool Detection::is_same(int x[2], int y[2]) {
   try {
-    if (x[0] - y[0] < 2 && x[1] - y[1] < 2) {return true;}
-    else {
+    if (x[0] - y[0] < 2 && x[1] - y[1] < 2) {return true;} else {
       return false;
     }
   }
@@ -164,8 +163,7 @@ void Detection::track(cv::Mat img) {
             std::vector<int> psh = {i, sam.centre[0], sam.centre[1]};
             storage.push_back(psh);
           }
-        }
-       else {
+        } else {
          for (auto j = 0 ; j < detections.size(); j++) {
              Human sam;
              sam.calc_centre(detections[j]);
@@ -173,7 +171,7 @@ void Detection::track(cv::Mat img) {
              storage.clear();
              for (auto i : temp) {
                int tem[2] = {i[1] , i[2]};
-               if (is_same(sam.centre,tem)) {
+               if (is_same(sam.centre, tem)) {
                  std::vector<int> psh = {j, sam.centre[0], sam.centre[1]};
                  storage.push_back(psh);
                }
@@ -182,10 +180,10 @@ void Detection::track(cv::Mat img) {
          }
         for (auto o : storage) {
           std::string text = "ID " + std::to_string(o[0]);
-          cv::putText(img, text, cv::Point(o[1],o[2]), cv::FONT_HERSHEY_DUPLEX, 1.0, CV_RGB(0, 255, 0), 2);
+          cv::putText(img, text, cv::Point(o[1], o[2]),
+                      cv::FONT_HERSHEY_DUPLEX, 1.0, CV_RGB(0, 255, 0), 2);
         }
-      }
-      else {
+      } else {
         storage.clear();
         std::cout << "Condition not satisfied\n";
       }
