@@ -1,0 +1,126 @@
+\hypertarget{SelfadjointMatrixVector__BLAS_8h_source}{}\doxysection{Selfadjoint\+Matrix\+Vector\+\_\+\+BLAS.\+h}
+\label{SelfadjointMatrixVector__BLAS_8h_source}\index{include/Eigen/src/Core/products/SelfadjointMatrixVector\_BLAS.h@{include/Eigen/src/Core/products/SelfadjointMatrixVector\_BLAS.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{/*}}
+\DoxyCodeLine{2 \textcolor{comment}{ Copyright (c) 2011, Intel Corporation. All rights reserved.}}
+\DoxyCodeLine{3 \textcolor{comment}{}}
+\DoxyCodeLine{4 \textcolor{comment}{ Redistribution and use in source and binary forms, with or without modification,}}
+\DoxyCodeLine{5 \textcolor{comment}{ are permitted provided that the following conditions are met:}}
+\DoxyCodeLine{6 \textcolor{comment}{}}
+\DoxyCodeLine{7 \textcolor{comment}{ * Redistributions of source code must retain the above copyright notice, this}}
+\DoxyCodeLine{8 \textcolor{comment}{   list of conditions and the following disclaimer.}}
+\DoxyCodeLine{9 \textcolor{comment}{ * Redistributions in binary form must reproduce the above copyright notice,}}
+\DoxyCodeLine{10 \textcolor{comment}{   this list of conditions and the following disclaimer in the documentation}}
+\DoxyCodeLine{11 \textcolor{comment}{   and/or other materials provided with the distribution.}}
+\DoxyCodeLine{12 \textcolor{comment}{ * Neither the name of Intel Corporation nor the names of its contributors may}}
+\DoxyCodeLine{13 \textcolor{comment}{   be used to endorse or promote products derived from this software without}}
+\DoxyCodeLine{14 \textcolor{comment}{   specific prior written permission.}}
+\DoxyCodeLine{15 \textcolor{comment}{}}
+\DoxyCodeLine{16 \textcolor{comment}{ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "{}AS IS"{} AND}}
+\DoxyCodeLine{17 \textcolor{comment}{ ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED}}
+\DoxyCodeLine{18 \textcolor{comment}{ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE}}
+\DoxyCodeLine{19 \textcolor{comment}{ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR}}
+\DoxyCodeLine{20 \textcolor{comment}{ ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES}}
+\DoxyCodeLine{21 \textcolor{comment}{ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;}}
+\DoxyCodeLine{22 \textcolor{comment}{ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON}}
+\DoxyCodeLine{23 \textcolor{comment}{ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT}}
+\DoxyCodeLine{24 \textcolor{comment}{ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS}}
+\DoxyCodeLine{25 \textcolor{comment}{ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.}}
+\DoxyCodeLine{26 \textcolor{comment}{}}
+\DoxyCodeLine{27 \textcolor{comment}{ ********************************************************************************}}
+\DoxyCodeLine{28 \textcolor{comment}{ *   Content : Eigen bindings to BLAS F77}}
+\DoxyCodeLine{29 \textcolor{comment}{ *   Selfadjoint matrix-\/vector product functionality based on ?SYMV/HEMV.}}
+\DoxyCodeLine{30 \textcolor{comment}{ ********************************************************************************}}
+\DoxyCodeLine{31 \textcolor{comment}{*/}}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33 \textcolor{preprocessor}{\#ifndef EIGEN\_SELFADJOINT\_MATRIX\_VECTOR\_BLAS\_H}}
+\DoxyCodeLine{34 \textcolor{preprocessor}{\#define EIGEN\_SELFADJOINT\_MATRIX\_VECTOR\_BLAS\_H}}
+\DoxyCodeLine{35 }
+\DoxyCodeLine{36 \textcolor{preprocessor}{\#include "{}../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{37 }
+\DoxyCodeLine{38 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{39 }
+\DoxyCodeLine{40 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{41 }
+\DoxyCodeLine{42 \textcolor{comment}{/**********************************************************************}}
+\DoxyCodeLine{43 \textcolor{comment}{* This file implements selfadjoint matrix-\/vector multiplication using BLAS}}
+\DoxyCodeLine{44 \textcolor{comment}{**********************************************************************/}}
+\DoxyCodeLine{45 }
+\DoxyCodeLine{46 \textcolor{comment}{// symv/hemv specialization}}
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Index, \textcolor{keywordtype}{int} StorageOrder, \textcolor{keywordtype}{int} UpLo, \textcolor{keywordtype}{bool} ConjugateLhs, \textcolor{keywordtype}{bool} ConjugateRhs>}
+\DoxyCodeLine{49 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1selfadjoint__matrix__vector__product__symv}{selfadjoint\_matrix\_vector\_product\_symv}} :}
+\DoxyCodeLine{50   \mbox{\hyperlink{structEigen_1_1internal_1_1selfadjoint__matrix__vector__product}{selfadjoint\_matrix\_vector\_product}}<Scalar,Index,StorageOrder,UpLo,ConjugateLhs,ConjugateRhs,BuiltIn> \{\};}
+\DoxyCodeLine{51 }
+\DoxyCodeLine{52 \textcolor{preprocessor}{\#define EIGEN\_BLAS\_SYMV\_SPECIALIZE(Scalar) \(\backslash\)}}
+\DoxyCodeLine{53 \textcolor{preprocessor}{template<typename Index, int StorageOrder, int UpLo, bool ConjugateLhs, bool ConjugateRhs> \(\backslash\)}}
+\DoxyCodeLine{54 \textcolor{preprocessor}{struct selfadjoint\_matrix\_vector\_product<Scalar,Index,StorageOrder,UpLo,ConjugateLhs,ConjugateRhs,Specialized> \{ \(\backslash\)}}
+\DoxyCodeLine{55 \textcolor{preprocessor}{static void run( \(\backslash\)}}
+\DoxyCodeLine{56 \textcolor{preprocessor}{  Index size, const Scalar*  lhs, Index lhsStride, \(\backslash\)}}
+\DoxyCodeLine{57 \textcolor{preprocessor}{  const Scalar* \_rhs, Scalar* res, Scalar alpha) \{ \(\backslash\)}}
+\DoxyCodeLine{58 \textcolor{preprocessor}{    enum \{\(\backslash\)}}
+\DoxyCodeLine{59 \textcolor{preprocessor}{      IsColMajor = StorageOrder==ColMajor \(\backslash\)}}
+\DoxyCodeLine{60 \textcolor{preprocessor}{    \}; \(\backslash\)}}
+\DoxyCodeLine{61 \textcolor{preprocessor}{    if (IsColMajor == ConjugateLhs) \{\(\backslash\)}}
+\DoxyCodeLine{62 \textcolor{preprocessor}{      selfadjoint\_matrix\_vector\_product<Scalar,Index,StorageOrder,UpLo,ConjugateLhs,ConjugateRhs,BuiltIn>::run( \(\backslash\)}}
+\DoxyCodeLine{63 \textcolor{preprocessor}{        size, lhs, lhsStride, \_rhs, res, alpha);  \(\backslash\)}}
+\DoxyCodeLine{64 \textcolor{preprocessor}{    \} else \{\(\backslash\)}}
+\DoxyCodeLine{65 \textcolor{preprocessor}{      selfadjoint\_matrix\_vector\_product\_symv<Scalar,Index,StorageOrder,UpLo,ConjugateLhs,ConjugateRhs>::run( \(\backslash\)}}
+\DoxyCodeLine{66 \textcolor{preprocessor}{        size, lhs, lhsStride, \_rhs, res, alpha);  \(\backslash\)}}
+\DoxyCodeLine{67 \textcolor{preprocessor}{    \}\(\backslash\)}}
+\DoxyCodeLine{68 \textcolor{preprocessor}{  \} \(\backslash\)}}
+\DoxyCodeLine{69 \textcolor{preprocessor}{\}; \(\backslash\)}}
+\DoxyCodeLine{70 \textcolor{preprocessor}{}}
+\DoxyCodeLine{71 EIGEN\_BLAS\_SYMV\_SPECIALIZE(\textcolor{keywordtype}{double})}
+\DoxyCodeLine{72 EIGEN\_BLAS\_SYMV\_SPECIALIZE(\textcolor{keywordtype}{float})}
+\DoxyCodeLine{73 EIGEN\_BLAS\_SYMV\_SPECIALIZE(dcomplex)}
+\DoxyCodeLine{74 EIGEN\_BLAS\_SYMV\_SPECIALIZE(scomplex)}
+\DoxyCodeLine{75 }
+\DoxyCodeLine{76 \textcolor{preprocessor}{\#define EIGEN\_BLAS\_SYMV\_SPECIALIZATION(EIGTYPE,BLASTYPE,BLASFUNC) \(\backslash\)}}
+\DoxyCodeLine{77 \textcolor{preprocessor}{template<typename Index, int StorageOrder, int UpLo, bool ConjugateLhs, bool ConjugateRhs> \(\backslash\)}}
+\DoxyCodeLine{78 \textcolor{preprocessor}{struct selfadjoint\_matrix\_vector\_product\_symv<EIGTYPE,Index,StorageOrder,UpLo,ConjugateLhs,ConjugateRhs> \(\backslash\)}}
+\DoxyCodeLine{79 \textcolor{preprocessor}{\{ \(\backslash\)}}
+\DoxyCodeLine{80 \textcolor{preprocessor}{typedef Matrix<EIGTYPE,Dynamic,1,ColMajor> SYMVVector;\(\backslash\)}}
+\DoxyCodeLine{81 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{82 \textcolor{preprocessor}{static void run( \(\backslash\)}}
+\DoxyCodeLine{83 \textcolor{preprocessor}{Index size, const EIGTYPE*  lhs, Index lhsStride, \(\backslash\)}}
+\DoxyCodeLine{84 \textcolor{preprocessor}{const EIGTYPE* \_rhs, EIGTYPE* res, EIGTYPE alpha) \(\backslash\)}}
+\DoxyCodeLine{85 \textcolor{preprocessor}{\{ \(\backslash\)}}
+\DoxyCodeLine{86 \textcolor{preprocessor}{  enum \{\(\backslash\)}}
+\DoxyCodeLine{87 \textcolor{preprocessor}{    IsRowMajor = StorageOrder==RowMajor ? 1 : 0, \(\backslash\)}}
+\DoxyCodeLine{88 \textcolor{preprocessor}{    IsLower = UpLo == Lower ? 1 : 0 \(\backslash\)}}
+\DoxyCodeLine{89 \textcolor{preprocessor}{  \}; \(\backslash\)}}
+\DoxyCodeLine{90 \textcolor{preprocessor}{  BlasIndex n=convert\_index<BlasIndex>(size), lda=convert\_index<BlasIndex>(lhsStride), incx=1, incy=1; \(\backslash\)}}
+\DoxyCodeLine{91 \textcolor{preprocessor}{  EIGTYPE beta(1); \(\backslash\)}}
+\DoxyCodeLine{92 \textcolor{preprocessor}{  const EIGTYPE *x\_ptr; \(\backslash\)}}
+\DoxyCodeLine{93 \textcolor{preprocessor}{  char uplo=(IsRowMajor) ? (IsLower ? 'U' : 'L') : (IsLower ? 'L' : 'U'); \(\backslash\)}}
+\DoxyCodeLine{94 \textcolor{preprocessor}{  SYMVVector x\_tmp; \(\backslash\)}}
+\DoxyCodeLine{95 \textcolor{preprocessor}{  if (ConjugateRhs) \{ \(\backslash\)}}
+\DoxyCodeLine{96 \textcolor{preprocessor}{    Map<const SYMVVector, 0 > map\_x(\_rhs,size,1); \(\backslash\)}}
+\DoxyCodeLine{97 \textcolor{preprocessor}{    x\_tmp=map\_x.conjugate(); \(\backslash\)}}
+\DoxyCodeLine{98 \textcolor{preprocessor}{    x\_ptr=x\_tmp.data(); \(\backslash\)}}
+\DoxyCodeLine{99 \textcolor{preprocessor}{  \} else x\_ptr=\_rhs; \(\backslash\)}}
+\DoxyCodeLine{100 \textcolor{preprocessor}{  BLASFUNC(\&uplo, \&n, (const BLASTYPE*)\&numext::real\_ref(alpha), (const BLASTYPE*)lhs, \&lda, (const BLASTYPE*)x\_ptr, \&incx, (const BLASTYPE*)\&numext::real\_ref(beta), (BLASTYPE*)res, \&incy); \(\backslash\)}}
+\DoxyCodeLine{101 \textcolor{preprocessor}{\}\(\backslash\)}}
+\DoxyCodeLine{102 \textcolor{preprocessor}{\};}}
+\DoxyCodeLine{103 }
+\DoxyCodeLine{104 \textcolor{preprocessor}{\#ifdef EIGEN\_USE\_MKL}}
+\DoxyCodeLine{105 EIGEN\_BLAS\_SYMV\_SPECIALIZATION(\textcolor{keywordtype}{double},   \textcolor{keywordtype}{double}, dsymv)}
+\DoxyCodeLine{106 EIGEN\_BLAS\_SYMV\_SPECIALIZATION(\textcolor{keywordtype}{float},    \textcolor{keywordtype}{float},  ssymv)}
+\DoxyCodeLine{107 EIGEN\_BLAS\_SYMV\_SPECIALIZATION(dcomplex, MKL\_Complex16, zhemv)}
+\DoxyCodeLine{108 EIGEN\_BLAS\_SYMV\_SPECIALIZATION(scomplex, MKL\_Complex8,  chemv)}
+\DoxyCodeLine{109 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{110 EIGEN\_BLAS\_SYMV\_SPECIALIZATION(\textcolor{keywordtype}{double},   \textcolor{keywordtype}{double}, dsymv\_)}
+\DoxyCodeLine{111 EIGEN\_BLAS\_SYMV\_SPECIALIZATION(\textcolor{keywordtype}{float},    \textcolor{keywordtype}{float},  ssymv\_)}
+\DoxyCodeLine{112 EIGEN\_BLAS\_SYMV\_SPECIALIZATION(dcomplex, \textcolor{keywordtype}{double}, zhemv\_)}
+\DoxyCodeLine{113 EIGEN\_BLAS\_SYMV\_SPECIALIZATION(scomplex, \textcolor{keywordtype}{float},  chemv\_)}
+\DoxyCodeLine{114 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{115 }
+\DoxyCodeLine{116 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{117 }
+\DoxyCodeLine{118 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{119 }
+\DoxyCodeLine{120 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_SELFADJOINT\_MATRIX\_VECTOR\_BLAS\_H}}
+
+\end{DoxyCode}

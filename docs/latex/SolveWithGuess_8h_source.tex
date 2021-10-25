@@ -1,0 +1,113 @@
+\hypertarget{SolveWithGuess_8h_source}{}\doxysection{Solve\+With\+Guess.\+h}
+\label{SolveWithGuess_8h_source}\index{include/Eigen/src/IterativeLinearSolvers/SolveWithGuess.h@{include/Eigen/src/IterativeLinearSolvers/SolveWithGuess.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2014 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_SOLVEWITHGUESS\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_SOLVEWITHGUESS\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Decomposition, \textcolor{keyword}{typename} RhsType, \textcolor{keyword}{typename} GuessType> \textcolor{keyword}{class }SolveWithGuess;}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{31 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33 }
+\DoxyCodeLine{34 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Decomposition, \textcolor{keyword}{typename} RhsType, \textcolor{keyword}{typename} GuessType>}
+\DoxyCodeLine{35 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{classEigen_1_1SolveWithGuess}{SolveWithGuess}}<Decomposition, RhsType, GuessType> >}
+\DoxyCodeLine{36   : \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<Solve<Decomposition,RhsType> >}
+\DoxyCodeLine{37 \{\};}
+\DoxyCodeLine{38 }
+\DoxyCodeLine{39 \}}
+\DoxyCodeLine{40 }
+\DoxyCodeLine{41 }
+\DoxyCodeLine{42 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Decomposition, \textcolor{keyword}{typename} RhsType, \textcolor{keyword}{typename} GuessType>}
+\DoxyCodeLine{43 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1SolveWithGuess}{SolveWithGuess}} : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1generic__xpr__base}{internal::generic\_xpr\_base}}<SolveWithGuess<Decomposition,RhsType,GuessType>, MatrixXpr, typename internal::traits<RhsType>::StorageKind>::type}
+\DoxyCodeLine{44 \{}
+\DoxyCodeLine{45 \textcolor{keyword}{public}:}
+\DoxyCodeLine{46   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<SolveWithGuess>::Scalar}} Scalar;}
+\DoxyCodeLine{47   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<SolveWithGuess>::PlainObject}} PlainObject;}
+\DoxyCodeLine{48   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1generic__xpr__base}{internal::generic\_xpr\_base<SolveWithGuess<Decomposition,RhsType,GuessType>}}, \mbox{\hyperlink{structEigen_1_1MatrixXpr}{MatrixXpr}}, \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<RhsType>::StorageKind}}>::type Base;}
+\DoxyCodeLine{49   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::ref\_selector<SolveWithGuess>::type}} Nested;}
+\DoxyCodeLine{50 }
+\DoxyCodeLine{51   \mbox{\hyperlink{classEigen_1_1SolveWithGuess}{SolveWithGuess}}(\textcolor{keyword}{const} Decomposition \&dec, \textcolor{keyword}{const} RhsType \&rhs, \textcolor{keyword}{const} GuessType \&guess)}
+\DoxyCodeLine{52     : m\_dec(dec), m\_rhs(rhs), m\_guess(guess)}
+\DoxyCodeLine{53   \{\}}
+\DoxyCodeLine{54 }
+\DoxyCodeLine{55   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{56   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows() const EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_dec.cols(); \}}
+\DoxyCodeLine{57   EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{58   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols() const EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_rhs.cols(); \}}
+\DoxyCodeLine{59 }
+\DoxyCodeLine{60   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{const} Decomposition\& dec()\textcolor{keyword}{   const }\{ \textcolor{keywordflow}{return} m\_dec; \}}
+\DoxyCodeLine{61   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{const} RhsType\&       rhs()\textcolor{keyword}{   const }\{ \textcolor{keywordflow}{return} m\_rhs; \}}
+\DoxyCodeLine{62   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{const} GuessType\&     guess()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_guess; \}}
+\DoxyCodeLine{63 }
+\DoxyCodeLine{64 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{65   \textcolor{keyword}{const} Decomposition \&m\_dec;}
+\DoxyCodeLine{66   \textcolor{keyword}{const} RhsType       \&m\_rhs;}
+\DoxyCodeLine{67   \textcolor{keyword}{const} GuessType     \&m\_guess;}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{69 \textcolor{keyword}{private}:}
+\DoxyCodeLine{70   Scalar coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col) \textcolor{keyword}{const};}
+\DoxyCodeLine{71   Scalar coeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i) \textcolor{keyword}{const};}
+\DoxyCodeLine{72 \};}
+\DoxyCodeLine{73 }
+\DoxyCodeLine{74 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{75 }
+\DoxyCodeLine{76 \textcolor{comment}{// Evaluator of SolveWithGuess -\/> eval into a temporary}}
+\DoxyCodeLine{77 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Decomposition, \textcolor{keyword}{typename} RhsType, \textcolor{keyword}{typename} GuessType>}
+\DoxyCodeLine{78 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<\mbox{\hyperlink{classEigen_1_1SolveWithGuess}{SolveWithGuess}}<Decomposition,RhsType, GuessType> >}
+\DoxyCodeLine{79   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<typename SolveWithGuess<Decomposition,RhsType,GuessType>::PlainObject>}
+\DoxyCodeLine{80 \{}
+\DoxyCodeLine{81   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SolveWithGuess}{SolveWithGuess<Decomposition,RhsType,GuessType>}} \mbox{\hyperlink{classEigen_1_1SolveWithGuess}{SolveType}};}
+\DoxyCodeLine{82   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} SolveType::PlainObject PlainObject;}
+\DoxyCodeLine{83   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<PlainObject>}} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}};}
+\DoxyCodeLine{84 }
+\DoxyCodeLine{85   \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SolveWithGuess}{SolveType}}\& solve)}
+\DoxyCodeLine{86     : m\_result(solve.rows(), solve.cols())}
+\DoxyCodeLine{87   \{}
+\DoxyCodeLine{88     ::new (\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})) \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}(m\_result);}
+\DoxyCodeLine{89     m\_result = solve.guess();}
+\DoxyCodeLine{90     solve.dec().\_solve\_with\_guess\_impl(solve.rhs(), m\_result);}
+\DoxyCodeLine{91   \}}
+\DoxyCodeLine{92 }
+\DoxyCodeLine{93 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{94   PlainObject m\_result;}
+\DoxyCodeLine{95 \};}
+\DoxyCodeLine{96 }
+\DoxyCodeLine{97 \textcolor{comment}{// Specialization for "{}dst = dec.solveWithGuess(rhs)"{}}}
+\DoxyCodeLine{98 \textcolor{comment}{// NOTE we need to specialize it for Dense2Dense to avoid ambiguous specialization error and a Sparse2Sparse specialization must exist somewhere}}
+\DoxyCodeLine{99 \textcolor{keyword}{template}<\textcolor{keyword}{typename} DstXprType, \textcolor{keyword}{typename} DecType, \textcolor{keyword}{typename} RhsType, \textcolor{keyword}{typename} GuessType, \textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{100 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1Assignment}{Assignment}}<DstXprType, \mbox{\hyperlink{classEigen_1_1SolveWithGuess}{SolveWithGuess}}<DecType,RhsType,GuessType>, internal::\mbox{\hyperlink{structEigen_1_1internal_1_1assign__op}{assign\_op}}<Scalar,Scalar>, \mbox{\hyperlink{structEigen_1_1internal_1_1Dense2Dense}{Dense2Dense}}>}
+\DoxyCodeLine{101 \{}
+\DoxyCodeLine{102   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SolveWithGuess}{SolveWithGuess<DecType,RhsType,GuessType>}} \mbox{\hyperlink{classEigen_1_1SolveWithGuess}{SrcXprType}};}
+\DoxyCodeLine{103   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(DstXprType \&dst, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SolveWithGuess}{SrcXprType}} \&src, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1assign__op}{internal::assign\_op<Scalar,Scalar>}} \&)}
+\DoxyCodeLine{104   \{}
+\DoxyCodeLine{105     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} dstRows = src.rows();}
+\DoxyCodeLine{106     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} dstCols = src.cols();}
+\DoxyCodeLine{107     \textcolor{keywordflow}{if}((dst.rows()!=dstRows) || (dst.cols()!=dstCols))}
+\DoxyCodeLine{108       dst.resize(dstRows, dstCols);}
+\DoxyCodeLine{109 }
+\DoxyCodeLine{110     dst = src.guess();}
+\DoxyCodeLine{111     src.dec().\_solve\_with\_guess\_impl(src.rhs(), dst\textcolor{comment}{/*, src.guess()*/});}
+\DoxyCodeLine{112   \}}
+\DoxyCodeLine{113 \};}
+\DoxyCodeLine{114 }
+\DoxyCodeLine{115 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{116 }
+\DoxyCodeLine{117 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{118 }
+\DoxyCodeLine{119 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_SOLVEWITHGUESS\_H}}
+
+\end{DoxyCode}

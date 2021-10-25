@@ -1,0 +1,476 @@
+\hypertarget{PardisoSupport_8h_source}{}\doxysection{Pardiso\+Support.\+h}
+\label{PardisoSupport_8h_source}\index{include/Eigen/src/PardisoSupport/PardisoSupport.h@{include/Eigen/src/PardisoSupport/PardisoSupport.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{/*}}
+\DoxyCodeLine{2 \textcolor{comment}{ Copyright (c) 2011, Intel Corporation. All rights reserved.}}
+\DoxyCodeLine{3 \textcolor{comment}{}}
+\DoxyCodeLine{4 \textcolor{comment}{ Redistribution and use in source and binary forms, with or without modification,}}
+\DoxyCodeLine{5 \textcolor{comment}{ are permitted provided that the following conditions are met:}}
+\DoxyCodeLine{6 \textcolor{comment}{}}
+\DoxyCodeLine{7 \textcolor{comment}{ * Redistributions of source code must retain the above copyright notice, this}}
+\DoxyCodeLine{8 \textcolor{comment}{   list of conditions and the following disclaimer.}}
+\DoxyCodeLine{9 \textcolor{comment}{ * Redistributions in binary form must reproduce the above copyright notice,}}
+\DoxyCodeLine{10 \textcolor{comment}{   this list of conditions and the following disclaimer in the documentation}}
+\DoxyCodeLine{11 \textcolor{comment}{   and/or other materials provided with the distribution.}}
+\DoxyCodeLine{12 \textcolor{comment}{ * Neither the name of Intel Corporation nor the names of its contributors may}}
+\DoxyCodeLine{13 \textcolor{comment}{   be used to endorse or promote products derived from this software without}}
+\DoxyCodeLine{14 \textcolor{comment}{   specific prior written permission.}}
+\DoxyCodeLine{15 \textcolor{comment}{}}
+\DoxyCodeLine{16 \textcolor{comment}{ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "{}AS IS"{} AND}}
+\DoxyCodeLine{17 \textcolor{comment}{ ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED}}
+\DoxyCodeLine{18 \textcolor{comment}{ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE}}
+\DoxyCodeLine{19 \textcolor{comment}{ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR}}
+\DoxyCodeLine{20 \textcolor{comment}{ ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES}}
+\DoxyCodeLine{21 \textcolor{comment}{ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;}}
+\DoxyCodeLine{22 \textcolor{comment}{ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON}}
+\DoxyCodeLine{23 \textcolor{comment}{ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT}}
+\DoxyCodeLine{24 \textcolor{comment}{ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS}}
+\DoxyCodeLine{25 \textcolor{comment}{ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.}}
+\DoxyCodeLine{26 \textcolor{comment}{}}
+\DoxyCodeLine{27 \textcolor{comment}{ ********************************************************************************}}
+\DoxyCodeLine{28 \textcolor{comment}{ *   Content : Eigen bindings to Intel(R) MKL PARDISO}}
+\DoxyCodeLine{29 \textcolor{comment}{ ********************************************************************************}}
+\DoxyCodeLine{30 \textcolor{comment}{*/}}
+\DoxyCodeLine{31 }
+\DoxyCodeLine{32 \textcolor{preprocessor}{\#ifndef EIGEN\_PARDISOSUPPORT\_H}}
+\DoxyCodeLine{33 \textcolor{preprocessor}{\#define EIGEN\_PARDISOSUPPORT\_H}}
+\DoxyCodeLine{34 }
+\DoxyCodeLine{35 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{37 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{38 }
+\DoxyCodeLine{39 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_> \textcolor{keyword}{class }PardisoLU;}
+\DoxyCodeLine{40 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_, \textcolor{keywordtype}{int} Options=Upper> \textcolor{keyword}{class }PardisoLLT;}
+\DoxyCodeLine{41 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_, \textcolor{keywordtype}{int} Options=Upper> \textcolor{keyword}{class }PardisoLDLT;}
+\DoxyCodeLine{42 }
+\DoxyCodeLine{43 \textcolor{keyword}{namespace }internal}
+\DoxyCodeLine{44 \{}
+\DoxyCodeLine{45   \textcolor{keyword}{template}<\textcolor{keyword}{typename} IndexType>}
+\DoxyCodeLine{46   \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1pardiso__run__selector}{pardiso\_run\_selector}}}
+\DoxyCodeLine{47   \{}
+\DoxyCodeLine{48     \textcolor{keyword}{static} IndexType run( \_MKL\_DSS\_HANDLE\_t pt, IndexType maxfct, IndexType mnum, IndexType type, IndexType phase, IndexType n, \textcolor{keywordtype}{void} *a,}
+\DoxyCodeLine{49                       IndexType *ia, IndexType *ja, IndexType *perm, IndexType nrhs, IndexType *iparm, IndexType msglvl, \textcolor{keywordtype}{void} *b, \textcolor{keywordtype}{void} *x)}
+\DoxyCodeLine{50     \{}
+\DoxyCodeLine{51       IndexType error = 0;}
+\DoxyCodeLine{52       ::pardiso(pt, \&maxfct, \&mnum, \&type, \&phase, \&n, a, ia, ja, perm, \&nrhs, iparm, \&msglvl, b, x, \&error);}
+\DoxyCodeLine{53       \textcolor{keywordflow}{return} error;}
+\DoxyCodeLine{54     \}}
+\DoxyCodeLine{55   \};}
+\DoxyCodeLine{56   \textcolor{keyword}{template}<>}
+\DoxyCodeLine{57   \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1pardiso__run__selector}{pardiso\_run\_selector}}<long long int>}
+\DoxyCodeLine{58   \{}
+\DoxyCodeLine{59     \textcolor{keyword}{typedef} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} \textcolor{keywordtype}{int} IndexType;}
+\DoxyCodeLine{60     \textcolor{keyword}{static} IndexType run( \_MKL\_DSS\_HANDLE\_t pt, IndexType maxfct, IndexType mnum, IndexType type, IndexType phase, IndexType n, \textcolor{keywordtype}{void} *a,}
+\DoxyCodeLine{61                       IndexType *ia, IndexType *ja, IndexType *perm, IndexType nrhs, IndexType *iparm, IndexType msglvl, \textcolor{keywordtype}{void} *b, \textcolor{keywordtype}{void} *x)}
+\DoxyCodeLine{62     \{}
+\DoxyCodeLine{63       IndexType error = 0;}
+\DoxyCodeLine{64       ::pardiso\_64(pt, \&maxfct, \&mnum, \&type, \&phase, \&n, a, ia, ja, perm, \&nrhs, iparm, \&msglvl, b, x, \&error);}
+\DoxyCodeLine{65       \textcolor{keywordflow}{return} error;}
+\DoxyCodeLine{66     \}}
+\DoxyCodeLine{67   \};}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{69   \textcolor{keyword}{template}<\textcolor{keyword}{class} Pardiso> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1pardiso__traits}{pardiso\_traits}};}
+\DoxyCodeLine{70 }
+\DoxyCodeLine{71   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_>}
+\DoxyCodeLine{72   \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1pardiso__traits}{pardiso\_traits}}< \mbox{\hyperlink{classEigen_1_1PardisoLU}{PardisoLU}}<MatrixType\_> >}
+\DoxyCodeLine{73   \{}
+\DoxyCodeLine{74     \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{75     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType\_::Scalar Scalar;}
+\DoxyCodeLine{76     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType\_::RealScalar RealScalar;}
+\DoxyCodeLine{77     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType\_::StorageIndex StorageIndex;}
+\DoxyCodeLine{78   \};}
+\DoxyCodeLine{79 }
+\DoxyCodeLine{80   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_, \textcolor{keywordtype}{int} Options>}
+\DoxyCodeLine{81   \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1pardiso__traits}{pardiso\_traits}}< \mbox{\hyperlink{classEigen_1_1PardisoLLT}{PardisoLLT}}<MatrixType\_, Options> >}
+\DoxyCodeLine{82   \{}
+\DoxyCodeLine{83     \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{84     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType\_::Scalar Scalar;}
+\DoxyCodeLine{85     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType\_::RealScalar RealScalar;}
+\DoxyCodeLine{86     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType\_::StorageIndex StorageIndex;}
+\DoxyCodeLine{87   \};}
+\DoxyCodeLine{88 }
+\DoxyCodeLine{89   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_, \textcolor{keywordtype}{int} Options>}
+\DoxyCodeLine{90   \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1pardiso__traits}{pardiso\_traits}}< \mbox{\hyperlink{classEigen_1_1PardisoLDLT}{PardisoLDLT}}<MatrixType\_, Options> >}
+\DoxyCodeLine{91   \{}
+\DoxyCodeLine{92     \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{93     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType\_::Scalar Scalar;}
+\DoxyCodeLine{94     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType\_::RealScalar RealScalar;}
+\DoxyCodeLine{95     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType\_::StorageIndex StorageIndex;}
+\DoxyCodeLine{96   \};}
+\DoxyCodeLine{97 }
+\DoxyCodeLine{98 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{99 }
+\DoxyCodeLine{100 \textcolor{keyword}{template}<\textcolor{keyword}{class} Derived>}
+\DoxyCodeLine{101 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1PardisoImpl}{PardisoImpl}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{SparseSolverBase}}<Derived>}
+\DoxyCodeLine{102 \{}
+\DoxyCodeLine{103   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{104     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{SparseSolverBase<Derived>}} \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{Base}};}
+\DoxyCodeLine{105     \textcolor{keyword}{using} Base::derived;}
+\DoxyCodeLine{106     \textcolor{keyword}{using} Base::m\_isInitialized;}
+\DoxyCodeLine{107     }
+\DoxyCodeLine{108     \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1pardiso__traits}{internal::pardiso\_traits<Derived>}} \mbox{\hyperlink{structEigen_1_1internal_1_1pardiso__traits}{Traits}};}
+\DoxyCodeLine{109   \textcolor{keyword}{public}:}
+\DoxyCodeLine{110     \textcolor{keyword}{using} Base::\_solve\_impl;}
+\DoxyCodeLine{111     }
+\DoxyCodeLine{112     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Traits::MatrixType MatrixType;}
+\DoxyCodeLine{113     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Traits::Scalar Scalar;}
+\DoxyCodeLine{114     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Traits::RealScalar RealScalar;}
+\DoxyCodeLine{115     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Traits::StorageIndex StorageIndex;}
+\DoxyCodeLine{116     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<Scalar,RowMajor,StorageIndex>}} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrixType}};}
+\DoxyCodeLine{117     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar,Dynamic,1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{VectorType}};}
+\DoxyCodeLine{118     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<StorageIndex, 1, MatrixType::ColsAtCompileTime>}} \mbox{\hyperlink{classEigen_1_1Matrix}{IntRowVectorType}};}
+\DoxyCodeLine{119     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<StorageIndex, MatrixType::RowsAtCompileTime, 1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{IntColVectorType}};}
+\DoxyCodeLine{120     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Array}{Array<StorageIndex,64,1,DontAlign>}} \mbox{\hyperlink{classEigen_1_1Array}{ParameterType}};}
+\DoxyCodeLine{121     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{122       ScalarIsComplex = \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::IsComplex}},}
+\DoxyCodeLine{123       ColsAtCompileTime = \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}},}
+\DoxyCodeLine{124       MaxColsAtCompileTime = \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}}
+\DoxyCodeLine{125     \};}
+\DoxyCodeLine{126 }
+\DoxyCodeLine{127     \mbox{\hyperlink{classEigen_1_1PardisoImpl}{PardisoImpl}}()}
+\DoxyCodeLine{128       : m\_analysisIsOk(\textcolor{keyword}{false}), m\_factorizationIsOk(\textcolor{keyword}{false})}
+\DoxyCodeLine{129     \{}
+\DoxyCodeLine{130       eigen\_assert((\textcolor{keyword}{sizeof}(StorageIndex) >= \textcolor{keyword}{sizeof}(\_INTEGER\_t) \&\& \textcolor{keyword}{sizeof}(StorageIndex) <= 8) \&\& \textcolor{stringliteral}{"{}Non-\/supported index type"{}});}
+\DoxyCodeLine{131       m\_iparm.\mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac21ad5f989f320e46958b75ac8d9a1da}{setZero}}();}
+\DoxyCodeLine{132       m\_msglvl = 0; \textcolor{comment}{// No output}}
+\DoxyCodeLine{133       m\_isInitialized = \textcolor{keyword}{false};}
+\DoxyCodeLine{134     \}}
+\DoxyCodeLine{135 }
+\DoxyCodeLine{136     \mbox{\hyperlink{classEigen_1_1PardisoImpl}{\string~PardisoImpl}}()}
+\DoxyCodeLine{137     \{}
+\DoxyCodeLine{138       pardisoRelease();}
+\DoxyCodeLine{139     \}}
+\DoxyCodeLine{140 }
+\DoxyCodeLine{141     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_size; \}}
+\DoxyCodeLine{142     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_size; \}}
+\DoxyCodeLine{143   }
+\DoxyCodeLine{149     \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} \mbox{\hyperlink{classEigen_1_1PardisoImpl_a7dce1175518593e33d32e30ab0ffee3b}{info}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{150 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{151       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}Decomposition is not initialized."{}});}
+\DoxyCodeLine{152       \textcolor{keywordflow}{return} m\_info;}
+\DoxyCodeLine{153     \}}
+\DoxyCodeLine{154 }
+\DoxyCodeLine{158     \mbox{\hyperlink{classEigen_1_1Array}{ParameterType}}\& \mbox{\hyperlink{classEigen_1_1PardisoImpl_a7125c32e9cd2f25dfd74f9df9f183697}{pardisoParameterArray}}()}
+\DoxyCodeLine{159     \{}
+\DoxyCodeLine{160       \textcolor{keywordflow}{return} m\_iparm;}
+\DoxyCodeLine{161     \}}
+\DoxyCodeLine{162     }
+\DoxyCodeLine{169     Derived\& \mbox{\hyperlink{classEigen_1_1PardisoImpl_af1773ce06014b55a69cd42daf34eeec4}{analyzePattern}}(\textcolor{keyword}{const} MatrixType\& matrix);}
+\DoxyCodeLine{170     }
+\DoxyCodeLine{177     Derived\& \mbox{\hyperlink{classEigen_1_1PardisoImpl_a6a4c092c5fb581a946d3c4e5ec347dfb}{factorize}}(\textcolor{keyword}{const} MatrixType\& matrix);}
+\DoxyCodeLine{178 }
+\DoxyCodeLine{179     Derived\& compute(\textcolor{keyword}{const} MatrixType\& matrix);}
+\DoxyCodeLine{180 }
+\DoxyCodeLine{181     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs,\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{182     \textcolor{keywordtype}{void} \_solve\_impl(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Rhs>}} \&b, \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Dest>}} \&dest) \textcolor{keyword}{const};}
+\DoxyCodeLine{183 }
+\DoxyCodeLine{184   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{185     \textcolor{keywordtype}{void} pardisoRelease()}
+\DoxyCodeLine{186     \{}
+\DoxyCodeLine{187       \textcolor{keywordflow}{if}(m\_isInitialized) \textcolor{comment}{// Factorization ran at least once}}
+\DoxyCodeLine{188       \{}
+\DoxyCodeLine{189         \mbox{\hyperlink{structEigen_1_1internal_1_1pardiso__run__selector}{internal::pardiso\_run\_selector<StorageIndex>::run}}(m\_pt, 1, 1, m\_type, -\/1, internal::convert\_index<StorageIndex>(m\_size),0, 0, 0, m\_perm.data(), 0,}
+\DoxyCodeLine{190                                                           m\_iparm.data(), m\_msglvl, NULL, NULL);}
+\DoxyCodeLine{191         m\_isInitialized = \textcolor{keyword}{false};}
+\DoxyCodeLine{192       \}}
+\DoxyCodeLine{193     \}}
+\DoxyCodeLine{194 }
+\DoxyCodeLine{195     \textcolor{keywordtype}{void} pardisoInit(\textcolor{keywordtype}{int} type)}
+\DoxyCodeLine{196     \{}
+\DoxyCodeLine{197       m\_type = type;}
+\DoxyCodeLine{198       \textcolor{keywordtype}{bool} symmetric = std::abs(m\_type) < 10;}
+\DoxyCodeLine{199       m\_iparm[0] = 1;   \textcolor{comment}{// No solver default}}
+\DoxyCodeLine{200       m\_iparm[1] = 2;   \textcolor{comment}{// use Metis for the ordering}}
+\DoxyCodeLine{201       m\_iparm[2] = 0;   \textcolor{comment}{// Reserved. Set to zero. (??Numbers of processors, value of OMP\_NUM\_THREADS??)}}
+\DoxyCodeLine{202       m\_iparm[3] = 0;   \textcolor{comment}{// No iterative-\/direct algorithm}}
+\DoxyCodeLine{203       m\_iparm[4] = 0;   \textcolor{comment}{// No user fill-\/in reducing permutation}}
+\DoxyCodeLine{204       m\_iparm[5] = 0;   \textcolor{comment}{// Write solution into x, b is left unchanged}}
+\DoxyCodeLine{205       m\_iparm[6] = 0;   \textcolor{comment}{// Not in use}}
+\DoxyCodeLine{206       m\_iparm[7] = 2;   \textcolor{comment}{// Max numbers of iterative refinement steps}}
+\DoxyCodeLine{207       m\_iparm[8] = 0;   \textcolor{comment}{// Not in use}}
+\DoxyCodeLine{208       m\_iparm[9] = 13;  \textcolor{comment}{// Perturb the pivot elements with 1E-\/13}}
+\DoxyCodeLine{209       m\_iparm[10] = symmetric ? 0 : 1; \textcolor{comment}{// Use nonsymmetric permutation and scaling MPS}}
+\DoxyCodeLine{210       m\_iparm[11] = 0;  \textcolor{comment}{// Not in use}}
+\DoxyCodeLine{211       m\_iparm[12] = symmetric ? 0 : 1;  \textcolor{comment}{// Maximum weighted matching algorithm is switched-\/off (default for symmetric).}}
+\DoxyCodeLine{212                                         \textcolor{comment}{// Try m\_iparm[12] = 1 in case of inappropriate accuracy}}
+\DoxyCodeLine{213       m\_iparm[13] = 0;  \textcolor{comment}{// Output: Number of perturbed pivots}}
+\DoxyCodeLine{214       m\_iparm[14] = 0;  \textcolor{comment}{// Not in use}}
+\DoxyCodeLine{215       m\_iparm[15] = 0;  \textcolor{comment}{// Not in use}}
+\DoxyCodeLine{216       m\_iparm[16] = 0;  \textcolor{comment}{// Not in use}}
+\DoxyCodeLine{217       m\_iparm[17] = -\/1; \textcolor{comment}{// Output: Number of nonzeros in the factor LU}}
+\DoxyCodeLine{218       m\_iparm[18] = -\/1; \textcolor{comment}{// Output: Mflops for LU factorization}}
+\DoxyCodeLine{219       m\_iparm[19] = 0;  \textcolor{comment}{// Output: Numbers of CG Iterations}}
+\DoxyCodeLine{220       }
+\DoxyCodeLine{221       m\_iparm[20] = 0;  \textcolor{comment}{// 1x1 pivoting}}
+\DoxyCodeLine{222       m\_iparm[26] = 0;  \textcolor{comment}{// No matrix checker}}
+\DoxyCodeLine{223       m\_iparm[27] = (\textcolor{keyword}{sizeof}(RealScalar) == 4) ? 1 : 0;}
+\DoxyCodeLine{224       m\_iparm[34] = 1;  \textcolor{comment}{// C indexing}}
+\DoxyCodeLine{225       m\_iparm[36] = 0;  \textcolor{comment}{// CSR}}
+\DoxyCodeLine{226       m\_iparm[59] = 0;  \textcolor{comment}{// 0 -\/ In-\/Core ; 1 -\/ Automatic switch between In-\/Core and Out-\/of-\/Core modes ; 2 -\/ Out-\/of-\/Core}}
+\DoxyCodeLine{227       }
+\DoxyCodeLine{228       memset(m\_pt, 0, \textcolor{keyword}{sizeof}(m\_pt));}
+\DoxyCodeLine{229     \}}
+\DoxyCodeLine{230 }
+\DoxyCodeLine{231   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{232     \textcolor{comment}{// cached data to reduce reallocation, etc.}}
+\DoxyCodeLine{233     }
+\DoxyCodeLine{234     \textcolor{keywordtype}{void} manageErrorCode(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} error)\textcolor{keyword}{ const}}
+\DoxyCodeLine{235 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{236       \textcolor{keywordflow}{switch}(error)}
+\DoxyCodeLine{237       \{}
+\DoxyCodeLine{238         \textcolor{keywordflow}{case} 0:}
+\DoxyCodeLine{239           m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}};}
+\DoxyCodeLine{240           \textcolor{keywordflow}{break};}
+\DoxyCodeLine{241         \textcolor{keywordflow}{case} -\/4:}
+\DoxyCodeLine{242         \textcolor{keywordflow}{case} -\/7:}
+\DoxyCodeLine{243           m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea1c6e20706575a629b27a105f07f1883b}{NumericalIssue}};}
+\DoxyCodeLine{244           \textcolor{keywordflow}{break};}
+\DoxyCodeLine{245         \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{246           m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea580b2a3cafe585691e789f768fb729bf}{InvalidInput}};}
+\DoxyCodeLine{247       \}}
+\DoxyCodeLine{248     \}}
+\DoxyCodeLine{249 }
+\DoxyCodeLine{250     \textcolor{keyword}{mutable} SparseMatrixType m\_matrix;}
+\DoxyCodeLine{251     \textcolor{keyword}{mutable} \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} m\_info;}
+\DoxyCodeLine{252     \textcolor{keywordtype}{bool} m\_analysisIsOk, m\_factorizationIsOk;}
+\DoxyCodeLine{253     StorageIndex m\_type, m\_msglvl;}
+\DoxyCodeLine{254     \textcolor{keyword}{mutable} \textcolor{keywordtype}{void} *m\_pt[64];}
+\DoxyCodeLine{255     \textcolor{keyword}{mutable} ParameterType m\_iparm;}
+\DoxyCodeLine{256     \textcolor{keyword}{mutable} IntColVectorType m\_perm;}
+\DoxyCodeLine{257     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m\_size;}
+\DoxyCodeLine{258     }
+\DoxyCodeLine{259 \};}
+\DoxyCodeLine{260 }
+\DoxyCodeLine{261 \textcolor{keyword}{template}<\textcolor{keyword}{class} Derived>}
+\DoxyCodeLine{262 Derived\& PardisoImpl<Derived>::compute(\textcolor{keyword}{const} MatrixType\& a)}
+\DoxyCodeLine{263 \{}
+\DoxyCodeLine{264   m\_size = a.rows();}
+\DoxyCodeLine{265   eigen\_assert(a.rows() == a.cols());}
+\DoxyCodeLine{266 }
+\DoxyCodeLine{267   pardisoRelease();}
+\DoxyCodeLine{268   m\_perm.setZero(m\_size);}
+\DoxyCodeLine{269   derived().getMatrix(a);}
+\DoxyCodeLine{270   }
+\DoxyCodeLine{271   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} error;}
+\DoxyCodeLine{272   error = internal::pardiso\_run\_selector<StorageIndex>::run(m\_pt, 1, 1, m\_type, 12, internal::convert\_index<StorageIndex>(m\_size),}
+\DoxyCodeLine{273                                                             m\_matrix.valuePtr(), m\_matrix.outerIndexPtr(), m\_matrix.innerIndexPtr(),}
+\DoxyCodeLine{274                                                             m\_perm.data(), 0, m\_iparm.data(), m\_msglvl, NULL, NULL);}
+\DoxyCodeLine{275   manageErrorCode(error);}
+\DoxyCodeLine{276   m\_analysisIsOk = \textcolor{keyword}{true};}
+\DoxyCodeLine{277   m\_factorizationIsOk = \textcolor{keyword}{true};}
+\DoxyCodeLine{278   m\_isInitialized = \textcolor{keyword}{true};}
+\DoxyCodeLine{279   \textcolor{keywordflow}{return} derived();}
+\DoxyCodeLine{280 \}}
+\DoxyCodeLine{281 }
+\DoxyCodeLine{282 \textcolor{keyword}{template}<\textcolor{keyword}{class} Derived>}
+\DoxyCodeLine{283 Derived\& \mbox{\hyperlink{classEigen_1_1PardisoImpl_af1773ce06014b55a69cd42daf34eeec4}{PardisoImpl<Derived>::analyzePattern}}(\textcolor{keyword}{const} MatrixType\& a)}
+\DoxyCodeLine{284 \{}
+\DoxyCodeLine{285   m\_size = a.rows();}
+\DoxyCodeLine{286   eigen\_assert(m\_size == a.cols());}
+\DoxyCodeLine{287 }
+\DoxyCodeLine{288   pardisoRelease();}
+\DoxyCodeLine{289   m\_perm.setZero(m\_size);}
+\DoxyCodeLine{290   derived().getMatrix(a);}
+\DoxyCodeLine{291   }
+\DoxyCodeLine{292   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} error;}
+\DoxyCodeLine{293   error = \mbox{\hyperlink{structEigen_1_1internal_1_1pardiso__run__selector}{internal::pardiso\_run\_selector<StorageIndex>::run}}(m\_pt, 1, 1, m\_type, 11, internal::convert\_index<StorageIndex>(m\_size),}
+\DoxyCodeLine{294                                                             m\_matrix.valuePtr(), m\_matrix.outerIndexPtr(), m\_matrix.innerIndexPtr(),}
+\DoxyCodeLine{295                                                             m\_perm.data(), 0, m\_iparm.data(), m\_msglvl, NULL, NULL);}
+\DoxyCodeLine{296   }
+\DoxyCodeLine{297   manageErrorCode(error);}
+\DoxyCodeLine{298   m\_analysisIsOk = \textcolor{keyword}{true};}
+\DoxyCodeLine{299   m\_factorizationIsOk = \textcolor{keyword}{false};}
+\DoxyCodeLine{300   m\_isInitialized = \textcolor{keyword}{true};}
+\DoxyCodeLine{301   \textcolor{keywordflow}{return} derived();}
+\DoxyCodeLine{302 \}}
+\DoxyCodeLine{303 }
+\DoxyCodeLine{304 \textcolor{keyword}{template}<\textcolor{keyword}{class} Derived>}
+\DoxyCodeLine{305 Derived\& \mbox{\hyperlink{classEigen_1_1PardisoImpl_a6a4c092c5fb581a946d3c4e5ec347dfb}{PardisoImpl<Derived>::factorize}}(\textcolor{keyword}{const} MatrixType\& a)}
+\DoxyCodeLine{306 \{}
+\DoxyCodeLine{307   eigen\_assert(m\_analysisIsOk \&\& \textcolor{stringliteral}{"{}You must first call analyzePattern()"{}});}
+\DoxyCodeLine{308   eigen\_assert(m\_size == a.rows() \&\& m\_size == a.cols());}
+\DoxyCodeLine{309   }
+\DoxyCodeLine{310   derived().getMatrix(a);}
+\DoxyCodeLine{311 }
+\DoxyCodeLine{312   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} error;}
+\DoxyCodeLine{313   error = \mbox{\hyperlink{structEigen_1_1internal_1_1pardiso__run__selector}{internal::pardiso\_run\_selector<StorageIndex>::run}}(m\_pt, 1, 1, m\_type, 22, internal::convert\_index<StorageIndex>(m\_size),}
+\DoxyCodeLine{314                                                             m\_matrix.valuePtr(), m\_matrix.outerIndexPtr(), m\_matrix.innerIndexPtr(),}
+\DoxyCodeLine{315                                                             m\_perm.data(), 0, m\_iparm.data(), m\_msglvl, NULL, NULL);}
+\DoxyCodeLine{316   }
+\DoxyCodeLine{317   manageErrorCode(error);}
+\DoxyCodeLine{318   m\_factorizationIsOk = \textcolor{keyword}{true};}
+\DoxyCodeLine{319   \textcolor{keywordflow}{return} derived();}
+\DoxyCodeLine{320 \}}
+\DoxyCodeLine{321 }
+\DoxyCodeLine{322 \textcolor{keyword}{template}<\textcolor{keyword}{class} Derived>}
+\DoxyCodeLine{323 \textcolor{keyword}{template}<\textcolor{keyword}{typename} BDerived,\textcolor{keyword}{typename} XDerived>}
+\DoxyCodeLine{324 \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1PardisoImpl}{PardisoImpl<Derived>::\_solve\_impl}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<BDerived>}} \&b, \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<XDerived>}}\& x)\textcolor{keyword}{ const}}
+\DoxyCodeLine{325 \textcolor{keyword}{}\{}
+\DoxyCodeLine{326   \textcolor{keywordflow}{if}(m\_iparm[0] == 0) \textcolor{comment}{// Factorization was not computed}}
+\DoxyCodeLine{327   \{}
+\DoxyCodeLine{328     m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea580b2a3cafe585691e789f768fb729bf}{InvalidInput}};}
+\DoxyCodeLine{329     \textcolor{keywordflow}{return};}
+\DoxyCodeLine{330   \}}
+\DoxyCodeLine{331 }
+\DoxyCodeLine{332   \textcolor{comment}{//Index n = m\_matrix.rows();}}
+\DoxyCodeLine{333   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nrhs = \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}(b.cols());}
+\DoxyCodeLine{334   eigen\_assert(m\_size==b.rows());}
+\DoxyCodeLine{335   eigen\_assert(((\mbox{\hyperlink{classEigen_1_1DenseBase_a318a3d7938de53dc9a353fe6ddeeef28a7392c9b2ad41ba3c16fdc5306c04d581}{MatrixBase<BDerived>::Flags}} \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) == 0 || nrhs == 1) \&\& \textcolor{stringliteral}{"{}Row-\/major right hand sides are not supported"{}});}
+\DoxyCodeLine{336   eigen\_assert(((\mbox{\hyperlink{classEigen_1_1DenseBase_a318a3d7938de53dc9a353fe6ddeeef28a7392c9b2ad41ba3c16fdc5306c04d581}{MatrixBase<XDerived>::Flags}} \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) == 0 || nrhs == 1) \&\& \textcolor{stringliteral}{"{}Row-\/major matrices of unknowns are not supported"{}});}
+\DoxyCodeLine{337   eigen\_assert(((nrhs == 1) || b.outerStride() == b.rows()));}
+\DoxyCodeLine{338 }
+\DoxyCodeLine{339 }
+\DoxyCodeLine{340 \textcolor{comment}{//  switch (transposed) \{}}
+\DoxyCodeLine{341 \textcolor{comment}{//    case SvNoTrans    : m\_iparm[11] = 0 ; break;}}
+\DoxyCodeLine{342 \textcolor{comment}{//    case SvTranspose  : m\_iparm[11] = 2 ; break;}}
+\DoxyCodeLine{343 \textcolor{comment}{//    case SvAdjoint    : m\_iparm[11] = 1 ; break;}}
+\DoxyCodeLine{344 \textcolor{comment}{//    default:}}
+\DoxyCodeLine{345 \textcolor{comment}{//      //std::cerr << "{}Eigen: transposition  option \(\backslash\)"{}"{} << transposed << "{}\(\backslash\)"{} not supported by the PARDISO backend\(\backslash\)n"{};}}
+\DoxyCodeLine{346 \textcolor{comment}{//      m\_iparm[11] = 0;}}
+\DoxyCodeLine{347 \textcolor{comment}{//  \}}}
+\DoxyCodeLine{348 }
+\DoxyCodeLine{349   Scalar* rhs\_ptr = \textcolor{keyword}{const\_cast<}Scalar*\textcolor{keyword}{>}(b.derived().data());}
+\DoxyCodeLine{350   Matrix<Scalar,Dynamic,Dynamic,ColMajor> tmp;}
+\DoxyCodeLine{351   }
+\DoxyCodeLine{352   \textcolor{comment}{// Pardiso cannot solve in-\/place}}
+\DoxyCodeLine{353   \textcolor{keywordflow}{if}(rhs\_ptr == x.derived().data())}
+\DoxyCodeLine{354   \{}
+\DoxyCodeLine{355     tmp = b;}
+\DoxyCodeLine{356     rhs\_ptr = tmp.data();}
+\DoxyCodeLine{357   \}}
+\DoxyCodeLine{358   }
+\DoxyCodeLine{359   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} error;}
+\DoxyCodeLine{360   error = internal::pardiso\_run\_selector<StorageIndex>::run(m\_pt, 1, 1, m\_type, 33, internal::convert\_index<StorageIndex>(m\_size),}
+\DoxyCodeLine{361                                                             m\_matrix.valuePtr(), m\_matrix.outerIndexPtr(), m\_matrix.innerIndexPtr(),}
+\DoxyCodeLine{362                                                             m\_perm.data(), internal::convert\_index<StorageIndex>(nrhs), m\_iparm.data(), m\_msglvl,}
+\DoxyCodeLine{363                                                             rhs\_ptr, x.derived().data());}
+\DoxyCodeLine{364 }
+\DoxyCodeLine{365   manageErrorCode(error);}
+\DoxyCodeLine{366 \}}
+\DoxyCodeLine{367 }
+\DoxyCodeLine{368 }
+\DoxyCodeLine{386 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{387 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1PardisoLU}{PardisoLU}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1PardisoImpl}{PardisoImpl}}< PardisoLU<MatrixType> >}
+\DoxyCodeLine{388 \{}
+\DoxyCodeLine{389   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{390     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1PardisoImpl}{PardisoImpl<PardisoLU>}} \mbox{\hyperlink{classEigen_1_1PardisoImpl}{Base}};}
+\DoxyCodeLine{391     \textcolor{keyword}{using} Base::pardisoInit;}
+\DoxyCodeLine{392     \textcolor{keyword}{using} Base::m\_matrix;}
+\DoxyCodeLine{393     \textcolor{keyword}{friend} \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1PardisoImpl}{PardisoImpl}}< \mbox{\hyperlink{classEigen_1_1PardisoLU}{PardisoLU}}<MatrixType> >;}
+\DoxyCodeLine{394 }
+\DoxyCodeLine{395   \textcolor{keyword}{public}:}
+\DoxyCodeLine{396 }
+\DoxyCodeLine{397     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::Scalar Scalar;}
+\DoxyCodeLine{398     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::RealScalar RealScalar;}
+\DoxyCodeLine{399 }
+\DoxyCodeLine{400     \textcolor{keyword}{using} Base::compute;}
+\DoxyCodeLine{401     \textcolor{keyword}{using} \mbox{\hyperlink{classEigen_1_1SparseSolverBase_a57c5b7f5e35274b55b5d57e8c88cc4a6}{Base::solve}};}
+\DoxyCodeLine{402 }
+\DoxyCodeLine{403     \mbox{\hyperlink{classEigen_1_1PardisoLU}{PardisoLU}}()}
+\DoxyCodeLine{404       : \mbox{\hyperlink{classEigen_1_1PardisoImpl}{Base}}()}
+\DoxyCodeLine{405     \{}
+\DoxyCodeLine{406       pardisoInit(Base::ScalarIsComplex ? 13 : 11);}
+\DoxyCodeLine{407     \}}
+\DoxyCodeLine{408 }
+\DoxyCodeLine{409     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1PardisoLU}{PardisoLU}}(\textcolor{keyword}{const} MatrixType\& matrix)}
+\DoxyCodeLine{410       : \mbox{\hyperlink{classEigen_1_1PardisoImpl}{Base}}()}
+\DoxyCodeLine{411     \{}
+\DoxyCodeLine{412       pardisoInit(Base::ScalarIsComplex ? 13 : 11);}
+\DoxyCodeLine{413       compute(matrix);}
+\DoxyCodeLine{414     \}}
+\DoxyCodeLine{415   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{416     \textcolor{keywordtype}{void} getMatrix(\textcolor{keyword}{const} MatrixType\& matrix)}
+\DoxyCodeLine{417     \{}
+\DoxyCodeLine{418       m\_matrix = matrix;}
+\DoxyCodeLine{419       m\_matrix.\mbox{\hyperlink{classEigen_1_1SparseMatrix_a6400e6e733a7131f9b776d6386d2ed89}{makeCompressed}}();}
+\DoxyCodeLine{420     \}}
+\DoxyCodeLine{421 \};}
+\DoxyCodeLine{422 }
+\DoxyCodeLine{442 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{int} UpLo\_>}
+\DoxyCodeLine{443 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1PardisoLLT}{PardisoLLT}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1PardisoImpl}{PardisoImpl}}< PardisoLLT<MatrixType,UpLo\_> >}
+\DoxyCodeLine{444 \{}
+\DoxyCodeLine{445   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{446     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1PardisoImpl}{PardisoImpl< PardisoLLT<MatrixType,UpLo\_>}} > \mbox{\hyperlink{classEigen_1_1PardisoImpl}{Base}};}
+\DoxyCodeLine{447     \textcolor{keyword}{using} Base::pardisoInit;}
+\DoxyCodeLine{448     \textcolor{keyword}{using} Base::m\_matrix;}
+\DoxyCodeLine{449     \textcolor{keyword}{friend} \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1PardisoImpl}{PardisoImpl}}< \mbox{\hyperlink{classEigen_1_1PardisoLLT}{PardisoLLT}}<MatrixType,UpLo\_> >;}
+\DoxyCodeLine{450 }
+\DoxyCodeLine{451   \textcolor{keyword}{public}:}
+\DoxyCodeLine{452 }
+\DoxyCodeLine{453     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::Scalar Scalar;}
+\DoxyCodeLine{454     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::RealScalar RealScalar;}
+\DoxyCodeLine{455     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::StorageIndex StorageIndex;}
+\DoxyCodeLine{456     \textcolor{keyword}{enum} \{ UpLo = UpLo\_ \};}
+\DoxyCodeLine{457     \textcolor{keyword}{using} Base::compute;}
+\DoxyCodeLine{458 }
+\DoxyCodeLine{459     \mbox{\hyperlink{classEigen_1_1PardisoLLT}{PardisoLLT}}()}
+\DoxyCodeLine{460       : \mbox{\hyperlink{classEigen_1_1PardisoImpl}{Base}}()}
+\DoxyCodeLine{461     \{}
+\DoxyCodeLine{462       pardisoInit(Base::ScalarIsComplex ? 4 : 2);}
+\DoxyCodeLine{463     \}}
+\DoxyCodeLine{464 }
+\DoxyCodeLine{465     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1PardisoLLT}{PardisoLLT}}(\textcolor{keyword}{const} MatrixType\& matrix)}
+\DoxyCodeLine{466       : \mbox{\hyperlink{classEigen_1_1PardisoImpl}{Base}}()}
+\DoxyCodeLine{467     \{}
+\DoxyCodeLine{468       pardisoInit(Base::ScalarIsComplex ? 4 : 2);}
+\DoxyCodeLine{469       compute(matrix);}
+\DoxyCodeLine{470     \}}
+\DoxyCodeLine{471     }
+\DoxyCodeLine{472   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{473     }
+\DoxyCodeLine{474     \textcolor{keywordtype}{void} getMatrix(\textcolor{keyword}{const} MatrixType\& matrix)}
+\DoxyCodeLine{475     \{}
+\DoxyCodeLine{476       \textcolor{comment}{// PARDISO supports only upper, row-\/major matrices}}
+\DoxyCodeLine{477       \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationMatrix<Dynamic,Dynamic,StorageIndex>}} p\_null;}
+\DoxyCodeLine{478       m\_matrix.\mbox{\hyperlink{classEigen_1_1SparseMatrix_a835ae5b304ddbb187eac25d5850b2ced}{resize}}(matrix.rows(), matrix.cols());}
+\DoxyCodeLine{479       m\_matrix.template selfadjointView<Upper>() = matrix.template selfadjointView<UpLo>().\mbox{\hyperlink{classEigen_1_1SparseMatrixBase_ad244a709f56230a8030b078a7ee889c6}{twistedBy}}(p\_null);}
+\DoxyCodeLine{480       m\_matrix.\mbox{\hyperlink{classEigen_1_1SparseMatrix_a6400e6e733a7131f9b776d6386d2ed89}{makeCompressed}}();}
+\DoxyCodeLine{481     \}}
+\DoxyCodeLine{482 \};}
+\DoxyCodeLine{483 }
+\DoxyCodeLine{505 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{int} Options>}
+\DoxyCodeLine{506 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1PardisoLDLT}{PardisoLDLT}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1PardisoImpl}{PardisoImpl}}< PardisoLDLT<MatrixType,Options> >}
+\DoxyCodeLine{507 \{}
+\DoxyCodeLine{508   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{509     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1PardisoImpl}{PardisoImpl< PardisoLDLT<MatrixType,Options>}} > \mbox{\hyperlink{classEigen_1_1PardisoImpl}{Base}};}
+\DoxyCodeLine{510     \textcolor{keyword}{using} Base::pardisoInit;}
+\DoxyCodeLine{511     \textcolor{keyword}{using} Base::m\_matrix;}
+\DoxyCodeLine{512     \textcolor{keyword}{friend} \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1PardisoImpl}{PardisoImpl}}< \mbox{\hyperlink{classEigen_1_1PardisoLDLT}{PardisoLDLT}}<MatrixType,Options> >;}
+\DoxyCodeLine{513 }
+\DoxyCodeLine{514   \textcolor{keyword}{public}:}
+\DoxyCodeLine{515 }
+\DoxyCodeLine{516     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::Scalar Scalar;}
+\DoxyCodeLine{517     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::RealScalar RealScalar;}
+\DoxyCodeLine{518     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::StorageIndex StorageIndex;}
+\DoxyCodeLine{519     \textcolor{keyword}{using} Base::compute;}
+\DoxyCodeLine{520     \textcolor{keyword}{enum} \{ UpLo = Options\&(\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}}|\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}}) \};}
+\DoxyCodeLine{521 }
+\DoxyCodeLine{522     \mbox{\hyperlink{classEigen_1_1PardisoLDLT}{PardisoLDLT}}()}
+\DoxyCodeLine{523       : \mbox{\hyperlink{classEigen_1_1PardisoImpl}{Base}}()}
+\DoxyCodeLine{524     \{}
+\DoxyCodeLine{525       pardisoInit(Base::ScalarIsComplex ? ( \textcolor{keywordtype}{bool}(Options\&\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdad5381b2d1c8973a08303c94e7da02333}{Symmetric}}) ? 6 : -\/4 ) : -\/2);}
+\DoxyCodeLine{526     \}}
+\DoxyCodeLine{527 }
+\DoxyCodeLine{528     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1PardisoLDLT}{PardisoLDLT}}(\textcolor{keyword}{const} MatrixType\& matrix)}
+\DoxyCodeLine{529       : \mbox{\hyperlink{classEigen_1_1PardisoImpl}{Base}}()}
+\DoxyCodeLine{530     \{}
+\DoxyCodeLine{531       pardisoInit(Base::ScalarIsComplex ? ( \textcolor{keywordtype}{bool}(Options\&\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdad5381b2d1c8973a08303c94e7da02333}{Symmetric}}) ? 6 : -\/4 ) : -\/2);}
+\DoxyCodeLine{532       compute(matrix);}
+\DoxyCodeLine{533     \}}
+\DoxyCodeLine{534     }
+\DoxyCodeLine{535     \textcolor{keywordtype}{void} getMatrix(\textcolor{keyword}{const} MatrixType\& matrix)}
+\DoxyCodeLine{536     \{}
+\DoxyCodeLine{537       \textcolor{comment}{// PARDISO supports only upper, row-\/major matrices}}
+\DoxyCodeLine{538       \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationMatrix<Dynamic,Dynamic,StorageIndex>}} p\_null;}
+\DoxyCodeLine{539       m\_matrix.\mbox{\hyperlink{classEigen_1_1SparseMatrix_a835ae5b304ddbb187eac25d5850b2ced}{resize}}(matrix.rows(), matrix.cols());}
+\DoxyCodeLine{540       m\_matrix.template selfadjointView<Upper>() = matrix.template selfadjointView<UpLo>().\mbox{\hyperlink{classEigen_1_1SparseMatrixBase_ad244a709f56230a8030b078a7ee889c6}{twistedBy}}(p\_null);}
+\DoxyCodeLine{541       m\_matrix.\mbox{\hyperlink{classEigen_1_1SparseMatrix_a6400e6e733a7131f9b776d6386d2ed89}{makeCompressed}}();}
+\DoxyCodeLine{542     \}}
+\DoxyCodeLine{543 \};}
+\DoxyCodeLine{544 }
+\DoxyCodeLine{545 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{546 }
+\DoxyCodeLine{547 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_PARDISOSUPPORT\_H}}
+
+\end{DoxyCode}

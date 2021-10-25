@@ -1,0 +1,174 @@
+\hypertarget{CwiseTernaryOp_8h_source}{}\doxysection{Cwise\+Ternary\+Op.\+h}
+\label{CwiseTernaryOp_8h_source}\index{include/Eigen/src/Core/CwiseTernaryOp.h@{include/Eigen/src/Core/CwiseTernaryOp.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2008-\/2014 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2006-\/2008 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{6 \textcolor{comment}{// Copyright (C) 2016 Eugene Brevdo <ebrevdo@gmail.com>}}
+\DoxyCodeLine{7 \textcolor{comment}{//}}
+\DoxyCodeLine{8 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{9 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{10 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{11 }
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#ifndef EIGEN\_CWISE\_TERNARY\_OP\_H}}
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#define EIGEN\_CWISE\_TERNARY\_OP\_H}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{20 \textcolor{keyword}{template} <\textcolor{keyword}{typename} TernaryOp, \textcolor{keyword}{typename} Arg1, \textcolor{keyword}{typename} Arg2, \textcolor{keyword}{typename} Arg3>}
+\DoxyCodeLine{21 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{classEigen_1_1CwiseTernaryOp}{CwiseTernaryOp}}<TernaryOp, Arg1, Arg2, Arg3> > \{}
+\DoxyCodeLine{22   \textcolor{comment}{// we must not inherit from traits<Arg1> since it has}}
+\DoxyCodeLine{23   \textcolor{comment}{// the potential to cause problems with MSVC}}
+\DoxyCodeLine{24   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<Arg1>::type Ancestor;}
+\DoxyCodeLine{25   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<Ancestor>::XprKind}} XprKind;}
+\DoxyCodeLine{26   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{27     RowsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<Ancestor>::RowsAtCompileTime}},}
+\DoxyCodeLine{28     ColsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<Ancestor>::ColsAtCompileTime}},}
+\DoxyCodeLine{29     MaxRowsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<Ancestor>::MaxRowsAtCompileTime}},}
+\DoxyCodeLine{30     MaxColsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<Ancestor>::MaxColsAtCompileTime}}}
+\DoxyCodeLine{31   \};}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33   \textcolor{comment}{// even though we require Arg1, Arg2, and Arg3 to have the same scalar type}}
+\DoxyCodeLine{34   \textcolor{comment}{// (see CwiseTernaryOp constructor),}}
+\DoxyCodeLine{35   \textcolor{comment}{// we still want to handle the case when the result type is different.}}
+\DoxyCodeLine{36   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1result__of}{result\_of}}<TernaryOp(}
+\DoxyCodeLine{37       \textcolor{keyword}{const} \textcolor{keyword}{typename} Arg1::Scalar\&, \textcolor{keyword}{const} \textcolor{keyword}{typename} Arg2::Scalar\&,}
+\DoxyCodeLine{38       \textcolor{keyword}{const} \textcolor{keyword}{typename} Arg3::Scalar\&)>::type Scalar;}
+\DoxyCodeLine{39 }
+\DoxyCodeLine{40   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Arg1>::StorageKind}} StorageKind;}
+\DoxyCodeLine{41   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Arg1>::StorageIndex}} StorageIndex;}
+\DoxyCodeLine{42 }
+\DoxyCodeLine{43   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Arg1::Nested Arg1Nested;}
+\DoxyCodeLine{44   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Arg2::Nested Arg2Nested;}
+\DoxyCodeLine{45   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Arg3::Nested Arg3Nested;}
+\DoxyCodeLine{46   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_reference<Arg1Nested>::type \_Arg1Nested;}
+\DoxyCodeLine{47   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_reference<Arg2Nested>::type \_Arg2Nested;}
+\DoxyCodeLine{48   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_reference<Arg3Nested>::type \_Arg3Nested;}
+\DoxyCodeLine{49   \textcolor{keyword}{enum} \{ Flags = \_Arg1Nested::Flags \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}} \};}
+\DoxyCodeLine{50 \};}
+\DoxyCodeLine{51 \}  \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{52 }
+\DoxyCodeLine{53 \textcolor{keyword}{template} <\textcolor{keyword}{typename} TernaryOp, \textcolor{keyword}{typename} Arg1, \textcolor{keyword}{typename} Arg2, \textcolor{keyword}{typename} Arg3,}
+\DoxyCodeLine{54           \textcolor{keyword}{typename} StorageKind>}
+\DoxyCodeLine{55 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1CwiseTernaryOpImpl}{CwiseTernaryOpImpl}};}
+\DoxyCodeLine{56 }
+\DoxyCodeLine{84 \textcolor{keyword}{template} <\textcolor{keyword}{typename} TernaryOp, \textcolor{keyword}{typename} Arg1Type, \textcolor{keyword}{typename} Arg2Type,}
+\DoxyCodeLine{85           \textcolor{keyword}{typename} Arg3Type>}
+\DoxyCodeLine{86 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1CwiseTernaryOp}{CwiseTernaryOp}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1CwiseTernaryOpImpl}{CwiseTernaryOpImpl}}<}
+\DoxyCodeLine{87                            TernaryOp, Arg1Type, Arg2Type, Arg3Type,}
+\DoxyCodeLine{88                            typename internal::traits<Arg1Type>::StorageKind>,}
+\DoxyCodeLine{89                        \mbox{\hyperlink{classEigen_1_1internal_1_1no__assignment__operator}{internal::no\_assignment\_operator}}}
+\DoxyCodeLine{90 \{}
+\DoxyCodeLine{91  \textcolor{keyword}{public}:}
+\DoxyCodeLine{92   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<Arg1Type>::type Arg1;}
+\DoxyCodeLine{93   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<Arg2Type>::type Arg2;}
+\DoxyCodeLine{94   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<Arg3Type>::type Arg3;}
+\DoxyCodeLine{95 }
+\DoxyCodeLine{96   \textcolor{comment}{// require the sizes to match}}
+\DoxyCodeLine{97   EIGEN\_STATIC\_ASSERT\_SAME\_MATRIX\_SIZE(Arg1, Arg2)}
+\DoxyCodeLine{98   EIGEN\_STATIC\_ASSERT\_SAME\_MATRIX\_SIZE(Arg1, Arg3)}
+\DoxyCodeLine{99 }
+\DoxyCodeLine{100   \textcolor{comment}{// The index types should match}}
+\DoxyCodeLine{101   EIGEN\_STATIC\_ASSERT((\mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{internal::is\_same}}<}
+\DoxyCodeLine{102                        \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Arg1Type>::StorageKind}},}
+\DoxyCodeLine{103                        \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Arg2Type>::StorageKind}}>::value),}
+\DoxyCodeLine{104                       STORAGE\_KIND\_MUST\_MATCH)}
+\DoxyCodeLine{105   EIGEN\_STATIC\_ASSERT((\mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{internal::is\_same}}<}
+\DoxyCodeLine{106                        \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Arg1Type>::StorageKind}},}
+\DoxyCodeLine{107                        \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Arg3Type>::StorageKind}}>::value),}
+\DoxyCodeLine{108                       STORAGE\_KIND\_MUST\_MATCH)}
+\DoxyCodeLine{109 }
+\DoxyCodeLine{110   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1CwiseTernaryOpImpl}{CwiseTernaryOpImpl}}<}
+\DoxyCodeLine{111       TernaryOp, Arg1Type, Arg2Type, Arg3Type,}
+\DoxyCodeLine{112       \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Arg1Type>::StorageKind}}>::Base \mbox{\hyperlink{classBase}{Base}};}
+\DoxyCodeLine{113   EIGEN\_GENERIC\_PUBLIC\_INTERFACE(\mbox{\hyperlink{classEigen_1_1CwiseTernaryOp}{CwiseTernaryOp}})}
+\DoxyCodeLine{114 }
+\DoxyCodeLine{115   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::ref\_selector<Arg1Type>::type}} Arg1Nested;}
+\DoxyCodeLine{116   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::ref\_selector<Arg2Type>::type}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{Arg2Nested}};}
+\DoxyCodeLine{117   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::ref\_selector<Arg3Type>::type}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{Arg3Nested}};}
+\DoxyCodeLine{118   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_reference<Arg1Nested>::type \_Arg1Nested;}
+\DoxyCodeLine{119   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_reference<Arg2Nested>::type \_Arg2Nested;}
+\DoxyCodeLine{120   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_reference<Arg3Nested>::type \_Arg3Nested;}
+\DoxyCodeLine{121 }
+\DoxyCodeLine{122   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{123   EIGEN\_STRONG\_INLINE \mbox{\hyperlink{classEigen_1_1CwiseTernaryOp}{CwiseTernaryOp}}(\textcolor{keyword}{const} Arg1\& a1, \textcolor{keyword}{const} Arg2\& a2,}
+\DoxyCodeLine{124                                      \textcolor{keyword}{const} Arg3\& a3,}
+\DoxyCodeLine{125                                      \textcolor{keyword}{const} TernaryOp\& func = TernaryOp())}
+\DoxyCodeLine{126       : m\_arg1(a1), m\_arg2(a2), m\_arg3(a3), m\_functor(func) \{}
+\DoxyCodeLine{127     eigen\_assert(a1.rows() == a2.rows() \&\& a1.cols() == a2.cols() \&\&}
+\DoxyCodeLine{128                  a1.rows() == a3.rows() \&\& a1.cols() == a3.cols());}
+\DoxyCodeLine{129   \}}
+\DoxyCodeLine{130 }
+\DoxyCodeLine{131   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{132   EIGEN\_STRONG\_INLINE \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{133     \textcolor{comment}{// return the fixed size type if available to enable compile time}}
+\DoxyCodeLine{134     \textcolor{comment}{// optimizations}}
+\DoxyCodeLine{135     \textcolor{keywordflow}{if} (\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits}}<\textcolor{keyword}{typename} internal::remove\_all<Arg1Nested>::type>::}
+\DoxyCodeLine{136                 RowsAtCompileTime == \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} \&\&}
+\DoxyCodeLine{137         \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits}}<\textcolor{keyword}{typename} internal::remove\_all<Arg2Nested>::type>::}
+\DoxyCodeLine{138                 RowsAtCompileTime == \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}})}
+\DoxyCodeLine{139       \textcolor{keywordflow}{return} m\_arg3.rows();}
+\DoxyCodeLine{140     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits}}<\textcolor{keyword}{typename} internal::remove\_all<Arg1Nested>::type>::}
+\DoxyCodeLine{141                      RowsAtCompileTime == \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} \&\&}
+\DoxyCodeLine{142              \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits}}<\textcolor{keyword}{typename} internal::remove\_all<Arg3Nested>::type>::}
+\DoxyCodeLine{143                      RowsAtCompileTime == \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}})}
+\DoxyCodeLine{144       \textcolor{keywordflow}{return} m\_arg2.rows();}
+\DoxyCodeLine{145     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{146       \textcolor{keywordflow}{return} m\_arg1.rows();}
+\DoxyCodeLine{147   \}}
+\DoxyCodeLine{148   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{149   EIGEN\_STRONG\_INLINE \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{150     \textcolor{comment}{// return the fixed size type if available to enable compile time}}
+\DoxyCodeLine{151     \textcolor{comment}{// optimizations}}
+\DoxyCodeLine{152     \textcolor{keywordflow}{if} (\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits}}<\textcolor{keyword}{typename} internal::remove\_all<Arg1Nested>::type>::}
+\DoxyCodeLine{153                 ColsAtCompileTime == \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} \&\&}
+\DoxyCodeLine{154         \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits}}<\textcolor{keyword}{typename} internal::remove\_all<Arg2Nested>::type>::}
+\DoxyCodeLine{155                 ColsAtCompileTime == \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}})}
+\DoxyCodeLine{156       \textcolor{keywordflow}{return} m\_arg3.cols();}
+\DoxyCodeLine{157     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits}}<\textcolor{keyword}{typename} internal::remove\_all<Arg1Nested>::type>::}
+\DoxyCodeLine{158                      ColsAtCompileTime == \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} \&\&}
+\DoxyCodeLine{159              \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits}}<\textcolor{keyword}{typename} internal::remove\_all<Arg3Nested>::type>::}
+\DoxyCodeLine{160                      ColsAtCompileTime == \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}})}
+\DoxyCodeLine{161       \textcolor{keywordflow}{return} m\_arg2.cols();}
+\DoxyCodeLine{162     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{163       \textcolor{keywordflow}{return} m\_arg1.cols();}
+\DoxyCodeLine{164   \}}
+\DoxyCodeLine{165 }
+\DoxyCodeLine{167   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{168   \textcolor{keyword}{const} \_Arg1Nested\& \mbox{\hyperlink{classEigen_1_1CwiseTernaryOp_a274c7a8c0b76f5b2d878c7dbd6dad75b}{arg1}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_arg1; \}}
+\DoxyCodeLine{170   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{171   \textcolor{keyword}{const} \_Arg2Nested\& \mbox{\hyperlink{classEigen_1_1CwiseTernaryOp_a45b72446b7a54ec2d50e6209d307fc9a}{arg2}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_arg2; \}}
+\DoxyCodeLine{173   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{174   \textcolor{keyword}{const} \_Arg3Nested\& \mbox{\hyperlink{classEigen_1_1CwiseTernaryOp_a5e78167a8d26ad67b2710822de40a045}{arg3}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_arg3; \}}
+\DoxyCodeLine{176   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{177   \textcolor{keyword}{const} TernaryOp\& \mbox{\hyperlink{classEigen_1_1CwiseTernaryOp_aef0716e9e3b3f58b1f549379e06823d9}{functor}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_functor; \}}
+\DoxyCodeLine{178 }
+\DoxyCodeLine{179  \textcolor{keyword}{protected}:}
+\DoxyCodeLine{180   Arg1Nested m\_arg1;}
+\DoxyCodeLine{181   Arg2Nested m\_arg2;}
+\DoxyCodeLine{182   Arg3Nested m\_arg3;}
+\DoxyCodeLine{183   \textcolor{keyword}{const} TernaryOp m\_functor;}
+\DoxyCodeLine{184 \};}
+\DoxyCodeLine{185 }
+\DoxyCodeLine{186 \textcolor{comment}{// Generic API dispatcher}}
+\DoxyCodeLine{187 \textcolor{keyword}{template} <\textcolor{keyword}{typename} TernaryOp, \textcolor{keyword}{typename} Arg1, \textcolor{keyword}{typename} Arg2, \textcolor{keyword}{typename} Arg3,}
+\DoxyCodeLine{188           \textcolor{keyword}{typename} StorageKind>}
+\DoxyCodeLine{189 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1CwiseTernaryOpImpl}{CwiseTernaryOpImpl}}}
+\DoxyCodeLine{190     : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1generic__xpr__base}{internal::generic\_xpr\_base}}<}
+\DoxyCodeLine{191           CwiseTernaryOp<TernaryOp, Arg1, Arg2, Arg3> >::type \{}
+\DoxyCodeLine{192  \textcolor{keyword}{public}:}
+\DoxyCodeLine{193   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1generic__xpr__base}{internal::generic\_xpr\_base}}<}
+\DoxyCodeLine{194       \mbox{\hyperlink{classEigen_1_1CwiseTernaryOp}{CwiseTernaryOp<TernaryOp, Arg1, Arg2, Arg3>}} >::type \mbox{\hyperlink{classBase}{Base}};}
+\DoxyCodeLine{195 \};}
+\DoxyCodeLine{196 }
+\DoxyCodeLine{197 \}  \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{198 }
+\DoxyCodeLine{199 \textcolor{preprocessor}{\#endif  }\textcolor{comment}{// EIGEN\_CWISE\_TERNARY\_OP\_H}}
+
+\end{DoxyCode}

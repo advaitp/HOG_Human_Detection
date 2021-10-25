@@ -1,0 +1,431 @@
+\hypertarget{RealSchur_8h_source}{}\doxysection{Real\+Schur.\+h}
+\label{RealSchur_8h_source}\index{include/Eigen/src/Eigenvalues/RealSchur.h@{include/Eigen/src/Eigenvalues/RealSchur.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2010,2012 Jitse Niesen <jitse@maths.leeds.ac.uk>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_REAL\_SCHUR\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_REAL\_SCHUR\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}./HessenbergDecomposition.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{19 }
+\DoxyCodeLine{56 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1RealSchur}{RealSchur}}}
+\DoxyCodeLine{57 \{}
+\DoxyCodeLine{58   \textcolor{keyword}{public}:}
+\DoxyCodeLine{59     \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{60     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{61       RowsAtCompileTime = MatrixType::RowsAtCompileTime,}
+\DoxyCodeLine{62       ColsAtCompileTime = MatrixType::ColsAtCompileTime,}
+\DoxyCodeLine{63       Options = MatrixType::Options,}
+\DoxyCodeLine{64       MaxRowsAtCompileTime = MatrixType::MaxRowsAtCompileTime,}
+\DoxyCodeLine{65       MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime}
+\DoxyCodeLine{66     \};}
+\DoxyCodeLine{67     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar Scalar;}
+\DoxyCodeLine{68     \textcolor{keyword}{typedef} std::complex<typename NumTraits<Scalar>::Real> ComplexScalar;}
+\DoxyCodeLine{69     \textcolor{keyword}{typedef} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Eigen::Index}} \mbox{\hyperlink{classEigen_1_1RealSchur_ad3a6ac65243d901525158f418c4d0582}{Index}}; }
+\DoxyCodeLine{70 }
+\DoxyCodeLine{71     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<ComplexScalar, ColsAtCompileTime, 1, Options \& \string~RowMajor, MaxColsAtCompileTime, 1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{EigenvalueType}};}
+\DoxyCodeLine{72     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar, ColsAtCompileTime, 1, Options \& \string~RowMajor, MaxColsAtCompileTime, 1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{ColumnVectorType}};}
+\DoxyCodeLine{73 }
+\DoxyCodeLine{85     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1RealSchur_a733948e4b4ef5f09cf73dc6ccc7149c6}{RealSchur}}(\mbox{\hyperlink{classEigen_1_1RealSchur_ad3a6ac65243d901525158f418c4d0582}{Index}} size = RowsAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} ? 1 : RowsAtCompileTime)}
+\DoxyCodeLine{86             : m\_matT(size, size),}
+\DoxyCodeLine{87               m\_matU(size, size),}
+\DoxyCodeLine{88               m\_workspaceVector(size),}
+\DoxyCodeLine{89               m\_hess(size),}
+\DoxyCodeLine{90               m\_isInitialized(false),}
+\DoxyCodeLine{91               m\_matUisUptodate(false),}
+\DoxyCodeLine{92               m\_maxIters(-\/1)}
+\DoxyCodeLine{93     \{ \}}
+\DoxyCodeLine{94 }
+\DoxyCodeLine{105     \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputType>}
+\DoxyCodeLine{106     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1RealSchur_a848ba492ee395686781a9edadbc8d2b7}{RealSchur}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<InputType>}}\& matrix, \textcolor{keywordtype}{bool} computeU = \textcolor{keyword}{true})}
+\DoxyCodeLine{107             : m\_matT(matrix.rows(),matrix.cols()),}
+\DoxyCodeLine{108               m\_matU(matrix.rows(),matrix.cols()),}
+\DoxyCodeLine{109               m\_workspaceVector(matrix.rows()),}
+\DoxyCodeLine{110               m\_hess(matrix.rows()),}
+\DoxyCodeLine{111               m\_isInitialized(false),}
+\DoxyCodeLine{112               m\_matUisUptodate(false),}
+\DoxyCodeLine{113               m\_maxIters(-\/1)}
+\DoxyCodeLine{114     \{}
+\DoxyCodeLine{115       \mbox{\hyperlink{classEigen_1_1RealSchur_ab6998388b5bebdb58c99bff3cce3d597}{compute}}(matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}(), computeU);}
+\DoxyCodeLine{116     \}}
+\DoxyCodeLine{117 }
+\DoxyCodeLine{129     \textcolor{keyword}{const} MatrixType\& \mbox{\hyperlink{classEigen_1_1RealSchur_a16546caa52bc43efdee71ad848ec12ee}{matrixU}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{130 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{131       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}RealSchur is not initialized."{}});}
+\DoxyCodeLine{132       eigen\_assert(m\_matUisUptodate \&\& \textcolor{stringliteral}{"{}The matrix U has not been computed during the RealSchur decomposition."{}});}
+\DoxyCodeLine{133       \textcolor{keywordflow}{return} m\_matU;}
+\DoxyCodeLine{134     \}}
+\DoxyCodeLine{135 }
+\DoxyCodeLine{146     \textcolor{keyword}{const} MatrixType\& \mbox{\hyperlink{classEigen_1_1RealSchur_aed9228e9341eac66b68f4d35c5204633}{matrixT}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{147 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{148       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}RealSchur is not initialized."{}});}
+\DoxyCodeLine{149       \textcolor{keywordflow}{return} m\_matT;}
+\DoxyCodeLine{150     \}}
+\DoxyCodeLine{151   }
+\DoxyCodeLine{171     \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputType>}
+\DoxyCodeLine{172     \mbox{\hyperlink{classEigen_1_1RealSchur}{RealSchur}}\& \mbox{\hyperlink{classEigen_1_1RealSchur_ab6998388b5bebdb58c99bff3cce3d597}{compute}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<InputType>}}\& matrix, \textcolor{keywordtype}{bool} computeU = \textcolor{keyword}{true});}
+\DoxyCodeLine{173 }
+\DoxyCodeLine{191     \textcolor{keyword}{template}<\textcolor{keyword}{typename} HessMatrixType, \textcolor{keyword}{typename} OrthMatrixType>}
+\DoxyCodeLine{192     \mbox{\hyperlink{classEigen_1_1RealSchur}{RealSchur}}\& \mbox{\hyperlink{classEigen_1_1RealSchur_ad03262c7b049c72f888b151d257c152b}{computeFromHessenberg}}(\textcolor{keyword}{const} HessMatrixType\& matrixH, \textcolor{keyword}{const} OrthMatrixType\& matrixQ,  \textcolor{keywordtype}{bool} computeU);}
+\DoxyCodeLine{197     \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} \mbox{\hyperlink{classEigen_1_1RealSchur_a2d89e0ee94baa7ebe226e68134cc36a2}{info}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{198 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{199       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}RealSchur is not initialized."{}});}
+\DoxyCodeLine{200       \textcolor{keywordflow}{return} m\_info;}
+\DoxyCodeLine{201     \}}
+\DoxyCodeLine{202 }
+\DoxyCodeLine{208     \mbox{\hyperlink{classEigen_1_1RealSchur}{RealSchur}}\& \mbox{\hyperlink{classEigen_1_1RealSchur_ac5193839d83c7c497367bb8d53a1a0df}{setMaxIterations}}(\mbox{\hyperlink{classEigen_1_1RealSchur_ad3a6ac65243d901525158f418c4d0582}{Index}} maxIters)}
+\DoxyCodeLine{209     \{}
+\DoxyCodeLine{210       m\_maxIters = maxIters;}
+\DoxyCodeLine{211       \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{212     \}}
+\DoxyCodeLine{213 }
+\DoxyCodeLine{215     \mbox{\hyperlink{classEigen_1_1RealSchur_ad3a6ac65243d901525158f418c4d0582}{Index}} \mbox{\hyperlink{classEigen_1_1RealSchur_a57eea8f6a25be4ac710097fd6cce9366}{getMaxIterations}}()}
+\DoxyCodeLine{216     \{}
+\DoxyCodeLine{217       \textcolor{keywordflow}{return} m\_maxIters;}
+\DoxyCodeLine{218     \}}
+\DoxyCodeLine{219 }
+\DoxyCodeLine{225     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} \mbox{\hyperlink{classEigen_1_1RealSchur_a96deb686155894864c9e5539c732b194}{m\_maxIterationsPerRow}} = 40;}
+\DoxyCodeLine{226 }
+\DoxyCodeLine{227   \textcolor{keyword}{private}:}
+\DoxyCodeLine{228     }
+\DoxyCodeLine{229     MatrixType m\_matT;}
+\DoxyCodeLine{230     MatrixType m\_matU;}
+\DoxyCodeLine{231     \mbox{\hyperlink{classEigen_1_1Matrix}{ColumnVectorType}} m\_workspaceVector;}
+\DoxyCodeLine{232     \mbox{\hyperlink{classEigen_1_1HessenbergDecomposition}{HessenbergDecomposition<MatrixType>}} m\_hess;}
+\DoxyCodeLine{233     \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} m\_info;}
+\DoxyCodeLine{234     \textcolor{keywordtype}{bool} m\_isInitialized;}
+\DoxyCodeLine{235     \textcolor{keywordtype}{bool} m\_matUisUptodate;}
+\DoxyCodeLine{236     \mbox{\hyperlink{classEigen_1_1RealSchur_ad3a6ac65243d901525158f418c4d0582}{Index}} m\_maxIters;}
+\DoxyCodeLine{237 }
+\DoxyCodeLine{238     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar,3,1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{Vector3s}};}
+\DoxyCodeLine{239 }
+\DoxyCodeLine{240     Scalar computeNormOfT();}
+\DoxyCodeLine{241     \mbox{\hyperlink{classEigen_1_1RealSchur_ad3a6ac65243d901525158f418c4d0582}{Index}} findSmallSubdiagEntry(\mbox{\hyperlink{classEigen_1_1RealSchur_ad3a6ac65243d901525158f418c4d0582}{Index}} iu, \textcolor{keyword}{const} Scalar\& considerAsZero);}
+\DoxyCodeLine{242     \textcolor{keywordtype}{void} splitOffTwoRows(\mbox{\hyperlink{classEigen_1_1RealSchur_ad3a6ac65243d901525158f418c4d0582}{Index}} iu, \textcolor{keywordtype}{bool} computeU, \textcolor{keyword}{const} Scalar\& exshift);}
+\DoxyCodeLine{243     \textcolor{keywordtype}{void} computeShift(\mbox{\hyperlink{classEigen_1_1RealSchur_ad3a6ac65243d901525158f418c4d0582}{Index}} iu, \mbox{\hyperlink{classEigen_1_1RealSchur_ad3a6ac65243d901525158f418c4d0582}{Index}} iter, Scalar\& exshift, \mbox{\hyperlink{classEigen_1_1Matrix}{Vector3s}}\& shiftInfo);}
+\DoxyCodeLine{244     \textcolor{keywordtype}{void} initFrancisQRStep(\mbox{\hyperlink{classEigen_1_1RealSchur_ad3a6ac65243d901525158f418c4d0582}{Index}} il, \mbox{\hyperlink{classEigen_1_1RealSchur_ad3a6ac65243d901525158f418c4d0582}{Index}} iu, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Matrix}{Vector3s}}\& shiftInfo, \mbox{\hyperlink{classEigen_1_1RealSchur_ad3a6ac65243d901525158f418c4d0582}{Index}}\& im, \mbox{\hyperlink{classEigen_1_1Matrix}{Vector3s}}\& firstHouseholderVector);}
+\DoxyCodeLine{245     \textcolor{keywordtype}{void} performFrancisQRStep(\mbox{\hyperlink{classEigen_1_1RealSchur_ad3a6ac65243d901525158f418c4d0582}{Index}} il, \mbox{\hyperlink{classEigen_1_1RealSchur_ad3a6ac65243d901525158f418c4d0582}{Index}} im, \mbox{\hyperlink{classEigen_1_1RealSchur_ad3a6ac65243d901525158f418c4d0582}{Index}} iu, \textcolor{keywordtype}{bool} computeU, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Matrix}{Vector3s}}\& firstHouseholderVector, Scalar* workspace);}
+\DoxyCodeLine{246 \};}
+\DoxyCodeLine{247 }
+\DoxyCodeLine{248 }
+\DoxyCodeLine{249 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{250 \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputType>}
+\DoxyCodeLine{251 \mbox{\hyperlink{classEigen_1_1RealSchur}{RealSchur<MatrixType>}}\& \mbox{\hyperlink{classEigen_1_1RealSchur_ab6998388b5bebdb58c99bff3cce3d597}{RealSchur<MatrixType>::compute}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<InputType>}}\& matrix, \textcolor{keywordtype}{bool} computeU)}
+\DoxyCodeLine{252 \{}
+\DoxyCodeLine{253   \textcolor{keyword}{const} Scalar considerAsZero = (std::numeric\_limits<Scalar>::min)();}
+\DoxyCodeLine{254 }
+\DoxyCodeLine{255   eigen\_assert(matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_a50c19c45f15acdfe1cb66ab5e879b8e3}{cols}}() == matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_af1d12fdb3361e150427e1fd94ebb1f14}{rows}}());}
+\DoxyCodeLine{256   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} maxIters = m\_maxIters;}
+\DoxyCodeLine{257   \textcolor{keywordflow}{if} (maxIters == -\/1)}
+\DoxyCodeLine{258     maxIters = m\_maxIterationsPerRow * matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_af1d12fdb3361e150427e1fd94ebb1f14}{rows}}();}
+\DoxyCodeLine{259 }
+\DoxyCodeLine{260   Scalar scale = matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}().cwiseAbs().maxCoeff();}
+\DoxyCodeLine{261   \textcolor{keywordflow}{if}(scale<considerAsZero)}
+\DoxyCodeLine{262   \{}
+\DoxyCodeLine{263     m\_matT.setZero(matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_af1d12fdb3361e150427e1fd94ebb1f14}{rows}}(),matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_a50c19c45f15acdfe1cb66ab5e879b8e3}{cols}}());}
+\DoxyCodeLine{264     \textcolor{keywordflow}{if}(computeU)}
+\DoxyCodeLine{265       m\_matU.setIdentity(matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_af1d12fdb3361e150427e1fd94ebb1f14}{rows}}(),matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_a50c19c45f15acdfe1cb66ab5e879b8e3}{cols}}());}
+\DoxyCodeLine{266     m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}};}
+\DoxyCodeLine{267     m\_isInitialized = \textcolor{keyword}{true};}
+\DoxyCodeLine{268     m\_matUisUptodate = computeU;}
+\DoxyCodeLine{269     \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{270   \}}
+\DoxyCodeLine{271 }
+\DoxyCodeLine{272   \textcolor{comment}{// Step 1. Reduce to Hessenberg form}}
+\DoxyCodeLine{273   m\_hess.compute(matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}()/scale);}
+\DoxyCodeLine{274 }
+\DoxyCodeLine{275   \textcolor{comment}{// Step 2. Reduce to real Schur form}}
+\DoxyCodeLine{276   \textcolor{comment}{// Note: we copy m\_hess.matrixQ() into m\_matU here and not in computeFromHessenberg}}
+\DoxyCodeLine{277   \textcolor{comment}{//       to be able to pass our working-\/space buffer for the Householder to Dense evaluation.}}
+\DoxyCodeLine{278   m\_workspaceVector.resize(matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_a50c19c45f15acdfe1cb66ab5e879b8e3}{cols}}());}
+\DoxyCodeLine{279   \textcolor{keywordflow}{if}(computeU)}
+\DoxyCodeLine{280     m\_hess.matrixQ().evalTo(m\_matU, m\_workspaceVector);}
+\DoxyCodeLine{281   computeFromHessenberg(m\_hess.matrixH(), m\_matU, computeU);}
+\DoxyCodeLine{282 }
+\DoxyCodeLine{283   m\_matT *= scale;}
+\DoxyCodeLine{284   }
+\DoxyCodeLine{285   \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{286 \}}
+\DoxyCodeLine{287 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{288 \textcolor{keyword}{template}<\textcolor{keyword}{typename} HessMatrixType, \textcolor{keyword}{typename} OrthMatrixType>}
+\DoxyCodeLine{289 RealSchur<MatrixType>\& \mbox{\hyperlink{classEigen_1_1RealSchur_ad03262c7b049c72f888b151d257c152b}{RealSchur<MatrixType>::computeFromHessenberg}}(\textcolor{keyword}{const} HessMatrixType\& matrixH, \textcolor{keyword}{const} OrthMatrixType\& matrixQ,  \textcolor{keywordtype}{bool} computeU)}
+\DoxyCodeLine{290 \{}
+\DoxyCodeLine{291   \textcolor{keyword}{using} std::abs;}
+\DoxyCodeLine{292 }
+\DoxyCodeLine{293   m\_matT = matrixH;}
+\DoxyCodeLine{294   m\_workspaceVector.resize(m\_matT.cols());}
+\DoxyCodeLine{295   \textcolor{keywordflow}{if}(computeU \&\& !internal::is\_same\_dense(m\_matU,matrixQ))}
+\DoxyCodeLine{296     m\_matU = matrixQ;}
+\DoxyCodeLine{297   }
+\DoxyCodeLine{298   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} maxIters = m\_maxIters;}
+\DoxyCodeLine{299   \textcolor{keywordflow}{if} (maxIters == -\/1)}
+\DoxyCodeLine{300     maxIters = m\_maxIterationsPerRow * matrixH.rows();}
+\DoxyCodeLine{301   Scalar* workspace = \&m\_workspaceVector.coeffRef(0);}
+\DoxyCodeLine{302 }
+\DoxyCodeLine{303   \textcolor{comment}{// The matrix m\_matT is divided in three parts. }}
+\DoxyCodeLine{304   \textcolor{comment}{// Rows 0,...,il-\/1 are decoupled from the rest because m\_matT(il,il-\/1) is zero. }}
+\DoxyCodeLine{305   \textcolor{comment}{// Rows il,...,iu is the part we are working on (the active window).}}
+\DoxyCodeLine{306   \textcolor{comment}{// Rows iu+1,...,end are already brought in triangular form.}}
+\DoxyCodeLine{307   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} iu = m\_matT.cols() -\/ 1;}
+\DoxyCodeLine{308   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} iter = 0;      \textcolor{comment}{// iteration count for current eigenvalue}}
+\DoxyCodeLine{309   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} totalIter = 0; \textcolor{comment}{// iteration count for whole matrix}}
+\DoxyCodeLine{310   Scalar exshift(0);   \textcolor{comment}{// sum of exceptional shifts}}
+\DoxyCodeLine{311   Scalar norm = computeNormOfT();}
+\DoxyCodeLine{312   \textcolor{comment}{// sub-\/diagonal entries smaller than considerAsZero will be treated as zero.}}
+\DoxyCodeLine{313   \textcolor{comment}{// We use eps\string^2 to enable more precision in small eigenvalues.}}
+\DoxyCodeLine{314   Scalar considerAsZero = numext::maxi<Scalar>( norm * numext::abs2(NumTraits<Scalar>::epsilon()),}
+\DoxyCodeLine{315                                                 (std::numeric\_limits<Scalar>::min)() );}
+\DoxyCodeLine{316 }
+\DoxyCodeLine{317   \textcolor{keywordflow}{if}(norm!=Scalar(0))}
+\DoxyCodeLine{318   \{}
+\DoxyCodeLine{319     \textcolor{keywordflow}{while} (iu >= 0)}
+\DoxyCodeLine{320     \{}
+\DoxyCodeLine{321       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} il = findSmallSubdiagEntry(iu,considerAsZero);}
+\DoxyCodeLine{322 }
+\DoxyCodeLine{323       \textcolor{comment}{// Check for convergence}}
+\DoxyCodeLine{324       \textcolor{keywordflow}{if} (il == iu) \textcolor{comment}{// One root found}}
+\DoxyCodeLine{325       \{}
+\DoxyCodeLine{326         m\_matT.coeffRef(iu,iu) = m\_matT.coeff(iu,iu) + exshift;}
+\DoxyCodeLine{327         \textcolor{keywordflow}{if} (iu > 0)}
+\DoxyCodeLine{328           m\_matT.coeffRef(iu, iu-\/1) = Scalar(0);}
+\DoxyCodeLine{329         iu-\/-\/;}
+\DoxyCodeLine{330         iter = 0;}
+\DoxyCodeLine{331       \}}
+\DoxyCodeLine{332       \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (il == iu-\/1) \textcolor{comment}{// Two roots found}}
+\DoxyCodeLine{333       \{}
+\DoxyCodeLine{334         splitOffTwoRows(iu, computeU, exshift);}
+\DoxyCodeLine{335         iu -\/= 2;}
+\DoxyCodeLine{336         iter = 0;}
+\DoxyCodeLine{337       \}}
+\DoxyCodeLine{338       \textcolor{keywordflow}{else} \textcolor{comment}{// No convergence yet}}
+\DoxyCodeLine{339       \{}
+\DoxyCodeLine{340         \textcolor{comment}{// The firstHouseholderVector vector has to be initialized to something to get rid of a silly GCC warning (-\/O1 -\/Wall -\/DNDEBUG )}}
+\DoxyCodeLine{341         Vector3s firstHouseholderVector = Vector3s::Zero(), shiftInfo;}
+\DoxyCodeLine{342         computeShift(iu, iter, exshift, shiftInfo);}
+\DoxyCodeLine{343         iter = iter + 1;}
+\DoxyCodeLine{344         totalIter = totalIter + 1;}
+\DoxyCodeLine{345         \textcolor{keywordflow}{if} (totalIter > maxIters) \textcolor{keywordflow}{break};}
+\DoxyCodeLine{346         \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} im;}
+\DoxyCodeLine{347         initFrancisQRStep(il, iu, shiftInfo, im, firstHouseholderVector);}
+\DoxyCodeLine{348         performFrancisQRStep(il, im, iu, computeU, firstHouseholderVector, workspace);}
+\DoxyCodeLine{349       \}}
+\DoxyCodeLine{350     \}}
+\DoxyCodeLine{351   \}}
+\DoxyCodeLine{352   \textcolor{keywordflow}{if}(totalIter <= maxIters)}
+\DoxyCodeLine{353     m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}};}
+\DoxyCodeLine{354   \textcolor{keywordflow}{else}}
+\DoxyCodeLine{355     m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea6a68dfb88a8336108a30588bdf356c57}{NoConvergence}};}
+\DoxyCodeLine{356 }
+\DoxyCodeLine{357   m\_isInitialized = \textcolor{keyword}{true};}
+\DoxyCodeLine{358   m\_matUisUptodate = computeU;}
+\DoxyCodeLine{359   \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{360 \}}
+\DoxyCodeLine{361 }
+\DoxyCodeLine{363 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{364 \textcolor{keyword}{inline} \textcolor{keyword}{typename} MatrixType::Scalar RealSchur<MatrixType>::computeNormOfT()}
+\DoxyCodeLine{365 \{}
+\DoxyCodeLine{366   \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size = m\_matT.cols();}
+\DoxyCodeLine{367   \textcolor{comment}{// FIXME to be efficient the following would requires a triangular reduxion code}}
+\DoxyCodeLine{368   \textcolor{comment}{// Scalar norm = m\_matT.upper().cwiseAbs().sum() }}
+\DoxyCodeLine{369   \textcolor{comment}{//               + m\_matT.bottomLeftCorner(size-\/1,size-\/1).diagonal().cwiseAbs().sum();}}
+\DoxyCodeLine{370   Scalar norm(0);}
+\DoxyCodeLine{371   \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < size; ++j)}
+\DoxyCodeLine{372     norm += m\_matT.col(j).segment(0, (std::min)(size,j+2)).cwiseAbs().sum();}
+\DoxyCodeLine{373   \textcolor{keywordflow}{return} norm;}
+\DoxyCodeLine{374 \}}
+\DoxyCodeLine{375 }
+\DoxyCodeLine{377 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{378 \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} RealSchur<MatrixType>::findSmallSubdiagEntry(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} iu, \textcolor{keyword}{const} Scalar\& considerAsZero)}
+\DoxyCodeLine{379 \{}
+\DoxyCodeLine{380   \textcolor{keyword}{using} std::abs;}
+\DoxyCodeLine{381   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} res = iu;}
+\DoxyCodeLine{382   \textcolor{keywordflow}{while} (res > 0)}
+\DoxyCodeLine{383   \{}
+\DoxyCodeLine{384     Scalar s = abs(m\_matT.coeff(res-\/1,res-\/1)) + abs(m\_matT.coeff(res,res));}
+\DoxyCodeLine{385 }
+\DoxyCodeLine{386     s = numext::maxi<Scalar>(s * NumTraits<Scalar>::epsilon(), considerAsZero);}
+\DoxyCodeLine{387     }
+\DoxyCodeLine{388     \textcolor{keywordflow}{if} (abs(m\_matT.coeff(res,res-\/1)) <= s)}
+\DoxyCodeLine{389       \textcolor{keywordflow}{break};}
+\DoxyCodeLine{390     res-\/-\/;}
+\DoxyCodeLine{391   \}}
+\DoxyCodeLine{392   \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{393 \}}
+\DoxyCodeLine{394 }
+\DoxyCodeLine{396 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{397 \textcolor{keyword}{inline} \textcolor{keywordtype}{void} RealSchur<MatrixType>::splitOffTwoRows(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} iu, \textcolor{keywordtype}{bool} computeU, \textcolor{keyword}{const} Scalar\& exshift)}
+\DoxyCodeLine{398 \{}
+\DoxyCodeLine{399   \textcolor{keyword}{using} std::sqrt;}
+\DoxyCodeLine{400   \textcolor{keyword}{using} std::abs;}
+\DoxyCodeLine{401   \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size = m\_matT.cols();}
+\DoxyCodeLine{402 }
+\DoxyCodeLine{403   \textcolor{comment}{// The eigenvalues of the 2x2 matrix [a b; c d] are }}
+\DoxyCodeLine{404   \textcolor{comment}{// trace +/-\/ sqrt(discr/4) where discr = tr\string^2 -\/ 4*det, tr = a + d, det = ad -\/ bc}}
+\DoxyCodeLine{405   Scalar p = Scalar(0.5) * (m\_matT.coeff(iu-\/1,iu-\/1) -\/ m\_matT.coeff(iu,iu));}
+\DoxyCodeLine{406   Scalar q = p * p + m\_matT.coeff(iu,iu-\/1) * m\_matT.coeff(iu-\/1,iu);   \textcolor{comment}{// q = tr\string^2 / 4 -\/ det = discr/4}}
+\DoxyCodeLine{407   m\_matT.coeffRef(iu,iu) += exshift;}
+\DoxyCodeLine{408   m\_matT.coeffRef(iu-\/1,iu-\/1) += exshift;}
+\DoxyCodeLine{409 }
+\DoxyCodeLine{410   \textcolor{keywordflow}{if} (q >= Scalar(0)) \textcolor{comment}{// Two real eigenvalues}}
+\DoxyCodeLine{411   \{}
+\DoxyCodeLine{412     Scalar z = sqrt(abs(q));}
+\DoxyCodeLine{413     JacobiRotation<Scalar> rot;}
+\DoxyCodeLine{414     \textcolor{keywordflow}{if} (p >= Scalar(0))}
+\DoxyCodeLine{415       rot.makeGivens(p + z, m\_matT.coeff(iu, iu-\/1));}
+\DoxyCodeLine{416     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{417       rot.makeGivens(p -\/ z, m\_matT.coeff(iu, iu-\/1));}
+\DoxyCodeLine{418 }
+\DoxyCodeLine{419     m\_matT.rightCols(size-\/iu+1).applyOnTheLeft(iu-\/1, iu, rot.adjoint());}
+\DoxyCodeLine{420     m\_matT.topRows(iu+1).applyOnTheRight(iu-\/1, iu, rot);}
+\DoxyCodeLine{421     m\_matT.coeffRef(iu, iu-\/1) = Scalar(0); }
+\DoxyCodeLine{422     \textcolor{keywordflow}{if} (computeU)}
+\DoxyCodeLine{423       m\_matU.applyOnTheRight(iu-\/1, iu, rot);}
+\DoxyCodeLine{424   \}}
+\DoxyCodeLine{425 }
+\DoxyCodeLine{426   \textcolor{keywordflow}{if} (iu > 1) }
+\DoxyCodeLine{427     m\_matT.coeffRef(iu-\/1, iu-\/2) = Scalar(0);}
+\DoxyCodeLine{428 \}}
+\DoxyCodeLine{429 }
+\DoxyCodeLine{431 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{432 \textcolor{keyword}{inline} \textcolor{keywordtype}{void} RealSchur<MatrixType>::computeShift(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} iu, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} iter, Scalar\& exshift, Vector3s\& shiftInfo)}
+\DoxyCodeLine{433 \{}
+\DoxyCodeLine{434   \textcolor{keyword}{using} std::sqrt;}
+\DoxyCodeLine{435   \textcolor{keyword}{using} std::abs;}
+\DoxyCodeLine{436   shiftInfo.coeffRef(0) = m\_matT.coeff(iu,iu);}
+\DoxyCodeLine{437   shiftInfo.coeffRef(1) = m\_matT.coeff(iu-\/1,iu-\/1);}
+\DoxyCodeLine{438   shiftInfo.coeffRef(2) = m\_matT.coeff(iu,iu-\/1) * m\_matT.coeff(iu-\/1,iu);}
+\DoxyCodeLine{439 }
+\DoxyCodeLine{440   \textcolor{comment}{// Wilkinson's original ad hoc shift}}
+\DoxyCodeLine{441   \textcolor{keywordflow}{if} (iter == 10)}
+\DoxyCodeLine{442   \{}
+\DoxyCodeLine{443     exshift += shiftInfo.coeff(0);}
+\DoxyCodeLine{444     \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = 0; i <= iu; ++i)}
+\DoxyCodeLine{445       m\_matT.coeffRef(i,i) -\/= shiftInfo.coeff(0);}
+\DoxyCodeLine{446     Scalar s = abs(m\_matT.coeff(iu,iu-\/1)) + abs(m\_matT.coeff(iu-\/1,iu-\/2));}
+\DoxyCodeLine{447     shiftInfo.coeffRef(0) = Scalar(0.75) * s;}
+\DoxyCodeLine{448     shiftInfo.coeffRef(1) = Scalar(0.75) * s;}
+\DoxyCodeLine{449     shiftInfo.coeffRef(2) = Scalar(-\/0.4375) * s * s;}
+\DoxyCodeLine{450   \}}
+\DoxyCodeLine{451 }
+\DoxyCodeLine{452   \textcolor{comment}{// MATLAB's new ad hoc shift}}
+\DoxyCodeLine{453   \textcolor{keywordflow}{if} (iter == 30)}
+\DoxyCodeLine{454   \{}
+\DoxyCodeLine{455     Scalar s = (shiftInfo.coeff(1) -\/ shiftInfo.coeff(0)) / Scalar(2.0);}
+\DoxyCodeLine{456     s = s * s + shiftInfo.coeff(2);}
+\DoxyCodeLine{457     \textcolor{keywordflow}{if} (s > Scalar(0))}
+\DoxyCodeLine{458     \{}
+\DoxyCodeLine{459       s = sqrt(s);}
+\DoxyCodeLine{460       \textcolor{keywordflow}{if} (shiftInfo.coeff(1) < shiftInfo.coeff(0))}
+\DoxyCodeLine{461         s = -\/s;}
+\DoxyCodeLine{462       s = s + (shiftInfo.coeff(1) -\/ shiftInfo.coeff(0)) / Scalar(2.0);}
+\DoxyCodeLine{463       s = shiftInfo.coeff(0) -\/ shiftInfo.coeff(2) / s;}
+\DoxyCodeLine{464       exshift += s;}
+\DoxyCodeLine{465       \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = 0; i <= iu; ++i)}
+\DoxyCodeLine{466         m\_matT.coeffRef(i,i) -\/= s;}
+\DoxyCodeLine{467       shiftInfo.setConstant(Scalar(0.964));}
+\DoxyCodeLine{468     \}}
+\DoxyCodeLine{469   \}}
+\DoxyCodeLine{470 \}}
+\DoxyCodeLine{471 }
+\DoxyCodeLine{473 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{474 \textcolor{keyword}{inline} \textcolor{keywordtype}{void} RealSchur<MatrixType>::initFrancisQRStep(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} il, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} iu, \textcolor{keyword}{const} Vector3s\& shiftInfo, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}\& im, Vector3s\& firstHouseholderVector)}
+\DoxyCodeLine{475 \{}
+\DoxyCodeLine{476   \textcolor{keyword}{using} std::abs;}
+\DoxyCodeLine{477   Vector3s\& v = firstHouseholderVector; \textcolor{comment}{// alias to save typing}}
+\DoxyCodeLine{478 }
+\DoxyCodeLine{479   \textcolor{keywordflow}{for} (im = iu-\/2; im >= il; -\/-\/im)}
+\DoxyCodeLine{480   \{}
+\DoxyCodeLine{481     \textcolor{keyword}{const} Scalar Tmm = m\_matT.coeff(im,im);}
+\DoxyCodeLine{482     \textcolor{keyword}{const} Scalar r = shiftInfo.coeff(0) -\/ Tmm;}
+\DoxyCodeLine{483     \textcolor{keyword}{const} Scalar s = shiftInfo.coeff(1) -\/ Tmm;}
+\DoxyCodeLine{484     v.coeffRef(0) = (r * s -\/ shiftInfo.coeff(2)) / m\_matT.coeff(im+1,im) + m\_matT.coeff(im,im+1);}
+\DoxyCodeLine{485     v.coeffRef(1) = m\_matT.coeff(im+1,im+1) -\/ Tmm -\/ r -\/ s;}
+\DoxyCodeLine{486     v.coeffRef(2) = m\_matT.coeff(im+2,im+1);}
+\DoxyCodeLine{487     \textcolor{keywordflow}{if} (im == il) \{}
+\DoxyCodeLine{488       \textcolor{keywordflow}{break};}
+\DoxyCodeLine{489     \}}
+\DoxyCodeLine{490     \textcolor{keyword}{const} Scalar lhs = m\_matT.coeff(im,im-\/1) * (abs(v.coeff(1)) + abs(v.coeff(2)));}
+\DoxyCodeLine{491     \textcolor{keyword}{const} Scalar rhs = v.coeff(0) * (abs(m\_matT.coeff(im-\/1,im-\/1)) + abs(Tmm) + abs(m\_matT.coeff(im+1,im+1)));}
+\DoxyCodeLine{492     \textcolor{keywordflow}{if} (abs(lhs) < NumTraits<Scalar>::epsilon() * rhs)}
+\DoxyCodeLine{493       \textcolor{keywordflow}{break};}
+\DoxyCodeLine{494   \}}
+\DoxyCodeLine{495 \}}
+\DoxyCodeLine{496 }
+\DoxyCodeLine{498 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{499 \textcolor{keyword}{inline} \textcolor{keywordtype}{void} RealSchur<MatrixType>::performFrancisQRStep(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} il, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} im, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} iu, \textcolor{keywordtype}{bool} computeU, \textcolor{keyword}{const} Vector3s\& firstHouseholderVector, Scalar* workspace)}
+\DoxyCodeLine{500 \{}
+\DoxyCodeLine{501   eigen\_assert(im >= il);}
+\DoxyCodeLine{502   eigen\_assert(im <= iu-\/2);}
+\DoxyCodeLine{503 }
+\DoxyCodeLine{504   \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size = m\_matT.cols();}
+\DoxyCodeLine{505 }
+\DoxyCodeLine{506   \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} k = im; k <= iu-\/2; ++k)}
+\DoxyCodeLine{507   \{}
+\DoxyCodeLine{508     \textcolor{keywordtype}{bool} firstIteration = (k == im);}
+\DoxyCodeLine{509 }
+\DoxyCodeLine{510     Vector3s v;}
+\DoxyCodeLine{511     \textcolor{keywordflow}{if} (firstIteration)}
+\DoxyCodeLine{512       v = firstHouseholderVector;}
+\DoxyCodeLine{513     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{514       v = m\_matT.template block<3,1>(k,k-\/1);}
+\DoxyCodeLine{515 }
+\DoxyCodeLine{516     Scalar tau, beta;}
+\DoxyCodeLine{517     Matrix<Scalar, 2, 1> ess;}
+\DoxyCodeLine{518     v.makeHouseholder(ess, tau, beta);}
+\DoxyCodeLine{519     }
+\DoxyCodeLine{520     \textcolor{keywordflow}{if} (beta != Scalar(0)) \textcolor{comment}{// if v is not zero}}
+\DoxyCodeLine{521     \{}
+\DoxyCodeLine{522       \textcolor{keywordflow}{if} (firstIteration \&\& k > il)}
+\DoxyCodeLine{523         m\_matT.coeffRef(k,k-\/1) = -\/m\_matT.coeff(k,k-\/1);}
+\DoxyCodeLine{524       \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (!firstIteration)}
+\DoxyCodeLine{525         m\_matT.coeffRef(k,k-\/1) = beta;}
+\DoxyCodeLine{526 }
+\DoxyCodeLine{527       \textcolor{comment}{// These Householder transformations form the O(n\string^3) part of the algorithm}}
+\DoxyCodeLine{528       m\_matT.block(k, k, 3, size-\/k).applyHouseholderOnTheLeft(ess, tau, workspace);}
+\DoxyCodeLine{529       m\_matT.block(0, k, (std::min)(iu,k+3) + 1, 3).applyHouseholderOnTheRight(ess, tau, workspace);}
+\DoxyCodeLine{530       \textcolor{keywordflow}{if} (computeU)}
+\DoxyCodeLine{531         m\_matU.block(0, k, size, 3).applyHouseholderOnTheRight(ess, tau, workspace);}
+\DoxyCodeLine{532     \}}
+\DoxyCodeLine{533   \}}
+\DoxyCodeLine{534 }
+\DoxyCodeLine{535   Matrix<Scalar, 2, 1> v = m\_matT.template block<2,1>(iu-\/1, iu-\/2);}
+\DoxyCodeLine{536   Scalar tau, beta;}
+\DoxyCodeLine{537   Matrix<Scalar, 1, 1> ess;}
+\DoxyCodeLine{538   v.makeHouseholder(ess, tau, beta);}
+\DoxyCodeLine{539 }
+\DoxyCodeLine{540   \textcolor{keywordflow}{if} (beta != Scalar(0)) \textcolor{comment}{// if v is not zero}}
+\DoxyCodeLine{541   \{}
+\DoxyCodeLine{542     m\_matT.coeffRef(iu-\/1, iu-\/2) = beta;}
+\DoxyCodeLine{543     m\_matT.block(iu-\/1, iu-\/1, 2, size-\/iu+1).applyHouseholderOnTheLeft(ess, tau, workspace);}
+\DoxyCodeLine{544     m\_matT.block(0, iu-\/1, iu+1, 2).applyHouseholderOnTheRight(ess, tau, workspace);}
+\DoxyCodeLine{545     \textcolor{keywordflow}{if} (computeU)}
+\DoxyCodeLine{546       m\_matU.block(0, iu-\/1, size, 2).applyHouseholderOnTheRight(ess, tau, workspace);}
+\DoxyCodeLine{547   \}}
+\DoxyCodeLine{548 }
+\DoxyCodeLine{549   \textcolor{comment}{// clean up pollution due to round-\/off errors}}
+\DoxyCodeLine{550   \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = im+2; i <= iu; ++i)}
+\DoxyCodeLine{551   \{}
+\DoxyCodeLine{552     m\_matT.coeffRef(i,i-\/2) = Scalar(0);}
+\DoxyCodeLine{553     \textcolor{keywordflow}{if} (i > im+2)}
+\DoxyCodeLine{554       m\_matT.coeffRef(i,i-\/3) = Scalar(0);}
+\DoxyCodeLine{555   \}}
+\DoxyCodeLine{556 \}}
+\DoxyCodeLine{557 }
+\DoxyCodeLine{558 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{559 }
+\DoxyCodeLine{560 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_REAL\_SCHUR\_H}}
+
+\end{DoxyCode}

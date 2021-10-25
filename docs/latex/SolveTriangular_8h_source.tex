@@ -1,0 +1,243 @@
+\hypertarget{SolveTriangular_8h_source}{}\doxysection{Solve\+Triangular.\+h}
+\label{SolveTriangular_8h_source}\index{include/Eigen/src/Core/SolveTriangular.h@{include/Eigen/src/Core/SolveTriangular.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2008-\/2009 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_SOLVETRIANGULAR\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_SOLVETRIANGULAR\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{comment}{// Forward declarations:}}
+\DoxyCodeLine{20 \textcolor{comment}{// The following two routines are implemented in the products/TriangularSolver*.h files}}
+\DoxyCodeLine{21 \textcolor{keyword}{template}<\textcolor{keyword}{typename} LhsScalar, \textcolor{keyword}{typename} RhsScalar, \textcolor{keyword}{typename} Index, \textcolor{keywordtype}{int} S\textcolor{keywordtype}{id}e, \textcolor{keywordtype}{int} Mode, \textcolor{keywordtype}{bool} Conjugate, \textcolor{keywordtype}{int} StorageOrder>}
+\DoxyCodeLine{22 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1triangular__solve__vector}{triangular\_solve\_vector}};}
+\DoxyCodeLine{23 }
+\DoxyCodeLine{24 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} Index, \textcolor{keywordtype}{int} S\textcolor{keywordtype}{id}e, \textcolor{keywordtype}{int} Mode, \textcolor{keywordtype}{bool} Conjugate, \textcolor{keywordtype}{int} TriStorageOrder, \textcolor{keywordtype}{int} OtherStorageOrder, \textcolor{keywordtype}{int} OtherInnerStr\textcolor{keywordtype}{id}e>}
+\DoxyCodeLine{25 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1triangular__solve__matrix}{triangular\_solve\_matrix}};}
+\DoxyCodeLine{26 }
+\DoxyCodeLine{27 \textcolor{comment}{// small helper struct extracting some traits on the underlying solver operation}}
+\DoxyCodeLine{28 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} S\textcolor{keywordtype}{id}e>}
+\DoxyCodeLine{29 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1trsolve__traits}{trsolve\_traits}}}
+\DoxyCodeLine{30 \{}
+\DoxyCodeLine{31   \textcolor{keyword}{private}:}
+\DoxyCodeLine{32     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{33       RhsIsVectorAtCompileTime = (Side==\mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba21b30a61e9cb10c967aec17567804007}{OnTheLeft}} ? Rhs::ColsAtCompileTime : Rhs::RowsAtCompileTime)==1}
+\DoxyCodeLine{34     \};}
+\DoxyCodeLine{35   \textcolor{keyword}{public}:}
+\DoxyCodeLine{36     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{37       Unrolling   = (RhsIsVectorAtCompileTime \&\& Rhs::SizeAtCompileTime != \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} \&\& Rhs::SizeAtCompileTime <= 8)}
+\DoxyCodeLine{38                   ? CompleteUnrolling : NoUnrolling,}
+\DoxyCodeLine{39       RhsVectors  = RhsIsVectorAtCompileTime ? 1 : \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}}
+\DoxyCodeLine{40     \};}
+\DoxyCodeLine{41 \};}
+\DoxyCodeLine{42 }
+\DoxyCodeLine{43 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs,}
+\DoxyCodeLine{44   \textcolor{keywordtype}{int} Side, \textcolor{comment}{// can be OnTheLeft/OnTheRight}}
+\DoxyCodeLine{45   \textcolor{keywordtype}{int} Mode, \textcolor{comment}{// can be Upper/Lower | UnitDiag}}
+\DoxyCodeLine{46   \textcolor{keywordtype}{int} Unrolling = \mbox{\hyperlink{classEigen_1_1internal_1_1trsolve__traits}{trsolve\_traits<Lhs,Rhs,Side>::Unrolling}},}
+\DoxyCodeLine{47   \textcolor{keywordtype}{int} RhsVectors = \mbox{\hyperlink{classEigen_1_1internal_1_1trsolve__traits}{trsolve\_traits<Lhs,Rhs,Side>::RhsVectors}}}
+\DoxyCodeLine{48   >}
+\DoxyCodeLine{49 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1triangular__solver__selector}{triangular\_solver\_selector}};}
+\DoxyCodeLine{50 }
+\DoxyCodeLine{51 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} S\textcolor{keywordtype}{id}e, \textcolor{keywordtype}{int} Mode>}
+\DoxyCodeLine{52 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1triangular__solver__selector}{triangular\_solver\_selector}}<Lhs,Rhs,Side,Mode,NoUnrolling,1>}
+\DoxyCodeLine{53 \{}
+\DoxyCodeLine{54   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Lhs::Scalar LhsScalar;}
+\DoxyCodeLine{55   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Rhs::Scalar RhsScalar;}
+\DoxyCodeLine{56   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits<Lhs>}} \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{LhsProductTraits}};}
+\DoxyCodeLine{57   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} LhsProductTraits::ExtractType ActualLhsType;}
+\DoxyCodeLine{58   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Map}{Map<Matrix<RhsScalar,Dynamic,1>}}, \mbox{\hyperlink{group__enums_gga45fe06e29902b7a2773de05ba27b47a1ae12d0f8f869c40c76128260af2242bc8}{Aligned}}> \mbox{\hyperlink{classEigen_1_1Map}{MappedRhs}};}
+\DoxyCodeLine{59   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{void} run(\textcolor{keyword}{const} Lhs\& lhs, Rhs\& rhs)}
+\DoxyCodeLine{60   \{}
+\DoxyCodeLine{61     ActualLhsType actualLhs = LhsProductTraits::extract(lhs);}
+\DoxyCodeLine{62 }
+\DoxyCodeLine{63     \textcolor{comment}{// FIXME find a way to allow an inner stride if packet\_traits<Scalar>::size==1}}
+\DoxyCodeLine{64 }
+\DoxyCodeLine{65     \textcolor{keywordtype}{bool} useRhsDirectly = Rhs::InnerStrideAtCompileTime==1 || rhs.innerStride()==1;}
+\DoxyCodeLine{66 }
+\DoxyCodeLine{67     ei\_declare\_aligned\_stack\_constructed\_variable(RhsScalar,actualRhs,rhs.size(),}
+\DoxyCodeLine{68                                                   (useRhsDirectly ? rhs.data() : 0));}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70     \textcolor{keywordflow}{if}(!useRhsDirectly)}
+\DoxyCodeLine{71       \mbox{\hyperlink{classEigen_1_1Map}{MappedRhs}}(actualRhs,rhs.size()) = rhs;}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73     \mbox{\hyperlink{structEigen_1_1internal_1_1triangular__solve__vector}{triangular\_solve\_vector}}<LhsScalar, RhsScalar, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}, Side, Mode, LhsProductTraits::NeedToConjugate,}
+\DoxyCodeLine{74                             (int(Lhs::Flags) \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) ? \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}} : \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}>}
+\DoxyCodeLine{75       ::run(actualLhs.cols(), actualLhs.data(), actualLhs.outerStride(), actualRhs);}
+\DoxyCodeLine{76 }
+\DoxyCodeLine{77     \textcolor{keywordflow}{if}(!useRhsDirectly)}
+\DoxyCodeLine{78       rhs = \mbox{\hyperlink{classEigen_1_1Map}{MappedRhs}}(actualRhs, rhs.size());}
+\DoxyCodeLine{79   \}}
+\DoxyCodeLine{80 \};}
+\DoxyCodeLine{81 }
+\DoxyCodeLine{82 \textcolor{comment}{// the rhs is a matrix}}
+\DoxyCodeLine{83 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} S\textcolor{keywordtype}{id}e, \textcolor{keywordtype}{int} Mode>}
+\DoxyCodeLine{84 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1triangular__solver__selector}{triangular\_solver\_selector}}<Lhs,Rhs,Side,Mode,NoUnrolling,\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}>}
+\DoxyCodeLine{85 \{}
+\DoxyCodeLine{86   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Rhs::Scalar Scalar;}
+\DoxyCodeLine{87   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{blas\_traits<Lhs>}} \mbox{\hyperlink{structEigen_1_1internal_1_1blas__traits}{LhsProductTraits}};}
+\DoxyCodeLine{88   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{LhsProductTraits::DirectLinearAccessType}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{ActualLhsType}};}
+\DoxyCodeLine{89 }
+\DoxyCodeLine{90   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{void} run(\textcolor{keyword}{const} Lhs\& lhs, Rhs\& rhs)}
+\DoxyCodeLine{91   \{}
+\DoxyCodeLine{92     \textcolor{keyword}{typename} internal::add\_const\_on\_value\_type<ActualLhsType>::type actualLhs = LhsProductTraits::extract(lhs);}
+\DoxyCodeLine{93 }
+\DoxyCodeLine{94     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size = lhs.rows();}
+\DoxyCodeLine{95     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} othersize = Side==\mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba21b30a61e9cb10c967aec17567804007}{OnTheLeft}}? rhs.cols() : rhs.rows();}
+\DoxyCodeLine{96 }
+\DoxyCodeLine{97     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1internal_1_1gemm__blocking__space}{internal::gemm\_blocking\_space}}<(Rhs::Flags\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) ? \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}} : \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}},Scalar,Scalar,}
+\DoxyCodeLine{98               Rhs::MaxRowsAtCompileTime, Rhs::MaxColsAtCompileTime, Lhs::MaxRowsAtCompileTime,4> BlockingType;}
+\DoxyCodeLine{99 }
+\DoxyCodeLine{100     BlockingType blocking(rhs.rows(), rhs.cols(), size, 1, \textcolor{keyword}{false});}
+\DoxyCodeLine{101 }
+\DoxyCodeLine{102     \mbox{\hyperlink{structEigen_1_1internal_1_1triangular__solve__matrix}{triangular\_solve\_matrix}}<Scalar,\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}},Side,Mode,LhsProductTraits::NeedToConjugate,(int(Lhs::Flags) \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) ? \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}} : \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}},}
+\DoxyCodeLine{103                                (Rhs::Flags\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) ? \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}} : \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}, Rhs::InnerStrideAtCompileTime>}
+\DoxyCodeLine{104       ::run(size, othersize, \&actualLhs.coeffRef(0,0), actualLhs.outerStride(), \&rhs.coeffRef(0,0), rhs.innerStride(), rhs.outerStride(), blocking);}
+\DoxyCodeLine{105   \}}
+\DoxyCodeLine{106 \};}
+\DoxyCodeLine{107 }
+\DoxyCodeLine{108 \textcolor{comment}{/***************************************************************************}}
+\DoxyCodeLine{109 \textcolor{comment}{* meta-\/unrolling implementation}}
+\DoxyCodeLine{110 \textcolor{comment}{***************************************************************************/}}
+\DoxyCodeLine{111 }
+\DoxyCodeLine{112 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} Mode, \textcolor{keywordtype}{int} LoopIndex, \textcolor{keywordtype}{int} Size,}
+\DoxyCodeLine{113          \textcolor{keywordtype}{bool} Stop = LoopIndex==Size>}
+\DoxyCodeLine{114 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1triangular__solver__unroller}{triangular\_solver\_unroller}};}
+\DoxyCodeLine{115 }
+\DoxyCodeLine{116 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} Mode, \textcolor{keywordtype}{int} LoopIndex, \textcolor{keywordtype}{int} Size>}
+\DoxyCodeLine{117 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1triangular__solver__unroller}{triangular\_solver\_unroller}}<Lhs,Rhs,Mode,LoopIndex,Size,false> \{}
+\DoxyCodeLine{118   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{119     IsLower = ((Mode\&\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}})==\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}}),}
+\DoxyCodeLine{120     DiagIndex  = IsLower ? LoopIndex : Size -\/ LoopIndex -\/ 1,}
+\DoxyCodeLine{121     StartIndex = IsLower ? 0         : DiagIndex+1}
+\DoxyCodeLine{122   \};}
+\DoxyCodeLine{123   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{void} run(\textcolor{keyword}{const} Lhs\& lhs, Rhs\& rhs)}
+\DoxyCodeLine{124   \{}
+\DoxyCodeLine{125     \textcolor{keywordflow}{if} (LoopIndex>0)}
+\DoxyCodeLine{126       rhs.coeffRef(DiagIndex) -\/= lhs.row(DiagIndex).template segment<LoopIndex>(StartIndex).transpose()}
+\DoxyCodeLine{127                                 .cwiseProduct(rhs.template segment<LoopIndex>(StartIndex)).sum();}
+\DoxyCodeLine{128 }
+\DoxyCodeLine{129     \textcolor{keywordflow}{if}(!(Mode \& \mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cda2ef430bff6cc12c2d1e0ef01b95f7ff3}{UnitDiag}}))}
+\DoxyCodeLine{130       rhs.coeffRef(DiagIndex) /= lhs.coeff(DiagIndex,DiagIndex);}
+\DoxyCodeLine{131 }
+\DoxyCodeLine{132     \mbox{\hyperlink{structEigen_1_1internal_1_1triangular__solver__unroller}{triangular\_solver\_unroller<Lhs,Rhs,Mode,LoopIndex+1,Size>::run}}(lhs,rhs);}
+\DoxyCodeLine{133   \}}
+\DoxyCodeLine{134 \};}
+\DoxyCodeLine{135 }
+\DoxyCodeLine{136 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} Mode, \textcolor{keywordtype}{int} LoopIndex, \textcolor{keywordtype}{int} Size>}
+\DoxyCodeLine{137 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1triangular__solver__unroller}{triangular\_solver\_unroller}}<Lhs,Rhs,Mode,LoopIndex,Size,true> \{}
+\DoxyCodeLine{138   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{void} run(\textcolor{keyword}{const} Lhs\&, Rhs\&) \{\}}
+\DoxyCodeLine{139 \};}
+\DoxyCodeLine{140 }
+\DoxyCodeLine{141 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} Mode>}
+\DoxyCodeLine{142 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1triangular__solver__selector}{triangular\_solver\_selector}}<Lhs,Rhs,\mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba21b30a61e9cb10c967aec17567804007}{OnTheLeft}},Mode,CompleteUnrolling,1> \{}
+\DoxyCodeLine{143   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{void} run(\textcolor{keyword}{const} Lhs\& lhs, Rhs\& rhs)}
+\DoxyCodeLine{144   \{ \mbox{\hyperlink{structEigen_1_1internal_1_1triangular__solver__unroller}{triangular\_solver\_unroller<Lhs,Rhs,Mode,0,Rhs::SizeAtCompileTime>::run}}(lhs,rhs); \}}
+\DoxyCodeLine{145 \};}
+\DoxyCodeLine{146 }
+\DoxyCodeLine{147 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} Mode>}
+\DoxyCodeLine{148 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1triangular__solver__selector}{triangular\_solver\_selector}}<Lhs,Rhs,\mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba329fc3a54ceb2b6e0e73b400998b8a82}{OnTheRight}},Mode,CompleteUnrolling,1> \{}
+\DoxyCodeLine{149   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{void} run(\textcolor{keyword}{const} Lhs\& lhs, Rhs\& rhs)}
+\DoxyCodeLine{150   \{}
+\DoxyCodeLine{151     \mbox{\hyperlink{classEigen_1_1Transpose}{Transpose<const Lhs>}} trLhs(lhs);}
+\DoxyCodeLine{152     \mbox{\hyperlink{classEigen_1_1Transpose}{Transpose<Rhs>}} trRhs(rhs);}
+\DoxyCodeLine{153 }
+\DoxyCodeLine{154     \mbox{\hyperlink{structEigen_1_1internal_1_1triangular__solver__unroller}{triangular\_solver\_unroller<Transpose<const Lhs>}},\mbox{\hyperlink{classEigen_1_1Transpose}{Transpose<Rhs>}},}
+\DoxyCodeLine{155                               ((Mode\&\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}})==\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}} ? \mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}} : \mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}}) | (Mode\&\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cda2ef430bff6cc12c2d1e0ef01b95f7ff3}{UnitDiag}}),}
+\DoxyCodeLine{156                               0,Rhs::SizeAtCompileTime>::run(trLhs,trRhs);}
+\DoxyCodeLine{157   \}}
+\DoxyCodeLine{158 \};}
+\DoxyCodeLine{159 }
+\DoxyCodeLine{160 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{161 }
+\DoxyCodeLine{162 \textcolor{comment}{/***************************************************************************}}
+\DoxyCodeLine{163 \textcolor{comment}{* TriangularView methods}}
+\DoxyCodeLine{164 \textcolor{comment}{***************************************************************************/}}
+\DoxyCodeLine{165 }
+\DoxyCodeLine{166 \textcolor{preprocessor}{\#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{167 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} Mode>}
+\DoxyCodeLine{168 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} S\textcolor{keywordtype}{id}e, \textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{169 EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1TriangularViewImpl}{TriangularViewImpl<MatrixType,Mode,Dense>::solveInPlace}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<OtherDerived>}}\& \_other)\textcolor{keyword}{ const}}
+\DoxyCodeLine{170 \textcolor{keyword}{}\{}
+\DoxyCodeLine{171   OtherDerived\& other = \_other.const\_cast\_derived();}
+\DoxyCodeLine{172   eigen\_assert( derived().cols() == derived().rows() \&\& ((Side==\mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba21b30a61e9cb10c967aec17567804007}{OnTheLeft}} \&\& derived().cols() == other.rows()) || (Side==\mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba329fc3a54ceb2b6e0e73b400998b8a82}{OnTheRight}} \&\& derived().cols() == other.cols())) );}
+\DoxyCodeLine{173   eigen\_assert((!(\textcolor{keywordtype}{int}(Mode) \& \textcolor{keywordtype}{int}(\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdac4dc554a61510151ddd5bafaf6040223}{ZeroDiag}}))) \&\& \textcolor{keywordtype}{bool}(\textcolor{keywordtype}{int}(Mode) \& (\textcolor{keywordtype}{int}(\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}}) | \textcolor{keywordtype}{int}(\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}}))));}
+\DoxyCodeLine{174   \textcolor{comment}{// If solving for a 0x0 matrix, nothing to do, simply return.}}
+\DoxyCodeLine{175   \textcolor{keywordflow}{if} (derived().cols() == 0)}
+\DoxyCodeLine{176     \textcolor{keywordflow}{return};}
+\DoxyCodeLine{177 }
+\DoxyCodeLine{178   \textcolor{keyword}{enum} \{ copy = (\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<OtherDerived>::Flags}} \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})  \&\& OtherDerived::IsVectorAtCompileTime \&\& OtherDerived::SizeAtCompileTime!=1\};}
+\DoxyCodeLine{179   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::conditional<copy,}
+\DoxyCodeLine{180     \textcolor{keyword}{typename} internal::plain\_matrix\_type\_column\_major<OtherDerived>::type, OtherDerived\&>::type OtherCopy;}
+\DoxyCodeLine{181   OtherCopy otherCopy(other);}
+\DoxyCodeLine{182 }
+\DoxyCodeLine{183   internal::triangular\_solver\_selector<MatrixType, typename internal::remove\_reference<OtherCopy>::type,}
+\DoxyCodeLine{184     Side, Mode>::run(derived().nestedExpression(), otherCopy);}
+\DoxyCodeLine{185 }
+\DoxyCodeLine{186   \textcolor{keywordflow}{if} (copy)}
+\DoxyCodeLine{187     other = otherCopy;}
+\DoxyCodeLine{188 \}}
+\DoxyCodeLine{189 }
+\DoxyCodeLine{190 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} Mode>}
+\DoxyCodeLine{191 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} S\textcolor{keywordtype}{id}e, \textcolor{keyword}{typename} Other>}
+\DoxyCodeLine{192 \textcolor{keyword}{const} internal::triangular\_solve\_retval<Side,TriangularView<Derived,Mode>,Other>}
+\DoxyCodeLine{193 TriangularViewImpl<Derived,Mode,Dense>::solve(\textcolor{keyword}{const} MatrixBase<Other>\& other)\textcolor{keyword}{ const}}
+\DoxyCodeLine{194 \textcolor{keyword}{}\{}
+\DoxyCodeLine{195   \textcolor{keywordflow}{return} internal::triangular\_solve\_retval<Side,TriangularViewType,Other>(derived(), other.derived());}
+\DoxyCodeLine{196 \}}
+\DoxyCodeLine{197 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{198 }
+\DoxyCodeLine{199 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{200 }
+\DoxyCodeLine{201 }
+\DoxyCodeLine{202 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} S\textcolor{keywordtype}{id}e, \textcolor{keyword}{typename} TriangularType, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{203 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{structEigen_1_1internal_1_1triangular__solve__retval}{triangular\_solve\_retval}}<Side, TriangularType, Rhs> >}
+\DoxyCodeLine{204 \{}
+\DoxyCodeLine{205   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Matrix}{internal::plain\_matrix\_type\_column\_major<Rhs>::type}} \mbox{\hyperlink{classEigen_1_1Matrix}{ReturnType}};}
+\DoxyCodeLine{206 \};}
+\DoxyCodeLine{207 }
+\DoxyCodeLine{208 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} S\textcolor{keywordtype}{id}e, \textcolor{keyword}{typename} TriangularType, \textcolor{keyword}{typename} Rhs> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1triangular__solve__retval}{triangular\_solve\_retval}}}
+\DoxyCodeLine{209  : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1ReturnByValue}{ReturnByValue}}<triangular\_solve\_retval<Side, TriangularType, Rhs> >}
+\DoxyCodeLine{210 \{}
+\DoxyCodeLine{211   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<typename Rhs::Nested>::type RhsNestedCleaned;}
+\DoxyCodeLine{212   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1ReturnByValue}{ReturnByValue<triangular\_solve\_retval>}} \mbox{\hyperlink{classEigen_1_1ReturnByValue}{Base}};}
+\DoxyCodeLine{213 }
+\DoxyCodeLine{214   \mbox{\hyperlink{structEigen_1_1internal_1_1triangular__solve__retval}{triangular\_solve\_retval}}(\textcolor{keyword}{const} TriangularType\& tri, \textcolor{keyword}{const} Rhs\& rhs)}
+\DoxyCodeLine{215     : m\_triangularMatrix(tri), m\_rhs(rhs)}
+\DoxyCodeLine{216   \{\}}
+\DoxyCodeLine{217 }
+\DoxyCodeLine{218   \textcolor{keyword}{inline} EIGEN\_CONSTEXPR \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_rhs.rows(); \}}
+\DoxyCodeLine{219   \textcolor{keyword}{inline} EIGEN\_CONSTEXPR \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_rhs.cols(); \}}
+\DoxyCodeLine{220 }
+\DoxyCodeLine{221   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest> \textcolor{keyword}{inline} \textcolor{keywordtype}{void} evalTo(Dest\& dst)\textcolor{keyword}{ const}}
+\DoxyCodeLine{222 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{223     \textcolor{keywordflow}{if}(!is\_same\_dense(dst,m\_rhs))}
+\DoxyCodeLine{224       dst = m\_rhs;}
+\DoxyCodeLine{225     m\_triangularMatrix.template solveInPlace<Side>(dst);}
+\DoxyCodeLine{226   \}}
+\DoxyCodeLine{227 }
+\DoxyCodeLine{228   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{229     \textcolor{keyword}{const} TriangularType\& m\_triangularMatrix;}
+\DoxyCodeLine{230     \textcolor{keyword}{typename} Rhs::Nested m\_rhs;}
+\DoxyCodeLine{231 \};}
+\DoxyCodeLine{232 }
+\DoxyCodeLine{233 \} \textcolor{comment}{// namespace internal}}
+\DoxyCodeLine{234 }
+\DoxyCodeLine{235 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{236 }
+\DoxyCodeLine{237 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_SOLVETRIANGULAR\_H}}
+
+\end{DoxyCode}

@@ -1,0 +1,145 @@
+\hypertarget{MKL__support_8h_source}{}\doxysection{MKL\+\_\+support.\+h}
+\label{MKL__support_8h_source}\index{include/Eigen/src/Core/util/MKL\_support.h@{include/Eigen/src/Core/util/MKL\_support.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{/*}}
+\DoxyCodeLine{2 \textcolor{comment}{ Copyright (c) 2011, Intel Corporation. All rights reserved.}}
+\DoxyCodeLine{3 \textcolor{comment}{}}
+\DoxyCodeLine{4 \textcolor{comment}{ Redistribution and use in source and binary forms, with or without modification,}}
+\DoxyCodeLine{5 \textcolor{comment}{ are permitted provided that the following conditions are met:}}
+\DoxyCodeLine{6 \textcolor{comment}{}}
+\DoxyCodeLine{7 \textcolor{comment}{ * Redistributions of source code must retain the above copyright notice, this}}
+\DoxyCodeLine{8 \textcolor{comment}{   list of conditions and the following disclaimer.}}
+\DoxyCodeLine{9 \textcolor{comment}{ * Redistributions in binary form must reproduce the above copyright notice,}}
+\DoxyCodeLine{10 \textcolor{comment}{   this list of conditions and the following disclaimer in the documentation}}
+\DoxyCodeLine{11 \textcolor{comment}{   and/or other materials provided with the distribution.}}
+\DoxyCodeLine{12 \textcolor{comment}{ * Neither the name of Intel Corporation nor the names of its contributors may}}
+\DoxyCodeLine{13 \textcolor{comment}{   be used to endorse or promote products derived from this software without}}
+\DoxyCodeLine{14 \textcolor{comment}{   specific prior written permission.}}
+\DoxyCodeLine{15 \textcolor{comment}{}}
+\DoxyCodeLine{16 \textcolor{comment}{ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "{}AS IS"{} AND}}
+\DoxyCodeLine{17 \textcolor{comment}{ ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED}}
+\DoxyCodeLine{18 \textcolor{comment}{ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE}}
+\DoxyCodeLine{19 \textcolor{comment}{ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR}}
+\DoxyCodeLine{20 \textcolor{comment}{ ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES}}
+\DoxyCodeLine{21 \textcolor{comment}{ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;}}
+\DoxyCodeLine{22 \textcolor{comment}{ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON}}
+\DoxyCodeLine{23 \textcolor{comment}{ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT}}
+\DoxyCodeLine{24 \textcolor{comment}{ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS}}
+\DoxyCodeLine{25 \textcolor{comment}{ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.}}
+\DoxyCodeLine{26 \textcolor{comment}{}}
+\DoxyCodeLine{27 \textcolor{comment}{ ********************************************************************************}}
+\DoxyCodeLine{28 \textcolor{comment}{ *   Content : Eigen bindings to Intel(R) MKL}}
+\DoxyCodeLine{29 \textcolor{comment}{ *   Include file with common MKL declarations}}
+\DoxyCodeLine{30 \textcolor{comment}{ ********************************************************************************}}
+\DoxyCodeLine{31 \textcolor{comment}{*/}}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33 \textcolor{preprocessor}{\#ifndef EIGEN\_MKL\_SUPPORT\_H}}
+\DoxyCodeLine{34 \textcolor{preprocessor}{\#define EIGEN\_MKL\_SUPPORT\_H}}
+\DoxyCodeLine{35 }
+\DoxyCodeLine{36 \textcolor{preprocessor}{\#ifdef EIGEN\_USE\_MKL\_ALL}}
+\DoxyCodeLine{37 \textcolor{preprocessor}{  \#ifndef EIGEN\_USE\_BLAS}}
+\DoxyCodeLine{38 \textcolor{preprocessor}{    \#define EIGEN\_USE\_BLAS}}
+\DoxyCodeLine{39 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{40 \textcolor{preprocessor}{  \#ifndef EIGEN\_USE\_LAPACKE}}
+\DoxyCodeLine{41 \textcolor{preprocessor}{    \#define EIGEN\_USE\_LAPACKE}}
+\DoxyCodeLine{42 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{43 \textcolor{preprocessor}{  \#ifndef EIGEN\_USE\_MKL\_VML}}
+\DoxyCodeLine{44 \textcolor{preprocessor}{    \#define EIGEN\_USE\_MKL\_VML}}
+\DoxyCodeLine{45 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{46 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48 \textcolor{preprocessor}{\#ifdef EIGEN\_USE\_LAPACKE\_STRICT}}
+\DoxyCodeLine{49 \textcolor{preprocessor}{  \#define EIGEN\_USE\_LAPACKE}}
+\DoxyCodeLine{50 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{51 }
+\DoxyCodeLine{52 \textcolor{preprocessor}{\#if defined(EIGEN\_USE\_MKL\_VML) \&\& !defined(EIGEN\_USE\_MKL)}}
+\DoxyCodeLine{53 \textcolor{preprocessor}{  \#define EIGEN\_USE\_MKL}}
+\DoxyCodeLine{54 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{55 }
+\DoxyCodeLine{56 }
+\DoxyCodeLine{57 \textcolor{preprocessor}{\#if defined EIGEN\_USE\_MKL}}
+\DoxyCodeLine{58 \textcolor{preprocessor}{\#   if (!defined MKL\_DIRECT\_CALL) \&\& (!defined EIGEN\_MKL\_NO\_DIRECT\_CALL)}}
+\DoxyCodeLine{59 \textcolor{preprocessor}{\#       define MKL\_DIRECT\_CALL}}
+\DoxyCodeLine{60 \textcolor{preprocessor}{\#       define MKL\_DIRECT\_CALL\_JUST\_SET}}
+\DoxyCodeLine{61 \textcolor{preprocessor}{\#   endif}}
+\DoxyCodeLine{62 \textcolor{preprocessor}{\#   include <mkl.h>}}
+\DoxyCodeLine{63 \textcolor{comment}{/*Check IMKL version for compatibility: < 10.3 is not usable with Eigen*/}}
+\DoxyCodeLine{64 \textcolor{preprocessor}{\#   ifndef INTEL\_MKL\_VERSION}}
+\DoxyCodeLine{65 \textcolor{preprocessor}{\#       undef EIGEN\_USE\_MKL }\textcolor{comment}{/* INTEL\_MKL\_VERSION is not even defined on older versions */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{66 \textcolor{preprocessor}{\#   elif INTEL\_MKL\_VERSION < 100305    }\textcolor{comment}{/* the intel-\/mkl-\/103-\/release-\/notes say this was when the lapacke.h interface was added*/}\textcolor{preprocessor}{}}
+\DoxyCodeLine{67 \textcolor{preprocessor}{\#       undef EIGEN\_USE\_MKL}}
+\DoxyCodeLine{68 \textcolor{preprocessor}{\#   endif}}
+\DoxyCodeLine{69 \textcolor{preprocessor}{\#   ifndef EIGEN\_USE\_MKL}}
+\DoxyCodeLine{70     \textcolor{comment}{/*If the MKL version is too old, undef everything*/}}
+\DoxyCodeLine{71 \textcolor{preprocessor}{\#       undef   EIGEN\_USE\_MKL\_ALL}}
+\DoxyCodeLine{72 \textcolor{preprocessor}{\#       undef   EIGEN\_USE\_LAPACKE}}
+\DoxyCodeLine{73 \textcolor{preprocessor}{\#       undef   EIGEN\_USE\_MKL\_VML}}
+\DoxyCodeLine{74 \textcolor{preprocessor}{\#       undef   EIGEN\_USE\_LAPACKE\_STRICT}}
+\DoxyCodeLine{75 \textcolor{preprocessor}{\#       undef   EIGEN\_USE\_LAPACKE}}
+\DoxyCodeLine{76 \textcolor{preprocessor}{\#       ifdef   MKL\_DIRECT\_CALL\_JUST\_SET}}
+\DoxyCodeLine{77 \textcolor{preprocessor}{\#           undef MKL\_DIRECT\_CALL}}
+\DoxyCodeLine{78 \textcolor{preprocessor}{\#       endif}}
+\DoxyCodeLine{79 \textcolor{preprocessor}{\#   endif}}
+\DoxyCodeLine{80 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{81 }
+\DoxyCodeLine{82 \textcolor{preprocessor}{\#if defined EIGEN\_USE\_MKL}}
+\DoxyCodeLine{83 }
+\DoxyCodeLine{84 \textcolor{preprocessor}{\#define EIGEN\_MKL\_VML\_THRESHOLD 128}}
+\DoxyCodeLine{85 }
+\DoxyCodeLine{86 \textcolor{comment}{/* MKL\_DOMAIN\_BLAS, etc are defined only in 10.3 update 7 */}}
+\DoxyCodeLine{87 \textcolor{comment}{/* MKL\_BLAS, etc are not defined in 11.2 */}}
+\DoxyCodeLine{88 \textcolor{preprocessor}{\#ifdef MKL\_DOMAIN\_ALL}}
+\DoxyCodeLine{89 \textcolor{preprocessor}{\#define EIGEN\_MKL\_DOMAIN\_ALL MKL\_DOMAIN\_ALL}}
+\DoxyCodeLine{90 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{91 \textcolor{preprocessor}{\#define EIGEN\_MKL\_DOMAIN\_ALL MKL\_ALL}}
+\DoxyCodeLine{92 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{93 }
+\DoxyCodeLine{94 \textcolor{preprocessor}{\#ifdef MKL\_DOMAIN\_BLAS}}
+\DoxyCodeLine{95 \textcolor{preprocessor}{\#define EIGEN\_MKL\_DOMAIN\_BLAS MKL\_DOMAIN\_BLAS}}
+\DoxyCodeLine{96 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{97 \textcolor{preprocessor}{\#define EIGEN\_MKL\_DOMAIN\_BLAS MKL\_BLAS}}
+\DoxyCodeLine{98 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{99 }
+\DoxyCodeLine{100 \textcolor{preprocessor}{\#ifdef MKL\_DOMAIN\_FFT}}
+\DoxyCodeLine{101 \textcolor{preprocessor}{\#define EIGEN\_MKL\_DOMAIN\_FFT MKL\_DOMAIN\_FFT}}
+\DoxyCodeLine{102 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{103 \textcolor{preprocessor}{\#define EIGEN\_MKL\_DOMAIN\_FFT MKL\_FFT}}
+\DoxyCodeLine{104 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{105 }
+\DoxyCodeLine{106 \textcolor{preprocessor}{\#ifdef MKL\_DOMAIN\_VML}}
+\DoxyCodeLine{107 \textcolor{preprocessor}{\#define EIGEN\_MKL\_DOMAIN\_VML MKL\_DOMAIN\_VML}}
+\DoxyCodeLine{108 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{109 \textcolor{preprocessor}{\#define EIGEN\_MKL\_DOMAIN\_VML MKL\_VML}}
+\DoxyCodeLine{110 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{111 }
+\DoxyCodeLine{112 \textcolor{preprocessor}{\#ifdef MKL\_DOMAIN\_PARDISO}}
+\DoxyCodeLine{113 \textcolor{preprocessor}{\#define EIGEN\_MKL\_DOMAIN\_PARDISO MKL\_DOMAIN\_PARDISO}}
+\DoxyCodeLine{114 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{115 \textcolor{preprocessor}{\#define EIGEN\_MKL\_DOMAIN\_PARDISO MKL\_PARDISO}}
+\DoxyCodeLine{116 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{117 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{118 }
+\DoxyCodeLine{119 \textcolor{preprocessor}{\#if defined(EIGEN\_USE\_BLAS) \&\& !defined(EIGEN\_USE\_MKL)}}
+\DoxyCodeLine{120 \textcolor{preprocessor}{\#include "{}../../misc/blas.h"{}}}
+\DoxyCodeLine{121 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{122 }
+\DoxyCodeLine{123 \textcolor{preprocessor}{\#include "{}../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{124 }
+\DoxyCodeLine{125 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{126 }
+\DoxyCodeLine{127 \textcolor{keyword}{typedef} std::complex<double> dcomplex;}
+\DoxyCodeLine{128 \textcolor{keyword}{typedef} std::complex<float>  scomplex;}
+\DoxyCodeLine{129 }
+\DoxyCodeLine{130 \textcolor{preprocessor}{\#if defined(EIGEN\_USE\_MKL)}}
+\DoxyCodeLine{131 \textcolor{keyword}{typedef} MKL\_INT BlasIndex;}
+\DoxyCodeLine{132 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{133 \textcolor{keyword}{typedef} \textcolor{keywordtype}{int} BlasIndex;}
+\DoxyCodeLine{134 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{135 }
+\DoxyCodeLine{136 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{137 }
+\DoxyCodeLine{138 }
+\DoxyCodeLine{139 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_MKL\_SUPPORT\_H}}
+
+\end{DoxyCode}

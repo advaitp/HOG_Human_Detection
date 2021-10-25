@@ -1,0 +1,434 @@
+\hypertarget{Amd_8h_source}{}\doxysection{Amd.\+h}
+\label{Amd_8h_source}\index{include/Eigen/src/OrderingMethods/Amd.h@{include/Eigen/src/OrderingMethods/Amd.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2010 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{comment}{/*}}
+\DoxyCodeLine{11 \textcolor{comment}{NOTE: this routine has been adapted from the CSparse library:}}
+\DoxyCodeLine{12 \textcolor{comment}{}}
+\DoxyCodeLine{13 \textcolor{comment}{Copyright (c) 2006, Timothy A. Davis.}}
+\DoxyCodeLine{14 \textcolor{comment}{http://www.suitesparse.com}}
+\DoxyCodeLine{15 \textcolor{comment}{}}
+\DoxyCodeLine{16 \textcolor{comment}{The author of CSparse, Timothy A. Davis., has executed a license with Google LLC}}
+\DoxyCodeLine{17 \textcolor{comment}{to permit distribution of this code and derivative works as part of Eigen under}}
+\DoxyCodeLine{18 \textcolor{comment}{the Mozilla Public License v. 2.0, as stated at the top of this file.}}
+\DoxyCodeLine{19 \textcolor{comment}{*/}}
+\DoxyCodeLine{20 }
+\DoxyCodeLine{21 \textcolor{preprocessor}{\#ifndef EIGEN\_SPARSE\_AMD\_H}}
+\DoxyCodeLine{22 \textcolor{preprocessor}{\#define EIGEN\_SPARSE\_AMD\_H}}
+\DoxyCodeLine{23 }
+\DoxyCodeLine{24 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{25 }
+\DoxyCodeLine{26 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{27 }
+\DoxyCodeLine{28 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{29   }
+\DoxyCodeLine{30 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{inline} T amd\_flip(\textcolor{keyword}{const} T\& i) \{ \textcolor{keywordflow}{return} -\/i-\/2; \}}
+\DoxyCodeLine{31 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{inline} T amd\_unflip(\textcolor{keyword}{const} T\& i) \{ \textcolor{keywordflow}{return} i<0 ? amd\_flip(i) : i; \}}
+\DoxyCodeLine{32 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T0, \textcolor{keyword}{typename} T1> \textcolor{keyword}{inline} \textcolor{keywordtype}{bool} amd\_marked(\textcolor{keyword}{const} T0* w, \textcolor{keyword}{const} T1\& j) \{ \textcolor{keywordflow}{return} w[j]<0; \}}
+\DoxyCodeLine{33 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T0, \textcolor{keyword}{typename} T1> \textcolor{keyword}{inline} \textcolor{keywordtype}{void} amd\_mark(\textcolor{keyword}{const} T0* w, \textcolor{keyword}{const} T1\& j) \{ \textcolor{keywordflow}{return} w[j] = amd\_flip(w[j]); \}}
+\DoxyCodeLine{34 }
+\DoxyCodeLine{35 \textcolor{comment}{/* clear w */}}
+\DoxyCodeLine{36 \textcolor{keyword}{template}<\textcolor{keyword}{typename} StorageIndex>}
+\DoxyCodeLine{37 \textcolor{keyword}{static} StorageIndex cs\_wclear (StorageIndex mark, StorageIndex lemax, StorageIndex *w, StorageIndex n)}
+\DoxyCodeLine{38 \{}
+\DoxyCodeLine{39   StorageIndex k;}
+\DoxyCodeLine{40   \textcolor{keywordflow}{if}(mark < 2 || (mark + lemax < 0))}
+\DoxyCodeLine{41   \{}
+\DoxyCodeLine{42     \textcolor{keywordflow}{for}(k = 0; k < n; k++)}
+\DoxyCodeLine{43       \textcolor{keywordflow}{if}(w[k] != 0)}
+\DoxyCodeLine{44         w[k] = 1;}
+\DoxyCodeLine{45     mark = 2;}
+\DoxyCodeLine{46   \}}
+\DoxyCodeLine{47   \textcolor{keywordflow}{return} (mark);     \textcolor{comment}{/* at this point, w[0..n-\/1] < mark holds */}}
+\DoxyCodeLine{48 \}}
+\DoxyCodeLine{49 }
+\DoxyCodeLine{50 \textcolor{comment}{/* depth-\/first search and postorder of a tree rooted at node j */}}
+\DoxyCodeLine{51 \textcolor{keyword}{template}<\textcolor{keyword}{typename} StorageIndex>}
+\DoxyCodeLine{52 StorageIndex cs\_tdfs(StorageIndex j, StorageIndex k, StorageIndex *head, \textcolor{keyword}{const} StorageIndex *next, StorageIndex *post, StorageIndex *stack)}
+\DoxyCodeLine{53 \{}
+\DoxyCodeLine{54   StorageIndex i, p, top = 0;}
+\DoxyCodeLine{55   \textcolor{keywordflow}{if}(!head || !next || !post || !stack) \textcolor{keywordflow}{return} (-\/1);    \textcolor{comment}{/* check inputs */}}
+\DoxyCodeLine{56   stack[0] = j;                 \textcolor{comment}{/* place j on the stack */}}
+\DoxyCodeLine{57   \textcolor{keywordflow}{while} (top >= 0)                \textcolor{comment}{/* while (stack is not empty) */}}
+\DoxyCodeLine{58   \{}
+\DoxyCodeLine{59     p = stack[top];           \textcolor{comment}{/* p = top of stack */}}
+\DoxyCodeLine{60     i = head[p];              \textcolor{comment}{/* i = youngest child of p */}}
+\DoxyCodeLine{61     \textcolor{keywordflow}{if}(i == -\/1)}
+\DoxyCodeLine{62     \{}
+\DoxyCodeLine{63       top-\/-\/;                 \textcolor{comment}{/* p has no unordered children left */}}
+\DoxyCodeLine{64       post[k++] = p;        \textcolor{comment}{/* node p is the kth postordered node */}}
+\DoxyCodeLine{65     \}}
+\DoxyCodeLine{66     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{67     \{}
+\DoxyCodeLine{68       head[p] = next[i];   \textcolor{comment}{/* remove i from children of p */}}
+\DoxyCodeLine{69       stack[++top] = i;     \textcolor{comment}{/* start dfs on child node i */}}
+\DoxyCodeLine{70     \}}
+\DoxyCodeLine{71   \}}
+\DoxyCodeLine{72   \textcolor{keywordflow}{return} k;}
+\DoxyCodeLine{73 \}}
+\DoxyCodeLine{74 }
+\DoxyCodeLine{75 }
+\DoxyCodeLine{85 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keyword}{typename} StorageIndex>}
+\DoxyCodeLine{86 \textcolor{keywordtype}{void} minimum\_degree\_ordering(SparseMatrix<Scalar,ColMajor,StorageIndex>\& C, PermutationMatrix<Dynamic,Dynamic,StorageIndex>\& perm)}
+\DoxyCodeLine{87 \{}
+\DoxyCodeLine{88   \textcolor{keyword}{using} std::sqrt;}
+\DoxyCodeLine{89   }
+\DoxyCodeLine{90   StorageIndex d, dk, dext, lemax = 0, e, elenk, eln, i, j, k, k1,}
+\DoxyCodeLine{91                 k2, k3, jlast, ln, dense, nzmax, mindeg = 0, nvi, nvj, nvk, mark, wnvi,}
+\DoxyCodeLine{92                 ok, nel = 0, p, p1, p2, p3, p4, pj, pk, pk1, pk2, pn, q, t, h;}
+\DoxyCodeLine{93   }
+\DoxyCodeLine{94   StorageIndex n = StorageIndex(C.cols());}
+\DoxyCodeLine{95   dense = std::max<StorageIndex> (16, StorageIndex(10 * sqrt(\textcolor{keywordtype}{double}(n))));   \textcolor{comment}{/* find dense threshold */}}
+\DoxyCodeLine{96   dense = (std::min)(n-\/2, dense);}
+\DoxyCodeLine{97   }
+\DoxyCodeLine{98   StorageIndex cnz = StorageIndex(C.nonZeros());}
+\DoxyCodeLine{99   perm.resize(n+1);}
+\DoxyCodeLine{100   t = cnz + cnz/5 + 2*n;                 \textcolor{comment}{/* add elbow room to C */}}
+\DoxyCodeLine{101   C.resizeNonZeros(t);}
+\DoxyCodeLine{102   }
+\DoxyCodeLine{103   \textcolor{comment}{// get workspace}}
+\DoxyCodeLine{104   ei\_declare\_aligned\_stack\_constructed\_variable(StorageIndex,W,8*(n+1),0);}
+\DoxyCodeLine{105   StorageIndex* len     = W;}
+\DoxyCodeLine{106   StorageIndex* nv      = W +   (n+1);}
+\DoxyCodeLine{107   StorageIndex* next    = W + 2*(n+1);}
+\DoxyCodeLine{108   StorageIndex* head    = W + 3*(n+1);}
+\DoxyCodeLine{109   StorageIndex* elen    = W + 4*(n+1);}
+\DoxyCodeLine{110   StorageIndex* degree  = W + 5*(n+1);}
+\DoxyCodeLine{111   StorageIndex* w       = W + 6*(n+1);}
+\DoxyCodeLine{112   StorageIndex* hhead   = W + 7*(n+1);}
+\DoxyCodeLine{113   StorageIndex* last    = perm.indices().data();                              \textcolor{comment}{/* use P as workspace for last */}}
+\DoxyCodeLine{114   }
+\DoxyCodeLine{115   \textcolor{comment}{/* -\/-\/-\/ Initialize quotient graph -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ */}}
+\DoxyCodeLine{116   StorageIndex* Cp = C.outerIndexPtr();}
+\DoxyCodeLine{117   StorageIndex* Ci = C.innerIndexPtr();}
+\DoxyCodeLine{118   \textcolor{keywordflow}{for}(k = 0; k < n; k++)}
+\DoxyCodeLine{119     len[k] = Cp[k+1] -\/ Cp[k];}
+\DoxyCodeLine{120   len[n] = 0;}
+\DoxyCodeLine{121   nzmax = t;}
+\DoxyCodeLine{122   }
+\DoxyCodeLine{123   \textcolor{keywordflow}{for}(i = 0; i <= n; i++)}
+\DoxyCodeLine{124   \{}
+\DoxyCodeLine{125     head[i]   = -\/1;                     \textcolor{comment}{// degree list i is empty}}
+\DoxyCodeLine{126     last[i]   = -\/1;}
+\DoxyCodeLine{127     next[i]   = -\/1;}
+\DoxyCodeLine{128     hhead[i]  = -\/1;                     \textcolor{comment}{// hash list i is empty }}
+\DoxyCodeLine{129     nv[i]     = 1;                      \textcolor{comment}{// node i is just one node}}
+\DoxyCodeLine{130     w[i]      = 1;                      \textcolor{comment}{// node i is alive}}
+\DoxyCodeLine{131     elen[i]   = 0;                      \textcolor{comment}{// Ek of node i is empty}}
+\DoxyCodeLine{132     degree[i] = len[i];                 \textcolor{comment}{// degree of node i}}
+\DoxyCodeLine{133   \}}
+\DoxyCodeLine{134   mark = internal::cs\_wclear<StorageIndex>(0, 0, w, n);         \textcolor{comment}{/* clear w */}}
+\DoxyCodeLine{135   }
+\DoxyCodeLine{136   \textcolor{comment}{/* -\/-\/-\/ Initialize degree lists -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ */}}
+\DoxyCodeLine{137   \textcolor{keywordflow}{for}(i = 0; i < n; i++)}
+\DoxyCodeLine{138   \{}
+\DoxyCodeLine{139     \textcolor{keywordtype}{bool} has\_diag = \textcolor{keyword}{false};}
+\DoxyCodeLine{140     \textcolor{keywordflow}{for}(p = Cp[i]; p<Cp[i+1]; ++p)}
+\DoxyCodeLine{141       \textcolor{keywordflow}{if}(Ci[p]==i)}
+\DoxyCodeLine{142       \{}
+\DoxyCodeLine{143         has\_diag = \textcolor{keyword}{true};}
+\DoxyCodeLine{144         \textcolor{keywordflow}{break};}
+\DoxyCodeLine{145       \}}
+\DoxyCodeLine{146    }
+\DoxyCodeLine{147     d = degree[i];}
+\DoxyCodeLine{148     \textcolor{keywordflow}{if}(d == 1 \&\& has\_diag)           \textcolor{comment}{/* node i is empty */}}
+\DoxyCodeLine{149     \{}
+\DoxyCodeLine{150       elen[i] = -\/2;                 \textcolor{comment}{/* element i is dead */}}
+\DoxyCodeLine{151       nel++;}
+\DoxyCodeLine{152       Cp[i] = -\/1;                   \textcolor{comment}{/* i is a root of assembly tree */}}
+\DoxyCodeLine{153       w[i] = 0;}
+\DoxyCodeLine{154     \}}
+\DoxyCodeLine{155     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(d > dense || !has\_diag)  \textcolor{comment}{/* node i is dense or has no structural diagonal element */}}
+\DoxyCodeLine{156     \{}
+\DoxyCodeLine{157       nv[i] = 0;                    \textcolor{comment}{/* absorb i into element n */}}
+\DoxyCodeLine{158       elen[i] = -\/1;                 \textcolor{comment}{/* node i is dead */}}
+\DoxyCodeLine{159       nel++;}
+\DoxyCodeLine{160       Cp[i] = amd\_flip (n);}
+\DoxyCodeLine{161       nv[n]++;}
+\DoxyCodeLine{162     \}}
+\DoxyCodeLine{163     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{164     \{}
+\DoxyCodeLine{165       \textcolor{keywordflow}{if}(head[d] != -\/1) last[head[d]] = i;}
+\DoxyCodeLine{166       next[i] = head[d];           \textcolor{comment}{/* put node i in degree list d */}}
+\DoxyCodeLine{167       head[d] = i;}
+\DoxyCodeLine{168     \}}
+\DoxyCodeLine{169   \}}
+\DoxyCodeLine{170   }
+\DoxyCodeLine{171   elen[n] = -\/2;                         \textcolor{comment}{/* n is a dead element */}}
+\DoxyCodeLine{172   Cp[n] = -\/1;                           \textcolor{comment}{/* n is a root of assembly tree */}}
+\DoxyCodeLine{173   w[n] = 0;                             \textcolor{comment}{/* n is a dead element */}}
+\DoxyCodeLine{174   }
+\DoxyCodeLine{175   \textcolor{keywordflow}{while} (nel < n)                         \textcolor{comment}{/* while (selecting pivots) do */}}
+\DoxyCodeLine{176   \{}
+\DoxyCodeLine{177     \textcolor{comment}{/* -\/-\/-\/ Select node of minimum approximate degree -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ */}}
+\DoxyCodeLine{178     \textcolor{keywordflow}{for}(k = -\/1; mindeg < n \&\& (k = head[mindeg]) == -\/1; mindeg++) \{\}}
+\DoxyCodeLine{179     \textcolor{keywordflow}{if}(next[k] != -\/1) last[next[k]] = -\/1;}
+\DoxyCodeLine{180     head[mindeg] = next[k];          \textcolor{comment}{/* remove k from degree list */}}
+\DoxyCodeLine{181     elenk = elen[k];                  \textcolor{comment}{/* elenk = |Ek| */}}
+\DoxyCodeLine{182     nvk = nv[k];                      \textcolor{comment}{/* \# of nodes k represents */}}
+\DoxyCodeLine{183     nel += nvk;                        \textcolor{comment}{/* nv[k] nodes of A eliminated */}}
+\DoxyCodeLine{184     }
+\DoxyCodeLine{185     \textcolor{comment}{/* -\/-\/-\/ Garbage collection -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ */}}
+\DoxyCodeLine{186     \textcolor{keywordflow}{if}(elenk > 0 \&\& cnz + mindeg >= nzmax)}
+\DoxyCodeLine{187     \{}
+\DoxyCodeLine{188       \textcolor{keywordflow}{for}(j = 0; j < n; j++)}
+\DoxyCodeLine{189       \{}
+\DoxyCodeLine{190         \textcolor{keywordflow}{if}((p = Cp[j]) >= 0)      \textcolor{comment}{/* j is a live node or element */}}
+\DoxyCodeLine{191         \{}
+\DoxyCodeLine{192           Cp[j] = Ci[p];          \textcolor{comment}{/* save first entry of object */}}
+\DoxyCodeLine{193           Ci[p] = amd\_flip (j);    \textcolor{comment}{/* first entry is now amd\_flip(j) */}}
+\DoxyCodeLine{194         \}}
+\DoxyCodeLine{195       \}}
+\DoxyCodeLine{196       \textcolor{keywordflow}{for}(q = 0, p = 0; p < cnz; ) \textcolor{comment}{/* scan all of memory */}}
+\DoxyCodeLine{197       \{}
+\DoxyCodeLine{198         \textcolor{keywordflow}{if}((j = amd\_flip (Ci[p++])) >= 0)  \textcolor{comment}{/* found object j */}}
+\DoxyCodeLine{199         \{}
+\DoxyCodeLine{200           Ci[q] = Cp[j];       \textcolor{comment}{/* restore first entry of object */}}
+\DoxyCodeLine{201           Cp[j] = q++;          \textcolor{comment}{/* new pointer to object j */}}
+\DoxyCodeLine{202           \textcolor{keywordflow}{for}(k3 = 0; k3 < len[j]-\/1; k3++) Ci[q++] = Ci[p++];}
+\DoxyCodeLine{203         \}}
+\DoxyCodeLine{204       \}}
+\DoxyCodeLine{205       cnz = q;                       \textcolor{comment}{/* Ci[cnz...nzmax-\/1] now free */}}
+\DoxyCodeLine{206     \}}
+\DoxyCodeLine{207     }
+\DoxyCodeLine{208     \textcolor{comment}{/* -\/-\/-\/ Construct new element -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ */}}
+\DoxyCodeLine{209     dk = 0;}
+\DoxyCodeLine{210     nv[k] = -\/nvk;                     \textcolor{comment}{/* flag k as in Lk */}}
+\DoxyCodeLine{211     p = Cp[k];}
+\DoxyCodeLine{212     pk1 = (elenk == 0) ? p : cnz;      \textcolor{comment}{/* do in place if elen[k] == 0 */}}
+\DoxyCodeLine{213     pk2 = pk1;}
+\DoxyCodeLine{214     \textcolor{keywordflow}{for}(k1 = 1; k1 <= elenk + 1; k1++)}
+\DoxyCodeLine{215     \{}
+\DoxyCodeLine{216       \textcolor{keywordflow}{if}(k1 > elenk)}
+\DoxyCodeLine{217       \{}
+\DoxyCodeLine{218         e = k;                     \textcolor{comment}{/* search the nodes in k */}}
+\DoxyCodeLine{219         pj = p;                    \textcolor{comment}{/* list of nodes starts at Ci[pj]*/}}
+\DoxyCodeLine{220         ln = len[k] -\/ elenk;      \textcolor{comment}{/* length of list of nodes in k */}}
+\DoxyCodeLine{221       \}}
+\DoxyCodeLine{222       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{223       \{}
+\DoxyCodeLine{224         e = Ci[p++];              \textcolor{comment}{/* search the nodes in e */}}
+\DoxyCodeLine{225         pj = Cp[e];}
+\DoxyCodeLine{226         ln = len[e];              \textcolor{comment}{/* length of list of nodes in e */}}
+\DoxyCodeLine{227       \}}
+\DoxyCodeLine{228       \textcolor{keywordflow}{for}(k2 = 1; k2 <= ln; k2++)}
+\DoxyCodeLine{229       \{}
+\DoxyCodeLine{230         i = Ci[pj++];}
+\DoxyCodeLine{231         \textcolor{keywordflow}{if}((nvi = nv[i]) <= 0) \textcolor{keywordflow}{continue}; \textcolor{comment}{/* node i dead, or seen */}}
+\DoxyCodeLine{232         dk += nvi;                 \textcolor{comment}{/* degree[Lk] += size of node i */}}
+\DoxyCodeLine{233         nv[i] = -\/nvi;             \textcolor{comment}{/* negate nv[i] to denote i in Lk*/}}
+\DoxyCodeLine{234         Ci[pk2++] = i;            \textcolor{comment}{/* place i in Lk */}}
+\DoxyCodeLine{235         \textcolor{keywordflow}{if}(next[i] != -\/1) last[next[i]] = last[i];}
+\DoxyCodeLine{236         \textcolor{keywordflow}{if}(last[i] != -\/1)         \textcolor{comment}{/* remove i from degree list */}}
+\DoxyCodeLine{237         \{}
+\DoxyCodeLine{238           next[last[i]] = next[i];}
+\DoxyCodeLine{239         \}}
+\DoxyCodeLine{240         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{241         \{}
+\DoxyCodeLine{242           head[degree[i]] = next[i];}
+\DoxyCodeLine{243         \}}
+\DoxyCodeLine{244       \}}
+\DoxyCodeLine{245       \textcolor{keywordflow}{if}(e != k)}
+\DoxyCodeLine{246       \{}
+\DoxyCodeLine{247         Cp[e] = amd\_flip (k);      \textcolor{comment}{/* absorb e into k */}}
+\DoxyCodeLine{248         w[e] = 0;                 \textcolor{comment}{/* e is now a dead element */}}
+\DoxyCodeLine{249       \}}
+\DoxyCodeLine{250     \}}
+\DoxyCodeLine{251     \textcolor{keywordflow}{if}(elenk != 0) cnz = pk2;         \textcolor{comment}{/* Ci[cnz...nzmax] is free */}}
+\DoxyCodeLine{252     degree[k] = dk;                   \textcolor{comment}{/* external degree of k -\/ |Lk\(\backslash\)i| */}}
+\DoxyCodeLine{253     Cp[k] = pk1;                      \textcolor{comment}{/* element k is in Ci[pk1..pk2-\/1] */}}
+\DoxyCodeLine{254     len[k] = pk2 -\/ pk1;}
+\DoxyCodeLine{255     elen[k] = -\/2;                     \textcolor{comment}{/* k is now an element */}}
+\DoxyCodeLine{256     }
+\DoxyCodeLine{257     \textcolor{comment}{/* -\/-\/-\/ Find set differences -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ */}}
+\DoxyCodeLine{258     mark = internal::cs\_wclear<StorageIndex>(mark, lemax, w, n);  \textcolor{comment}{/* clear w if necessary */}}
+\DoxyCodeLine{259     \textcolor{keywordflow}{for}(pk = pk1; pk < pk2; pk++)    \textcolor{comment}{/* scan 1: find |Le\(\backslash\)Lk| */}}
+\DoxyCodeLine{260     \{}
+\DoxyCodeLine{261       i = Ci[pk];}
+\DoxyCodeLine{262       \textcolor{keywordflow}{if}((eln = elen[i]) <= 0) \textcolor{keywordflow}{continue};\textcolor{comment}{/* skip if elen[i] empty */}}
+\DoxyCodeLine{263       nvi = -\/nv[i];                      \textcolor{comment}{/* nv[i] was negated */}}
+\DoxyCodeLine{264       wnvi = mark -\/ nvi;}
+\DoxyCodeLine{265       \textcolor{keywordflow}{for}(p = Cp[i]; p <= Cp[i] + eln -\/ 1; p++)  \textcolor{comment}{/* scan Ei */}}
+\DoxyCodeLine{266       \{}
+\DoxyCodeLine{267         e = Ci[p];}
+\DoxyCodeLine{268         \textcolor{keywordflow}{if}(w[e] >= mark)}
+\DoxyCodeLine{269         \{}
+\DoxyCodeLine{270           w[e] -\/= nvi;          \textcolor{comment}{/* decrement |Le\(\backslash\)Lk| */}}
+\DoxyCodeLine{271         \}}
+\DoxyCodeLine{272         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(w[e] != 0)        \textcolor{comment}{/* ensure e is a live element */}}
+\DoxyCodeLine{273         \{}
+\DoxyCodeLine{274           w[e] = degree[e] + wnvi; \textcolor{comment}{/* 1st time e seen in scan 1 */}}
+\DoxyCodeLine{275         \}}
+\DoxyCodeLine{276       \}}
+\DoxyCodeLine{277     \}}
+\DoxyCodeLine{278     }
+\DoxyCodeLine{279     \textcolor{comment}{/* -\/-\/-\/ Degree update -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ */}}
+\DoxyCodeLine{280     \textcolor{keywordflow}{for}(pk = pk1; pk < pk2; pk++)    \textcolor{comment}{/* scan2: degree update */}}
+\DoxyCodeLine{281     \{}
+\DoxyCodeLine{282       i = Ci[pk];                   \textcolor{comment}{/* consider node i in Lk */}}
+\DoxyCodeLine{283       p1 = Cp[i];}
+\DoxyCodeLine{284       p2 = p1 + elen[i] -\/ 1;}
+\DoxyCodeLine{285       pn = p1;}
+\DoxyCodeLine{286       \textcolor{keywordflow}{for}(h = 0, d = 0, p = p1; p <= p2; p++)    \textcolor{comment}{/* scan Ei */}}
+\DoxyCodeLine{287       \{}
+\DoxyCodeLine{288         e = Ci[p];}
+\DoxyCodeLine{289         \textcolor{keywordflow}{if}(w[e] != 0)             \textcolor{comment}{/* e is an unabsorbed element */}}
+\DoxyCodeLine{290         \{}
+\DoxyCodeLine{291           dext = w[e] -\/ mark;   \textcolor{comment}{/* dext = |Le\(\backslash\)Lk| */}}
+\DoxyCodeLine{292           \textcolor{keywordflow}{if}(dext > 0)}
+\DoxyCodeLine{293           \{}
+\DoxyCodeLine{294             d += dext;         \textcolor{comment}{/* sum up the set differences */}}
+\DoxyCodeLine{295             Ci[pn++] = e;     \textcolor{comment}{/* keep e in Ei */}}
+\DoxyCodeLine{296             h += e;            \textcolor{comment}{/* compute the hash of node i */}}
+\DoxyCodeLine{297           \}}
+\DoxyCodeLine{298           \textcolor{keywordflow}{else}}
+\DoxyCodeLine{299           \{}
+\DoxyCodeLine{300             Cp[e] = amd\_flip (k);  \textcolor{comment}{/* aggressive absorb. e-\/>k */}}
+\DoxyCodeLine{301             w[e] = 0;             \textcolor{comment}{/* e is a dead element */}}
+\DoxyCodeLine{302           \}}
+\DoxyCodeLine{303         \}}
+\DoxyCodeLine{304       \}}
+\DoxyCodeLine{305       elen[i] = pn -\/ p1 + 1;        \textcolor{comment}{/* elen[i] = |Ei| */}}
+\DoxyCodeLine{306       p3 = pn;}
+\DoxyCodeLine{307       p4 = p1 + len[i];}
+\DoxyCodeLine{308       \textcolor{keywordflow}{for}(p = p2 + 1; p < p4; p++) \textcolor{comment}{/* prune edges in Ai */}}
+\DoxyCodeLine{309       \{}
+\DoxyCodeLine{310         j = Ci[p];}
+\DoxyCodeLine{311         \textcolor{keywordflow}{if}((nvj = nv[j]) <= 0) \textcolor{keywordflow}{continue}; \textcolor{comment}{/* node j dead or in Lk */}}
+\DoxyCodeLine{312         d += nvj;                  \textcolor{comment}{/* degree(i) += |j| */}}
+\DoxyCodeLine{313         Ci[pn++] = j;             \textcolor{comment}{/* place j in node list of i */}}
+\DoxyCodeLine{314         h += j;                    \textcolor{comment}{/* compute hash for node i */}}
+\DoxyCodeLine{315       \}}
+\DoxyCodeLine{316       \textcolor{keywordflow}{if}(d == 0)                     \textcolor{comment}{/* check for mass elimination */}}
+\DoxyCodeLine{317       \{}
+\DoxyCodeLine{318         Cp[i] = amd\_flip (k);      \textcolor{comment}{/* absorb i into k */}}
+\DoxyCodeLine{319         nvi = -\/nv[i];}
+\DoxyCodeLine{320         dk -\/= nvi;                 \textcolor{comment}{/* |Lk| -\/= |i| */}}
+\DoxyCodeLine{321         nvk += nvi;                \textcolor{comment}{/* |k| += nv[i] */}}
+\DoxyCodeLine{322         nel += nvi;}
+\DoxyCodeLine{323         nv[i] = 0;}
+\DoxyCodeLine{324         elen[i] = -\/1;             \textcolor{comment}{/* node i is dead */}}
+\DoxyCodeLine{325       \}}
+\DoxyCodeLine{326       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{327       \{}
+\DoxyCodeLine{328         degree[i] = std::min<StorageIndex> (degree[i], d);   \textcolor{comment}{/* update degree(i) */}}
+\DoxyCodeLine{329         Ci[pn] = Ci[p3];         \textcolor{comment}{/* move first node to end */}}
+\DoxyCodeLine{330         Ci[p3] = Ci[p1];         \textcolor{comment}{/* move 1st el. to end of Ei */}}
+\DoxyCodeLine{331         Ci[p1] = k;               \textcolor{comment}{/* add k as 1st element in of Ei */}}
+\DoxyCodeLine{332         len[i] = pn -\/ p1 + 1;     \textcolor{comment}{/* new len of adj. list of node i */}}
+\DoxyCodeLine{333         h \%= n;                    \textcolor{comment}{/* finalize hash of i */}}
+\DoxyCodeLine{334         next[i] = hhead[h];      \textcolor{comment}{/* place i in hash bucket */}}
+\DoxyCodeLine{335         hhead[h] = i;}
+\DoxyCodeLine{336         last[i] = h;      \textcolor{comment}{/* save hash of i in last[i] */}}
+\DoxyCodeLine{337       \}}
+\DoxyCodeLine{338     \}                                   \textcolor{comment}{/* scan2 is done */}}
+\DoxyCodeLine{339     degree[k] = dk;                   \textcolor{comment}{/* finalize |Lk| */}}
+\DoxyCodeLine{340     lemax = std::max<StorageIndex>(lemax, dk);}
+\DoxyCodeLine{341     mark = internal::cs\_wclear<StorageIndex>(mark+lemax, lemax, w, n);    \textcolor{comment}{/* clear w */}}
+\DoxyCodeLine{342     }
+\DoxyCodeLine{343     \textcolor{comment}{/* -\/-\/-\/ Supernode detection -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ */}}
+\DoxyCodeLine{344     \textcolor{keywordflow}{for}(pk = pk1; pk < pk2; pk++)}
+\DoxyCodeLine{345     \{}
+\DoxyCodeLine{346       i = Ci[pk];}
+\DoxyCodeLine{347       \textcolor{keywordflow}{if}(nv[i] >= 0) \textcolor{keywordflow}{continue};         \textcolor{comment}{/* skip if i is dead */}}
+\DoxyCodeLine{348       h = last[i];                      \textcolor{comment}{/* scan hash bucket of node i */}}
+\DoxyCodeLine{349       i = hhead[h];}
+\DoxyCodeLine{350       hhead[h] = -\/1;                    \textcolor{comment}{/* hash bucket will be empty */}}
+\DoxyCodeLine{351       \textcolor{keywordflow}{for}(; i != -\/1 \&\& next[i] != -\/1; i = next[i], mark++)}
+\DoxyCodeLine{352       \{}
+\DoxyCodeLine{353         ln = len[i];}
+\DoxyCodeLine{354         eln = elen[i];}
+\DoxyCodeLine{355         \textcolor{keywordflow}{for}(p = Cp[i]+1; p <= Cp[i] + ln-\/1; p++) w[Ci[p]] = mark;}
+\DoxyCodeLine{356         jlast = i;}
+\DoxyCodeLine{357         \textcolor{keywordflow}{for}(j = next[i]; j != -\/1; ) \textcolor{comment}{/* compare i with all j */}}
+\DoxyCodeLine{358         \{}
+\DoxyCodeLine{359           ok = (len[j] == ln) \&\& (elen[j] == eln);}
+\DoxyCodeLine{360           \textcolor{keywordflow}{for}(p = Cp[j] + 1; ok \&\& p <= Cp[j] + ln -\/ 1; p++)}
+\DoxyCodeLine{361           \{}
+\DoxyCodeLine{362             \textcolor{keywordflow}{if}(w[Ci[p]] != mark) ok = 0;    \textcolor{comment}{/* compare i and j*/}}
+\DoxyCodeLine{363           \}}
+\DoxyCodeLine{364           \textcolor{keywordflow}{if}(ok)                     \textcolor{comment}{/* i and j are identical */}}
+\DoxyCodeLine{365           \{}
+\DoxyCodeLine{366             Cp[j] = amd\_flip (i);  \textcolor{comment}{/* absorb j into i */}}
+\DoxyCodeLine{367             nv[i] += nv[j];}
+\DoxyCodeLine{368             nv[j] = 0;}
+\DoxyCodeLine{369             elen[j] = -\/1;         \textcolor{comment}{/* node j is dead */}}
+\DoxyCodeLine{370             j = next[j];          \textcolor{comment}{/* delete j from hash bucket */}}
+\DoxyCodeLine{371             next[jlast] = j;}
+\DoxyCodeLine{372           \}}
+\DoxyCodeLine{373           \textcolor{keywordflow}{else}}
+\DoxyCodeLine{374           \{}
+\DoxyCodeLine{375             jlast = j;             \textcolor{comment}{/* j and i are different */}}
+\DoxyCodeLine{376             j = next[j];}
+\DoxyCodeLine{377           \}}
+\DoxyCodeLine{378         \}}
+\DoxyCodeLine{379       \}}
+\DoxyCodeLine{380     \}}
+\DoxyCodeLine{381     }
+\DoxyCodeLine{382     \textcolor{comment}{/* -\/-\/-\/ Finalize new element-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ */}}
+\DoxyCodeLine{383     \textcolor{keywordflow}{for}(p = pk1, pk = pk1; pk < pk2; pk++)   \textcolor{comment}{/* finalize Lk */}}
+\DoxyCodeLine{384     \{}
+\DoxyCodeLine{385       i = Ci[pk];}
+\DoxyCodeLine{386       \textcolor{keywordflow}{if}((nvi = -\/nv[i]) <= 0) \textcolor{keywordflow}{continue};\textcolor{comment}{/* skip if i is dead */}}
+\DoxyCodeLine{387       nv[i] = nvi;                      \textcolor{comment}{/* restore nv[i] */}}
+\DoxyCodeLine{388       d = degree[i] + dk -\/ nvi;         \textcolor{comment}{/* compute external degree(i) */}}
+\DoxyCodeLine{389       d = std::min<StorageIndex> (d, n -\/ nel -\/ nvi);}
+\DoxyCodeLine{390       \textcolor{keywordflow}{if}(head[d] != -\/1) last[head[d]] = i;}
+\DoxyCodeLine{391       next[i] = head[d];               \textcolor{comment}{/* put i back in degree list */}}
+\DoxyCodeLine{392       last[i] = -\/1;}
+\DoxyCodeLine{393       head[d] = i;}
+\DoxyCodeLine{394       mindeg = std::min<StorageIndex> (mindeg, d);       \textcolor{comment}{/* find new minimum degree */}}
+\DoxyCodeLine{395       degree[i] = d;}
+\DoxyCodeLine{396       Ci[p++] = i;                      \textcolor{comment}{/* place i in Lk */}}
+\DoxyCodeLine{397     \}}
+\DoxyCodeLine{398     nv[k] = nvk;                      \textcolor{comment}{/* \# nodes absorbed into k */}}
+\DoxyCodeLine{399     \textcolor{keywordflow}{if}((len[k] = p-\/pk1) == 0)         \textcolor{comment}{/* length of adj list of element k*/}}
+\DoxyCodeLine{400     \{}
+\DoxyCodeLine{401       Cp[k] = -\/1;                   \textcolor{comment}{/* k is a root of the tree */}}
+\DoxyCodeLine{402       w[k] = 0;                     \textcolor{comment}{/* k is now a dead element */}}
+\DoxyCodeLine{403     \}}
+\DoxyCodeLine{404     \textcolor{keywordflow}{if}(elenk != 0) cnz = p;           \textcolor{comment}{/* free unused space in Lk */}}
+\DoxyCodeLine{405   \}}
+\DoxyCodeLine{406   }
+\DoxyCodeLine{407   \textcolor{comment}{/* -\/-\/-\/ Postordering -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ */}}
+\DoxyCodeLine{408   \textcolor{keywordflow}{for}(i = 0; i < n; i++) Cp[i] = amd\_flip (Cp[i]);\textcolor{comment}{/* fix assembly tree */}}
+\DoxyCodeLine{409   \textcolor{keywordflow}{for}(j = 0; j <= n; j++) head[j] = -\/1;}
+\DoxyCodeLine{410   \textcolor{keywordflow}{for}(j = n; j >= 0; j-\/-\/)              \textcolor{comment}{/* place unordered nodes in lists */}}
+\DoxyCodeLine{411   \{}
+\DoxyCodeLine{412     \textcolor{keywordflow}{if}(nv[j] > 0) \textcolor{keywordflow}{continue};          \textcolor{comment}{/* skip if j is an element */}}
+\DoxyCodeLine{413     next[j] = head[Cp[j]];          \textcolor{comment}{/* place j in list of its parent */}}
+\DoxyCodeLine{414     head[Cp[j]] = j;}
+\DoxyCodeLine{415   \}}
+\DoxyCodeLine{416   \textcolor{keywordflow}{for}(e = n; e >= 0; e-\/-\/)              \textcolor{comment}{/* place elements in lists */}}
+\DoxyCodeLine{417   \{}
+\DoxyCodeLine{418     \textcolor{keywordflow}{if}(nv[e] <= 0) \textcolor{keywordflow}{continue};         \textcolor{comment}{/* skip unless e is an element */}}
+\DoxyCodeLine{419     \textcolor{keywordflow}{if}(Cp[e] != -\/1)}
+\DoxyCodeLine{420     \{}
+\DoxyCodeLine{421       next[e] = head[Cp[e]];      \textcolor{comment}{/* place e in list of its parent */}}
+\DoxyCodeLine{422       head[Cp[e]] = e;}
+\DoxyCodeLine{423     \}}
+\DoxyCodeLine{424   \}}
+\DoxyCodeLine{425   \textcolor{keywordflow}{for}(k = 0, i = 0; i <= n; i++)       \textcolor{comment}{/* postorder the assembly tree */}}
+\DoxyCodeLine{426   \{}
+\DoxyCodeLine{427     \textcolor{keywordflow}{if}(Cp[i] == -\/1) k = internal::cs\_tdfs<StorageIndex>(i, k, head, next, perm.indices().data(), w);}
+\DoxyCodeLine{428   \}}
+\DoxyCodeLine{429   }
+\DoxyCodeLine{430   perm.indices().conservativeResize(n);}
+\DoxyCodeLine{431 \}}
+\DoxyCodeLine{432 }
+\DoxyCodeLine{433 \} \textcolor{comment}{// namespace internal}}
+\DoxyCodeLine{434 }
+\DoxyCodeLine{435 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{436 }
+\DoxyCodeLine{437 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_SPARSE\_AMD\_H}}
+
+\end{DoxyCode}

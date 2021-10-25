@@ -31,6 +31,7 @@
 #define INCLUDE_CAMERA_HPP_
 
 #include<iostream>
+#include<vector>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
@@ -38,7 +39,7 @@
 class Camera{
  public :
   Camera();
-  Camera(const int* x);
+  explicit Camera(int x);
   // variable to hold each frame of video
   cv::Mat frame;
   int webcam;

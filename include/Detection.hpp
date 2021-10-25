@@ -36,23 +36,32 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 #include <Box.h>
+#include <Human.h>
 
 class Detection{
  private :
-  /// variable to access HOG descriptor
+  // variable to access HOG descriptor
   cv::HOGDescriptor hog;
 
+  // Vector to store confidence score of each detection
   std::vector<double> confidences;
 
-  /// Store collection of boxes
-  std::vector<cv::Rect> Boxes ;
-
-  /// Store indices of bounding boxes after Non Max Suppression.
-  std::vector<int> indices;
+  // Count of humans detected
+  int humans;
 
  public :
-  /// variable to hold the all the bounding boxes coordinates after detection
-  std::vector<Box> detections;
+  // variable to hold the all the bounding boxes coordinates after detection
+  std::vector<Box*> detections;
+
+  // Storage to store previous image's humans
+  std::vector<std::vector<int>> storage;
+
+  // Store collection of boxes
+  std::vector<cv::Rect> Boxes;
+
+  // Store indices of bounding boxes after Non Max Suppression.
+  std::vector<int> indices;
+  Detection();
 
  /**
   * @brief Function to get all the detection boxes after detection using HOG and SVM
@@ -71,6 +80,29 @@ class Detection{
    *
    */
   void drawboxes(cv::Mat frame);
+  /**
+     * @fn void track(cv::Mat)
+   * @brief The track function is used to track and
+   *  identify human in two consecutive frames
+   *
+   * @pre
+   * @post
+   * @param
+   */
+  void track(cv::Mat);
+  /**
+     * @fn bool is_same(int[], int[])
+   * @brief The is_same function asserts if two input
+   *  arrays are in close proximity to one another
+   *
+   * @pre
+   * @post
+   * @param
+   * @param
+   * @return
+   */
+  bool is_same(int[2], int[2]);
 };
+
 
 #endif  // INCLUDE_DETECTION_HPP_

@@ -1,0 +1,632 @@
+\hypertarget{SparseQR_8h_source}{}\doxysection{Sparse\+QR.\+h}
+\label{SparseQR_8h_source}\index{include/Eigen/src/SparseQR/SparseQR.h@{include/Eigen/src/SparseQR/SparseQR.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2012-\/2013 Desire Nuentsa <desire.nuentsa\_wakam@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2012-\/2014 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_SPARSE\_QR\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_SPARSE\_QR\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keyword}{typename} OrderingType> \textcolor{keyword}{class }SparseQR;}
+\DoxyCodeLine{19 \textcolor{keyword}{template}<\textcolor{keyword}{typename} SparseQRType> \textcolor{keyword}{struct }SparseQRMatrixQReturnType;}
+\DoxyCodeLine{20 \textcolor{keyword}{template}<\textcolor{keyword}{typename} SparseQRType> \textcolor{keyword}{struct }SparseQRMatrixQTransposeReturnType;}
+\DoxyCodeLine{21 \textcolor{keyword}{template}<\textcolor{keyword}{typename} SparseQRType, \textcolor{keyword}{typename} Derived> \textcolor{keyword}{struct }SparseQR\_QProduct;}
+\DoxyCodeLine{22 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{23   \textcolor{keyword}{template} <\textcolor{keyword}{typename} SparseQRType> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{structEigen_1_1SparseQRMatrixQReturnType}{SparseQRMatrixQReturnType}}<SparseQRType> >}
+\DoxyCodeLine{24   \{}
+\DoxyCodeLine{25     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} SparseQRType::MatrixType ReturnType;}
+\DoxyCodeLine{26     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} ReturnType::StorageIndex StorageIndex;}
+\DoxyCodeLine{27     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} ReturnType::StorageKind StorageKind;}
+\DoxyCodeLine{28     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{29       RowsAtCompileTime = \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}},}
+\DoxyCodeLine{30       ColsAtCompileTime = \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}}
+\DoxyCodeLine{31     \};}
+\DoxyCodeLine{32   \};}
+\DoxyCodeLine{33   \textcolor{keyword}{template} <\textcolor{keyword}{typename} SparseQRType> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{structEigen_1_1SparseQRMatrixQTransposeReturnType}{SparseQRMatrixQTransposeReturnType}}<SparseQRType> >}
+\DoxyCodeLine{34   \{}
+\DoxyCodeLine{35     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} SparseQRType::MatrixType ReturnType;}
+\DoxyCodeLine{36   \};}
+\DoxyCodeLine{37   \textcolor{keyword}{template} <\textcolor{keyword}{typename} SparseQRType, \textcolor{keyword}{typename} Derived> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{structEigen_1_1SparseQR__QProduct}{SparseQR\_QProduct}}<SparseQRType, Derived> >}
+\DoxyCodeLine{38   \{}
+\DoxyCodeLine{39     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Derived::PlainObject ReturnType;}
+\DoxyCodeLine{40   \};}
+\DoxyCodeLine{41 \} \textcolor{comment}{// End namespace internal}}
+\DoxyCodeLine{42 }
+\DoxyCodeLine{85 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_, \textcolor{keyword}{typename} OrderingType\_>}
+\DoxyCodeLine{86 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1SparseQR}{SparseQR}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{SparseSolverBase}}<SparseQR<MatrixType\_,OrderingType\_> >}
+\DoxyCodeLine{87 \{}
+\DoxyCodeLine{88   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{89     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{SparseSolverBase<SparseQR<MatrixType\_,OrderingType\_>}} > \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{Base}};}
+\DoxyCodeLine{90     \textcolor{keyword}{using} Base::m\_isInitialized;}
+\DoxyCodeLine{91   \textcolor{keyword}{public}:}
+\DoxyCodeLine{92     \textcolor{keyword}{using} Base::\_solve\_impl;}
+\DoxyCodeLine{93     \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{94     \textcolor{keyword}{typedef} OrderingType\_ OrderingType;}
+\DoxyCodeLine{95     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar Scalar;}
+\DoxyCodeLine{96     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::RealScalar RealScalar;}
+\DoxyCodeLine{97     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::StorageIndex StorageIndex;}
+\DoxyCodeLine{98     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<Scalar,ColMajor,StorageIndex>}} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{QRMatrixType}};}
+\DoxyCodeLine{99     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<StorageIndex, Dynamic, 1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}};}
+\DoxyCodeLine{100     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar, Dynamic, 1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{ScalarVector}};}
+\DoxyCodeLine{101     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationMatrix<Dynamic, Dynamic, StorageIndex>}} \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationType}};}
+\DoxyCodeLine{102 }
+\DoxyCodeLine{103     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{104       ColsAtCompileTime = MatrixType::ColsAtCompileTime,}
+\DoxyCodeLine{105       MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime}
+\DoxyCodeLine{106     \};}
+\DoxyCodeLine{107     }
+\DoxyCodeLine{108   \textcolor{keyword}{public}:}
+\DoxyCodeLine{109     \mbox{\hyperlink{classEigen_1_1SparseQR}{SparseQR}} () :  m\_analysisIsok(\textcolor{keyword}{false}), m\_lastError(\textcolor{stringliteral}{"{}"{}}), m\_useDefaultThreshold(\textcolor{keyword}{true}),m\_isQSorted(\textcolor{keyword}{false}),m\_isEtreeOk(\textcolor{keyword}{false})}
+\DoxyCodeLine{110     \{ \}}
+\DoxyCodeLine{111     }
+\DoxyCodeLine{118     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1SparseQR_a5f13e65437ada7e10a85de8cd55db11d}{SparseQR}}(\textcolor{keyword}{const} MatrixType\& mat) : m\_analysisIsok(false), m\_lastError(\textcolor{stringliteral}{"{}"{}}), m\_useDefaultThreshold(true),m\_isQSorted(false),m\_isEtreeOk(false)}
+\DoxyCodeLine{119     \{}
+\DoxyCodeLine{120       \mbox{\hyperlink{classEigen_1_1SparseQR_aba8ae81fd3d4ce9139eccb6b7a0256b2}{compute}}(mat);}
+\DoxyCodeLine{121     \}}
+\DoxyCodeLine{122     }
+\DoxyCodeLine{129     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1SparseQR_aba8ae81fd3d4ce9139eccb6b7a0256b2}{compute}}(\textcolor{keyword}{const} MatrixType\& mat)}
+\DoxyCodeLine{130     \{}
+\DoxyCodeLine{131       \mbox{\hyperlink{classEigen_1_1SparseQR_a4b425ddb1358c914d764cde48853a4f6}{analyzePattern}}(mat);}
+\DoxyCodeLine{132       \mbox{\hyperlink{classEigen_1_1SparseQR_a55a34bacf05bd30a1dacbccad9f03c6d}{factorize}}(mat);}
+\DoxyCodeLine{133     \}}
+\DoxyCodeLine{134     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1SparseQR_a4b425ddb1358c914d764cde48853a4f6}{analyzePattern}}(\textcolor{keyword}{const} MatrixType\& mat);}
+\DoxyCodeLine{135     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1SparseQR_a55a34bacf05bd30a1dacbccad9f03c6d}{factorize}}(\textcolor{keyword}{const} MatrixType\& mat);}
+\DoxyCodeLine{136     }
+\DoxyCodeLine{139     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \mbox{\hyperlink{classEigen_1_1SparseQR_a9b196c075fdf32737b6843a615e79ea6}{rows}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_pmat.\mbox{\hyperlink{classEigen_1_1SparseMatrix_a853a76dd42349fa2f3654a4a61e0f574}{rows}}(); \}}
+\DoxyCodeLine{140     }
+\DoxyCodeLine{143     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \mbox{\hyperlink{classEigen_1_1SparseQR_a6fdb992f3381ecc5b0a21a692fc0e0a4}{cols}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_pmat.\mbox{\hyperlink{classEigen_1_1SparseMatrix_a36b8cc95234b4e2de38a199b6b2af9fc}{cols}}();\}}
+\DoxyCodeLine{144     }
+\DoxyCodeLine{158     \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{QRMatrixType}}\& \mbox{\hyperlink{classEigen_1_1SparseQR_a72ca645c14679dffe8b29f1bbfb500ba}{matrixR}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_R; \}}
+\DoxyCodeLine{159     }
+\DoxyCodeLine{164     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \mbox{\hyperlink{classEigen_1_1SparseQR_afa0359921bffa067601b102edff440b0}{rank}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{165 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{166       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}The factorization should be called first, use compute()"{}});}
+\DoxyCodeLine{167       \textcolor{keywordflow}{return} m\_nonzeropivots; }
+\DoxyCodeLine{168     \}}
+\DoxyCodeLine{169     }
+\DoxyCodeLine{188     \mbox{\hyperlink{structEigen_1_1SparseQRMatrixQReturnType}{SparseQRMatrixQReturnType<SparseQR>}} \mbox{\hyperlink{classEigen_1_1SparseQR_a7e48d6699393739d6cebe45509d0673d}{matrixQ}}()\textcolor{keyword}{ const }}
+\DoxyCodeLine{189 \textcolor{keyword}{    }\{ \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1SparseQRMatrixQReturnType}{SparseQRMatrixQReturnType<SparseQR>}}(*\textcolor{keyword}{this}); \}}
+\DoxyCodeLine{190     }
+\DoxyCodeLine{194     \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationType}}\& \mbox{\hyperlink{classEigen_1_1SparseQR_a0411828875c786a9082be0067c5879f9}{colsPermutation}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{195 \textcolor{keyword}{    }\{ }
+\DoxyCodeLine{196       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}Decomposition is not initialized."{}});}
+\DoxyCodeLine{197       \textcolor{keywordflow}{return} m\_outputPerm\_c;}
+\DoxyCodeLine{198     \}}
+\DoxyCodeLine{199     }
+\DoxyCodeLine{203     std::string \mbox{\hyperlink{classEigen_1_1SparseQR_ab9cc9c9d14e8c2f7587ca3f747bd1c14}{lastErrorMessage}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_lastError; \}}
+\DoxyCodeLine{204     }
+\DoxyCodeLine{206     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{207     \textcolor{keywordtype}{bool} \_solve\_impl(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Rhs>}} \&B, \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Dest>}} \&dest)\textcolor{keyword}{ const}}
+\DoxyCodeLine{208 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{209       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}The factorization should be called first, use compute()"{}});}
+\DoxyCodeLine{210       eigen\_assert(this-\/>\mbox{\hyperlink{classEigen_1_1SparseQR_a9b196c075fdf32737b6843a615e79ea6}{rows}}() == B.rows() \&\& \textcolor{stringliteral}{"{}SparseQR::solve() : invalid number of rows in the right hand side matrix"{}});}
+\DoxyCodeLine{211 }
+\DoxyCodeLine{212       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \mbox{\hyperlink{classEigen_1_1SparseQR_afa0359921bffa067601b102edff440b0}{rank}} = this-\/>\mbox{\hyperlink{classEigen_1_1SparseQR_afa0359921bffa067601b102edff440b0}{rank}}();}
+\DoxyCodeLine{213       }
+\DoxyCodeLine{214       \textcolor{comment}{// Compute Q\string^* * b;}}
+\DoxyCodeLine{215       \textcolor{keyword}{typename} Dest::PlainObject y, b;}
+\DoxyCodeLine{216       y = this-\/>\mbox{\hyperlink{classEigen_1_1SparseQR_a7e48d6699393739d6cebe45509d0673d}{matrixQ}}().adjoint() * B;}
+\DoxyCodeLine{217       b = y;}
+\DoxyCodeLine{218       }
+\DoxyCodeLine{219       \textcolor{comment}{// Solve with the triangular matrix R}}
+\DoxyCodeLine{220       y.resize((std::max<Index>)(\mbox{\hyperlink{classEigen_1_1SparseQR_a6fdb992f3381ecc5b0a21a692fc0e0a4}{cols}}(),y.rows()),y.cols());}
+\DoxyCodeLine{221       y.topRows(\mbox{\hyperlink{classEigen_1_1SparseQR_afa0359921bffa067601b102edff440b0}{rank}}) = this-\/>\mbox{\hyperlink{classEigen_1_1SparseQR_a72ca645c14679dffe8b29f1bbfb500ba}{matrixR}}().topLeftCorner(rank, \mbox{\hyperlink{classEigen_1_1SparseQR_afa0359921bffa067601b102edff440b0}{rank}}).template triangularView<Upper>().solve(b.topRows(\mbox{\hyperlink{classEigen_1_1SparseQR_afa0359921bffa067601b102edff440b0}{rank}}));}
+\DoxyCodeLine{222       y.bottomRows(y.rows()-\/\mbox{\hyperlink{classEigen_1_1SparseQR_afa0359921bffa067601b102edff440b0}{rank}}).setZero();}
+\DoxyCodeLine{223       }
+\DoxyCodeLine{224       \textcolor{comment}{// Apply the column permutation}}
+\DoxyCodeLine{225       \textcolor{keywordflow}{if} (m\_perm\_c.\mbox{\hyperlink{classEigen_1_1PermutationBase_a25614f2ddbe5f9250496188d54cd793d}{size}}())  dest = \mbox{\hyperlink{classEigen_1_1SparseQR_a0411828875c786a9082be0067c5879f9}{colsPermutation}}() * y.topRows(\mbox{\hyperlink{classEigen_1_1SparseQR_a6fdb992f3381ecc5b0a21a692fc0e0a4}{cols}}());}
+\DoxyCodeLine{226       \textcolor{keywordflow}{else}                  dest = y.topRows(\mbox{\hyperlink{classEigen_1_1SparseQR_a6fdb992f3381ecc5b0a21a692fc0e0a4}{cols}}());}
+\DoxyCodeLine{227       }
+\DoxyCodeLine{228       m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}};}
+\DoxyCodeLine{229       \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
+\DoxyCodeLine{230     \}}
+\DoxyCodeLine{231 }
+\DoxyCodeLine{237     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1SparseQR_a05f11a211307cb106e9e47ee9730d7ed}{setPivotThreshold}}(\textcolor{keyword}{const} RealScalar\& threshold)}
+\DoxyCodeLine{238     \{}
+\DoxyCodeLine{239       m\_useDefaultThreshold = \textcolor{keyword}{false};}
+\DoxyCodeLine{240       m\_threshold = threshold;}
+\DoxyCodeLine{241     \}}
+\DoxyCodeLine{242     }
+\DoxyCodeLine{247     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{248     \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Solve}{Solve<SparseQR, Rhs>}} \mbox{\hyperlink{classEigen_1_1SparseQR_a888f5d0676807ef875aba643baa10e3d}{solve}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Rhs>}}\& B)\textcolor{keyword}{ const }}
+\DoxyCodeLine{249 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{250       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}The factorization should be called first, use compute()"{}});}
+\DoxyCodeLine{251       eigen\_assert(this-\/>\mbox{\hyperlink{classEigen_1_1SparseQR_a9b196c075fdf32737b6843a615e79ea6}{rows}}() == B.rows() \&\& \textcolor{stringliteral}{"{}SparseQR::solve() : invalid number of rows in the right hand side matrix"{}});}
+\DoxyCodeLine{252       \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Solve}{Solve<SparseQR, Rhs>}}(*\textcolor{keyword}{this}, B.derived());}
+\DoxyCodeLine{253     \}}
+\DoxyCodeLine{254     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{255     \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Solve}{Solve<SparseQR, Rhs>}} \mbox{\hyperlink{classEigen_1_1SparseQR_a888f5d0676807ef875aba643baa10e3d}{solve}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{SparseMatrixBase<Rhs>}}\& B)\textcolor{keyword}{ const}}
+\DoxyCodeLine{256 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{257           eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}The factorization should be called first, use compute()"{}});}
+\DoxyCodeLine{258           eigen\_assert(this-\/>\mbox{\hyperlink{classEigen_1_1SparseQR_a9b196c075fdf32737b6843a615e79ea6}{rows}}() == B.\mbox{\hyperlink{classEigen_1_1SparseMatrixBase_a1944e9fa9ce7937bfc3a87b2cb94371f}{rows}}() \&\& \textcolor{stringliteral}{"{}SparseQR::solve() : invalid number of rows in the right hand side matrix"{}});}
+\DoxyCodeLine{259           \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Solve}{Solve<SparseQR, Rhs>}}(*\textcolor{keyword}{this}, B.derived());}
+\DoxyCodeLine{260     \}}
+\DoxyCodeLine{261     }
+\DoxyCodeLine{270     \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} \mbox{\hyperlink{classEigen_1_1SparseQR_ae9da700b8c3b9bb30ff77508c359e764}{info}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{271 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{272       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}Decomposition is not initialized."{}});}
+\DoxyCodeLine{273       \textcolor{keywordflow}{return} m\_info;}
+\DoxyCodeLine{274     \}}
+\DoxyCodeLine{275 }
+\DoxyCodeLine{276 }
+\DoxyCodeLine{278     \textcolor{keyword}{inline} \textcolor{keywordtype}{void} \_sort\_matrix\_Q()}
+\DoxyCodeLine{279     \{}
+\DoxyCodeLine{280       \textcolor{keywordflow}{if}(this-\/>m\_isQSorted) \textcolor{keywordflow}{return};}
+\DoxyCodeLine{281       \textcolor{comment}{// The matrix Q is sorted during the transposition}}
+\DoxyCodeLine{282       \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<Scalar, RowMajor, Index>}} mQrm(this-\/>m\_Q);}
+\DoxyCodeLine{283       this-\/>m\_Q = mQrm;}
+\DoxyCodeLine{284       this-\/>m\_isQSorted = \textcolor{keyword}{true};}
+\DoxyCodeLine{285     \}}
+\DoxyCodeLine{286 }
+\DoxyCodeLine{287     }
+\DoxyCodeLine{288   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{289     \textcolor{keywordtype}{bool} m\_analysisIsok;}
+\DoxyCodeLine{290     \textcolor{keywordtype}{bool} m\_factorizationIsok;}
+\DoxyCodeLine{291     \textcolor{keyword}{mutable} \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} m\_info;}
+\DoxyCodeLine{292     std::string m\_lastError;}
+\DoxyCodeLine{293     QRMatrixType m\_pmat;            \textcolor{comment}{// Temporary matrix}}
+\DoxyCodeLine{294     QRMatrixType m\_R;               \textcolor{comment}{// The triangular factor matrix}}
+\DoxyCodeLine{295     QRMatrixType m\_Q;               \textcolor{comment}{// The orthogonal reflectors}}
+\DoxyCodeLine{296     ScalarVector m\_hcoeffs;         \textcolor{comment}{// The Householder coefficients}}
+\DoxyCodeLine{297     PermutationType m\_perm\_c;       \textcolor{comment}{// Fill-\/reducing  Column  permutation}}
+\DoxyCodeLine{298     PermutationType m\_pivotperm;    \textcolor{comment}{// The permutation for rank revealing}}
+\DoxyCodeLine{299     PermutationType m\_outputPerm\_c; \textcolor{comment}{// The final column permutation}}
+\DoxyCodeLine{300     RealScalar m\_threshold;         \textcolor{comment}{// Threshold to determine null Householder reflections}}
+\DoxyCodeLine{301     \textcolor{keywordtype}{bool} m\_useDefaultThreshold;     \textcolor{comment}{// Use default threshold}}
+\DoxyCodeLine{302     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m\_nonzeropivots;          \textcolor{comment}{// Number of non zero pivots found}}
+\DoxyCodeLine{303     IndexVector m\_etree;            \textcolor{comment}{// Column elimination tree}}
+\DoxyCodeLine{304     IndexVector m\_firstRowElt;      \textcolor{comment}{// First element in each row}}
+\DoxyCodeLine{305     \textcolor{keywordtype}{bool} m\_isQSorted;               \textcolor{comment}{// whether Q is sorted or not}}
+\DoxyCodeLine{306     \textcolor{keywordtype}{bool} m\_isEtreeOk;               \textcolor{comment}{// whether the elimination tree match the initial input matrix}}
+\DoxyCodeLine{307     }
+\DoxyCodeLine{308     \textcolor{keyword}{template} <\textcolor{keyword}{typename}, \textcolor{keyword}{typename} > \textcolor{keyword}{friend} \textcolor{keyword}{struct }SparseQR\_QProduct;}
+\DoxyCodeLine{309     }
+\DoxyCodeLine{310 \};}
+\DoxyCodeLine{311 }
+\DoxyCodeLine{321 \textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixType, \textcolor{keyword}{typename} OrderingType>}
+\DoxyCodeLine{322 \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1SparseQR_a4b425ddb1358c914d764cde48853a4f6}{SparseQR<MatrixType,OrderingType>::analyzePattern}}(\textcolor{keyword}{const} MatrixType\& mat)}
+\DoxyCodeLine{323 \{}
+\DoxyCodeLine{324   eigen\_assert(mat.isCompressed() \&\& \textcolor{stringliteral}{"{}SparseQR requires a sparse matrix in compressed mode. Call .makeCompressed() before passing it to SparseQR"{}});}
+\DoxyCodeLine{325   \textcolor{comment}{// Copy to a column major matrix if the input is rowmajor}}
+\DoxyCodeLine{326   \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::conditional<MatrixType::IsRowMajor,QRMatrixType,const MatrixType\&>::type}} matCpy(mat);}
+\DoxyCodeLine{327   \textcolor{comment}{// Compute the column fill reducing ordering}}
+\DoxyCodeLine{328   OrderingType ord; }
+\DoxyCodeLine{329   ord(matCpy, m\_perm\_c); }
+\DoxyCodeLine{330   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} n = mat.cols();}
+\DoxyCodeLine{331   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m = mat.rows();}
+\DoxyCodeLine{332   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} diagSize = (std::min)(m,n);}
+\DoxyCodeLine{333   }
+\DoxyCodeLine{334   \textcolor{keywordflow}{if} (!m\_perm\_c.size())}
+\DoxyCodeLine{335   \{}
+\DoxyCodeLine{336     m\_perm\_c.resize(n);}
+\DoxyCodeLine{337     m\_perm\_c.indices().setLinSpaced(n, 0,StorageIndex(n-\/1));}
+\DoxyCodeLine{338   \}}
+\DoxyCodeLine{339   }
+\DoxyCodeLine{340   \textcolor{comment}{// Compute the column elimination tree of the permuted matrix}}
+\DoxyCodeLine{341   m\_outputPerm\_c = m\_perm\_c.inverse();}
+\DoxyCodeLine{342   internal::coletree(matCpy, m\_etree, m\_firstRowElt, m\_outputPerm\_c.indices().data());}
+\DoxyCodeLine{343   m\_isEtreeOk = \textcolor{keyword}{true};}
+\DoxyCodeLine{344   }
+\DoxyCodeLine{345   m\_R.resize(m, n);}
+\DoxyCodeLine{346   m\_Q.resize(m, diagSize);}
+\DoxyCodeLine{347   }
+\DoxyCodeLine{348   \textcolor{comment}{// Allocate space for nonzero elements: rough estimation}}
+\DoxyCodeLine{349   m\_R.reserve(2*mat.nonZeros()); \textcolor{comment}{//FIXME Get a more accurate estimation through symbolic factorization with the etree}}
+\DoxyCodeLine{350   m\_Q.reserve(2*mat.nonZeros());}
+\DoxyCodeLine{351   m\_hcoeffs.resize(diagSize);}
+\DoxyCodeLine{352   m\_analysisIsok = \textcolor{keyword}{true};}
+\DoxyCodeLine{353 \}}
+\DoxyCodeLine{354 }
+\DoxyCodeLine{362 \textcolor{keyword}{template} <\textcolor{keyword}{typename} MatrixType, \textcolor{keyword}{typename} OrderingType>}
+\DoxyCodeLine{363 \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1SparseQR_a55a34bacf05bd30a1dacbccad9f03c6d}{SparseQR<MatrixType,OrderingType>::factorize}}(\textcolor{keyword}{const} MatrixType\& mat)}
+\DoxyCodeLine{364 \{}
+\DoxyCodeLine{365   \textcolor{keyword}{using} std::abs;}
+\DoxyCodeLine{366   }
+\DoxyCodeLine{367   eigen\_assert(m\_analysisIsok \&\& \textcolor{stringliteral}{"{}analyzePattern() should be called before this step"{}});}
+\DoxyCodeLine{368   StorageIndex m = StorageIndex(mat.rows());}
+\DoxyCodeLine{369   StorageIndex n = StorageIndex(mat.cols());}
+\DoxyCodeLine{370   StorageIndex diagSize = (std::min)(m,n);}
+\DoxyCodeLine{371   \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}} mark((std::max)(m,n)); mark.\mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac8dea1df3d92b752cc683ff42abf6f9b}{setConstant}}(-\/1);  \textcolor{comment}{// Record the visited nodes}}
+\DoxyCodeLine{372   \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}} Ridx(n), Qidx(m);                             \textcolor{comment}{// Store temporarily the row indexes for the current column of R and Q}}
+\DoxyCodeLine{373   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nzcolR, nzcolQ;                                     \textcolor{comment}{// Number of nonzero for the current column of R and Q}}
+\DoxyCodeLine{374   \mbox{\hyperlink{classEigen_1_1Matrix}{ScalarVector}} tval(m);                                     \textcolor{comment}{// The dense vector used to compute the current column}}
+\DoxyCodeLine{375   RealScalar pivotThreshold = m\_threshold;}
+\DoxyCodeLine{376   }
+\DoxyCodeLine{377   m\_R.setZero();}
+\DoxyCodeLine{378   m\_Q.setZero();}
+\DoxyCodeLine{379   m\_pmat = mat;}
+\DoxyCodeLine{380   \textcolor{keywordflow}{if}(!m\_isEtreeOk)}
+\DoxyCodeLine{381   \{}
+\DoxyCodeLine{382     m\_outputPerm\_c = m\_perm\_c.inverse();}
+\DoxyCodeLine{383     internal::coletree(m\_pmat, m\_etree, m\_firstRowElt, m\_outputPerm\_c.indices().data());}
+\DoxyCodeLine{384     m\_isEtreeOk = \textcolor{keyword}{true};}
+\DoxyCodeLine{385   \}}
+\DoxyCodeLine{386 }
+\DoxyCodeLine{387   m\_pmat.uncompress(); \textcolor{comment}{// To have the innerNonZeroPtr allocated}}
+\DoxyCodeLine{388   }
+\DoxyCodeLine{389   \textcolor{comment}{// Apply the fill-\/in reducing permutation lazily:}}
+\DoxyCodeLine{390   \{}
+\DoxyCodeLine{391     \textcolor{comment}{// If the input is row major, copy the original column indices,}}
+\DoxyCodeLine{392     \textcolor{comment}{// otherwise directly use the input matrix}}
+\DoxyCodeLine{393     \textcolor{comment}{// }}
+\DoxyCodeLine{394     \mbox{\hyperlink{classEigen_1_1Matrix}{IndexVector}} originalOuterIndicesCpy;}
+\DoxyCodeLine{395     \textcolor{keyword}{const} StorageIndex *originalOuterIndices = mat.outerIndexPtr();}
+\DoxyCodeLine{396     \textcolor{keywordflow}{if}(MatrixType::IsRowMajor)}
+\DoxyCodeLine{397     \{}
+\DoxyCodeLine{398       originalOuterIndicesCpy = IndexVector::Map(m\_pmat.outerIndexPtr(),n+1);}
+\DoxyCodeLine{399       originalOuterIndices = originalOuterIndicesCpy.data();}
+\DoxyCodeLine{400     \}}
+\DoxyCodeLine{401     }
+\DoxyCodeLine{402     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < n; i++)}
+\DoxyCodeLine{403     \{}
+\DoxyCodeLine{404       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} p = m\_perm\_c.size() ? m\_perm\_c.indices()(i) : i;}
+\DoxyCodeLine{405       m\_pmat.outerIndexPtr()[p] = originalOuterIndices[i]; }
+\DoxyCodeLine{406       m\_pmat.innerNonZeroPtr()[p] = originalOuterIndices[i+1] -\/ originalOuterIndices[i]; }
+\DoxyCodeLine{407     \}}
+\DoxyCodeLine{408   \}}
+\DoxyCodeLine{409   }
+\DoxyCodeLine{410   \textcolor{comment}{/* Compute the default threshold as in MatLab, see:}}
+\DoxyCodeLine{411 \textcolor{comment}{   * Tim Davis, "{}Algorithm 915, SuiteSparseQR: Multifrontal Multithreaded Rank-\/Revealing}}
+\DoxyCodeLine{412 \textcolor{comment}{   * Sparse QR Factorization, ACM Trans. on Math. Soft. 38(1), 2011, Page 8:3 }}
+\DoxyCodeLine{413 \textcolor{comment}{   */}}
+\DoxyCodeLine{414   \textcolor{keywordflow}{if}(m\_useDefaultThreshold) }
+\DoxyCodeLine{415   \{}
+\DoxyCodeLine{416     RealScalar max2Norm = 0.0;}
+\DoxyCodeLine{417     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} j = 0; j < n; j++) max2Norm = numext::maxi(max2Norm, m\_pmat.col(j).norm());}
+\DoxyCodeLine{418     \textcolor{keywordflow}{if}(max2Norm==RealScalar(0))}
+\DoxyCodeLine{419       max2Norm = RealScalar(1);}
+\DoxyCodeLine{420     pivotThreshold = 20 * (m + n) * max2Norm * \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<RealScalar>::epsilon}}();}
+\DoxyCodeLine{421   \}}
+\DoxyCodeLine{422   }
+\DoxyCodeLine{423   \textcolor{comment}{// Initialize the numerical permutation}}
+\DoxyCodeLine{424   m\_pivotperm.setIdentity(n);}
+\DoxyCodeLine{425   }
+\DoxyCodeLine{426   StorageIndex nonzeroCol = 0; \textcolor{comment}{// Record the number of valid pivots}}
+\DoxyCodeLine{427   m\_Q.startVec(0);}
+\DoxyCodeLine{428 }
+\DoxyCodeLine{429   \textcolor{comment}{// Left looking rank-\/revealing QR factorization: compute a column of R and Q at a time}}
+\DoxyCodeLine{430   \textcolor{keywordflow}{for} (StorageIndex col = 0; col < n; ++col)}
+\DoxyCodeLine{431   \{}
+\DoxyCodeLine{432     mark.\mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac8dea1df3d92b752cc683ff42abf6f9b}{setConstant}}(-\/1);}
+\DoxyCodeLine{433     m\_R.startVec(col);}
+\DoxyCodeLine{434     mark(nonzeroCol) = col;}
+\DoxyCodeLine{435     Qidx(0) = nonzeroCol;}
+\DoxyCodeLine{436     nzcolR = 0; nzcolQ = 1;}
+\DoxyCodeLine{437     \textcolor{keywordtype}{bool} found\_diag = nonzeroCol>=m;}
+\DoxyCodeLine{438     tval.\mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac21ad5f989f320e46958b75ac8d9a1da}{setZero}}(); }
+\DoxyCodeLine{439     }
+\DoxyCodeLine{440     \textcolor{comment}{// Symbolic factorization: find the nonzero locations of the column k of the factors R and Q, i.e.,}}
+\DoxyCodeLine{441     \textcolor{comment}{// all the nodes (with indexes lower than rank) reachable through the column elimination tree (etree) rooted at node k.}}
+\DoxyCodeLine{442     \textcolor{comment}{// Note: if the diagonal entry does not exist, then its contribution must be explicitly added,}}
+\DoxyCodeLine{443     \textcolor{comment}{// thus the trick with found\_diag that permits to do one more iteration on the diagonal element if this one has not been found.}}
+\DoxyCodeLine{444     \textcolor{keywordflow}{for} (\textcolor{keyword}{typename} QRMatrixType::InnerIterator itp(m\_pmat, col); itp || !found\_diag; ++itp)}
+\DoxyCodeLine{445     \{}
+\DoxyCodeLine{446       StorageIndex curIdx = nonzeroCol;}
+\DoxyCodeLine{447       \textcolor{keywordflow}{if}(itp) curIdx = StorageIndex(itp.row());}
+\DoxyCodeLine{448       \textcolor{keywordflow}{if}(curIdx == nonzeroCol) found\_diag = \textcolor{keyword}{true};}
+\DoxyCodeLine{449       }
+\DoxyCodeLine{450       \textcolor{comment}{// Get the nonzeros indexes of the current column of R}}
+\DoxyCodeLine{451       StorageIndex st = m\_firstRowElt(curIdx); \textcolor{comment}{// The traversal of the etree starts here}}
+\DoxyCodeLine{452       \textcolor{keywordflow}{if} (st < 0 )}
+\DoxyCodeLine{453       \{}
+\DoxyCodeLine{454         m\_lastError = \textcolor{stringliteral}{"{}Empty row found during numerical factorization"{}};}
+\DoxyCodeLine{455         m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea580b2a3cafe585691e789f768fb729bf}{InvalidInput}};}
+\DoxyCodeLine{456         \textcolor{keywordflow}{return};}
+\DoxyCodeLine{457       \}}
+\DoxyCodeLine{458 }
+\DoxyCodeLine{459       \textcolor{comment}{// Traverse the etree }}
+\DoxyCodeLine{460       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} bi = nzcolR;}
+\DoxyCodeLine{461       \textcolor{keywordflow}{for} (; mark(st) != col; st = m\_etree(st))}
+\DoxyCodeLine{462       \{}
+\DoxyCodeLine{463         Ridx(nzcolR) = st;  \textcolor{comment}{// Add this row to the list,}}
+\DoxyCodeLine{464         mark(st) = col;     \textcolor{comment}{// and mark this row as visited}}
+\DoxyCodeLine{465         nzcolR++;}
+\DoxyCodeLine{466       \}}
+\DoxyCodeLine{467 }
+\DoxyCodeLine{468       \textcolor{comment}{// Reverse the list to get the topological ordering}}
+\DoxyCodeLine{469       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nt = nzcolR-\/bi;}
+\DoxyCodeLine{470       \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = 0; i < nt/2; i++) std::swap(Ridx(bi+i), Ridx(nzcolR-\/i-\/1));}
+\DoxyCodeLine{471        }
+\DoxyCodeLine{472       \textcolor{comment}{// Copy the current (curIdx,pcol) value of the input matrix}}
+\DoxyCodeLine{473       \textcolor{keywordflow}{if}(itp) tval(curIdx) = itp.value();}
+\DoxyCodeLine{474       \textcolor{keywordflow}{else}    tval(curIdx) = Scalar(0);}
+\DoxyCodeLine{475       }
+\DoxyCodeLine{476       \textcolor{comment}{// Compute the pattern of Q(:,k)}}
+\DoxyCodeLine{477       \textcolor{keywordflow}{if}(curIdx > nonzeroCol \&\& mark(curIdx) != col ) }
+\DoxyCodeLine{478       \{}
+\DoxyCodeLine{479         Qidx(nzcolQ) = curIdx;  \textcolor{comment}{// Add this row to the pattern of Q,}}
+\DoxyCodeLine{480         mark(curIdx) = col;     \textcolor{comment}{// and mark it as visited}}
+\DoxyCodeLine{481         nzcolQ++;}
+\DoxyCodeLine{482       \}}
+\DoxyCodeLine{483     \}}
+\DoxyCodeLine{484 }
+\DoxyCodeLine{485     \textcolor{comment}{// Browse all the indexes of R(:,col) in reverse order}}
+\DoxyCodeLine{486     \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = nzcolR-\/1; i >= 0; i-\/-\/)}
+\DoxyCodeLine{487     \{}
+\DoxyCodeLine{488       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} curIdx = Ridx(i);}
+\DoxyCodeLine{489       }
+\DoxyCodeLine{490       \textcolor{comment}{// Apply the curIdx-\/th householder vector to the current column (temporarily stored into tval)}}
+\DoxyCodeLine{491       Scalar tdot(0);}
+\DoxyCodeLine{492       }
+\DoxyCodeLine{493       \textcolor{comment}{// First compute q' * tval}}
+\DoxyCodeLine{494       tdot = m\_Q.col(curIdx).dot(tval);}
+\DoxyCodeLine{495 }
+\DoxyCodeLine{496       tdot *= m\_hcoeffs(curIdx);}
+\DoxyCodeLine{497       }
+\DoxyCodeLine{498       \textcolor{comment}{// Then update tval = tval -\/ q * tau}}
+\DoxyCodeLine{499       \textcolor{comment}{// FIXME: tval -\/= tdot * m\_Q.col(curIdx) should amount to the same (need to check/add support for efficient "{}dense ?= sparse"{})}}
+\DoxyCodeLine{500       \textcolor{keywordflow}{for} (\textcolor{keyword}{typename} QRMatrixType::InnerIterator itq(m\_Q, curIdx); itq; ++itq)}
+\DoxyCodeLine{501         tval(itq.row()) -\/= itq.value() * tdot;}
+\DoxyCodeLine{502 }
+\DoxyCodeLine{503       \textcolor{comment}{// Detect fill-\/in for the current column of Q}}
+\DoxyCodeLine{504       \textcolor{keywordflow}{if}(m\_etree(Ridx(i)) == nonzeroCol)}
+\DoxyCodeLine{505       \{}
+\DoxyCodeLine{506         \textcolor{keywordflow}{for} (\textcolor{keyword}{typename} QRMatrixType::InnerIterator itq(m\_Q, curIdx); itq; ++itq)}
+\DoxyCodeLine{507         \{}
+\DoxyCodeLine{508           StorageIndex iQ = StorageIndex(itq.row());}
+\DoxyCodeLine{509           \textcolor{keywordflow}{if} (mark(iQ) != col)}
+\DoxyCodeLine{510           \{}
+\DoxyCodeLine{511             Qidx(nzcolQ++) = iQ;  \textcolor{comment}{// Add this row to the pattern of Q,}}
+\DoxyCodeLine{512             mark(iQ) = col;       \textcolor{comment}{// and mark it as visited}}
+\DoxyCodeLine{513           \}}
+\DoxyCodeLine{514         \}}
+\DoxyCodeLine{515       \}}
+\DoxyCodeLine{516     \} \textcolor{comment}{// End update current column}}
+\DoxyCodeLine{517     }
+\DoxyCodeLine{518     Scalar tau = RealScalar(0);}
+\DoxyCodeLine{519     RealScalar beta = 0;}
+\DoxyCodeLine{520     }
+\DoxyCodeLine{521     \textcolor{keywordflow}{if}(nonzeroCol < diagSize)}
+\DoxyCodeLine{522     \{}
+\DoxyCodeLine{523       \textcolor{comment}{// Compute the Householder reflection that eliminate the current column}}
+\DoxyCodeLine{524       \textcolor{comment}{// FIXME this step should call the Householder module.}}
+\DoxyCodeLine{525       Scalar c0 = nzcolQ ? tval(Qidx(0)) : Scalar(0);}
+\DoxyCodeLine{526       }
+\DoxyCodeLine{527       \textcolor{comment}{// First, the squared norm of Q((col+1):m, col)}}
+\DoxyCodeLine{528       RealScalar sqrNorm = 0.;}
+\DoxyCodeLine{529       \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} itq = 1; itq < nzcolQ; ++itq) sqrNorm += numext::abs2(tval(Qidx(itq)));}
+\DoxyCodeLine{530       \textcolor{keywordflow}{if}(sqrNorm == RealScalar(0) \&\& numext::imag(c0) == RealScalar(0))}
+\DoxyCodeLine{531       \{}
+\DoxyCodeLine{532         beta = numext::real(c0);}
+\DoxyCodeLine{533         tval(Qidx(0)) = 1;}
+\DoxyCodeLine{534       \}}
+\DoxyCodeLine{535       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{536       \{}
+\DoxyCodeLine{537         \textcolor{keyword}{using} std::sqrt;}
+\DoxyCodeLine{538         beta = sqrt(numext::abs2(c0) + sqrNorm);}
+\DoxyCodeLine{539         \textcolor{keywordflow}{if}(numext::real(c0) >= RealScalar(0))}
+\DoxyCodeLine{540           beta = -\/beta;}
+\DoxyCodeLine{541         tval(Qidx(0)) = 1;}
+\DoxyCodeLine{542         \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} itq = 1; itq < nzcolQ; ++itq)}
+\DoxyCodeLine{543           tval(Qidx(itq)) /= (c0 -\/ beta);}
+\DoxyCodeLine{544         tau = numext::conj((beta-\/c0) / beta);}
+\DoxyCodeLine{545           }
+\DoxyCodeLine{546       \}}
+\DoxyCodeLine{547     \}}
+\DoxyCodeLine{548 }
+\DoxyCodeLine{549     \textcolor{comment}{// Insert values in R}}
+\DoxyCodeLine{550     \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}  i = nzcolR-\/1; i >= 0; i-\/-\/)}
+\DoxyCodeLine{551     \{}
+\DoxyCodeLine{552       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} curIdx = Ridx(i);}
+\DoxyCodeLine{553       \textcolor{keywordflow}{if}(curIdx < nonzeroCol) }
+\DoxyCodeLine{554       \{}
+\DoxyCodeLine{555         m\_R.insertBackByOuterInnerUnordered(col, curIdx) = tval(curIdx);}
+\DoxyCodeLine{556         tval(curIdx) = Scalar(0.);}
+\DoxyCodeLine{557       \}}
+\DoxyCodeLine{558     \}}
+\DoxyCodeLine{559 }
+\DoxyCodeLine{560     \textcolor{keywordflow}{if}(nonzeroCol < diagSize \&\& abs(beta) >= pivotThreshold)}
+\DoxyCodeLine{561     \{}
+\DoxyCodeLine{562       m\_R.insertBackByOuterInner(col, nonzeroCol) = beta;}
+\DoxyCodeLine{563       \textcolor{comment}{// The householder coefficient}}
+\DoxyCodeLine{564       m\_hcoeffs(nonzeroCol) = tau;}
+\DoxyCodeLine{565       \textcolor{comment}{// Record the householder reflections}}
+\DoxyCodeLine{566       \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} itq = 0; itq < nzcolQ; ++itq)}
+\DoxyCodeLine{567       \{}
+\DoxyCodeLine{568         \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} iQ = Qidx(itq);}
+\DoxyCodeLine{569         m\_Q.insertBackByOuterInnerUnordered(nonzeroCol,iQ) = tval(iQ);}
+\DoxyCodeLine{570         tval(iQ) = Scalar(0.);}
+\DoxyCodeLine{571       \}}
+\DoxyCodeLine{572       nonzeroCol++;}
+\DoxyCodeLine{573       \textcolor{keywordflow}{if}(nonzeroCol<diagSize)}
+\DoxyCodeLine{574         m\_Q.startVec(nonzeroCol);}
+\DoxyCodeLine{575     \}}
+\DoxyCodeLine{576     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{577     \{}
+\DoxyCodeLine{578       \textcolor{comment}{// Zero pivot found: move implicitly this column to the end}}
+\DoxyCodeLine{579       \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = nonzeroCol; j < n-\/1; j++) }
+\DoxyCodeLine{580         std::swap(m\_pivotperm.indices()(j), m\_pivotperm.indices()[j+1]);}
+\DoxyCodeLine{581       }
+\DoxyCodeLine{582       \textcolor{comment}{// Recompute the column elimination tree}}
+\DoxyCodeLine{583       internal::coletree(m\_pmat, m\_etree, m\_firstRowElt, m\_pivotperm.indices().data());}
+\DoxyCodeLine{584       m\_isEtreeOk = \textcolor{keyword}{false};}
+\DoxyCodeLine{585     \}}
+\DoxyCodeLine{586   \}}
+\DoxyCodeLine{587   }
+\DoxyCodeLine{588   m\_hcoeffs.tail(diagSize-\/nonzeroCol).setZero();}
+\DoxyCodeLine{589   }
+\DoxyCodeLine{590   \textcolor{comment}{// Finalize the column pointers of the sparse matrices R and Q}}
+\DoxyCodeLine{591   m\_Q.finalize();}
+\DoxyCodeLine{592   m\_Q.makeCompressed();}
+\DoxyCodeLine{593   m\_R.finalize();}
+\DoxyCodeLine{594   m\_R.makeCompressed();}
+\DoxyCodeLine{595   m\_isQSorted = \textcolor{keyword}{false};}
+\DoxyCodeLine{596 }
+\DoxyCodeLine{597   m\_nonzeropivots = nonzeroCol;}
+\DoxyCodeLine{598   }
+\DoxyCodeLine{599   \textcolor{keywordflow}{if}(nonzeroCol<n)}
+\DoxyCodeLine{600   \{}
+\DoxyCodeLine{601     \textcolor{comment}{// Permute the triangular factor to put the 'dead' columns to the end}}
+\DoxyCodeLine{602     \mbox{\hyperlink{classEigen_1_1SparseMatrix}{QRMatrixType}} tempR(m\_R);}
+\DoxyCodeLine{603     m\_R = tempR * m\_pivotperm;}
+\DoxyCodeLine{604     }
+\DoxyCodeLine{605     \textcolor{comment}{// Update the column permutation}}
+\DoxyCodeLine{606     m\_outputPerm\_c = m\_outputPerm\_c * m\_pivotperm;}
+\DoxyCodeLine{607   \}}
+\DoxyCodeLine{608   }
+\DoxyCodeLine{609   m\_isInitialized = \textcolor{keyword}{true}; }
+\DoxyCodeLine{610   m\_factorizationIsok = \textcolor{keyword}{true};}
+\DoxyCodeLine{611   m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}};}
+\DoxyCodeLine{612 \}}
+\DoxyCodeLine{613 }
+\DoxyCodeLine{614 \textcolor{keyword}{template} <\textcolor{keyword}{typename} SparseQRType, \textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{615 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1SparseQR__QProduct}{SparseQR\_QProduct}} : \mbox{\hyperlink{classEigen_1_1ReturnByValue}{ReturnByValue}}<SparseQR\_QProduct<SparseQRType, Derived> >}
+\DoxyCodeLine{616 \{}
+\DoxyCodeLine{617   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} SparseQRType::QRMatrixType MatrixType;}
+\DoxyCodeLine{618   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} SparseQRType::Scalar Scalar;}
+\DoxyCodeLine{619   \textcolor{comment}{// Get the references }}
+\DoxyCodeLine{620   \mbox{\hyperlink{structEigen_1_1SparseQR__QProduct}{SparseQR\_QProduct}}(\textcolor{keyword}{const} SparseQRType\& qr, \textcolor{keyword}{const} Derived\& other, \textcolor{keywordtype}{bool} transpose) : }
+\DoxyCodeLine{621   m\_qr(qr),m\_other(other),m\_transpose(transpose) \{\}}
+\DoxyCodeLine{622   \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_qr.matrixQ().rows(); \}}
+\DoxyCodeLine{623   \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_other.cols(); \}}
+\DoxyCodeLine{624   }
+\DoxyCodeLine{625   \textcolor{comment}{// Assign to a vector}}
+\DoxyCodeLine{626   \textcolor{keyword}{template}<\textcolor{keyword}{typename} DesType>}
+\DoxyCodeLine{627   \textcolor{keywordtype}{void} evalTo(DesType\& res)\textcolor{keyword}{ const}}
+\DoxyCodeLine{628 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{629     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m = m\_qr.rows();}
+\DoxyCodeLine{630     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} n = m\_qr.cols();}
+\DoxyCodeLine{631     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} diagSize = (std::min)(m,n);}
+\DoxyCodeLine{632     res = m\_other;}
+\DoxyCodeLine{633     \textcolor{keywordflow}{if} (m\_transpose)}
+\DoxyCodeLine{634     \{}
+\DoxyCodeLine{635       eigen\_assert(m\_qr.m\_Q.rows() == m\_other.rows() \&\& \textcolor{stringliteral}{"{}Non conforming object sizes"{}});}
+\DoxyCodeLine{636       \textcolor{comment}{//Compute res = Q' * other column by column}}
+\DoxyCodeLine{637       \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < res.cols(); j++)\{}
+\DoxyCodeLine{638         \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} k = 0; k < diagSize; k++)}
+\DoxyCodeLine{639         \{}
+\DoxyCodeLine{640           Scalar tau = Scalar(0);}
+\DoxyCodeLine{641           tau = m\_qr.m\_Q.col(k).dot(res.col(j));}
+\DoxyCodeLine{642           \textcolor{keywordflow}{if}(tau==Scalar(0)) \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{643           tau = tau * m\_qr.m\_hcoeffs(k);}
+\DoxyCodeLine{644           res.col(j) -\/= tau * m\_qr.m\_Q.col(k);}
+\DoxyCodeLine{645         \}}
+\DoxyCodeLine{646       \}}
+\DoxyCodeLine{647     \}}
+\DoxyCodeLine{648     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{649     \{}
+\DoxyCodeLine{650       eigen\_assert(m\_qr.matrixQ().cols() == m\_other.rows() \&\& \textcolor{stringliteral}{"{}Non conforming object sizes"{}});}
+\DoxyCodeLine{651 }
+\DoxyCodeLine{652       res.conservativeResize(rows(), cols());}
+\DoxyCodeLine{653 }
+\DoxyCodeLine{654       \textcolor{comment}{// Compute res = Q * other column by column}}
+\DoxyCodeLine{655       \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < res.cols(); j++)}
+\DoxyCodeLine{656       \{}
+\DoxyCodeLine{657         \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} start\_k = \mbox{\hyperlink{structEigen_1_1internal_1_1is__identity}{internal::is\_identity<Derived>::value}} ? numext::mini(j,diagSize-\/1) : diagSize-\/1;}
+\DoxyCodeLine{658         \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} k = start\_k; k >=0; k-\/-\/)}
+\DoxyCodeLine{659         \{}
+\DoxyCodeLine{660           Scalar tau = Scalar(0);}
+\DoxyCodeLine{661           tau = m\_qr.m\_Q.col(k).dot(res.col(j));}
+\DoxyCodeLine{662           \textcolor{keywordflow}{if}(tau==Scalar(0)) \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{663           tau = tau * numext::conj(m\_qr.m\_hcoeffs(k));}
+\DoxyCodeLine{664           res.col(j) -\/= tau * m\_qr.m\_Q.col(k);}
+\DoxyCodeLine{665         \}}
+\DoxyCodeLine{666       \}}
+\DoxyCodeLine{667     \}}
+\DoxyCodeLine{668   \}}
+\DoxyCodeLine{669   }
+\DoxyCodeLine{670   \textcolor{keyword}{const} SparseQRType\& m\_qr;}
+\DoxyCodeLine{671   \textcolor{keyword}{const} Derived\& m\_other;}
+\DoxyCodeLine{672   \textcolor{keywordtype}{bool} m\_transpose; \textcolor{comment}{// TODO this actually means adjoint}}
+\DoxyCodeLine{673 \};}
+\DoxyCodeLine{674 }
+\DoxyCodeLine{675 \textcolor{keyword}{template}<\textcolor{keyword}{typename} SparseQRType>}
+\DoxyCodeLine{676 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1SparseQRMatrixQReturnType}{SparseQRMatrixQReturnType}} : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase}}<SparseQRMatrixQReturnType<SparseQRType> >}
+\DoxyCodeLine{677 \{  }
+\DoxyCodeLine{678   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} SparseQRType::Scalar Scalar;}
+\DoxyCodeLine{679   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar,Dynamic,Dynamic>}} \mbox{\hyperlink{classEigen_1_1Matrix}{DenseMatrix}};}
+\DoxyCodeLine{680   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{681     RowsAtCompileTime = \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}},}
+\DoxyCodeLine{682     ColsAtCompileTime = \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}}
+\DoxyCodeLine{683   \};}
+\DoxyCodeLine{684   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1SparseQRMatrixQReturnType}{SparseQRMatrixQReturnType}}(\textcolor{keyword}{const} SparseQRType\& qr) : m\_qr(qr) \{\}}
+\DoxyCodeLine{685   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{686   \mbox{\hyperlink{structEigen_1_1SparseQR__QProduct}{SparseQR\_QProduct<SparseQRType, Derived>}} operator*(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Derived>}}\& other)}
+\DoxyCodeLine{687   \{}
+\DoxyCodeLine{688     \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1SparseQR__QProduct}{SparseQR\_QProduct<SparseQRType,Derived>}}(m\_qr,other.derived(),\textcolor{keyword}{false});}
+\DoxyCodeLine{689   \}}
+\DoxyCodeLine{690   \textcolor{comment}{// To use for operations with the adjoint of Q}}
+\DoxyCodeLine{691   \mbox{\hyperlink{structEigen_1_1SparseQRMatrixQTransposeReturnType}{SparseQRMatrixQTransposeReturnType<SparseQRType>}} adjoint()\textcolor{keyword}{ const}}
+\DoxyCodeLine{692 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{693     \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1SparseQRMatrixQTransposeReturnType}{SparseQRMatrixQTransposeReturnType<SparseQRType>}}(m\_qr);}
+\DoxyCodeLine{694   \}}
+\DoxyCodeLine{695   \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} rows()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_qr.rows(); \}}
+\DoxyCodeLine{696   \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} cols()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_qr.rows(); \}}
+\DoxyCodeLine{697   \textcolor{comment}{// To use for operations with the transpose of Q FIXME this is the same as adjoint at the moment}}
+\DoxyCodeLine{698   \mbox{\hyperlink{structEigen_1_1SparseQRMatrixQTransposeReturnType}{SparseQRMatrixQTransposeReturnType<SparseQRType>}} transpose()\textcolor{keyword}{ const}}
+\DoxyCodeLine{699 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{700     \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1SparseQRMatrixQTransposeReturnType}{SparseQRMatrixQTransposeReturnType<SparseQRType>}}(m\_qr);}
+\DoxyCodeLine{701   \}}
+\DoxyCodeLine{702   \textcolor{keyword}{const} SparseQRType\& m\_qr;}
+\DoxyCodeLine{703 \};}
+\DoxyCodeLine{704 }
+\DoxyCodeLine{705 \textcolor{comment}{// TODO this actually represents the adjoint of Q}}
+\DoxyCodeLine{706 \textcolor{keyword}{template}<\textcolor{keyword}{typename} SparseQRType>}
+\DoxyCodeLine{707 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1SparseQRMatrixQTransposeReturnType}{SparseQRMatrixQTransposeReturnType}}}
+\DoxyCodeLine{708 \{}
+\DoxyCodeLine{709   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1SparseQRMatrixQTransposeReturnType}{SparseQRMatrixQTransposeReturnType}}(\textcolor{keyword}{const} SparseQRType\& qr) : m\_qr(qr) \{\}}
+\DoxyCodeLine{710   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{711   \mbox{\hyperlink{structEigen_1_1SparseQR__QProduct}{SparseQR\_QProduct<SparseQRType,Derived>}} operator*(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Derived>}}\& other)}
+\DoxyCodeLine{712   \{}
+\DoxyCodeLine{713     \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1SparseQR__QProduct}{SparseQR\_QProduct<SparseQRType,Derived>}}(m\_qr,other.derived(), \textcolor{keyword}{true});}
+\DoxyCodeLine{714   \}}
+\DoxyCodeLine{715   \textcolor{keyword}{const} SparseQRType\& m\_qr;}
+\DoxyCodeLine{716 \};}
+\DoxyCodeLine{717 }
+\DoxyCodeLine{718 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{719   }
+\DoxyCodeLine{720 \textcolor{keyword}{template}<\textcolor{keyword}{typename} SparseQRType>}
+\DoxyCodeLine{721 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__traits}{evaluator\_traits}}<\mbox{\hyperlink{structEigen_1_1SparseQRMatrixQReturnType}{SparseQRMatrixQReturnType}}<SparseQRType> >}
+\DoxyCodeLine{722 \{}
+\DoxyCodeLine{723   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} SparseQRType::MatrixType MatrixType;}
+\DoxyCodeLine{724   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{storage\_kind\_to\_evaluator\_kind<typename MatrixType::StorageKind>::Kind}} \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{Kind}};}
+\DoxyCodeLine{725   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1SparseShape}{SparseShape}} \mbox{\hyperlink{structEigen_1_1SparseShape}{Shape}};}
+\DoxyCodeLine{726 \};}
+\DoxyCodeLine{727 }
+\DoxyCodeLine{728 \textcolor{keyword}{template}< \textcolor{keyword}{typename} DstXprType, \textcolor{keyword}{typename} SparseQRType>}
+\DoxyCodeLine{729 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1Assignment}{Assignment}}<DstXprType, \mbox{\hyperlink{structEigen_1_1SparseQRMatrixQReturnType}{SparseQRMatrixQReturnType}}<SparseQRType>, internal::\mbox{\hyperlink{structEigen_1_1internal_1_1assign__op}{assign\_op}}<typename DstXprType::Scalar,typename DstXprType::Scalar>, \mbox{\hyperlink{structEigen_1_1internal_1_1Sparse2Sparse}{Sparse2Sparse}}>}
+\DoxyCodeLine{730 \{}
+\DoxyCodeLine{731   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1SparseQRMatrixQReturnType}{SparseQRMatrixQReturnType<SparseQRType>}} \mbox{\hyperlink{structEigen_1_1SparseQRMatrixQReturnType}{SrcXprType}};}
+\DoxyCodeLine{732   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} DstXprType::Scalar Scalar;}
+\DoxyCodeLine{733   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} DstXprType::StorageIndex StorageIndex;}
+\DoxyCodeLine{734   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(DstXprType \&dst, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1SparseQRMatrixQReturnType}{SrcXprType}} \&src, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1assign__op}{internal::assign\_op<Scalar,Scalar>}} \&\textcolor{comment}{/*func*/})}
+\DoxyCodeLine{735   \{}
+\DoxyCodeLine{736     \textcolor{keyword}{typename} DstXprType::PlainObject idMat(src.rows(), src.cols());}
+\DoxyCodeLine{737     idMat.setIdentity();}
+\DoxyCodeLine{738     \textcolor{comment}{// Sort the sparse householder reflectors if needed}}
+\DoxyCodeLine{739     \textcolor{keyword}{const\_cast<}SparseQRType *\textcolor{keyword}{>}(\&src.m\_qr)-\/>\_sort\_matrix\_Q();}
+\DoxyCodeLine{740     dst = \mbox{\hyperlink{structEigen_1_1SparseQR__QProduct}{SparseQR\_QProduct<SparseQRType, DstXprType>}}(src.m\_qr, idMat, \textcolor{keyword}{false});}
+\DoxyCodeLine{741   \}}
+\DoxyCodeLine{742 \};}
+\DoxyCodeLine{743 }
+\DoxyCodeLine{744 \textcolor{keyword}{template}< \textcolor{keyword}{typename} DstXprType, \textcolor{keyword}{typename} SparseQRType>}
+\DoxyCodeLine{745 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1Assignment}{Assignment}}<DstXprType, \mbox{\hyperlink{structEigen_1_1SparseQRMatrixQReturnType}{SparseQRMatrixQReturnType}}<SparseQRType>, internal::\mbox{\hyperlink{structEigen_1_1internal_1_1assign__op}{assign\_op}}<typename DstXprType::Scalar,typename DstXprType::Scalar>, \mbox{\hyperlink{structEigen_1_1internal_1_1Sparse2Dense}{Sparse2Dense}}>}
+\DoxyCodeLine{746 \{}
+\DoxyCodeLine{747   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1SparseQRMatrixQReturnType}{SparseQRMatrixQReturnType<SparseQRType>}} \mbox{\hyperlink{structEigen_1_1SparseQRMatrixQReturnType}{SrcXprType}};}
+\DoxyCodeLine{748   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} DstXprType::Scalar Scalar;}
+\DoxyCodeLine{749   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} DstXprType::StorageIndex StorageIndex;}
+\DoxyCodeLine{750   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(DstXprType \&dst, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1SparseQRMatrixQReturnType}{SrcXprType}} \&src, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1assign__op}{internal::assign\_op<Scalar,Scalar>}} \&\textcolor{comment}{/*func*/})}
+\DoxyCodeLine{751   \{}
+\DoxyCodeLine{752     dst = src.m\_qr.matrixQ() * DstXprType::Identity(src.m\_qr.rows(), src.m\_qr.rows());}
+\DoxyCodeLine{753   \}}
+\DoxyCodeLine{754 \};}
+\DoxyCodeLine{755 }
+\DoxyCodeLine{756 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{757 }
+\DoxyCodeLine{758 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{759 }
+\DoxyCodeLine{760 \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

@@ -1,0 +1,727 @@
+\hypertarget{SparseCwiseBinaryOp_8h_source}{}\doxysection{Sparse\+Cwise\+Binary\+Op.\+h}
+\label{SparseCwiseBinaryOp_8h_source}\index{include/Eigen/src/SparseCore/SparseCwiseBinaryOp.h@{include/Eigen/src/SparseCore/SparseCwiseBinaryOp.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2008-\/2014 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_SPARSE\_CWISE\_BINARY\_OP\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_SPARSE\_CWISE\_BINARY\_OP\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{comment}{// Here we have to handle 3 cases:}}
+\DoxyCodeLine{18 \textcolor{comment}{//  1 -\/ sparse op dense}}
+\DoxyCodeLine{19 \textcolor{comment}{//  2 -\/ dense op sparse}}
+\DoxyCodeLine{20 \textcolor{comment}{//  3 -\/ sparse op sparse}}
+\DoxyCodeLine{21 \textcolor{comment}{// We also need to implement a 4th iterator for:}}
+\DoxyCodeLine{22 \textcolor{comment}{//  4 -\/ dense op dense}}
+\DoxyCodeLine{23 \textcolor{comment}{// Finally, we also need to distinguish between the product and other operations :}}
+\DoxyCodeLine{24 \textcolor{comment}{//                configuration      returned mode}}
+\DoxyCodeLine{25 \textcolor{comment}{//  1 -\/ sparse op dense    product      sparse}}
+\DoxyCodeLine{26 \textcolor{comment}{//                         generic      dense}}
+\DoxyCodeLine{27 \textcolor{comment}{//  2 -\/ dense op sparse    product      sparse}}
+\DoxyCodeLine{28 \textcolor{comment}{//                         generic      dense}}
+\DoxyCodeLine{29 \textcolor{comment}{//  3 -\/ sparse op sparse   product      sparse}}
+\DoxyCodeLine{30 \textcolor{comment}{//                         generic      sparse}}
+\DoxyCodeLine{31 \textcolor{comment}{//  4 -\/ dense op dense     product      dense}}
+\DoxyCodeLine{32 \textcolor{comment}{//                         generic      dense}}
+\DoxyCodeLine{33 \textcolor{comment}{//}}
+\DoxyCodeLine{34 \textcolor{comment}{// TODO to ease compiler job, we could specialize product/quotient with a scalar}}
+\DoxyCodeLine{35 \textcolor{comment}{//      and fallback to cwise-\/unary evaluator using bind1st\_op and bind2nd\_op.}}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{37 \textcolor{keyword}{template}<\textcolor{keyword}{typename} BinaryOp, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{38 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1CwiseBinaryOpImpl}{CwiseBinaryOpImpl}}<BinaryOp, Lhs, Rhs, \mbox{\hyperlink{structEigen_1_1Sparse}{Sparse}}>}
+\DoxyCodeLine{39   : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{SparseMatrixBase}}<CwiseBinaryOp<BinaryOp, Lhs, Rhs> >}
+\DoxyCodeLine{40 \{}
+\DoxyCodeLine{41   \textcolor{keyword}{public}:}
+\DoxyCodeLine{42     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp<BinaryOp, Lhs, Rhs>}} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{Derived}};}
+\DoxyCodeLine{43     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{SparseMatrixBase<Derived>}} \mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{Base}};}
+\DoxyCodeLine{44     EIGEN\_SPARSE\_PUBLIC\_INTERFACE(\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{Derived}})}
+\DoxyCodeLine{45     EIGEN\_STATIC\_ASSERT((}
+\DoxyCodeLine{46               (!\mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{internal::is\_same}}<\textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Lhs>::StorageKind}},}
+\DoxyCodeLine{47                                   \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Rhs>::StorageKind}}>::value)}
+\DoxyCodeLine{48           ||  ((\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{internal::evaluator<Lhs>::Flags}}\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) == (\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{internal::evaluator<Rhs>::Flags}}\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}))),}
+\DoxyCodeLine{49           THE\_STORAGE\_ORDER\_OF\_BOTH\_SIDES\_MUST\_MATCH)}
+\DoxyCodeLine{50 \};}
+\DoxyCodeLine{51 }
+\DoxyCodeLine{52 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{53 }
+\DoxyCodeLine{54   }
+\DoxyCodeLine{55 \textcolor{comment}{// Generic "{}sparse OP sparse"{}}}
+\DoxyCodeLine{56 \textcolor{keyword}{template}<\textcolor{keyword}{typename} XprType> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1binary__sparse__evaluator}{binary\_sparse\_evaluator}};}
+\DoxyCodeLine{57 }
+\DoxyCodeLine{58 \textcolor{keyword}{template}<\textcolor{keyword}{typename} BinaryOp, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{59 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}<BinaryOp, Lhs, Rhs>, \mbox{\hyperlink{structEigen_1_1internal_1_1IteratorBased}{IteratorBased}}, \mbox{\hyperlink{structEigen_1_1internal_1_1IteratorBased}{IteratorBased}}>}
+\DoxyCodeLine{60   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<CwiseBinaryOp<BinaryOp, Lhs, Rhs> >}
+\DoxyCodeLine{61 \{}
+\DoxyCodeLine{62 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{63   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Lhs>::InnerIterator}}  LhsIterator;}
+\DoxyCodeLine{64   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Rhs>::InnerIterator}}  RhsIterator;}
+\DoxyCodeLine{65   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp<BinaryOp, Lhs, Rhs>}} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}};}
+\DoxyCodeLine{66   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<XprType>::Scalar}} Scalar;}
+\DoxyCodeLine{67   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::StorageIndex StorageIndex;}
+\DoxyCodeLine{68 \textcolor{keyword}{public}:}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70   \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1InnerIterator}{InnerIterator}}}
+\DoxyCodeLine{71   \{}
+\DoxyCodeLine{72   \textcolor{keyword}{public}:}
+\DoxyCodeLine{73     }
+\DoxyCodeLine{74     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{classEigen_1_1InnerIterator}{InnerIterator}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}\& aEval, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outer)}
+\DoxyCodeLine{75       : m\_lhsIter(aEval.m\_lhsImpl,outer), m\_rhsIter(aEval.m\_rhsImpl,outer), m\_functor(aEval.m\_functor)}
+\DoxyCodeLine{76     \{}
+\DoxyCodeLine{77       this-\/>operator++();}
+\DoxyCodeLine{78     \}}
+\DoxyCodeLine{79 }
+\DoxyCodeLine{80     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{classEigen_1_1InnerIterator}{InnerIterator}}\& operator++()}
+\DoxyCodeLine{81     \{}
+\DoxyCodeLine{82       \textcolor{keywordflow}{if} (m\_lhsIter \&\& m\_rhsIter \&\& (m\_lhsIter.index() == m\_rhsIter.index()))}
+\DoxyCodeLine{83       \{}
+\DoxyCodeLine{84         m\_id = m\_lhsIter.index();}
+\DoxyCodeLine{85         m\_value = m\_functor(m\_lhsIter.value(), m\_rhsIter.value());}
+\DoxyCodeLine{86         ++m\_lhsIter;}
+\DoxyCodeLine{87         ++m\_rhsIter;}
+\DoxyCodeLine{88       \}}
+\DoxyCodeLine{89       \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (m\_lhsIter \&\& (!m\_rhsIter || (m\_lhsIter.index() < m\_rhsIter.index())))}
+\DoxyCodeLine{90       \{}
+\DoxyCodeLine{91         m\_id = m\_lhsIter.index();}
+\DoxyCodeLine{92         m\_value = m\_functor(m\_lhsIter.value(), Scalar(0));}
+\DoxyCodeLine{93         ++m\_lhsIter;}
+\DoxyCodeLine{94       \}}
+\DoxyCodeLine{95       \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (m\_rhsIter \&\& (!m\_lhsIter || (m\_lhsIter.index() > m\_rhsIter.index())))}
+\DoxyCodeLine{96       \{}
+\DoxyCodeLine{97         m\_id = m\_rhsIter.index();}
+\DoxyCodeLine{98         m\_value = m\_functor(Scalar(0), m\_rhsIter.value());}
+\DoxyCodeLine{99         ++m\_rhsIter;}
+\DoxyCodeLine{100       \}}
+\DoxyCodeLine{101       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{102       \{}
+\DoxyCodeLine{103         m\_value = Scalar(0); \textcolor{comment}{// this is to avoid a compilation warning}}
+\DoxyCodeLine{104         m\_id = -\/1;}
+\DoxyCodeLine{105       \}}
+\DoxyCodeLine{106       \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{107     \}}
+\DoxyCodeLine{108 }
+\DoxyCodeLine{109     EIGEN\_STRONG\_INLINE Scalar value()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_value; \}}
+\DoxyCodeLine{110 }
+\DoxyCodeLine{111     EIGEN\_STRONG\_INLINE StorageIndex index()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_id; \}}
+\DoxyCodeLine{112     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outer()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_lhsIter.outer(); \}}
+\DoxyCodeLine{113     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} Lhs::IsRowMajor ? m\_lhsIter.row() : index(); \}}
+\DoxyCodeLine{114     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} Lhs::IsRowMajor ? index() : m\_lhsIter.col(); \}}
+\DoxyCodeLine{115 }
+\DoxyCodeLine{116     EIGEN\_STRONG\_INLINE \textcolor{keyword}{operator} bool()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_id>=0; \}}
+\DoxyCodeLine{117 }
+\DoxyCodeLine{118   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{119     LhsIterator m\_lhsIter;}
+\DoxyCodeLine{120     RhsIterator m\_rhsIter;}
+\DoxyCodeLine{121     \textcolor{keyword}{const} BinaryOp\& m\_functor;}
+\DoxyCodeLine{122     Scalar m\_value;}
+\DoxyCodeLine{123     StorageIndex m\_id;}
+\DoxyCodeLine{124   \};}
+\DoxyCodeLine{125   }
+\DoxyCodeLine{126   }
+\DoxyCodeLine{127   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{128     CoeffReadCost = int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Lhs>::CoeffReadCost}}) + int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Rhs>::CoeffReadCost}}) + int(\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<BinaryOp>::Cost}}),}
+\DoxyCodeLine{129     Flags = XprType::Flags}
+\DoxyCodeLine{130   \};}
+\DoxyCodeLine{131   }
+\DoxyCodeLine{132   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}(\textcolor{keyword}{const} XprType\& xpr)}
+\DoxyCodeLine{133     : m\_functor(xpr.functor()),}
+\DoxyCodeLine{134       m\_lhsImpl(xpr.lhs()), }
+\DoxyCodeLine{135       m\_rhsImpl(xpr.rhs())  }
+\DoxyCodeLine{136   \{}
+\DoxyCodeLine{137     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<BinaryOp>::Cost}});}
+\DoxyCodeLine{138     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(CoeffReadCost);}
+\DoxyCodeLine{139   \}}
+\DoxyCodeLine{140   }
+\DoxyCodeLine{141   \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nonZerosEstimate()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{142     \textcolor{keywordflow}{return} m\_lhsImpl.nonZerosEstimate() + m\_rhsImpl.nonZerosEstimate();}
+\DoxyCodeLine{143   \}}
+\DoxyCodeLine{144 }
+\DoxyCodeLine{145 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{146   \textcolor{keyword}{const} BinaryOp m\_functor;}
+\DoxyCodeLine{147   evaluator<Lhs> m\_lhsImpl;}
+\DoxyCodeLine{148   evaluator<Rhs> m\_rhsImpl;}
+\DoxyCodeLine{149 \};}
+\DoxyCodeLine{150 }
+\DoxyCodeLine{151 \textcolor{comment}{// dense op sparse}}
+\DoxyCodeLine{152 \textcolor{keyword}{template}<\textcolor{keyword}{typename} BinaryOp, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{153 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}<BinaryOp, Lhs, Rhs>, \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{IndexBased}}, \mbox{\hyperlink{structEigen_1_1internal_1_1IteratorBased}{IteratorBased}}>}
+\DoxyCodeLine{154   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<CwiseBinaryOp<BinaryOp, Lhs, Rhs> >}
+\DoxyCodeLine{155 \{}
+\DoxyCodeLine{156 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{157   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Rhs>::InnerIterator}}  RhsIterator;}
+\DoxyCodeLine{158   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp<BinaryOp, Lhs, Rhs>}} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}};}
+\DoxyCodeLine{159   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<XprType>::Scalar}} Scalar;}
+\DoxyCodeLine{160   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::StorageIndex StorageIndex;}
+\DoxyCodeLine{161 \textcolor{keyword}{public}:}
+\DoxyCodeLine{162 }
+\DoxyCodeLine{163   \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1InnerIterator}{InnerIterator}}}
+\DoxyCodeLine{164   \{}
+\DoxyCodeLine{165     \textcolor{keyword}{enum} \{ IsRowMajor = (int(Rhs::Flags)\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})==\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}} \};}
+\DoxyCodeLine{166   \textcolor{keyword}{public}:}
+\DoxyCodeLine{167 }
+\DoxyCodeLine{168     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{classEigen_1_1InnerIterator}{InnerIterator}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}\& aEval, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outer)}
+\DoxyCodeLine{169       : m\_lhsEval(aEval.m\_lhsImpl), m\_rhsIter(aEval.m\_rhsImpl,outer), m\_functor(aEval.m\_functor), m\_value(0), m\_id(-\/1), m\_innerSize(aEval.m\_expr.rhs().innerSize())}
+\DoxyCodeLine{170     \{}
+\DoxyCodeLine{171       this-\/>operator++();}
+\DoxyCodeLine{172     \}}
+\DoxyCodeLine{173 }
+\DoxyCodeLine{174     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{classEigen_1_1InnerIterator}{InnerIterator}}\& operator++()}
+\DoxyCodeLine{175     \{}
+\DoxyCodeLine{176       ++m\_id;}
+\DoxyCodeLine{177       \textcolor{keywordflow}{if}(m\_id<m\_innerSize)}
+\DoxyCodeLine{178       \{}
+\DoxyCodeLine{179         Scalar lhsVal = m\_lhsEval.coeff(IsRowMajor?m\_rhsIter.outer():m\_id,}
+\DoxyCodeLine{180                                         IsRowMajor?m\_id:m\_rhsIter.outer());}
+\DoxyCodeLine{181         \textcolor{keywordflow}{if}(m\_rhsIter \&\& m\_rhsIter.index()==m\_id)}
+\DoxyCodeLine{182         \{}
+\DoxyCodeLine{183           m\_value = m\_functor(lhsVal, m\_rhsIter.value());}
+\DoxyCodeLine{184           ++m\_rhsIter;}
+\DoxyCodeLine{185         \}}
+\DoxyCodeLine{186         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{187           m\_value = m\_functor(lhsVal, Scalar(0));}
+\DoxyCodeLine{188       \}}
+\DoxyCodeLine{189 }
+\DoxyCodeLine{190       \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{191     \}}
+\DoxyCodeLine{192 }
+\DoxyCodeLine{193     EIGEN\_STRONG\_INLINE Scalar value()\textcolor{keyword}{ const }\{ eigen\_internal\_assert(m\_id<m\_innerSize); \textcolor{keywordflow}{return} m\_value; \}}
+\DoxyCodeLine{194 }
+\DoxyCodeLine{195     EIGEN\_STRONG\_INLINE StorageIndex index()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_id; \}}
+\DoxyCodeLine{196     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outer()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_rhsIter.outer(); \}}
+\DoxyCodeLine{197     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} IsRowMajor ? m\_rhsIter.outer() : m\_id; \}}
+\DoxyCodeLine{198     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} IsRowMajor ? m\_id : m\_rhsIter.outer(); \}}
+\DoxyCodeLine{199 }
+\DoxyCodeLine{200     EIGEN\_STRONG\_INLINE \textcolor{keyword}{operator} bool()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_id<m\_innerSize; \}}
+\DoxyCodeLine{201 }
+\DoxyCodeLine{202   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{203     \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Lhs>}} \&m\_lhsEval;}
+\DoxyCodeLine{204     RhsIterator m\_rhsIter;}
+\DoxyCodeLine{205     \textcolor{keyword}{const} BinaryOp\& m\_functor;}
+\DoxyCodeLine{206     Scalar m\_value;}
+\DoxyCodeLine{207     StorageIndex m\_id;}
+\DoxyCodeLine{208     StorageIndex m\_innerSize;}
+\DoxyCodeLine{209   \};}
+\DoxyCodeLine{210 }
+\DoxyCodeLine{211 }
+\DoxyCodeLine{212   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{213     CoeffReadCost = int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Lhs>::CoeffReadCost}}) + int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Rhs>::CoeffReadCost}}) + int(\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<BinaryOp>::Cost}}),}
+\DoxyCodeLine{214     Flags = XprType::Flags}
+\DoxyCodeLine{215   \};}
+\DoxyCodeLine{216 }
+\DoxyCodeLine{217   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}(\textcolor{keyword}{const} XprType\& xpr)}
+\DoxyCodeLine{218     : m\_functor(xpr.functor()),}
+\DoxyCodeLine{219       m\_lhsImpl(xpr.lhs()),}
+\DoxyCodeLine{220       m\_rhsImpl(xpr.rhs()),}
+\DoxyCodeLine{221       m\_expr(xpr)}
+\DoxyCodeLine{222   \{}
+\DoxyCodeLine{223     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<BinaryOp>::Cost}});}
+\DoxyCodeLine{224     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(CoeffReadCost);}
+\DoxyCodeLine{225   \}}
+\DoxyCodeLine{226 }
+\DoxyCodeLine{227   \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nonZerosEstimate()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{228     \textcolor{keywordflow}{return} m\_expr.size();}
+\DoxyCodeLine{229   \}}
+\DoxyCodeLine{230 }
+\DoxyCodeLine{231 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{232   \textcolor{keyword}{const} BinaryOp m\_functor;}
+\DoxyCodeLine{233   evaluator<Lhs> m\_lhsImpl;}
+\DoxyCodeLine{234   evaluator<Rhs> m\_rhsImpl;}
+\DoxyCodeLine{235   \textcolor{keyword}{const} XprType \&m\_expr;}
+\DoxyCodeLine{236 \};}
+\DoxyCodeLine{237 }
+\DoxyCodeLine{238 \textcolor{comment}{// sparse op dense}}
+\DoxyCodeLine{239 \textcolor{keyword}{template}<\textcolor{keyword}{typename} BinaryOp, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{240 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}<BinaryOp, Lhs, Rhs>, \mbox{\hyperlink{structEigen_1_1internal_1_1IteratorBased}{IteratorBased}}, \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{IndexBased}}>}
+\DoxyCodeLine{241   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<CwiseBinaryOp<BinaryOp, Lhs, Rhs> >}
+\DoxyCodeLine{242 \{}
+\DoxyCodeLine{243 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{244   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Lhs>::InnerIterator}}  LhsIterator;}
+\DoxyCodeLine{245   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp<BinaryOp, Lhs, Rhs>}} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}};}
+\DoxyCodeLine{246   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<XprType>::Scalar}} Scalar;}
+\DoxyCodeLine{247   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::StorageIndex StorageIndex;}
+\DoxyCodeLine{248 \textcolor{keyword}{public}:}
+\DoxyCodeLine{249 }
+\DoxyCodeLine{250   \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1InnerIterator}{InnerIterator}}}
+\DoxyCodeLine{251   \{}
+\DoxyCodeLine{252     \textcolor{keyword}{enum} \{ IsRowMajor = (int(Lhs::Flags)\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})==\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}} \};}
+\DoxyCodeLine{253   \textcolor{keyword}{public}:}
+\DoxyCodeLine{254 }
+\DoxyCodeLine{255     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{classEigen_1_1InnerIterator}{InnerIterator}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}\& aEval, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outer)}
+\DoxyCodeLine{256       : m\_lhsIter(aEval.m\_lhsImpl,outer), m\_rhsEval(aEval.m\_rhsImpl), m\_functor(aEval.m\_functor), m\_value(0), m\_id(-\/1), m\_innerSize(aEval.m\_expr.lhs().innerSize())}
+\DoxyCodeLine{257     \{}
+\DoxyCodeLine{258       this-\/>operator++();}
+\DoxyCodeLine{259     \}}
+\DoxyCodeLine{260 }
+\DoxyCodeLine{261     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{classEigen_1_1InnerIterator}{InnerIterator}}\& operator++()}
+\DoxyCodeLine{262     \{}
+\DoxyCodeLine{263       ++m\_id;}
+\DoxyCodeLine{264       \textcolor{keywordflow}{if}(m\_id<m\_innerSize)}
+\DoxyCodeLine{265       \{}
+\DoxyCodeLine{266         Scalar rhsVal = m\_rhsEval.coeff(IsRowMajor?m\_lhsIter.outer():m\_id,}
+\DoxyCodeLine{267                                         IsRowMajor?m\_id:m\_lhsIter.outer());}
+\DoxyCodeLine{268         \textcolor{keywordflow}{if}(m\_lhsIter \&\& m\_lhsIter.index()==m\_id)}
+\DoxyCodeLine{269         \{}
+\DoxyCodeLine{270           m\_value = m\_functor(m\_lhsIter.value(), rhsVal);}
+\DoxyCodeLine{271           ++m\_lhsIter;}
+\DoxyCodeLine{272         \}}
+\DoxyCodeLine{273         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{274           m\_value = m\_functor(Scalar(0),rhsVal);}
+\DoxyCodeLine{275       \}}
+\DoxyCodeLine{276 }
+\DoxyCodeLine{277       \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{278     \}}
+\DoxyCodeLine{279 }
+\DoxyCodeLine{280     EIGEN\_STRONG\_INLINE Scalar value()\textcolor{keyword}{ const }\{ eigen\_internal\_assert(m\_id<m\_innerSize); \textcolor{keywordflow}{return} m\_value; \}}
+\DoxyCodeLine{281 }
+\DoxyCodeLine{282     EIGEN\_STRONG\_INLINE StorageIndex index()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_id; \}}
+\DoxyCodeLine{283     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outer()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_lhsIter.outer(); \}}
+\DoxyCodeLine{284     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} IsRowMajor ? m\_lhsIter.outer() : m\_id; \}}
+\DoxyCodeLine{285     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} IsRowMajor ? m\_id : m\_lhsIter.outer(); \}}
+\DoxyCodeLine{286 }
+\DoxyCodeLine{287     EIGEN\_STRONG\_INLINE \textcolor{keyword}{operator} bool()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_id<m\_innerSize; \}}
+\DoxyCodeLine{288 }
+\DoxyCodeLine{289   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{290     LhsIterator m\_lhsIter;}
+\DoxyCodeLine{291     \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Rhs>}} \&m\_rhsEval;}
+\DoxyCodeLine{292     \textcolor{keyword}{const} BinaryOp\& m\_functor;}
+\DoxyCodeLine{293     Scalar m\_value;}
+\DoxyCodeLine{294     StorageIndex m\_id;}
+\DoxyCodeLine{295     StorageIndex m\_innerSize;}
+\DoxyCodeLine{296   \};}
+\DoxyCodeLine{297 }
+\DoxyCodeLine{298 }
+\DoxyCodeLine{299   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{300     CoeffReadCost = int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Lhs>::CoeffReadCost}}) + int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<Rhs>::CoeffReadCost}}) + int(\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<BinaryOp>::Cost}}),}
+\DoxyCodeLine{301     Flags = XprType::Flags}
+\DoxyCodeLine{302   \};}
+\DoxyCodeLine{303 }
+\DoxyCodeLine{304   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}(\textcolor{keyword}{const} XprType\& xpr)}
+\DoxyCodeLine{305     : m\_functor(xpr.functor()),}
+\DoxyCodeLine{306       m\_lhsImpl(xpr.lhs()),}
+\DoxyCodeLine{307       m\_rhsImpl(xpr.rhs()),}
+\DoxyCodeLine{308       m\_expr(xpr)}
+\DoxyCodeLine{309   \{}
+\DoxyCodeLine{310     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<BinaryOp>::Cost}});}
+\DoxyCodeLine{311     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(CoeffReadCost);}
+\DoxyCodeLine{312   \}}
+\DoxyCodeLine{313 }
+\DoxyCodeLine{314   \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nonZerosEstimate()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{315     \textcolor{keywordflow}{return} m\_expr.size();}
+\DoxyCodeLine{316   \}}
+\DoxyCodeLine{317 }
+\DoxyCodeLine{318 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{319   \textcolor{keyword}{const} BinaryOp m\_functor;}
+\DoxyCodeLine{320   evaluator<Lhs> m\_lhsImpl;}
+\DoxyCodeLine{321   evaluator<Rhs> m\_rhsImpl;}
+\DoxyCodeLine{322   \textcolor{keyword}{const} XprType \&m\_expr;}
+\DoxyCodeLine{323 \};}
+\DoxyCodeLine{324 }
+\DoxyCodeLine{325 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T,}
+\DoxyCodeLine{326          \textcolor{keyword}{typename} LhsKind   = \textcolor{keyword}{typename} evaluator\_traits<typename T::Lhs>::Kind,}
+\DoxyCodeLine{327          \textcolor{keyword}{typename} RhsKind   = \textcolor{keyword}{typename} evaluator\_traits<typename T::Rhs>::Kind,}
+\DoxyCodeLine{328          \textcolor{keyword}{typename} LhsScalar = \textcolor{keyword}{typename} traits<typename T::Lhs>::Scalar,}
+\DoxyCodeLine{329          \textcolor{keyword}{typename} RhsScalar = \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<typename T::Rhs>::Scalar}}> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator}};}
+\DoxyCodeLine{330 }
+\DoxyCodeLine{331 \textcolor{comment}{// "{}sparse .* sparse"{}}}
+\DoxyCodeLine{332 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T1, \textcolor{keyword}{typename} T2, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{333 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__product__op}{scalar\_product\_op}}<T1,T2>, Lhs, Rhs>, \mbox{\hyperlink{structEigen_1_1internal_1_1IteratorBased}{IteratorBased}}, \mbox{\hyperlink{structEigen_1_1internal_1_1IteratorBased}{IteratorBased}}>}
+\DoxyCodeLine{334   : \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator}}<CwiseBinaryOp<scalar\_product\_op<T1,T2>, Lhs, Rhs> >}
+\DoxyCodeLine{335 \{}
+\DoxyCodeLine{336   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp<scalar\_product\_op<T1,T2>}}, Lhs, Rhs> \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}};}
+\DoxyCodeLine{337   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator<XprType>}} \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{Base}};}
+\DoxyCodeLine{338   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}}\& xpr) : \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{Base}}(xpr) \{\}}
+\DoxyCodeLine{339 \};}
+\DoxyCodeLine{340 \textcolor{comment}{// "{}dense .* sparse"{}}}
+\DoxyCodeLine{341 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T1, \textcolor{keyword}{typename} T2, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{342 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__product__op}{scalar\_product\_op}}<T1,T2>, Lhs, Rhs>, \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{IndexBased}}, \mbox{\hyperlink{structEigen_1_1internal_1_1IteratorBased}{IteratorBased}}>}
+\DoxyCodeLine{343   : \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator}}<CwiseBinaryOp<scalar\_product\_op<T1,T2>, Lhs, Rhs> >}
+\DoxyCodeLine{344 \{}
+\DoxyCodeLine{345   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp<scalar\_product\_op<T1,T2>}}, Lhs, Rhs> \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}};}
+\DoxyCodeLine{346   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator<XprType>}} \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{Base}};}
+\DoxyCodeLine{347   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}}\& xpr) : \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{Base}}(xpr) \{\}}
+\DoxyCodeLine{348 \};}
+\DoxyCodeLine{349 \textcolor{comment}{// "{}sparse .* dense"{}}}
+\DoxyCodeLine{350 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T1, \textcolor{keyword}{typename} T2, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{351 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__product__op}{scalar\_product\_op}}<T1,T2>, Lhs, Rhs>, \mbox{\hyperlink{structEigen_1_1internal_1_1IteratorBased}{IteratorBased}}, \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{IndexBased}}>}
+\DoxyCodeLine{352   : \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator}}<CwiseBinaryOp<scalar\_product\_op<T1,T2>, Lhs, Rhs> >}
+\DoxyCodeLine{353 \{}
+\DoxyCodeLine{354   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp<scalar\_product\_op<T1,T2>}}, Lhs, Rhs> \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}};}
+\DoxyCodeLine{355   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator<XprType>}} \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{Base}};}
+\DoxyCodeLine{356   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}}\& xpr) : \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{Base}}(xpr) \{\}}
+\DoxyCodeLine{357 \};}
+\DoxyCodeLine{358 }
+\DoxyCodeLine{359 \textcolor{comment}{// "{}sparse ./ dense"{}}}
+\DoxyCodeLine{360 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T1, \textcolor{keyword}{typename} T2, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{361 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__quotient__op}{scalar\_quotient\_op}}<T1,T2>, Lhs, Rhs>, \mbox{\hyperlink{structEigen_1_1internal_1_1IteratorBased}{IteratorBased}}, \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{IndexBased}}>}
+\DoxyCodeLine{362   : \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator}}<CwiseBinaryOp<scalar\_quotient\_op<T1,T2>, Lhs, Rhs> >}
+\DoxyCodeLine{363 \{}
+\DoxyCodeLine{364   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp<scalar\_quotient\_op<T1,T2>}}, Lhs, Rhs> \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}};}
+\DoxyCodeLine{365   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator<XprType>}} \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{Base}};}
+\DoxyCodeLine{366   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}}\& xpr) : \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{Base}}(xpr) \{\}}
+\DoxyCodeLine{367 \};}
+\DoxyCodeLine{368 }
+\DoxyCodeLine{369 \textcolor{comment}{// "{}sparse \&\& sparse"{}}}
+\DoxyCodeLine{370 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{371 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__boolean__and__op}{scalar\_boolean\_and\_op}}, Lhs, Rhs>, \mbox{\hyperlink{structEigen_1_1internal_1_1IteratorBased}{IteratorBased}}, \mbox{\hyperlink{structEigen_1_1internal_1_1IteratorBased}{IteratorBased}}>}
+\DoxyCodeLine{372   : \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator}}<CwiseBinaryOp<scalar\_boolean\_and\_op, Lhs, Rhs> >}
+\DoxyCodeLine{373 \{}
+\DoxyCodeLine{374   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp<scalar\_boolean\_and\_op, Lhs, Rhs>}} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}};}
+\DoxyCodeLine{375   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator<XprType>}} \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{Base}};}
+\DoxyCodeLine{376   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}}\& xpr) : \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{Base}}(xpr) \{\}}
+\DoxyCodeLine{377 \};}
+\DoxyCodeLine{378 \textcolor{comment}{// "{}dense \&\& sparse"{}}}
+\DoxyCodeLine{379 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{380 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__boolean__and__op}{scalar\_boolean\_and\_op}}, Lhs, Rhs>, \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{IndexBased}}, \mbox{\hyperlink{structEigen_1_1internal_1_1IteratorBased}{IteratorBased}}>}
+\DoxyCodeLine{381   : \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator}}<CwiseBinaryOp<scalar\_boolean\_and\_op, Lhs, Rhs> >}
+\DoxyCodeLine{382 \{}
+\DoxyCodeLine{383   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp<scalar\_boolean\_and\_op, Lhs, Rhs>}} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}};}
+\DoxyCodeLine{384   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator<XprType>}} \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{Base}};}
+\DoxyCodeLine{385   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}}\& xpr) : \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{Base}}(xpr) \{\}}
+\DoxyCodeLine{386 \};}
+\DoxyCodeLine{387 \textcolor{comment}{// "{}sparse \&\& dense"{}}}
+\DoxyCodeLine{388 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>}
+\DoxyCodeLine{389 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp}}<\mbox{\hyperlink{structEigen_1_1internal_1_1scalar__boolean__and__op}{scalar\_boolean\_and\_op}}, Lhs, Rhs>, \mbox{\hyperlink{structEigen_1_1internal_1_1IteratorBased}{IteratorBased}}, \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{IndexBased}}>}
+\DoxyCodeLine{390   : \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator}}<CwiseBinaryOp<scalar\_boolean\_and\_op, Lhs, Rhs> >}
+\DoxyCodeLine{391 \{}
+\DoxyCodeLine{392   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp<scalar\_boolean\_and\_op, Lhs, Rhs>}} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}};}
+\DoxyCodeLine{393   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator<XprType>}} \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{Base}};}
+\DoxyCodeLine{394   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1binary__evaluator}{binary\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{XprType}}\& xpr) : \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{Base}}(xpr) \{\}}
+\DoxyCodeLine{395 \};}
+\DoxyCodeLine{396 }
+\DoxyCodeLine{397 \textcolor{comment}{// "{}sparse \string^ sparse"{}}}
+\DoxyCodeLine{398 \textcolor{keyword}{template}<\textcolor{keyword}{typename} XprType>}
+\DoxyCodeLine{399 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator}}<XprType, \mbox{\hyperlink{structEigen_1_1internal_1_1IteratorBased}{IteratorBased}}, \mbox{\hyperlink{structEigen_1_1internal_1_1IteratorBased}{IteratorBased}}>}
+\DoxyCodeLine{400   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<XprType>}
+\DoxyCodeLine{401 \{}
+\DoxyCodeLine{402 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{403   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Functor BinaryOp;}
+\DoxyCodeLine{404   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Lhs LhsArg;}
+\DoxyCodeLine{405   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Rhs RhsArg;}
+\DoxyCodeLine{406   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<LhsArg>::InnerIterator}}  LhsIterator;}
+\DoxyCodeLine{407   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<RhsArg>::InnerIterator}}  RhsIterator;}
+\DoxyCodeLine{408   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::StorageIndex StorageIndex;}
+\DoxyCodeLine{409   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<XprType>::Scalar}} Scalar;}
+\DoxyCodeLine{410 \textcolor{keyword}{public}:}
+\DoxyCodeLine{411 }
+\DoxyCodeLine{412   \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1InnerIterator}{InnerIterator}}}
+\DoxyCodeLine{413   \{}
+\DoxyCodeLine{414   \textcolor{keyword}{public}:}
+\DoxyCodeLine{415     }
+\DoxyCodeLine{416     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{classEigen_1_1InnerIterator}{InnerIterator}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator}}\& aEval, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outer)}
+\DoxyCodeLine{417       : m\_lhsIter(aEval.m\_lhsImpl,outer), m\_rhsIter(aEval.m\_rhsImpl,outer), m\_functor(aEval.m\_functor)}
+\DoxyCodeLine{418     \{}
+\DoxyCodeLine{419       \textcolor{keywordflow}{while} (m\_lhsIter \&\& m\_rhsIter \&\& (m\_lhsIter.index() != m\_rhsIter.index()))}
+\DoxyCodeLine{420       \{}
+\DoxyCodeLine{421         \textcolor{keywordflow}{if} (m\_lhsIter.index() < m\_rhsIter.index())}
+\DoxyCodeLine{422           ++m\_lhsIter;}
+\DoxyCodeLine{423         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{424           ++m\_rhsIter;}
+\DoxyCodeLine{425       \}}
+\DoxyCodeLine{426     \}}
+\DoxyCodeLine{427 }
+\DoxyCodeLine{428     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{classEigen_1_1InnerIterator}{InnerIterator}}\& operator++()}
+\DoxyCodeLine{429     \{}
+\DoxyCodeLine{430       ++m\_lhsIter;}
+\DoxyCodeLine{431       ++m\_rhsIter;}
+\DoxyCodeLine{432       \textcolor{keywordflow}{while} (m\_lhsIter \&\& m\_rhsIter \&\& (m\_lhsIter.index() != m\_rhsIter.index()))}
+\DoxyCodeLine{433       \{}
+\DoxyCodeLine{434         \textcolor{keywordflow}{if} (m\_lhsIter.index() < m\_rhsIter.index())}
+\DoxyCodeLine{435           ++m\_lhsIter;}
+\DoxyCodeLine{436         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{437           ++m\_rhsIter;}
+\DoxyCodeLine{438       \}}
+\DoxyCodeLine{439       \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{440     \}}
+\DoxyCodeLine{441     }
+\DoxyCodeLine{442     EIGEN\_STRONG\_INLINE Scalar value()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_functor(m\_lhsIter.value(), m\_rhsIter.value()); \}}
+\DoxyCodeLine{443 }
+\DoxyCodeLine{444     EIGEN\_STRONG\_INLINE StorageIndex index()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_lhsIter.index(); \}}
+\DoxyCodeLine{445     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outer()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_lhsIter.outer(); \}}
+\DoxyCodeLine{446     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_lhsIter.row(); \}}
+\DoxyCodeLine{447     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_lhsIter.col(); \}}
+\DoxyCodeLine{448 }
+\DoxyCodeLine{449     EIGEN\_STRONG\_INLINE \textcolor{keyword}{operator} bool()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} (m\_lhsIter \&\& m\_rhsIter); \}}
+\DoxyCodeLine{450 }
+\DoxyCodeLine{451   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{452     LhsIterator m\_lhsIter;}
+\DoxyCodeLine{453     RhsIterator m\_rhsIter;}
+\DoxyCodeLine{454     \textcolor{keyword}{const} BinaryOp\& m\_functor;}
+\DoxyCodeLine{455   \};}
+\DoxyCodeLine{456   }
+\DoxyCodeLine{457   }
+\DoxyCodeLine{458   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{459     CoeffReadCost = int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<LhsArg>::CoeffReadCost}}) + int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<RhsArg>::CoeffReadCost}}) + int(\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<BinaryOp>::Cost}}),}
+\DoxyCodeLine{460     Flags = XprType::Flags}
+\DoxyCodeLine{461   \};}
+\DoxyCodeLine{462   }
+\DoxyCodeLine{463   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator}}(\textcolor{keyword}{const} XprType\& xpr)}
+\DoxyCodeLine{464     : m\_functor(xpr.functor()),}
+\DoxyCodeLine{465       m\_lhsImpl(xpr.lhs()), }
+\DoxyCodeLine{466       m\_rhsImpl(xpr.rhs())  }
+\DoxyCodeLine{467   \{}
+\DoxyCodeLine{468     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<BinaryOp>::Cost}});}
+\DoxyCodeLine{469     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(CoeffReadCost);}
+\DoxyCodeLine{470   \}}
+\DoxyCodeLine{471   }
+\DoxyCodeLine{472   \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nonZerosEstimate()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{473     \textcolor{keywordflow}{return} (std::min)(m\_lhsImpl.nonZerosEstimate(), m\_rhsImpl.nonZerosEstimate());}
+\DoxyCodeLine{474   \}}
+\DoxyCodeLine{475 }
+\DoxyCodeLine{476 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{477   \textcolor{keyword}{const} BinaryOp m\_functor;}
+\DoxyCodeLine{478   evaluator<LhsArg> m\_lhsImpl;}
+\DoxyCodeLine{479   evaluator<RhsArg> m\_rhsImpl;}
+\DoxyCodeLine{480 \};}
+\DoxyCodeLine{481 }
+\DoxyCodeLine{482 \textcolor{comment}{// "{}dense \string^ sparse"{}}}
+\DoxyCodeLine{483 \textcolor{keyword}{template}<\textcolor{keyword}{typename} XprType>}
+\DoxyCodeLine{484 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator}}<XprType, \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{IndexBased}}, \mbox{\hyperlink{structEigen_1_1internal_1_1IteratorBased}{IteratorBased}}>}
+\DoxyCodeLine{485   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<XprType>}
+\DoxyCodeLine{486 \{}
+\DoxyCodeLine{487 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{488   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Functor BinaryOp;}
+\DoxyCodeLine{489   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Lhs LhsArg;}
+\DoxyCodeLine{490   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Rhs RhsArg;}
+\DoxyCodeLine{491   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<LhsArg>}} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{LhsEvaluator}};}
+\DoxyCodeLine{492   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<RhsArg>::InnerIterator}}  RhsIterator;}
+\DoxyCodeLine{493   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::StorageIndex StorageIndex;}
+\DoxyCodeLine{494   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<XprType>::Scalar}} Scalar;}
+\DoxyCodeLine{495 \textcolor{keyword}{public}:}
+\DoxyCodeLine{496 }
+\DoxyCodeLine{497   \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1InnerIterator}{InnerIterator}}}
+\DoxyCodeLine{498   \{}
+\DoxyCodeLine{499     \textcolor{keyword}{enum} \{ IsRowMajor = (int(RhsArg::Flags)\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})==\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}} \};}
+\DoxyCodeLine{500 }
+\DoxyCodeLine{501   \textcolor{keyword}{public}:}
+\DoxyCodeLine{502     }
+\DoxyCodeLine{503     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{classEigen_1_1InnerIterator}{InnerIterator}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator}}\& aEval, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outer)}
+\DoxyCodeLine{504       : m\_lhsEval(aEval.m\_lhsImpl), m\_rhsIter(aEval.m\_rhsImpl,outer), m\_functor(aEval.m\_functor), m\_outer(outer)}
+\DoxyCodeLine{505     \{\}}
+\DoxyCodeLine{506 }
+\DoxyCodeLine{507     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{classEigen_1_1InnerIterator}{InnerIterator}}\& operator++()}
+\DoxyCodeLine{508     \{}
+\DoxyCodeLine{509       ++m\_rhsIter;}
+\DoxyCodeLine{510       \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{511     \}}
+\DoxyCodeLine{512 }
+\DoxyCodeLine{513     EIGEN\_STRONG\_INLINE Scalar value()\textcolor{keyword}{ const}}
+\DoxyCodeLine{514 \textcolor{keyword}{    }\{ \textcolor{keywordflow}{return} m\_functor(m\_lhsEval.coeff(IsRowMajor?m\_outer:m\_rhsIter.index(),IsRowMajor?m\_rhsIter.index():m\_outer), m\_rhsIter.value()); \}}
+\DoxyCodeLine{515 }
+\DoxyCodeLine{516     EIGEN\_STRONG\_INLINE StorageIndex index()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_rhsIter.index(); \}}
+\DoxyCodeLine{517     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outer()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_rhsIter.outer(); \}}
+\DoxyCodeLine{518     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_rhsIter.row(); \}}
+\DoxyCodeLine{519     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_rhsIter.col(); \}}
+\DoxyCodeLine{520 }
+\DoxyCodeLine{521     EIGEN\_STRONG\_INLINE \textcolor{keyword}{operator} bool()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_rhsIter; \}}
+\DoxyCodeLine{522     }
+\DoxyCodeLine{523   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{524     \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{LhsEvaluator}} \&m\_lhsEval;}
+\DoxyCodeLine{525     RhsIterator m\_rhsIter;}
+\DoxyCodeLine{526     \textcolor{keyword}{const} BinaryOp\& m\_functor;}
+\DoxyCodeLine{527     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m\_outer;}
+\DoxyCodeLine{528   \};}
+\DoxyCodeLine{529   }
+\DoxyCodeLine{530   }
+\DoxyCodeLine{531   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{532     CoeffReadCost = int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<LhsArg>::CoeffReadCost}}) + int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<RhsArg>::CoeffReadCost}}) + int(\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<BinaryOp>::Cost}}),}
+\DoxyCodeLine{533     Flags = XprType::Flags}
+\DoxyCodeLine{534   \};}
+\DoxyCodeLine{535   }
+\DoxyCodeLine{536   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator}}(\textcolor{keyword}{const} XprType\& xpr)}
+\DoxyCodeLine{537     : m\_functor(xpr.functor()),}
+\DoxyCodeLine{538       m\_lhsImpl(xpr.lhs()), }
+\DoxyCodeLine{539       m\_rhsImpl(xpr.rhs())  }
+\DoxyCodeLine{540   \{}
+\DoxyCodeLine{541     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<BinaryOp>::Cost}});}
+\DoxyCodeLine{542     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(CoeffReadCost);}
+\DoxyCodeLine{543   \}}
+\DoxyCodeLine{544   }
+\DoxyCodeLine{545   \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nonZerosEstimate()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{546     \textcolor{keywordflow}{return} m\_rhsImpl.nonZerosEstimate();}
+\DoxyCodeLine{547   \}}
+\DoxyCodeLine{548 }
+\DoxyCodeLine{549 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{550   \textcolor{keyword}{const} BinaryOp m\_functor;}
+\DoxyCodeLine{551   evaluator<LhsArg> m\_lhsImpl;}
+\DoxyCodeLine{552   evaluator<RhsArg> m\_rhsImpl;}
+\DoxyCodeLine{553 \};}
+\DoxyCodeLine{554 }
+\DoxyCodeLine{555 \textcolor{comment}{// "{}sparse \string^ dense"{}}}
+\DoxyCodeLine{556 \textcolor{keyword}{template}<\textcolor{keyword}{typename} XprType>}
+\DoxyCodeLine{557 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator}}<XprType, \mbox{\hyperlink{structEigen_1_1internal_1_1IteratorBased}{IteratorBased}}, \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{IndexBased}}>}
+\DoxyCodeLine{558   : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__base}{evaluator\_base}}<XprType>}
+\DoxyCodeLine{559 \{}
+\DoxyCodeLine{560 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{561   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Functor BinaryOp;}
+\DoxyCodeLine{562   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Lhs LhsArg;}
+\DoxyCodeLine{563   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::Rhs RhsArg;}
+\DoxyCodeLine{564   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<LhsArg>::InnerIterator}} LhsIterator;}
+\DoxyCodeLine{565   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<RhsArg>}} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{RhsEvaluator}};}
+\DoxyCodeLine{566   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} XprType::StorageIndex StorageIndex;}
+\DoxyCodeLine{567   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<XprType>::Scalar}} Scalar;}
+\DoxyCodeLine{568 \textcolor{keyword}{public}:}
+\DoxyCodeLine{569 }
+\DoxyCodeLine{570   \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1InnerIterator}{InnerIterator}}}
+\DoxyCodeLine{571   \{}
+\DoxyCodeLine{572     \textcolor{keyword}{enum} \{ IsRowMajor = (int(LhsArg::Flags)\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})==\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}} \};}
+\DoxyCodeLine{573 }
+\DoxyCodeLine{574   \textcolor{keyword}{public}:}
+\DoxyCodeLine{575     }
+\DoxyCodeLine{576     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{classEigen_1_1InnerIterator}{InnerIterator}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator}}\& aEval, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outer)}
+\DoxyCodeLine{577       : m\_lhsIter(aEval.m\_lhsImpl,outer), m\_rhsEval(aEval.m\_rhsImpl), m\_functor(aEval.m\_functor), m\_outer(outer)}
+\DoxyCodeLine{578     \{\}}
+\DoxyCodeLine{579 }
+\DoxyCodeLine{580     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{classEigen_1_1InnerIterator}{InnerIterator}}\& operator++()}
+\DoxyCodeLine{581     \{}
+\DoxyCodeLine{582       ++m\_lhsIter;}
+\DoxyCodeLine{583       \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{584     \}}
+\DoxyCodeLine{585 }
+\DoxyCodeLine{586     EIGEN\_STRONG\_INLINE Scalar value()\textcolor{keyword}{ const}}
+\DoxyCodeLine{587 \textcolor{keyword}{    }\{ \textcolor{keywordflow}{return} m\_functor(m\_lhsIter.value(),}
+\DoxyCodeLine{588                        m\_rhsEval.coeff(IsRowMajor?m\_outer:m\_lhsIter.index(),IsRowMajor?m\_lhsIter.index():m\_outer)); \}}
+\DoxyCodeLine{589 }
+\DoxyCodeLine{590     EIGEN\_STRONG\_INLINE StorageIndex index()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_lhsIter.index(); \}}
+\DoxyCodeLine{591     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outer()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_lhsIter.outer(); \}}
+\DoxyCodeLine{592     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_lhsIter.row(); \}}
+\DoxyCodeLine{593     EIGEN\_STRONG\_INLINE \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_lhsIter.col(); \}}
+\DoxyCodeLine{594 }
+\DoxyCodeLine{595     EIGEN\_STRONG\_INLINE \textcolor{keyword}{operator} bool()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_lhsIter; \}}
+\DoxyCodeLine{596     }
+\DoxyCodeLine{597   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{598     LhsIterator m\_lhsIter;}
+\DoxyCodeLine{599     \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<RhsArg>}} \&m\_rhsEval;}
+\DoxyCodeLine{600     \textcolor{keyword}{const} BinaryOp\& m\_functor;}
+\DoxyCodeLine{601     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m\_outer;}
+\DoxyCodeLine{602   \};}
+\DoxyCodeLine{603   }
+\DoxyCodeLine{604   }
+\DoxyCodeLine{605   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{606     CoeffReadCost = int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<LhsArg>::CoeffReadCost}}) + int(\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<RhsArg>::CoeffReadCost}}) + int(\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<BinaryOp>::Cost}}),}
+\DoxyCodeLine{607     Flags = XprType::Flags}
+\DoxyCodeLine{608   \};}
+\DoxyCodeLine{609   }
+\DoxyCodeLine{610   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__conjunction__evaluator}{sparse\_conjunction\_evaluator}}(\textcolor{keyword}{const} XprType\& xpr)}
+\DoxyCodeLine{611     : m\_functor(xpr.functor()),}
+\DoxyCodeLine{612       m\_lhsImpl(xpr.lhs()), }
+\DoxyCodeLine{613       m\_rhsImpl(xpr.rhs())  }
+\DoxyCodeLine{614   \{}
+\DoxyCodeLine{615     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(\mbox{\hyperlink{structEigen_1_1internal_1_1functor__traits}{functor\_traits<BinaryOp>::Cost}});}
+\DoxyCodeLine{616     EIGEN\_INTERNAL\_CHECK\_COST\_VALUE(CoeffReadCost);}
+\DoxyCodeLine{617   \}}
+\DoxyCodeLine{618   }
+\DoxyCodeLine{619   \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} nonZerosEstimate()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{620     \textcolor{keywordflow}{return} m\_lhsImpl.nonZerosEstimate();}
+\DoxyCodeLine{621   \}}
+\DoxyCodeLine{622 }
+\DoxyCodeLine{623 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{624   \textcolor{keyword}{const} BinaryOp m\_functor;}
+\DoxyCodeLine{625   evaluator<LhsArg> m\_lhsImpl;}
+\DoxyCodeLine{626   evaluator<RhsArg> m\_rhsImpl;}
+\DoxyCodeLine{627 \};}
+\DoxyCodeLine{628 }
+\DoxyCodeLine{629 \}}
+\DoxyCodeLine{630 }
+\DoxyCodeLine{631 \textcolor{comment}{/***************************************************************************}}
+\DoxyCodeLine{632 \textcolor{comment}{* Implementation of SparseMatrixBase and SparseCwise functions/operators}}
+\DoxyCodeLine{633 \textcolor{comment}{***************************************************************************/}}
+\DoxyCodeLine{634 }
+\DoxyCodeLine{635 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{636 \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{637 Derived\& SparseMatrixBase<Derived>::operator+=(\textcolor{keyword}{const} EigenBase<OtherDerived> \&other)}
+\DoxyCodeLine{638 \{}
+\DoxyCodeLine{639   call\_assignment(derived(), other.derived(), internal::add\_assign\_op<Scalar,typename OtherDerived::Scalar>());}
+\DoxyCodeLine{640   \textcolor{keywordflow}{return} derived();}
+\DoxyCodeLine{641 \}}
+\DoxyCodeLine{642 }
+\DoxyCodeLine{643 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{644 \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{645 Derived\& SparseMatrixBase<Derived>::operator-\/=(\textcolor{keyword}{const} EigenBase<OtherDerived> \&other)}
+\DoxyCodeLine{646 \{}
+\DoxyCodeLine{647   call\_assignment(derived(), other.derived(), internal::assign\_op<Scalar,typename OtherDerived::Scalar>());}
+\DoxyCodeLine{648   \textcolor{keywordflow}{return} derived();}
+\DoxyCodeLine{649 \}}
+\DoxyCodeLine{650 }
+\DoxyCodeLine{651 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{652 \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{653 EIGEN\_STRONG\_INLINE Derived \&}
+\DoxyCodeLine{654 SparseMatrixBase<Derived>::operator-\/=(\textcolor{keyword}{const} SparseMatrixBase<OtherDerived> \&other)}
+\DoxyCodeLine{655 \{}
+\DoxyCodeLine{656   \textcolor{keywordflow}{return} derived() = derived() -\/ other.derived();}
+\DoxyCodeLine{657 \}}
+\DoxyCodeLine{658 }
+\DoxyCodeLine{659 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{660 \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{661 EIGEN\_STRONG\_INLINE Derived \&}
+\DoxyCodeLine{662 SparseMatrixBase<Derived>::operator+=(\textcolor{keyword}{const} SparseMatrixBase<OtherDerived>\& other)}
+\DoxyCodeLine{663 \{}
+\DoxyCodeLine{664   \textcolor{keywordflow}{return} derived() = derived() + other.derived();}
+\DoxyCodeLine{665 \}}
+\DoxyCodeLine{666 }
+\DoxyCodeLine{667 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{668 \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{669 Derived\& SparseMatrixBase<Derived>::operator+=(\textcolor{keyword}{const} DiagonalBase<OtherDerived>\& other)}
+\DoxyCodeLine{670 \{}
+\DoxyCodeLine{671   call\_assignment\_no\_alias(derived(), other.derived(), internal::add\_assign\_op<Scalar,typename OtherDerived::Scalar>());}
+\DoxyCodeLine{672   \textcolor{keywordflow}{return} derived();}
+\DoxyCodeLine{673 \}}
+\DoxyCodeLine{674 }
+\DoxyCodeLine{675 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{676 \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{677 Derived\& SparseMatrixBase<Derived>::operator-\/=(\textcolor{keyword}{const} DiagonalBase<OtherDerived>\& other)}
+\DoxyCodeLine{678 \{}
+\DoxyCodeLine{679   call\_assignment\_no\_alias(derived(), other.derived(), internal::sub\_assign\_op<Scalar,typename OtherDerived::Scalar>());}
+\DoxyCodeLine{680   \textcolor{keywordflow}{return} derived();}
+\DoxyCodeLine{681 \}}
+\DoxyCodeLine{682     }
+\DoxyCodeLine{683 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{684 \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{685 EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} \textcolor{keyword}{typename} SparseMatrixBase<Derived>::template CwiseProductDenseReturnType<OtherDerived>::Type}
+\DoxyCodeLine{686 SparseMatrixBase<Derived>::cwiseProduct(\textcolor{keyword}{const} MatrixBase<OtherDerived> \&other)\textcolor{keyword}{ const}}
+\DoxyCodeLine{687 \textcolor{keyword}{}\{}
+\DoxyCodeLine{688   \textcolor{keywordflow}{return} \textcolor{keyword}{typename} CwiseProductDenseReturnType<OtherDerived>::Type(derived(), other.derived());}
+\DoxyCodeLine{689 \}}
+\DoxyCodeLine{690 }
+\DoxyCodeLine{691 \textcolor{keyword}{template}<\textcolor{keyword}{typename} DenseDerived, \textcolor{keyword}{typename} SparseDerived>}
+\DoxyCodeLine{692 EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} CwiseBinaryOp<internal::scalar\_sum\_op<typename DenseDerived::Scalar,typename SparseDerived::Scalar>, \textcolor{keyword}{const} DenseDerived, \textcolor{keyword}{const} SparseDerived>}
+\DoxyCodeLine{693 operator+(\textcolor{keyword}{const} MatrixBase<DenseDerived> \&a, \textcolor{keyword}{const} SparseMatrixBase<SparseDerived> \&b)}
+\DoxyCodeLine{694 \{}
+\DoxyCodeLine{695   \textcolor{keywordflow}{return} CwiseBinaryOp<internal::scalar\_sum\_op<typename DenseDerived::Scalar,typename SparseDerived::Scalar>, \textcolor{keyword}{const} DenseDerived, \textcolor{keyword}{const} SparseDerived>(a.derived(), b.derived());}
+\DoxyCodeLine{696 \}}
+\DoxyCodeLine{697 }
+\DoxyCodeLine{698 \textcolor{keyword}{template}<\textcolor{keyword}{typename} SparseDerived, \textcolor{keyword}{typename} DenseDerived>}
+\DoxyCodeLine{699 EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} CwiseBinaryOp<internal::scalar\_sum\_op<typename SparseDerived::Scalar,typename DenseDerived::Scalar>, \textcolor{keyword}{const} SparseDerived, \textcolor{keyword}{const} DenseDerived>}
+\DoxyCodeLine{700 operator+(\textcolor{keyword}{const} SparseMatrixBase<SparseDerived> \&a, \textcolor{keyword}{const} MatrixBase<DenseDerived> \&b)}
+\DoxyCodeLine{701 \{}
+\DoxyCodeLine{702   \textcolor{keywordflow}{return} CwiseBinaryOp<internal::scalar\_sum\_op<typename SparseDerived::Scalar,typename DenseDerived::Scalar>, \textcolor{keyword}{const} SparseDerived, \textcolor{keyword}{const} DenseDerived>(a.derived(), b.derived());}
+\DoxyCodeLine{703 \}}
+\DoxyCodeLine{704 }
+\DoxyCodeLine{705 \textcolor{keyword}{template}<\textcolor{keyword}{typename} DenseDerived, \textcolor{keyword}{typename} SparseDerived>}
+\DoxyCodeLine{706 EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} CwiseBinaryOp<internal::scalar\_difference\_op<typename DenseDerived::Scalar,typename SparseDerived::Scalar>, \textcolor{keyword}{const} DenseDerived, \textcolor{keyword}{const} SparseDerived>}
+\DoxyCodeLine{707 operator-\/(\textcolor{keyword}{const} MatrixBase<DenseDerived> \&a, \textcolor{keyword}{const} SparseMatrixBase<SparseDerived> \&b)}
+\DoxyCodeLine{708 \{}
+\DoxyCodeLine{709   \textcolor{keywordflow}{return} CwiseBinaryOp<internal::scalar\_difference\_op<typename DenseDerived::Scalar,typename SparseDerived::Scalar>, \textcolor{keyword}{const} DenseDerived, \textcolor{keyword}{const} SparseDerived>(a.derived(), b.derived());}
+\DoxyCodeLine{710 \}}
+\DoxyCodeLine{711 }
+\DoxyCodeLine{712 \textcolor{keyword}{template}<\textcolor{keyword}{typename} SparseDerived, \textcolor{keyword}{typename} DenseDerived>}
+\DoxyCodeLine{713 EIGEN\_STRONG\_INLINE \textcolor{keyword}{const} CwiseBinaryOp<internal::scalar\_difference\_op<typename SparseDerived::Scalar,typename DenseDerived::Scalar>, \textcolor{keyword}{const} SparseDerived, \textcolor{keyword}{const} DenseDerived>}
+\DoxyCodeLine{714 operator-\/(\textcolor{keyword}{const} SparseMatrixBase<SparseDerived> \&a, \textcolor{keyword}{const} MatrixBase<DenseDerived> \&b)}
+\DoxyCodeLine{715 \{}
+\DoxyCodeLine{716   \textcolor{keywordflow}{return} CwiseBinaryOp<internal::scalar\_difference\_op<typename SparseDerived::Scalar,typename DenseDerived::Scalar>, \textcolor{keyword}{const} SparseDerived, \textcolor{keyword}{const} DenseDerived>(a.derived(), b.derived());}
+\DoxyCodeLine{717 \}}
+\DoxyCodeLine{718 }
+\DoxyCodeLine{719 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{720 }
+\DoxyCodeLine{721 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_SPARSE\_CWISE\_BINARY\_OP\_H}}
+
+\end{DoxyCode}

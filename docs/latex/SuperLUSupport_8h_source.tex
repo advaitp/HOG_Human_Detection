@@ -1,0 +1,950 @@
+\hypertarget{SuperLUSupport_8h_source}{}\doxysection{Super\+LUSupport.\+h}
+\label{SuperLUSupport_8h_source}\index{include/Eigen/src/SuperLUSupport/SuperLUSupport.h@{include/Eigen/src/SuperLUSupport/SuperLUSupport.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2008-\/2015 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_SUPERLUSUPPORT\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_SUPERLUSUPPORT\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{preprocessor}{\#if defined(SUPERLU\_MAJOR\_VERSION) \&\& (SUPERLU\_MAJOR\_VERSION >= 5)}}
+\DoxyCodeLine{18 \textcolor{preprocessor}{\#define DECL\_GSSVX(PREFIX,FLOATTYPE,KEYTYPE)        \(\backslash\)}}
+\DoxyCodeLine{19 \textcolor{preprocessor}{    extern "{}C"{}} \{                                                                                          \(\backslash\)}
+\DoxyCodeLine{20       extern void PREFIX\#\#gssvx(superlu\_options\_t *, SuperMatrix *, int *, int *, int *,                  \(\backslash\)}
+\DoxyCodeLine{21                                 char *, FLOATTYPE *, FLOATTYPE *, SuperMatrix *, SuperMatrix *,           \(\backslash\)}
+\DoxyCodeLine{22                                 void *, int, SuperMatrix *, SuperMatrix *,                                \(\backslash\)}
+\DoxyCodeLine{23                                 FLOATTYPE *, FLOATTYPE *, FLOATTYPE *, FLOATTYPE *,                       \(\backslash\)}
+\DoxyCodeLine{24                                 GlobalLU\_t *, mem\_usage\_t *, SuperLUStat\_t *, int *);                     \(\backslash\)}
+\DoxyCodeLine{25     \}                                                                                                     \(\backslash\)}
+\DoxyCodeLine{26     inline float SuperLU\_gssvx(superlu\_options\_t *options, SuperMatrix *A,                                \(\backslash\)}
+\DoxyCodeLine{27          int *perm\_c, int *perm\_r, int *etree, char *equed,                                               \(\backslash\)}
+\DoxyCodeLine{28          FLOATTYPE *R, FLOATTYPE *C, SuperMatrix *L,                                                      \(\backslash\)}
+\DoxyCodeLine{29          SuperMatrix *U, void *work, int lwork,                                                           \(\backslash\)}
+\DoxyCodeLine{30          SuperMatrix *B, SuperMatrix *X,                                                                  \(\backslash\)}
+\DoxyCodeLine{31          FLOATTYPE *recip\_pivot\_growth,                                                                   \(\backslash\)}
+\DoxyCodeLine{32          FLOATTYPE *rcond, FLOATTYPE *ferr, FLOATTYPE *berr,                                              \(\backslash\)}
+\DoxyCodeLine{33          SuperLUStat\_t *stats, int *info, KEYTYPE) \{                                                      \(\backslash\)}
+\DoxyCodeLine{34     mem\_usage\_t mem\_usage;                                                                                \(\backslash\)}
+\DoxyCodeLine{35     GlobalLU\_t gLU;                                                                                       \(\backslash\)}
+\DoxyCodeLine{36     PREFIX\#\#gssvx(options, A, perm\_c, perm\_r, etree, equed, R, C, L,                                      \(\backslash\)}
+\DoxyCodeLine{37          U, work, lwork, B, X, recip\_pivot\_growth, rcond,                                                 \(\backslash\)}
+\DoxyCodeLine{38          ferr, berr, \&gLU, \&mem\_usage, stats, info);                                                      \(\backslash\)}
+\DoxyCodeLine{39     return mem\_usage.for\_lu; \textcolor{comment}{/* bytes used by the factor storage */}\textcolor{preprocessor}{                                       \(\backslash\)}}
+\DoxyCodeLine{40 \textcolor{preprocessor}{  \}}}
+\DoxyCodeLine{41 \textcolor{preprocessor}{\#else }\textcolor{comment}{// version < 5.0}}
+\DoxyCodeLine{42 \textcolor{preprocessor}{\#define DECL\_GSSVX(PREFIX,FLOATTYPE,KEYTYPE)        \(\backslash\)}}
+\DoxyCodeLine{43 \textcolor{preprocessor}{    extern "{}C"{}} \{                                                                                          \(\backslash\)}
+\DoxyCodeLine{44       extern void PREFIX\#\#gssvx(superlu\_options\_t *, SuperMatrix *, int *, int *, int *,                  \(\backslash\)}
+\DoxyCodeLine{45                                 char *, FLOATTYPE *, FLOATTYPE *, SuperMatrix *, SuperMatrix *,           \(\backslash\)}
+\DoxyCodeLine{46                                 void *, int, SuperMatrix *, SuperMatrix *,                                \(\backslash\)}
+\DoxyCodeLine{47                                 FLOATTYPE *, FLOATTYPE *, FLOATTYPE *, FLOATTYPE *,                       \(\backslash\)}
+\DoxyCodeLine{48                                 mem\_usage\_t *, SuperLUStat\_t *, int *);                                   \(\backslash\)}
+\DoxyCodeLine{49     \}                                                                                                     \(\backslash\)}
+\DoxyCodeLine{50     inline float SuperLU\_gssvx(superlu\_options\_t *options, SuperMatrix *A,                                \(\backslash\)}
+\DoxyCodeLine{51          int *perm\_c, int *perm\_r, int *etree, char *equed,                                               \(\backslash\)}
+\DoxyCodeLine{52          FLOATTYPE *R, FLOATTYPE *C, SuperMatrix *L,                                                      \(\backslash\)}
+\DoxyCodeLine{53          SuperMatrix *U, void *work, int lwork,                                                           \(\backslash\)}
+\DoxyCodeLine{54          SuperMatrix *B, SuperMatrix *X,                                                                  \(\backslash\)}
+\DoxyCodeLine{55          FLOATTYPE *recip\_pivot\_growth,                                                                   \(\backslash\)}
+\DoxyCodeLine{56          FLOATTYPE *rcond, FLOATTYPE *ferr, FLOATTYPE *berr,                                              \(\backslash\)}
+\DoxyCodeLine{57          SuperLUStat\_t *stats, int *info, KEYTYPE) \{                                                      \(\backslash\)}
+\DoxyCodeLine{58     mem\_usage\_t mem\_usage;                                                                                \(\backslash\)}
+\DoxyCodeLine{59     PREFIX\#\#gssvx(options, A, perm\_c, perm\_r, etree, equed, R, C, L,                                      \(\backslash\)}
+\DoxyCodeLine{60          U, work, lwork, B, X, recip\_pivot\_growth, rcond,                                                 \(\backslash\)}
+\DoxyCodeLine{61          ferr, berr, \&mem\_usage, stats, info);                                                            \(\backslash\)}
+\DoxyCodeLine{62     return mem\_usage.for\_lu; \textcolor{comment}{/* bytes used by the factor storage */}\textcolor{preprocessor}{                                       \(\backslash\)}}
+\DoxyCodeLine{63 \textcolor{preprocessor}{  \}}}
+\DoxyCodeLine{64 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{65 }
+\DoxyCodeLine{66 DECL\_GSSVX(s,\textcolor{keywordtype}{float},\textcolor{keywordtype}{float})}
+\DoxyCodeLine{67 DECL\_GSSVX(c,\textcolor{keywordtype}{float},std::complex<float>)}
+\DoxyCodeLine{68 DECL\_GSSVX(d,\textcolor{keywordtype}{double},\textcolor{keywordtype}{double})}
+\DoxyCodeLine{69 DECL\_GSSVX(z,\textcolor{keywordtype}{double},std::complex<double>)}
+\DoxyCodeLine{70 }
+\DoxyCodeLine{71 \textcolor{preprocessor}{\#ifdef MILU\_ALPHA}}
+\DoxyCodeLine{72 \textcolor{preprocessor}{\#define EIGEN\_SUPERLU\_HAS\_ILU}}
+\DoxyCodeLine{73 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{74 }
+\DoxyCodeLine{75 \textcolor{preprocessor}{\#ifdef EIGEN\_SUPERLU\_HAS\_ILU}}
+\DoxyCodeLine{76 }
+\DoxyCodeLine{77 \textcolor{comment}{// similarly for the incomplete factorization using gsisx}}
+\DoxyCodeLine{78 \textcolor{preprocessor}{\#define DECL\_GSISX(PREFIX,FLOATTYPE,KEYTYPE)                                                    \(\backslash\)}}
+\DoxyCodeLine{79 \textcolor{preprocessor}{    extern "{}C"{}} \{                                                                                \(\backslash\)}
+\DoxyCodeLine{80       extern void PREFIX\#\#gsisx(superlu\_options\_t *, SuperMatrix *, int *, int *, int *,        \(\backslash\)}
+\DoxyCodeLine{81                          char *, FLOATTYPE *, FLOATTYPE *, SuperMatrix *, SuperMatrix *,        \(\backslash\)}
+\DoxyCodeLine{82                          void *, int, SuperMatrix *, SuperMatrix *, FLOATTYPE *, FLOATTYPE *,   \(\backslash\)}
+\DoxyCodeLine{83                          mem\_usage\_t *, SuperLUStat\_t *, int *);                        \(\backslash\)}
+\DoxyCodeLine{84     \}                                                                                           \(\backslash\)}
+\DoxyCodeLine{85     inline float SuperLU\_gsisx(superlu\_options\_t *options, SuperMatrix *A,                      \(\backslash\)}
+\DoxyCodeLine{86          int *perm\_c, int *perm\_r, int *etree, char *equed,                                     \(\backslash\)}
+\DoxyCodeLine{87          FLOATTYPE *R, FLOATTYPE *C, SuperMatrix *L,                                            \(\backslash\)}
+\DoxyCodeLine{88          SuperMatrix *U, void *work, int lwork,                                                 \(\backslash\)}
+\DoxyCodeLine{89          SuperMatrix *B, SuperMatrix *X,                                                        \(\backslash\)}
+\DoxyCodeLine{90          FLOATTYPE *recip\_pivot\_growth,                                                         \(\backslash\)}
+\DoxyCodeLine{91          FLOATTYPE *rcond,                                                                      \(\backslash\)}
+\DoxyCodeLine{92          SuperLUStat\_t *stats, int *info, KEYTYPE) \{                                            \(\backslash\)}
+\DoxyCodeLine{93     mem\_usage\_t mem\_usage;                                                              \(\backslash\)}
+\DoxyCodeLine{94     PREFIX\#\#gsisx(options, A, perm\_c, perm\_r, etree, equed, R, C, L,                            \(\backslash\)}
+\DoxyCodeLine{95          U, work, lwork, B, X, recip\_pivot\_growth, rcond,                                       \(\backslash\)}
+\DoxyCodeLine{96          \&mem\_usage, stats, info);                                                              \(\backslash\)}
+\DoxyCodeLine{97     return mem\_usage.for\_lu; \textcolor{comment}{/* bytes used by the factor storage */}\textcolor{preprocessor}{                             \(\backslash\)}}
+\DoxyCodeLine{98 \textcolor{preprocessor}{  \}}}
+\DoxyCodeLine{99 }
+\DoxyCodeLine{100 DECL\_GSISX(s,\textcolor{keywordtype}{float},\textcolor{keywordtype}{float})}
+\DoxyCodeLine{101 DECL\_GSISX(c,\textcolor{keywordtype}{float},std::complex<float>)}
+\DoxyCodeLine{102 DECL\_GSISX(d,\textcolor{keywordtype}{double},\textcolor{keywordtype}{double})}
+\DoxyCodeLine{103 DECL\_GSISX(z,\textcolor{keywordtype}{double},std::complex<double>)}
+\DoxyCodeLine{104 }
+\DoxyCodeLine{105 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{106 }
+\DoxyCodeLine{107 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{108 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1SluMatrixMapHelper}{SluMatrixMapHelper}};}
+\DoxyCodeLine{109 }
+\DoxyCodeLine{117 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1SluMatrix}{SluMatrix}} : SuperMatrix}
+\DoxyCodeLine{118 \{}
+\DoxyCodeLine{119   \mbox{\hyperlink{structEigen_1_1SluMatrix}{SluMatrix}}()}
+\DoxyCodeLine{120   \{}
+\DoxyCodeLine{121     Store = \&storage;}
+\DoxyCodeLine{122   \}}
+\DoxyCodeLine{123 }
+\DoxyCodeLine{124   \mbox{\hyperlink{structEigen_1_1SluMatrix}{SluMatrix}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1SluMatrix}{SluMatrix}}\& other)}
+\DoxyCodeLine{125     : SuperMatrix(other)}
+\DoxyCodeLine{126   \{}
+\DoxyCodeLine{127     Store = \&storage;}
+\DoxyCodeLine{128     storage = other.storage;}
+\DoxyCodeLine{129   \}}
+\DoxyCodeLine{130 }
+\DoxyCodeLine{131   \mbox{\hyperlink{structEigen_1_1SluMatrix}{SluMatrix}}\& operator=(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1SluMatrix}{SluMatrix}}\& other)}
+\DoxyCodeLine{132   \{}
+\DoxyCodeLine{133     SuperMatrix::operator=(\textcolor{keyword}{static\_cast<}\textcolor{keyword}{const }SuperMatrix\&\textcolor{keyword}{>}(other));}
+\DoxyCodeLine{134     Store = \&storage;}
+\DoxyCodeLine{135     storage = other.storage;}
+\DoxyCodeLine{136     \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{137   \}}
+\DoxyCodeLine{138 }
+\DoxyCodeLine{139   \textcolor{keyword}{struct}}
+\DoxyCodeLine{140   \{}
+\DoxyCodeLine{141     \textcolor{keyword}{union }\{\textcolor{keywordtype}{int} nnz;\textcolor{keywordtype}{int} lda;\};}
+\DoxyCodeLine{142     \textcolor{keywordtype}{void} *values;}
+\DoxyCodeLine{143     \textcolor{keywordtype}{int} *innerInd;}
+\DoxyCodeLine{144     \textcolor{keywordtype}{int} *outerInd;}
+\DoxyCodeLine{145   \} storage;}
+\DoxyCodeLine{146 }
+\DoxyCodeLine{147   \textcolor{keywordtype}{void} setStorageType(Stype\_t t)}
+\DoxyCodeLine{148   \{}
+\DoxyCodeLine{149     Stype = t;}
+\DoxyCodeLine{150     \textcolor{keywordflow}{if} (t==SLU\_NC || t==SLU\_NR || t==SLU\_DN)}
+\DoxyCodeLine{151       Store = \&storage;}
+\DoxyCodeLine{152     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{153     \{}
+\DoxyCodeLine{154       eigen\_assert(\textcolor{keyword}{false} \&\& \textcolor{stringliteral}{"{}storage type not supported"{}});}
+\DoxyCodeLine{155       Store = 0;}
+\DoxyCodeLine{156     \}}
+\DoxyCodeLine{157   \}}
+\DoxyCodeLine{158 }
+\DoxyCodeLine{159   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{160   \textcolor{keywordtype}{void} setScalarType()}
+\DoxyCodeLine{161   \{}
+\DoxyCodeLine{162     \textcolor{keywordflow}{if} (\mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{internal::is\_same<Scalar,float>::value}})}
+\DoxyCodeLine{163       Dtype = SLU\_S;}
+\DoxyCodeLine{164     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (\mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{internal::is\_same<Scalar,double>::value}})}
+\DoxyCodeLine{165       Dtype = SLU\_D;}
+\DoxyCodeLine{166     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (\mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{internal::is\_same}}<Scalar,std::complex<float> >::value)}
+\DoxyCodeLine{167       Dtype = SLU\_C;}
+\DoxyCodeLine{168     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (\mbox{\hyperlink{structEigen_1_1internal_1_1is__same}{internal::is\_same}}<Scalar,std::complex<double> >::value)}
+\DoxyCodeLine{169       Dtype = SLU\_Z;}
+\DoxyCodeLine{170     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{171     \{}
+\DoxyCodeLine{172       eigen\_assert(\textcolor{keyword}{false} \&\& \textcolor{stringliteral}{"{}Scalar type not supported by SuperLU"{}});}
+\DoxyCodeLine{173     \}}
+\DoxyCodeLine{174   \}}
+\DoxyCodeLine{175 }
+\DoxyCodeLine{176   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{177   \textcolor{keyword}{static} \mbox{\hyperlink{structEigen_1_1SluMatrix}{SluMatrix}} \mbox{\hyperlink{classEigen_1_1Map}{Map}}(\mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<MatrixType>}}\& \_mat)}
+\DoxyCodeLine{178   \{}
+\DoxyCodeLine{179     MatrixType\& mat(\_mat.derived());}
+\DoxyCodeLine{180     eigen\_assert( ((MatrixType::Flags\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})!=\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) \&\& \textcolor{stringliteral}{"{}row-\/major dense matrices are not supported by SuperLU"{}});}
+\DoxyCodeLine{181     \mbox{\hyperlink{structEigen_1_1SluMatrix}{SluMatrix}} res;}
+\DoxyCodeLine{182     res.setStorageType(SLU\_DN);}
+\DoxyCodeLine{183     res.setScalarType<\textcolor{keyword}{typename} MatrixType::Scalar>();}
+\DoxyCodeLine{184     res.Mtype     = SLU\_GE;}
+\DoxyCodeLine{185 }
+\DoxyCodeLine{186     res.nrow      = internal::convert\_index<int>(mat.rows());}
+\DoxyCodeLine{187     res.ncol      = internal::convert\_index<int>(mat.cols());}
+\DoxyCodeLine{188 }
+\DoxyCodeLine{189     res.storage.lda       = internal::convert\_index<int>(MatrixType::IsVectorAtCompileTime ? mat.size() : mat.outerStride());}
+\DoxyCodeLine{190     res.storage.values    = (\textcolor{keywordtype}{void}*)(mat.data());}
+\DoxyCodeLine{191     \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{192   \}}
+\DoxyCodeLine{193 }
+\DoxyCodeLine{194   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{195   \textcolor{keyword}{static} \mbox{\hyperlink{structEigen_1_1SluMatrix}{SluMatrix}} \mbox{\hyperlink{classEigen_1_1Map}{Map}}(\mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{SparseMatrixBase<MatrixType>}}\& a\_mat)}
+\DoxyCodeLine{196   \{}
+\DoxyCodeLine{197     MatrixType \&mat(a\_mat.derived());}
+\DoxyCodeLine{198     \mbox{\hyperlink{structEigen_1_1SluMatrix}{SluMatrix}} res;}
+\DoxyCodeLine{199     \textcolor{keywordflow}{if} ((MatrixType::Flags\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})==\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})}
+\DoxyCodeLine{200     \{}
+\DoxyCodeLine{201       res.setStorageType(SLU\_NR);}
+\DoxyCodeLine{202       res.nrow      = internal::convert\_index<int>(mat.cols());}
+\DoxyCodeLine{203       res.ncol      = internal::convert\_index<int>(mat.rows());}
+\DoxyCodeLine{204     \}}
+\DoxyCodeLine{205     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{206     \{}
+\DoxyCodeLine{207       res.setStorageType(SLU\_NC);}
+\DoxyCodeLine{208       res.nrow      = internal::convert\_index<int>(mat.rows());}
+\DoxyCodeLine{209       res.ncol      = internal::convert\_index<int>(mat.cols());}
+\DoxyCodeLine{210     \}}
+\DoxyCodeLine{211 }
+\DoxyCodeLine{212     res.Mtype       = SLU\_GE;}
+\DoxyCodeLine{213 }
+\DoxyCodeLine{214     res.storage.nnz       = internal::convert\_index<int>(mat.nonZeros());}
+\DoxyCodeLine{215     res.storage.values    = mat.valuePtr();}
+\DoxyCodeLine{216     res.storage.innerInd  = mat.innerIndexPtr();}
+\DoxyCodeLine{217     res.storage.outerInd  = mat.outerIndexPtr();}
+\DoxyCodeLine{218 }
+\DoxyCodeLine{219     res.setScalarType<\textcolor{keyword}{typename} MatrixType::Scalar>();}
+\DoxyCodeLine{220 }
+\DoxyCodeLine{221     \textcolor{comment}{// FIXME the following is not very accurate}}
+\DoxyCodeLine{222     \textcolor{keywordflow}{if} (\textcolor{keywordtype}{int}(MatrixType::Flags) \& int(\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}}))}
+\DoxyCodeLine{223       res.Mtype = SLU\_TRU;}
+\DoxyCodeLine{224     if (\textcolor{keywordtype}{int}(MatrixType::Flags) \& int(\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}}))}
+\DoxyCodeLine{225       res.Mtype = SLU\_TRL;}
+\DoxyCodeLine{226 }
+\DoxyCodeLine{227     eigen\_assert(((\textcolor{keywordtype}{int}(MatrixType::Flags) \& \textcolor{keywordtype}{int}(\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdacf9ccb2016f8b9c0f3268f05a1e75821}{SelfAdjoint}}))==0) \&\& \textcolor{stringliteral}{"{}SelfAdjoint matrix shape not supported by SuperLU"{}});}
+\DoxyCodeLine{228 }
+\DoxyCodeLine{229     \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{230   \}}
+\DoxyCodeLine{231 \};}
+\DoxyCodeLine{232 }
+\DoxyCodeLine{233 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keywordtype}{int} Rows, \textcolor{keywordtype}{int} Cols, \textcolor{keywordtype}{int} Options, \textcolor{keywordtype}{int} MRows, \textcolor{keywordtype}{int} MCols>}
+\DoxyCodeLine{234 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1SluMatrixMapHelper}{SluMatrixMapHelper}}<\mbox{\hyperlink{classEigen_1_1Matrix}{Matrix}}<Scalar,Rows,Cols,Options,MRows,MCols> >}
+\DoxyCodeLine{235 \{}
+\DoxyCodeLine{236   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar,Rows,Cols,Options,MRows,MCols>}} \mbox{\hyperlink{classEigen_1_1Matrix}{MatrixType}};}
+\DoxyCodeLine{237   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(\mbox{\hyperlink{classEigen_1_1Matrix}{MatrixType}}\& mat, \mbox{\hyperlink{structEigen_1_1SluMatrix}{SluMatrix}}\& res)}
+\DoxyCodeLine{238   \{}
+\DoxyCodeLine{239     eigen\_assert( ((Options\&\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}})!=\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}}) \&\& \textcolor{stringliteral}{"{}row-\/major dense matrices is not supported by SuperLU"{}});}
+\DoxyCodeLine{240     res.setStorageType(SLU\_DN);}
+\DoxyCodeLine{241     res.setScalarType<Scalar>();}
+\DoxyCodeLine{242     res.Mtype     = SLU\_GE;}
+\DoxyCodeLine{243 }
+\DoxyCodeLine{244     res.nrow      = mat.rows();}
+\DoxyCodeLine{245     res.ncol      = mat.cols();}
+\DoxyCodeLine{246 }
+\DoxyCodeLine{247     res.storage.lda       = mat.outerStride();}
+\DoxyCodeLine{248     res.storage.values    = mat.data();}
+\DoxyCodeLine{249   \}}
+\DoxyCodeLine{250 \};}
+\DoxyCodeLine{251 }
+\DoxyCodeLine{252 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{253 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1SluMatrixMapHelper}{SluMatrixMapHelper}}<\mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{SparseMatrixBase}}<Derived> >}
+\DoxyCodeLine{254 \{}
+\DoxyCodeLine{255   \textcolor{keyword}{typedef} Derived MatrixType;}
+\DoxyCodeLine{256   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(MatrixType\& mat, \mbox{\hyperlink{structEigen_1_1SluMatrix}{SluMatrix}}\& res)}
+\DoxyCodeLine{257   \{}
+\DoxyCodeLine{258     \textcolor{keywordflow}{if} ((MatrixType::Flags\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})==\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})}
+\DoxyCodeLine{259     \{}
+\DoxyCodeLine{260       res.setStorageType(SLU\_NR);}
+\DoxyCodeLine{261       res.nrow      = mat.cols();}
+\DoxyCodeLine{262       res.ncol      = mat.rows();}
+\DoxyCodeLine{263     \}}
+\DoxyCodeLine{264     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{265     \{}
+\DoxyCodeLine{266       res.setStorageType(SLU\_NC);}
+\DoxyCodeLine{267       res.nrow      = mat.rows();}
+\DoxyCodeLine{268       res.ncol      = mat.cols();}
+\DoxyCodeLine{269     \}}
+\DoxyCodeLine{270 }
+\DoxyCodeLine{271     res.Mtype       = SLU\_GE;}
+\DoxyCodeLine{272 }
+\DoxyCodeLine{273     res.storage.nnz       = mat.nonZeros();}
+\DoxyCodeLine{274     res.storage.values    = mat.valuePtr();}
+\DoxyCodeLine{275     res.storage.innerInd  = mat.innerIndexPtr();}
+\DoxyCodeLine{276     res.storage.outerInd  = mat.outerIndexPtr();}
+\DoxyCodeLine{277 }
+\DoxyCodeLine{278     res.setScalarType<\textcolor{keyword}{typename} MatrixType::Scalar>();}
+\DoxyCodeLine{279 }
+\DoxyCodeLine{280     \textcolor{comment}{// FIXME the following is not very accurate}}
+\DoxyCodeLine{281     \textcolor{keywordflow}{if} (MatrixType::Flags \& \mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}})}
+\DoxyCodeLine{282       res.Mtype = SLU\_TRU;}
+\DoxyCodeLine{283     \textcolor{keywordflow}{if} (MatrixType::Flags \& \mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}})}
+\DoxyCodeLine{284       res.Mtype = SLU\_TRL;}
+\DoxyCodeLine{285 }
+\DoxyCodeLine{286     eigen\_assert(((MatrixType::Flags \& \mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdacf9ccb2016f8b9c0f3268f05a1e75821}{SelfAdjoint}})==0) \&\& \textcolor{stringliteral}{"{}SelfAdjoint matrix shape not supported by SuperLU"{}});}
+\DoxyCodeLine{287   \}}
+\DoxyCodeLine{288 \};}
+\DoxyCodeLine{289 }
+\DoxyCodeLine{290 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{291 }
+\DoxyCodeLine{292 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{293 \mbox{\hyperlink{structEigen_1_1SluMatrix}{SluMatrix}} asSluMatrix(MatrixType\& mat)}
+\DoxyCodeLine{294 \{}
+\DoxyCodeLine{295   \textcolor{keywordflow}{return} SluMatrix::Map(mat);}
+\DoxyCodeLine{296 \}}
+\DoxyCodeLine{297 }
+\DoxyCodeLine{299 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keywordtype}{int} Flags, \textcolor{keyword}{typename} Index>}
+\DoxyCodeLine{300 MappedSparseMatrix<Scalar,Flags,Index> map\_superlu(SluMatrix\& sluMat)}
+\DoxyCodeLine{301 \{}
+\DoxyCodeLine{302   eigen\_assert(((Flags\&\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}})==\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}} \&\& sluMat.Stype == SLU\_NR)}
+\DoxyCodeLine{303          || ((Flags\&\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}})==\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}} \&\& sluMat.Stype == SLU\_NC));}
+\DoxyCodeLine{304 }
+\DoxyCodeLine{305   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} outerSize = (Flags\&\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}})==\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}} ? sluMat.ncol : sluMat.nrow;}
+\DoxyCodeLine{306 }
+\DoxyCodeLine{307   \textcolor{keywordflow}{return} MappedSparseMatrix<Scalar,Flags,Index>(}
+\DoxyCodeLine{308     sluMat.nrow, sluMat.ncol, sluMat.storage.outerInd[outerSize],}
+\DoxyCodeLine{309     sluMat.storage.outerInd, sluMat.storage.innerInd, \textcolor{keyword}{reinterpret\_cast<}Scalar*\textcolor{keyword}{>}(sluMat.storage.values) );}
+\DoxyCodeLine{310 \}}
+\DoxyCodeLine{311 }
+\DoxyCodeLine{312 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{313 }
+\DoxyCodeLine{318 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_, \textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{319 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1SuperLUBase}{SuperLUBase}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{SparseSolverBase}}<Derived>}
+\DoxyCodeLine{320 \{}
+\DoxyCodeLine{321   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{322     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{SparseSolverBase<Derived>}} \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{Base}};}
+\DoxyCodeLine{323     \textcolor{keyword}{using} Base::derived;}
+\DoxyCodeLine{324     \textcolor{keyword}{using} Base::m\_isInitialized;}
+\DoxyCodeLine{325   \textcolor{keyword}{public}:}
+\DoxyCodeLine{326     \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{327     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar Scalar;}
+\DoxyCodeLine{328     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::RealScalar RealScalar;}
+\DoxyCodeLine{329     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::StorageIndex StorageIndex;}
+\DoxyCodeLine{330     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar,Dynamic,1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{Vector}};}
+\DoxyCodeLine{331     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<int, 1, MatrixType::ColsAtCompileTime>}} \mbox{\hyperlink{classEigen_1_1Matrix}{IntRowVectorType}};}
+\DoxyCodeLine{332     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<int, MatrixType::RowsAtCompileTime, 1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{IntColVectorType}};    }
+\DoxyCodeLine{333     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Map}{Map<PermutationMatrix<Dynamic,Dynamic,int>}} > \mbox{\hyperlink{classEigen_1_1Map}{PermutationMap}};}
+\DoxyCodeLine{334     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<Scalar>}} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{LUMatrixType}};}
+\DoxyCodeLine{335     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{336       ColsAtCompileTime = MatrixType::ColsAtCompileTime,}
+\DoxyCodeLine{337       MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime}
+\DoxyCodeLine{338     \};}
+\DoxyCodeLine{339 }
+\DoxyCodeLine{340   \textcolor{keyword}{public}:}
+\DoxyCodeLine{341 }
+\DoxyCodeLine{342     \mbox{\hyperlink{classEigen_1_1SuperLUBase}{SuperLUBase}}() \{\}}
+\DoxyCodeLine{343 }
+\DoxyCodeLine{344     \mbox{\hyperlink{classEigen_1_1SuperLUBase}{\string~SuperLUBase}}()}
+\DoxyCodeLine{345     \{}
+\DoxyCodeLine{346       clearFactors();}
+\DoxyCodeLine{347     \}}
+\DoxyCodeLine{348     }
+\DoxyCodeLine{349     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_matrix.\mbox{\hyperlink{classEigen_1_1SparseMatrix_a853a76dd42349fa2f3654a4a61e0f574}{rows}}(); \}}
+\DoxyCodeLine{350     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_matrix.\mbox{\hyperlink{classEigen_1_1SparseMatrix_a36b8cc95234b4e2de38a199b6b2af9fc}{cols}}(); \}}
+\DoxyCodeLine{351     }
+\DoxyCodeLine{353     \textcolor{keyword}{inline} superlu\_options\_t\& \mbox{\hyperlink{classEigen_1_1SuperLUBase_a9ff4adff156572bafd8cb6941d27f362}{options}}() \{ \textcolor{keywordflow}{return} m\_sluOptions; \}}
+\DoxyCodeLine{354     }
+\DoxyCodeLine{360     \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} \mbox{\hyperlink{classEigen_1_1SuperLUBase_a31b08cd67fd9f41de3bb5445fc22e769}{info}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{361 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{362       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}Decomposition is not initialized."{}});}
+\DoxyCodeLine{363       \textcolor{keywordflow}{return} m\_info;}
+\DoxyCodeLine{364     \}}
+\DoxyCodeLine{365 }
+\DoxyCodeLine{367     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1SuperLUBase_a1403b11acd09554f53142a3876d4015c}{compute}}(\textcolor{keyword}{const} MatrixType\& matrix)}
+\DoxyCodeLine{368     \{}
+\DoxyCodeLine{369       derived().analyzePattern(matrix);}
+\DoxyCodeLine{370       derived().factorize(matrix);}
+\DoxyCodeLine{371     \}}
+\DoxyCodeLine{372 }
+\DoxyCodeLine{379     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1SuperLUBase_a997de18ac591325aaba3852dfcf2ea7f}{analyzePattern}}(\textcolor{keyword}{const} MatrixType\& \textcolor{comment}{/*matrix*/})}
+\DoxyCodeLine{380     \{}
+\DoxyCodeLine{381       m\_isInitialized = \textcolor{keyword}{true};}
+\DoxyCodeLine{382       m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}};}
+\DoxyCodeLine{383       m\_analysisIsOk = \textcolor{keyword}{true};}
+\DoxyCodeLine{384       m\_factorizationIsOk = \textcolor{keyword}{false};}
+\DoxyCodeLine{385     \}}
+\DoxyCodeLine{386     }
+\DoxyCodeLine{387     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Stream>}
+\DoxyCodeLine{388     \textcolor{keywordtype}{void} dumpMemory(Stream\& \textcolor{comment}{/*s*/})}
+\DoxyCodeLine{389     \{\}}
+\DoxyCodeLine{390     }
+\DoxyCodeLine{391   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{392     }
+\DoxyCodeLine{393     \textcolor{keywordtype}{void} initFactorization(\textcolor{keyword}{const} MatrixType\& a)}
+\DoxyCodeLine{394     \{}
+\DoxyCodeLine{395       set\_default\_options(\&this-\/>m\_sluOptions);}
+\DoxyCodeLine{396       }
+\DoxyCodeLine{397       \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size = a.rows();}
+\DoxyCodeLine{398       m\_matrix = a;}
+\DoxyCodeLine{399 }
+\DoxyCodeLine{400       m\_sluA = internal::asSluMatrix(m\_matrix);}
+\DoxyCodeLine{401       clearFactors();}
+\DoxyCodeLine{402 }
+\DoxyCodeLine{403       m\_p.resize(size);}
+\DoxyCodeLine{404       m\_q.resize(size);}
+\DoxyCodeLine{405       m\_sluRscale.resize(size);}
+\DoxyCodeLine{406       m\_sluCscale.resize(size);}
+\DoxyCodeLine{407       m\_sluEtree.resize(size);}
+\DoxyCodeLine{408 }
+\DoxyCodeLine{409       \textcolor{comment}{// set empty B and X}}
+\DoxyCodeLine{410       m\_sluB.setStorageType(SLU\_DN);}
+\DoxyCodeLine{411       m\_sluB.setScalarType<Scalar>();}
+\DoxyCodeLine{412       m\_sluB.Mtype          = SLU\_GE;}
+\DoxyCodeLine{413       m\_sluB.storage.values = 0;}
+\DoxyCodeLine{414       m\_sluB.nrow           = 0;}
+\DoxyCodeLine{415       m\_sluB.ncol           = 0;}
+\DoxyCodeLine{416       m\_sluB.storage.lda    = internal::convert\_index<int>(size);}
+\DoxyCodeLine{417       m\_sluX                = m\_sluB;}
+\DoxyCodeLine{418       }
+\DoxyCodeLine{419       m\_extractedDataAreDirty = \textcolor{keyword}{true};}
+\DoxyCodeLine{420     \}}
+\DoxyCodeLine{421     }
+\DoxyCodeLine{422     \textcolor{keywordtype}{void} init()}
+\DoxyCodeLine{423     \{}
+\DoxyCodeLine{424       m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea580b2a3cafe585691e789f768fb729bf}{InvalidInput}};}
+\DoxyCodeLine{425       m\_isInitialized = \textcolor{keyword}{false};}
+\DoxyCodeLine{426       m\_sluL.Store = 0;}
+\DoxyCodeLine{427       m\_sluU.Store = 0;}
+\DoxyCodeLine{428     \}}
+\DoxyCodeLine{429     }
+\DoxyCodeLine{430     \textcolor{keywordtype}{void} extractData() \textcolor{keyword}{const};}
+\DoxyCodeLine{431 }
+\DoxyCodeLine{432     \textcolor{keywordtype}{void} clearFactors()}
+\DoxyCodeLine{433     \{}
+\DoxyCodeLine{434       \textcolor{keywordflow}{if}(m\_sluL.Store)}
+\DoxyCodeLine{435         Destroy\_SuperNode\_Matrix(\&m\_sluL);}
+\DoxyCodeLine{436       \textcolor{keywordflow}{if}(m\_sluU.Store)}
+\DoxyCodeLine{437         Destroy\_CompCol\_Matrix(\&m\_sluU);}
+\DoxyCodeLine{438 }
+\DoxyCodeLine{439       m\_sluL.Store = 0;}
+\DoxyCodeLine{440       m\_sluU.Store = 0;}
+\DoxyCodeLine{441 }
+\DoxyCodeLine{442       memset(\&m\_sluL,0,\textcolor{keyword}{sizeof} m\_sluL);}
+\DoxyCodeLine{443       memset(\&m\_sluU,0,\textcolor{keyword}{sizeof} m\_sluU);}
+\DoxyCodeLine{444     \}}
+\DoxyCodeLine{445 }
+\DoxyCodeLine{446     \textcolor{comment}{// cached data to reduce reallocation, etc.}}
+\DoxyCodeLine{447     \textcolor{keyword}{mutable} LUMatrixType m\_l;}
+\DoxyCodeLine{448     \textcolor{keyword}{mutable} LUMatrixType m\_u;}
+\DoxyCodeLine{449     \textcolor{keyword}{mutable} IntColVectorType m\_p;}
+\DoxyCodeLine{450     \textcolor{keyword}{mutable} IntRowVectorType m\_q;}
+\DoxyCodeLine{451 }
+\DoxyCodeLine{452     \textcolor{keyword}{mutable} LUMatrixType m\_matrix;  \textcolor{comment}{// copy of the factorized matrix}}
+\DoxyCodeLine{453     \textcolor{keyword}{mutable} SluMatrix m\_sluA;}
+\DoxyCodeLine{454     \textcolor{keyword}{mutable} SuperMatrix m\_sluL, m\_sluU;}
+\DoxyCodeLine{455     \textcolor{keyword}{mutable} SluMatrix m\_sluB, m\_sluX;}
+\DoxyCodeLine{456     \textcolor{keyword}{mutable} SuperLUStat\_t m\_sluStat;}
+\DoxyCodeLine{457     \textcolor{keyword}{mutable} superlu\_options\_t m\_sluOptions;}
+\DoxyCodeLine{458     \textcolor{keyword}{mutable} std::vector<int> m\_sluEtree;}
+\DoxyCodeLine{459     \textcolor{keyword}{mutable} Matrix<RealScalar,Dynamic,1> m\_sluRscale, m\_sluCscale;}
+\DoxyCodeLine{460     \textcolor{keyword}{mutable} Matrix<RealScalar,Dynamic,1> m\_sluFerr, m\_sluBerr;}
+\DoxyCodeLine{461     \textcolor{keyword}{mutable} \textcolor{keywordtype}{char} m\_sluEqued;}
+\DoxyCodeLine{462 }
+\DoxyCodeLine{463     \textcolor{keyword}{mutable} \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} m\_info;}
+\DoxyCodeLine{464     \textcolor{keywordtype}{int} m\_factorizationIsOk;}
+\DoxyCodeLine{465     \textcolor{keywordtype}{int} m\_analysisIsOk;}
+\DoxyCodeLine{466     \textcolor{keyword}{mutable} \textcolor{keywordtype}{bool} m\_extractedDataAreDirty;}
+\DoxyCodeLine{467     }
+\DoxyCodeLine{468   \textcolor{keyword}{private}:}
+\DoxyCodeLine{469     SuperLUBase(SuperLUBase\& ) \{ \}}
+\DoxyCodeLine{470 \};}
+\DoxyCodeLine{471 }
+\DoxyCodeLine{472 }
+\DoxyCodeLine{489 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_>}
+\DoxyCodeLine{490 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1SuperLU}{SuperLU}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1SuperLUBase}{SuperLUBase}}<MatrixType\_,SuperLU<MatrixType\_> >}
+\DoxyCodeLine{491 \{}
+\DoxyCodeLine{492   \textcolor{keyword}{public}:}
+\DoxyCodeLine{493     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SuperLUBase}{SuperLUBase<MatrixType\_,SuperLU>}} \mbox{\hyperlink{classEigen_1_1SuperLUBase}{Base}};}
+\DoxyCodeLine{494     \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{495     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::Scalar Scalar;}
+\DoxyCodeLine{496     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::RealScalar RealScalar;}
+\DoxyCodeLine{497     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::StorageIndex StorageIndex;}
+\DoxyCodeLine{498     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Matrix}{Base::IntRowVectorType}} \mbox{\hyperlink{classEigen_1_1Matrix}{IntRowVectorType}};}
+\DoxyCodeLine{499     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Matrix}{Base::IntColVectorType}} \mbox{\hyperlink{classEigen_1_1Matrix}{IntColVectorType}};   }
+\DoxyCodeLine{500     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Map}{Base::PermutationMap}} \mbox{\hyperlink{classEigen_1_1Map}{PermutationMap}};}
+\DoxyCodeLine{501     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{Base::LUMatrixType}} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{LUMatrixType}};}
+\DoxyCodeLine{502     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView<LUMatrixType, Lower|UnitDiag>}}  \mbox{\hyperlink{classEigen_1_1TriangularView}{LMatrixType}};}
+\DoxyCodeLine{503     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView<LUMatrixType,  Upper>}}          \mbox{\hyperlink{classEigen_1_1TriangularView}{UMatrixType}};}
+\DoxyCodeLine{504 }
+\DoxyCodeLine{505   \textcolor{keyword}{public}:}
+\DoxyCodeLine{506     \textcolor{keyword}{using} Base::\_solve\_impl;}
+\DoxyCodeLine{507 }
+\DoxyCodeLine{508     \mbox{\hyperlink{classEigen_1_1SuperLU}{SuperLU}}() : \mbox{\hyperlink{classEigen_1_1SuperLUBase}{Base}}() \{ init(); \}}
+\DoxyCodeLine{509 }
+\DoxyCodeLine{510     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1SuperLU}{SuperLU}}(\textcolor{keyword}{const} MatrixType\& matrix) : \mbox{\hyperlink{classEigen_1_1SuperLUBase}{Base}}()}
+\DoxyCodeLine{511     \{}
+\DoxyCodeLine{512       init();}
+\DoxyCodeLine{513       \mbox{\hyperlink{classEigen_1_1SuperLUBase_a1403b11acd09554f53142a3876d4015c}{Base::compute}}(matrix);}
+\DoxyCodeLine{514     \}}
+\DoxyCodeLine{515 }
+\DoxyCodeLine{516     \mbox{\hyperlink{classEigen_1_1SuperLU}{\string~SuperLU}}()}
+\DoxyCodeLine{517     \{}
+\DoxyCodeLine{518     \}}
+\DoxyCodeLine{519     }
+\DoxyCodeLine{526     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1SuperLU_a12cfc985526ead011f33504581fb9cbf}{analyzePattern}}(\textcolor{keyword}{const} MatrixType\& matrix)}
+\DoxyCodeLine{527     \{}
+\DoxyCodeLine{528       m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea580b2a3cafe585691e789f768fb729bf}{InvalidInput}};}
+\DoxyCodeLine{529       m\_isInitialized = \textcolor{keyword}{false};}
+\DoxyCodeLine{530       \mbox{\hyperlink{classEigen_1_1SuperLUBase_a997de18ac591325aaba3852dfcf2ea7f}{Base::analyzePattern}}(matrix);}
+\DoxyCodeLine{531     \}}
+\DoxyCodeLine{532     }
+\DoxyCodeLine{539     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1SuperLU_a0b5a5fbda1a1f368003c7c01021a4636}{factorize}}(\textcolor{keyword}{const} MatrixType\& matrix);}
+\DoxyCodeLine{540     }
+\DoxyCodeLine{542     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs,\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{543     \textcolor{keywordtype}{void} \_solve\_impl(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Rhs>}} \&b, \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Dest>}} \&dest) \textcolor{keyword}{const};}
+\DoxyCodeLine{544     }
+\DoxyCodeLine{545     \textcolor{keyword}{inline} \textcolor{keyword}{const} LMatrixType\& matrixL()\textcolor{keyword}{ const}}
+\DoxyCodeLine{546 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{547       \textcolor{keywordflow}{if} (m\_extractedDataAreDirty) this-\/>extractData();}
+\DoxyCodeLine{548       \textcolor{keywordflow}{return} m\_l;}
+\DoxyCodeLine{549     \}}
+\DoxyCodeLine{550 }
+\DoxyCodeLine{551     \textcolor{keyword}{inline} \textcolor{keyword}{const} UMatrixType\& matrixU()\textcolor{keyword}{ const}}
+\DoxyCodeLine{552 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{553       \textcolor{keywordflow}{if} (m\_extractedDataAreDirty) this-\/>extractData();}
+\DoxyCodeLine{554       \textcolor{keywordflow}{return} m\_u;}
+\DoxyCodeLine{555     \}}
+\DoxyCodeLine{556 }
+\DoxyCodeLine{557     \textcolor{keyword}{inline} \textcolor{keyword}{const} IntColVectorType\& permutationP()\textcolor{keyword}{ const}}
+\DoxyCodeLine{558 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{559       \textcolor{keywordflow}{if} (m\_extractedDataAreDirty) this-\/>extractData();}
+\DoxyCodeLine{560       \textcolor{keywordflow}{return} m\_p;}
+\DoxyCodeLine{561     \}}
+\DoxyCodeLine{562 }
+\DoxyCodeLine{563     \textcolor{keyword}{inline} \textcolor{keyword}{const} IntRowVectorType\& permutationQ()\textcolor{keyword}{ const}}
+\DoxyCodeLine{564 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{565       \textcolor{keywordflow}{if} (m\_extractedDataAreDirty) this-\/>extractData();}
+\DoxyCodeLine{566       \textcolor{keywordflow}{return} m\_q;}
+\DoxyCodeLine{567     \}}
+\DoxyCodeLine{568     }
+\DoxyCodeLine{569     Scalar determinant() \textcolor{keyword}{const};}
+\DoxyCodeLine{570     }
+\DoxyCodeLine{571   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{572     }
+\DoxyCodeLine{573     \textcolor{keyword}{using} Base::m\_matrix;}
+\DoxyCodeLine{574     \textcolor{keyword}{using} Base::m\_sluOptions;}
+\DoxyCodeLine{575     \textcolor{keyword}{using} Base::m\_sluA;}
+\DoxyCodeLine{576     \textcolor{keyword}{using} Base::m\_sluB;}
+\DoxyCodeLine{577     \textcolor{keyword}{using} Base::m\_sluX;}
+\DoxyCodeLine{578     \textcolor{keyword}{using} Base::m\_p;}
+\DoxyCodeLine{579     \textcolor{keyword}{using} Base::m\_q;}
+\DoxyCodeLine{580     \textcolor{keyword}{using} Base::m\_sluEtree;}
+\DoxyCodeLine{581     \textcolor{keyword}{using} Base::m\_sluEqued;}
+\DoxyCodeLine{582     \textcolor{keyword}{using} Base::m\_sluRscale;}
+\DoxyCodeLine{583     \textcolor{keyword}{using} Base::m\_sluCscale;}
+\DoxyCodeLine{584     \textcolor{keyword}{using} Base::m\_sluL;}
+\DoxyCodeLine{585     \textcolor{keyword}{using} Base::m\_sluU;}
+\DoxyCodeLine{586     \textcolor{keyword}{using} Base::m\_sluStat;}
+\DoxyCodeLine{587     \textcolor{keyword}{using} Base::m\_sluFerr;}
+\DoxyCodeLine{588     \textcolor{keyword}{using} Base::m\_sluBerr;}
+\DoxyCodeLine{589     \textcolor{keyword}{using} Base::m\_l;}
+\DoxyCodeLine{590     \textcolor{keyword}{using} Base::m\_u;}
+\DoxyCodeLine{591     }
+\DoxyCodeLine{592     \textcolor{keyword}{using} Base::m\_analysisIsOk;}
+\DoxyCodeLine{593     \textcolor{keyword}{using} Base::m\_factorizationIsOk;}
+\DoxyCodeLine{594     \textcolor{keyword}{using} Base::m\_extractedDataAreDirty;}
+\DoxyCodeLine{595     \textcolor{keyword}{using} Base::m\_isInitialized;}
+\DoxyCodeLine{596     \textcolor{keyword}{using} Base::m\_info;}
+\DoxyCodeLine{597     }
+\DoxyCodeLine{598     \textcolor{keywordtype}{void} init()}
+\DoxyCodeLine{599     \{}
+\DoxyCodeLine{600       Base::init();}
+\DoxyCodeLine{601       }
+\DoxyCodeLine{602       set\_default\_options(\&this-\/>m\_sluOptions);}
+\DoxyCodeLine{603       m\_sluOptions.PrintStat        = NO;}
+\DoxyCodeLine{604       m\_sluOptions.ConditionNumber  = NO;}
+\DoxyCodeLine{605       m\_sluOptions.Trans            = NOTRANS;}
+\DoxyCodeLine{606       m\_sluOptions.ColPerm          = COLAMD;}
+\DoxyCodeLine{607     \}}
+\DoxyCodeLine{608     }
+\DoxyCodeLine{609     }
+\DoxyCodeLine{610   \textcolor{keyword}{private}:}
+\DoxyCodeLine{611     SuperLU(SuperLU\& ) \{ \}}
+\DoxyCodeLine{612 \};}
+\DoxyCodeLine{613 }
+\DoxyCodeLine{614 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{615 \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1SuperLU_a0b5a5fbda1a1f368003c7c01021a4636}{SuperLU<MatrixType>::factorize}}(\textcolor{keyword}{const} MatrixType\& a)}
+\DoxyCodeLine{616 \{}
+\DoxyCodeLine{617   eigen\_assert(m\_analysisIsOk \&\& \textcolor{stringliteral}{"{}You must first call analyzePattern()"{}});}
+\DoxyCodeLine{618   \textcolor{keywordflow}{if}(!m\_analysisIsOk)}
+\DoxyCodeLine{619   \{}
+\DoxyCodeLine{620     m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea580b2a3cafe585691e789f768fb729bf}{InvalidInput}};}
+\DoxyCodeLine{621     \textcolor{keywordflow}{return};}
+\DoxyCodeLine{622   \}}
+\DoxyCodeLine{623   }
+\DoxyCodeLine{624   this-\/>initFactorization(a);}
+\DoxyCodeLine{625   }
+\DoxyCodeLine{626   m\_sluOptions.ColPerm = COLAMD;}
+\DoxyCodeLine{627   \textcolor{keywordtype}{int} info = 0;}
+\DoxyCodeLine{628   RealScalar recip\_pivot\_growth, rcond;}
+\DoxyCodeLine{629   RealScalar ferr, berr;}
+\DoxyCodeLine{630 }
+\DoxyCodeLine{631   StatInit(\&m\_sluStat);}
+\DoxyCodeLine{632   SuperLU\_gssvx(\&m\_sluOptions, \&m\_sluA, m\_q.data(), m\_p.data(), \&m\_sluEtree[0],}
+\DoxyCodeLine{633                 \&m\_sluEqued, \&m\_sluRscale[0], \&m\_sluCscale[0],}
+\DoxyCodeLine{634                 \&m\_sluL, \&m\_sluU,}
+\DoxyCodeLine{635                 NULL, 0,}
+\DoxyCodeLine{636                 \&m\_sluB, \&m\_sluX,}
+\DoxyCodeLine{637                 \&recip\_pivot\_growth, \&rcond,}
+\DoxyCodeLine{638                 \&ferr, \&berr,}
+\DoxyCodeLine{639                 \&m\_sluStat, \&info, Scalar());}
+\DoxyCodeLine{640   StatFree(\&m\_sluStat);}
+\DoxyCodeLine{641 }
+\DoxyCodeLine{642   m\_extractedDataAreDirty = \textcolor{keyword}{true};}
+\DoxyCodeLine{643 }
+\DoxyCodeLine{644   \textcolor{comment}{// FIXME how to better check for errors ???}}
+\DoxyCodeLine{645   m\_info = info == 0 ? \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}} : \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea1c6e20706575a629b27a105f07f1883b}{NumericalIssue}};}
+\DoxyCodeLine{646   m\_factorizationIsOk = \textcolor{keyword}{true};}
+\DoxyCodeLine{647 \}}
+\DoxyCodeLine{648 }
+\DoxyCodeLine{649 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{650 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs,\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{651 \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1SuperLU}{SuperLU<MatrixType>::\_solve\_impl}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Rhs>}} \&b, \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Dest>}}\& x)\textcolor{keyword}{ const}}
+\DoxyCodeLine{652 \textcolor{keyword}{}\{}
+\DoxyCodeLine{653   eigen\_assert(m\_factorizationIsOk \&\& \textcolor{stringliteral}{"{}The decomposition is not in a valid state for solving, you must first call either compute() or analyzePattern()/factorize()"{}});}
+\DoxyCodeLine{654 }
+\DoxyCodeLine{655   \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rhsCols = b.cols();}
+\DoxyCodeLine{656   eigen\_assert(m\_matrix.rows()==b.rows());}
+\DoxyCodeLine{657 }
+\DoxyCodeLine{658   m\_sluOptions.Trans = NOTRANS;}
+\DoxyCodeLine{659   m\_sluOptions.Fact = FACTORED;}
+\DoxyCodeLine{660   m\_sluOptions.IterRefine = NOREFINE;}
+\DoxyCodeLine{661   }
+\DoxyCodeLine{662 }
+\DoxyCodeLine{663   m\_sluFerr.resize(rhsCols);}
+\DoxyCodeLine{664   m\_sluBerr.resize(rhsCols);}
+\DoxyCodeLine{665   }
+\DoxyCodeLine{666   \mbox{\hyperlink{classEigen_1_1Ref}{Ref<const Matrix<typename Rhs::Scalar,Dynamic,Dynamic,ColMajor>}} > b\_ref(b);}
+\DoxyCodeLine{667   \mbox{\hyperlink{classEigen_1_1Ref}{Ref<const Matrix<typename Dest::Scalar,Dynamic,Dynamic,ColMajor>}} > x\_ref(x);}
+\DoxyCodeLine{668   }
+\DoxyCodeLine{669   m\_sluB = SluMatrix::Map(b\_ref.const\_cast\_derived());}
+\DoxyCodeLine{670   m\_sluX = SluMatrix::Map(x\_ref.const\_cast\_derived());}
+\DoxyCodeLine{671   }
+\DoxyCodeLine{672   \textcolor{keyword}{typename} Rhs::PlainObject b\_cpy;}
+\DoxyCodeLine{673   \textcolor{keywordflow}{if}(m\_sluEqued!=\textcolor{charliteral}{'N'})}
+\DoxyCodeLine{674   \{}
+\DoxyCodeLine{675     b\_cpy = b;}
+\DoxyCodeLine{676     m\_sluB = SluMatrix::Map(b\_cpy.const\_cast\_derived());  }
+\DoxyCodeLine{677   \}}
+\DoxyCodeLine{678 }
+\DoxyCodeLine{679   StatInit(\&m\_sluStat);}
+\DoxyCodeLine{680   \textcolor{keywordtype}{int} info = 0;}
+\DoxyCodeLine{681   RealScalar recip\_pivot\_growth, rcond;}
+\DoxyCodeLine{682   SuperLU\_gssvx(\&m\_sluOptions, \&m\_sluA,}
+\DoxyCodeLine{683                 m\_q.data(), m\_p.data(),}
+\DoxyCodeLine{684                 \&m\_sluEtree[0], \&m\_sluEqued,}
+\DoxyCodeLine{685                 \&m\_sluRscale[0], \&m\_sluCscale[0],}
+\DoxyCodeLine{686                 \&m\_sluL, \&m\_sluU,}
+\DoxyCodeLine{687                 NULL, 0,}
+\DoxyCodeLine{688                 \&m\_sluB, \&m\_sluX,}
+\DoxyCodeLine{689                 \&recip\_pivot\_growth, \&rcond,}
+\DoxyCodeLine{690                 \&m\_sluFerr[0], \&m\_sluBerr[0],}
+\DoxyCodeLine{691                 \&m\_sluStat, \&info, Scalar());}
+\DoxyCodeLine{692   StatFree(\&m\_sluStat);}
+\DoxyCodeLine{693   }
+\DoxyCodeLine{694   \textcolor{keywordflow}{if}(x.derived().data() != x\_ref.data())}
+\DoxyCodeLine{695     x = x\_ref;}
+\DoxyCodeLine{696   }
+\DoxyCodeLine{697   m\_info = info==0 ? \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}} : \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea1c6e20706575a629b27a105f07f1883b}{NumericalIssue}};}
+\DoxyCodeLine{698 \}}
+\DoxyCodeLine{699 }
+\DoxyCodeLine{700 \textcolor{comment}{// the code of this extractData() function has been adapted from the SuperLU's Matlab support code,}}
+\DoxyCodeLine{701 \textcolor{comment}{//}}
+\DoxyCodeLine{702 \textcolor{comment}{//  Copyright (c) 1994 by Xerox Corporation.  All rights reserved.}}
+\DoxyCodeLine{703 \textcolor{comment}{//}}
+\DoxyCodeLine{704 \textcolor{comment}{//  THIS MATERIAL IS PROVIDED AS IS, WITH ABSOLUTELY NO WARRANTY}}
+\DoxyCodeLine{705 \textcolor{comment}{//  EXPRESSED OR IMPLIED.  ANY USE IS AT YOUR OWN RISK.}}
+\DoxyCodeLine{706 \textcolor{comment}{//}}
+\DoxyCodeLine{707 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{708 \textcolor{keywordtype}{void} SuperLUBase<MatrixType,Derived>::extractData()\textcolor{keyword}{ const}}
+\DoxyCodeLine{709 \textcolor{keyword}{}\{}
+\DoxyCodeLine{710   eigen\_assert(m\_factorizationIsOk \&\& \textcolor{stringliteral}{"{}The decomposition is not in a valid state for extracting factors, you must first call either compute() or analyzePattern()/factorize()"{}});}
+\DoxyCodeLine{711   \textcolor{keywordflow}{if} (m\_extractedDataAreDirty)}
+\DoxyCodeLine{712   \{}
+\DoxyCodeLine{713     \textcolor{keywordtype}{int}         upper;}
+\DoxyCodeLine{714     \textcolor{keywordtype}{int}         fsupc, istart, nsupr;}
+\DoxyCodeLine{715     \textcolor{keywordtype}{int}         lastl = 0, lastu = 0;}
+\DoxyCodeLine{716     SCformat    *Lstore = \textcolor{keyword}{static\_cast<}SCformat*\textcolor{keyword}{>}(m\_sluL.Store);}
+\DoxyCodeLine{717     NCformat    *Ustore = \textcolor{keyword}{static\_cast<}NCformat*\textcolor{keyword}{>}(m\_sluU.Store);}
+\DoxyCodeLine{718     Scalar      *SNptr;}
+\DoxyCodeLine{719 }
+\DoxyCodeLine{720     \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size = m\_matrix.rows();}
+\DoxyCodeLine{721     m\_l.resize(size,size);}
+\DoxyCodeLine{722     m\_l.resizeNonZeros(Lstore-\/>nnz);}
+\DoxyCodeLine{723     m\_u.resize(size,size);}
+\DoxyCodeLine{724     m\_u.resizeNonZeros(Ustore-\/>nnz);}
+\DoxyCodeLine{725 }
+\DoxyCodeLine{726     \textcolor{keywordtype}{int}* Lcol = m\_l.outerIndexPtr();}
+\DoxyCodeLine{727     \textcolor{keywordtype}{int}* Lrow = m\_l.innerIndexPtr();}
+\DoxyCodeLine{728     Scalar* Lval = m\_l.valuePtr();}
+\DoxyCodeLine{729 }
+\DoxyCodeLine{730     \textcolor{keywordtype}{int}* Ucol = m\_u.outerIndexPtr();}
+\DoxyCodeLine{731     \textcolor{keywordtype}{int}* Urow = m\_u.innerIndexPtr();}
+\DoxyCodeLine{732     Scalar* Uval = m\_u.valuePtr();}
+\DoxyCodeLine{733 }
+\DoxyCodeLine{734     Ucol[0] = 0;}
+\DoxyCodeLine{735     Ucol[0] = 0;}
+\DoxyCodeLine{736 }
+\DoxyCodeLine{737     \textcolor{comment}{/* for each supernode */}}
+\DoxyCodeLine{738     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} k = 0; k <= Lstore-\/>nsuper; ++k)}
+\DoxyCodeLine{739     \{}
+\DoxyCodeLine{740       fsupc   = L\_FST\_SUPC(k);}
+\DoxyCodeLine{741       istart  = L\_SUB\_START(fsupc);}
+\DoxyCodeLine{742       nsupr   = L\_SUB\_START(fsupc+1) -\/ istart;}
+\DoxyCodeLine{743       upper   = 1;}
+\DoxyCodeLine{744 }
+\DoxyCodeLine{745       \textcolor{comment}{/* for each column in the supernode */}}
+\DoxyCodeLine{746       \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} j = fsupc; j < L\_FST\_SUPC(k+1); ++j)}
+\DoxyCodeLine{747       \{}
+\DoxyCodeLine{748         SNptr = \&((Scalar*)Lstore-\/>nzval)[L\_NZ\_START(j)];}
+\DoxyCodeLine{749 }
+\DoxyCodeLine{750         \textcolor{comment}{/* Extract U */}}
+\DoxyCodeLine{751         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = U\_NZ\_START(j); i < U\_NZ\_START(j+1); ++i)}
+\DoxyCodeLine{752         \{}
+\DoxyCodeLine{753           Uval[lastu] = ((Scalar*)Ustore-\/>nzval)[i];}
+\DoxyCodeLine{754           \textcolor{comment}{/* Matlab doesn't like explicit zero. */}}
+\DoxyCodeLine{755           \textcolor{keywordflow}{if} (Uval[lastu] != 0.0)}
+\DoxyCodeLine{756             Urow[lastu++] = U\_SUB(i);}
+\DoxyCodeLine{757         \}}
+\DoxyCodeLine{758         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < upper; ++i)}
+\DoxyCodeLine{759         \{}
+\DoxyCodeLine{760           \textcolor{comment}{/* upper triangle in the supernode */}}
+\DoxyCodeLine{761           Uval[lastu] = SNptr[i];}
+\DoxyCodeLine{762           \textcolor{comment}{/* Matlab doesn't like explicit zero. */}}
+\DoxyCodeLine{763           \textcolor{keywordflow}{if} (Uval[lastu] != 0.0)}
+\DoxyCodeLine{764             Urow[lastu++] = L\_SUB(istart+i);}
+\DoxyCodeLine{765         \}}
+\DoxyCodeLine{766         Ucol[j+1] = lastu;}
+\DoxyCodeLine{767 }
+\DoxyCodeLine{768         \textcolor{comment}{/* Extract L */}}
+\DoxyCodeLine{769         Lval[lastl] = 1.0; \textcolor{comment}{/* unit diagonal */}}
+\DoxyCodeLine{770         Lrow[lastl++] = L\_SUB(istart + upper -\/ 1);}
+\DoxyCodeLine{771         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = upper; i < nsupr; ++i)}
+\DoxyCodeLine{772         \{}
+\DoxyCodeLine{773           Lval[lastl] = SNptr[i];}
+\DoxyCodeLine{774           \textcolor{comment}{/* Matlab doesn't like explicit zero. */}}
+\DoxyCodeLine{775           \textcolor{keywordflow}{if} (Lval[lastl] != 0.0)}
+\DoxyCodeLine{776             Lrow[lastl++] = L\_SUB(istart+i);}
+\DoxyCodeLine{777         \}}
+\DoxyCodeLine{778         Lcol[j+1] = lastl;}
+\DoxyCodeLine{779 }
+\DoxyCodeLine{780         ++upper;}
+\DoxyCodeLine{781       \} \textcolor{comment}{/* for j ... */}}
+\DoxyCodeLine{782 }
+\DoxyCodeLine{783     \} \textcolor{comment}{/* for k ... */}}
+\DoxyCodeLine{784 }
+\DoxyCodeLine{785     \textcolor{comment}{// squeeze the matrices :}}
+\DoxyCodeLine{786     m\_l.resizeNonZeros(lastl);}
+\DoxyCodeLine{787     m\_u.resizeNonZeros(lastu);}
+\DoxyCodeLine{788 }
+\DoxyCodeLine{789     m\_extractedDataAreDirty = \textcolor{keyword}{false};}
+\DoxyCodeLine{790   \}}
+\DoxyCodeLine{791 \}}
+\DoxyCodeLine{792 }
+\DoxyCodeLine{793 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{794 \textcolor{keyword}{typename} SuperLU<MatrixType>::Scalar SuperLU<MatrixType>::determinant()\textcolor{keyword}{ const}}
+\DoxyCodeLine{795 \textcolor{keyword}{}\{}
+\DoxyCodeLine{796   eigen\_assert(m\_factorizationIsOk \&\& \textcolor{stringliteral}{"{}The decomposition is not in a valid state for computing the determinant, you must first call either compute() or analyzePattern()/factorize()"{}});}
+\DoxyCodeLine{797   }
+\DoxyCodeLine{798   \textcolor{keywordflow}{if} (m\_extractedDataAreDirty)}
+\DoxyCodeLine{799     this-\/>extractData();}
+\DoxyCodeLine{800 }
+\DoxyCodeLine{801   Scalar det = Scalar(1);}
+\DoxyCodeLine{802   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} j=0; j<m\_u.cols(); ++j)}
+\DoxyCodeLine{803   \{}
+\DoxyCodeLine{804     \textcolor{keywordflow}{if} (m\_u.outerIndexPtr()[j+1]-\/m\_u.outerIndexPtr()[j] > 0)}
+\DoxyCodeLine{805     \{}
+\DoxyCodeLine{806       \textcolor{keywordtype}{int} lastId = m\_u.outerIndexPtr()[j+1]-\/1;}
+\DoxyCodeLine{807       eigen\_assert(m\_u.innerIndexPtr()[lastId]<=j);}
+\DoxyCodeLine{808       \textcolor{keywordflow}{if} (m\_u.innerIndexPtr()[lastId]==j)}
+\DoxyCodeLine{809         det *= m\_u.valuePtr()[lastId];}
+\DoxyCodeLine{810     \}}
+\DoxyCodeLine{811   \}}
+\DoxyCodeLine{812   \textcolor{keywordflow}{if}(PermutationMap(m\_p.data(),m\_p.size()).determinant()*PermutationMap(m\_q.data(),m\_q.size()).determinant()<0)}
+\DoxyCodeLine{813     det = -\/det;}
+\DoxyCodeLine{814   \textcolor{keywordflow}{if}(m\_sluEqued!=\textcolor{charliteral}{'N'})}
+\DoxyCodeLine{815     \textcolor{keywordflow}{return} det/m\_sluRscale.prod()/m\_sluCscale.prod();}
+\DoxyCodeLine{816   \textcolor{keywordflow}{else}}
+\DoxyCodeLine{817     \textcolor{keywordflow}{return} det;}
+\DoxyCodeLine{818 \}}
+\DoxyCodeLine{819 }
+\DoxyCodeLine{820 \textcolor{preprocessor}{\#ifdef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{821 \textcolor{preprocessor}{\#define EIGEN\_SUPERLU\_HAS\_ILU}}
+\DoxyCodeLine{822 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{823 }
+\DoxyCodeLine{824 \textcolor{preprocessor}{\#ifdef EIGEN\_SUPERLU\_HAS\_ILU}}
+\DoxyCodeLine{825 }
+\DoxyCodeLine{842 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_>}
+\DoxyCodeLine{843 \textcolor{keyword}{class }SuperILU : \textcolor{keyword}{public} SuperLUBase<MatrixType\_,SuperILU<MatrixType\_> >}
+\DoxyCodeLine{844 \{}
+\DoxyCodeLine{845   \textcolor{keyword}{public}:}
+\DoxyCodeLine{846     \textcolor{keyword}{typedef} SuperLUBase<MatrixType\_,SuperILU> Base;}
+\DoxyCodeLine{847     \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{848     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::Scalar Scalar;}
+\DoxyCodeLine{849     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::RealScalar RealScalar;}
+\DoxyCodeLine{850 }
+\DoxyCodeLine{851   \textcolor{keyword}{public}:}
+\DoxyCodeLine{852     \textcolor{keyword}{using} Base::\_solve\_impl;}
+\DoxyCodeLine{853 }
+\DoxyCodeLine{854     SuperILU() : Base() \{ init(); \}}
+\DoxyCodeLine{855 }
+\DoxyCodeLine{856     SuperILU(\textcolor{keyword}{const} MatrixType\& matrix) : Base()}
+\DoxyCodeLine{857     \{}
+\DoxyCodeLine{858       init();}
+\DoxyCodeLine{859       Base::compute(matrix);}
+\DoxyCodeLine{860     \}}
+\DoxyCodeLine{861 }
+\DoxyCodeLine{862     \string~SuperILU()}
+\DoxyCodeLine{863     \{}
+\DoxyCodeLine{864     \}}
+\DoxyCodeLine{865     }
+\DoxyCodeLine{872     \textcolor{keywordtype}{void} analyzePattern(\textcolor{keyword}{const} MatrixType\& matrix)}
+\DoxyCodeLine{873     \{}
+\DoxyCodeLine{874       Base::analyzePattern(matrix);}
+\DoxyCodeLine{875     \}}
+\DoxyCodeLine{876     }
+\DoxyCodeLine{883     \textcolor{keywordtype}{void} factorize(\textcolor{keyword}{const} MatrixType\& matrix);}
+\DoxyCodeLine{884     }
+\DoxyCodeLine{885 \textcolor{preprocessor}{    \#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{887     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs,\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{888     \textcolor{keywordtype}{void} \_solve\_impl(\textcolor{keyword}{const} MatrixBase<Rhs> \&b, MatrixBase<Dest> \&dest) \textcolor{keyword}{const};}
+\DoxyCodeLine{889 \textcolor{preprocessor}{    \#endif }\textcolor{comment}{// EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{890     }
+\DoxyCodeLine{891   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{892     }
+\DoxyCodeLine{893     \textcolor{keyword}{using} Base::m\_matrix;}
+\DoxyCodeLine{894     \textcolor{keyword}{using} Base::m\_sluOptions;}
+\DoxyCodeLine{895     \textcolor{keyword}{using} Base::m\_sluA;}
+\DoxyCodeLine{896     \textcolor{keyword}{using} Base::m\_sluB;}
+\DoxyCodeLine{897     \textcolor{keyword}{using} Base::m\_sluX;}
+\DoxyCodeLine{898     \textcolor{keyword}{using} Base::m\_p;}
+\DoxyCodeLine{899     \textcolor{keyword}{using} Base::m\_q;}
+\DoxyCodeLine{900     \textcolor{keyword}{using} Base::m\_sluEtree;}
+\DoxyCodeLine{901     \textcolor{keyword}{using} Base::m\_sluEqued;}
+\DoxyCodeLine{902     \textcolor{keyword}{using} Base::m\_sluRscale;}
+\DoxyCodeLine{903     \textcolor{keyword}{using} Base::m\_sluCscale;}
+\DoxyCodeLine{904     \textcolor{keyword}{using} Base::m\_sluL;}
+\DoxyCodeLine{905     \textcolor{keyword}{using} Base::m\_sluU;}
+\DoxyCodeLine{906     \textcolor{keyword}{using} Base::m\_sluStat;}
+\DoxyCodeLine{907     \textcolor{keyword}{using} Base::m\_sluFerr;}
+\DoxyCodeLine{908     \textcolor{keyword}{using} Base::m\_sluBerr;}
+\DoxyCodeLine{909     \textcolor{keyword}{using} Base::m\_l;}
+\DoxyCodeLine{910     \textcolor{keyword}{using} Base::m\_u;}
+\DoxyCodeLine{911     }
+\DoxyCodeLine{912     \textcolor{keyword}{using} Base::m\_analysisIsOk;}
+\DoxyCodeLine{913     \textcolor{keyword}{using} Base::m\_factorizationIsOk;}
+\DoxyCodeLine{914     \textcolor{keyword}{using} Base::m\_extractedDataAreDirty;}
+\DoxyCodeLine{915     \textcolor{keyword}{using} Base::m\_isInitialized;}
+\DoxyCodeLine{916     \textcolor{keyword}{using} Base::m\_info;}
+\DoxyCodeLine{917 }
+\DoxyCodeLine{918     \textcolor{keywordtype}{void} init()}
+\DoxyCodeLine{919     \{}
+\DoxyCodeLine{920       Base::init();}
+\DoxyCodeLine{921       }
+\DoxyCodeLine{922       ilu\_set\_default\_options(\&m\_sluOptions);}
+\DoxyCodeLine{923       m\_sluOptions.PrintStat        = NO;}
+\DoxyCodeLine{924       m\_sluOptions.ConditionNumber  = NO;}
+\DoxyCodeLine{925       m\_sluOptions.Trans            = NOTRANS;}
+\DoxyCodeLine{926       m\_sluOptions.ColPerm          = MMD\_AT\_PLUS\_A;}
+\DoxyCodeLine{927       }
+\DoxyCodeLine{928       \textcolor{comment}{// no attempt to preserve column sum}}
+\DoxyCodeLine{929       m\_sluOptions.ILU\_MILU = SILU;}
+\DoxyCodeLine{930       \textcolor{comment}{// only basic ILU(k) support -\/-\/ no direct control over memory consumption}}
+\DoxyCodeLine{931       \textcolor{comment}{// better to use ILU\_DropRule = DROP\_BASIC | DROP\_AREA}}
+\DoxyCodeLine{932       \textcolor{comment}{// and set ILU\_FillFactor to max memory growth}}
+\DoxyCodeLine{933       m\_sluOptions.ILU\_DropRule = DROP\_BASIC;}
+\DoxyCodeLine{934       m\_sluOptions.ILU\_DropTol = NumTraits<Scalar>::dummy\_precision()*10;}
+\DoxyCodeLine{935     \}}
+\DoxyCodeLine{936     }
+\DoxyCodeLine{937   \textcolor{keyword}{private}:}
+\DoxyCodeLine{938     SuperILU(SuperILU\& ) \{ \}}
+\DoxyCodeLine{939 \};}
+\DoxyCodeLine{940 }
+\DoxyCodeLine{941 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{942 \textcolor{keywordtype}{void} SuperILU<MatrixType>::factorize(\textcolor{keyword}{const} MatrixType\& a)}
+\DoxyCodeLine{943 \{}
+\DoxyCodeLine{944   eigen\_assert(m\_analysisIsOk \&\& \textcolor{stringliteral}{"{}You must first call analyzePattern()"{}});}
+\DoxyCodeLine{945   \textcolor{keywordflow}{if}(!m\_analysisIsOk)}
+\DoxyCodeLine{946   \{}
+\DoxyCodeLine{947     m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea580b2a3cafe585691e789f768fb729bf}{InvalidInput}};}
+\DoxyCodeLine{948     \textcolor{keywordflow}{return};}
+\DoxyCodeLine{949   \}}
+\DoxyCodeLine{950   }
+\DoxyCodeLine{951   this-\/>initFactorization(a);}
+\DoxyCodeLine{952 }
+\DoxyCodeLine{953   \textcolor{keywordtype}{int} info = 0;}
+\DoxyCodeLine{954   RealScalar recip\_pivot\_growth, rcond;}
+\DoxyCodeLine{955 }
+\DoxyCodeLine{956   StatInit(\&m\_sluStat);}
+\DoxyCodeLine{957   SuperLU\_gsisx(\&m\_sluOptions, \&m\_sluA, m\_q.data(), m\_p.data(), \&m\_sluEtree[0],}
+\DoxyCodeLine{958                 \&m\_sluEqued, \&m\_sluRscale[0], \&m\_sluCscale[0],}
+\DoxyCodeLine{959                 \&m\_sluL, \&m\_sluU,}
+\DoxyCodeLine{960                 NULL, 0,}
+\DoxyCodeLine{961                 \&m\_sluB, \&m\_sluX,}
+\DoxyCodeLine{962                 \&recip\_pivot\_growth, \&rcond,}
+\DoxyCodeLine{963                 \&m\_sluStat, \&info, Scalar());}
+\DoxyCodeLine{964   StatFree(\&m\_sluStat);}
+\DoxyCodeLine{965 }
+\DoxyCodeLine{966   \textcolor{comment}{// FIXME how to better check for errors ???}}
+\DoxyCodeLine{967   m\_info = info == 0 ? \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}} : \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea1c6e20706575a629b27a105f07f1883b}{NumericalIssue}};}
+\DoxyCodeLine{968   m\_factorizationIsOk = \textcolor{keyword}{true};}
+\DoxyCodeLine{969 \}}
+\DoxyCodeLine{970 }
+\DoxyCodeLine{971 \textcolor{preprocessor}{\#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{972 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{973 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs,\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{974 \textcolor{keywordtype}{void} SuperILU<MatrixType>::\_solve\_impl(\textcolor{keyword}{const} MatrixBase<Rhs> \&b, MatrixBase<Dest>\& x)\textcolor{keyword}{ const}}
+\DoxyCodeLine{975 \textcolor{keyword}{}\{}
+\DoxyCodeLine{976   eigen\_assert(m\_factorizationIsOk \&\& \textcolor{stringliteral}{"{}The decomposition is not in a valid state for solving, you must first call either compute() or analyzePattern()/factorize()"{}});}
+\DoxyCodeLine{977 }
+\DoxyCodeLine{978   \textcolor{keyword}{const} \textcolor{keywordtype}{int} rhsCols = b.cols();}
+\DoxyCodeLine{979   eigen\_assert(m\_matrix.rows()==b.rows());}
+\DoxyCodeLine{980 }
+\DoxyCodeLine{981   m\_sluOptions.Trans = NOTRANS;}
+\DoxyCodeLine{982   m\_sluOptions.Fact = FACTORED;}
+\DoxyCodeLine{983   m\_sluOptions.IterRefine = NOREFINE;}
+\DoxyCodeLine{984 }
+\DoxyCodeLine{985   m\_sluFerr.resize(rhsCols);}
+\DoxyCodeLine{986   m\_sluBerr.resize(rhsCols);}
+\DoxyCodeLine{987   }
+\DoxyCodeLine{988   Ref<const Matrix<typename Rhs::Scalar,Dynamic,Dynamic,ColMajor> > b\_ref(b);}
+\DoxyCodeLine{989   Ref<const Matrix<typename Dest::Scalar,Dynamic,Dynamic,ColMajor> > x\_ref(x);}
+\DoxyCodeLine{990   }
+\DoxyCodeLine{991   m\_sluB = SluMatrix::Map(b\_ref.const\_cast\_derived());}
+\DoxyCodeLine{992   m\_sluX = SluMatrix::Map(x\_ref.const\_cast\_derived());}
+\DoxyCodeLine{993 }
+\DoxyCodeLine{994   \textcolor{keyword}{typename} Rhs::PlainObject b\_cpy;}
+\DoxyCodeLine{995   \textcolor{keywordflow}{if}(m\_sluEqued!=\textcolor{charliteral}{'N'})}
+\DoxyCodeLine{996   \{}
+\DoxyCodeLine{997     b\_cpy = b;}
+\DoxyCodeLine{998     m\_sluB = SluMatrix::Map(b\_cpy.const\_cast\_derived());  }
+\DoxyCodeLine{999   \}}
+\DoxyCodeLine{1000   }
+\DoxyCodeLine{1001   \textcolor{keywordtype}{int} info = 0;}
+\DoxyCodeLine{1002   RealScalar recip\_pivot\_growth, rcond;}
+\DoxyCodeLine{1003 }
+\DoxyCodeLine{1004   StatInit(\&m\_sluStat);}
+\DoxyCodeLine{1005   SuperLU\_gsisx(\&m\_sluOptions, \&m\_sluA,}
+\DoxyCodeLine{1006                 m\_q.data(), m\_p.data(),}
+\DoxyCodeLine{1007                 \&m\_sluEtree[0], \&m\_sluEqued,}
+\DoxyCodeLine{1008                 \&m\_sluRscale[0], \&m\_sluCscale[0],}
+\DoxyCodeLine{1009                 \&m\_sluL, \&m\_sluU,}
+\DoxyCodeLine{1010                 NULL, 0,}
+\DoxyCodeLine{1011                 \&m\_sluB, \&m\_sluX,}
+\DoxyCodeLine{1012                 \&recip\_pivot\_growth, \&rcond,}
+\DoxyCodeLine{1013                 \&m\_sluStat, \&info, Scalar());}
+\DoxyCodeLine{1014   StatFree(\&m\_sluStat);}
+\DoxyCodeLine{1015   }
+\DoxyCodeLine{1016   \textcolor{keywordflow}{if}(x.derived().data() != x\_ref.data())}
+\DoxyCodeLine{1017     x = x\_ref;}
+\DoxyCodeLine{1018 }
+\DoxyCodeLine{1019   m\_info = info==0 ? \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}} : \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea1c6e20706575a629b27a105f07f1883b}{NumericalIssue}};}
+\DoxyCodeLine{1020 \}}
+\DoxyCodeLine{1021 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{1022 }
+\DoxyCodeLine{1023 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{1024 }
+\DoxyCodeLine{1025 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{1026 }
+\DoxyCodeLine{1027 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_SUPERLUSUPPORT\_H}}
+
+\end{DoxyCode}

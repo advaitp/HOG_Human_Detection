@@ -1,0 +1,170 @@
+\hypertarget{Serializer_8h_source}{}\doxysection{Serializer.\+h}
+\label{Serializer_8h_source}\index{include/Eigen/src/Core/util/Serializer.h@{include/Eigen/src/Core/util/Serializer.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2021 The Eigen Team}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_SERIALIZER\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_SERIALIZER\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include <type\_traits>}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{comment}{// The Serializer class encodes data into a memory buffer so it can be later}}
+\DoxyCodeLine{16 \textcolor{comment}{// reconstructed. This is mainly used to send objects back-\/and-\/forth between}}
+\DoxyCodeLine{17 \textcolor{comment}{// the CPU and GPU.}}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{20 }
+\DoxyCodeLine{26 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} EnableIf = \textcolor{keywordtype}{void}>}
+\DoxyCodeLine{27 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1Serializer}{Serializer}};}
+\DoxyCodeLine{28 }
+\DoxyCodeLine{29 \textcolor{comment}{// Specialization for POD types.}}
+\DoxyCodeLine{30 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{31 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1Serializer}{Serializer}}<T, typename std::enable\_if<}
+\DoxyCodeLine{32                       std::is\_trivial<T>::value }
+\DoxyCodeLine{33                       \&\& std::is\_standard\_layout<T>::value>::type > \{}
+\DoxyCodeLine{34  \textcolor{keyword}{public}:}
+\DoxyCodeLine{35  }
+\DoxyCodeLine{42   EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{size\_t} \mbox{\hyperlink{classEigen_1_1Serializer_3_01T_00_01typename_01std_1_1enable__if_3_01std_1_1is__trivial_3_01T_01d1d350a0a1d3164e59eeddfd40150844_ad54597c30946286b56a2f2c4734e60a8}{size}}(\textcolor{keyword}{const} T\& value)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{43     \textcolor{keywordflow}{return} \textcolor{keyword}{sizeof}(value);}
+\DoxyCodeLine{44   \}}
+\DoxyCodeLine{45   }
+\DoxyCodeLine{52   EIGEN\_DEVICE\_FUNC uint8\_t* \mbox{\hyperlink{classEigen_1_1Serializer_3_01T_00_01typename_01std_1_1enable__if_3_01std_1_1is__trivial_3_01T_01d1d350a0a1d3164e59eeddfd40150844_af7e2baecb4b21b726ddd86dc96c55780}{serialize}}(uint8\_t* dest, \textcolor{keyword}{const} T\& value) \{}
+\DoxyCodeLine{53     EIGEN\_USING\_STD(memcpy)}
+\DoxyCodeLine{54     memcpy(dest, \&value, \textcolor{keyword}{sizeof}(value));}
+\DoxyCodeLine{55     \textcolor{keywordflow}{return} dest + \textcolor{keyword}{sizeof}(value);}
+\DoxyCodeLine{56   \}}
+\DoxyCodeLine{57   }
+\DoxyCodeLine{64   EIGEN\_DEVICE\_FUNC uint8\_t* \mbox{\hyperlink{classEigen_1_1Serializer_3_01T_00_01typename_01std_1_1enable__if_3_01std_1_1is__trivial_3_01T_01d1d350a0a1d3164e59eeddfd40150844_a6afc9b62b38c335c288dc3121038a170}{deserialize}}(uint8\_t* src, T\& value)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{65     EIGEN\_USING\_STD(memcpy)}
+\DoxyCodeLine{66     memcpy(\&value, src, \textcolor{keyword}{sizeof}(value));}
+\DoxyCodeLine{67     \textcolor{keywordflow}{return} src + \textcolor{keyword}{sizeof}(value);}
+\DoxyCodeLine{68   \}}
+\DoxyCodeLine{69 \};}
+\DoxyCodeLine{70 }
+\DoxyCodeLine{71 \textcolor{comment}{// Specialization for DenseBase.}}
+\DoxyCodeLine{72 \textcolor{comment}{// Serializes [rows, cols, data...].}}
+\DoxyCodeLine{73 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{74 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1Serializer}{Serializer}}<\mbox{\hyperlink{classEigen_1_1DenseBase}{DenseBase}}<Derived>, void> \{}
+\DoxyCodeLine{75  \textcolor{keyword}{public}:}
+\DoxyCodeLine{76   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Derived::Scalar Scalar;}
+\DoxyCodeLine{77   }
+\DoxyCodeLine{78   \textcolor{keyword}{struct }Header \{}
+\DoxyCodeLine{79     \textcolor{keyword}{typename} Derived::Index rows;}
+\DoxyCodeLine{80     \textcolor{keyword}{typename} Derived::Index cols;}
+\DoxyCodeLine{81   \};}
+\DoxyCodeLine{82   }
+\DoxyCodeLine{83   EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{size\_t} size(\textcolor{keyword}{const} Derived\& value)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{84     \textcolor{keywordflow}{return} \textcolor{keyword}{sizeof}(Header) + \textcolor{keyword}{sizeof}(Scalar) * value.size();}
+\DoxyCodeLine{85   \}}
+\DoxyCodeLine{86   }
+\DoxyCodeLine{87   EIGEN\_DEVICE\_FUNC uint8\_t* \mbox{\hyperlink{namespaceEigen_a143da5eb2de9988152c58faef4f457d3}{serialize}}(uint8\_t* dest, \textcolor{keyword}{const} Derived\& value) \{}
+\DoxyCodeLine{88     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} header\_bytes = \textcolor{keyword}{sizeof}(Header);}
+\DoxyCodeLine{89     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} data\_bytes = \textcolor{keyword}{sizeof}(Scalar) * value.size();}
+\DoxyCodeLine{90     Header header = \{value.rows(), value.cols()\};}
+\DoxyCodeLine{91     EIGEN\_USING\_STD(memcpy)}
+\DoxyCodeLine{92     memcpy(dest, \&header, header\_bytes);}
+\DoxyCodeLine{93     dest += header\_bytes;}
+\DoxyCodeLine{94     memcpy(dest, value.data(), data\_bytes);}
+\DoxyCodeLine{95     \textcolor{keywordflow}{return} dest + data\_bytes;}
+\DoxyCodeLine{96   \}}
+\DoxyCodeLine{97   }
+\DoxyCodeLine{98   EIGEN\_DEVICE\_FUNC uint8\_t* \mbox{\hyperlink{namespaceEigen_a49d72a38d750419b5208bf1ef37a3537}{deserialize}}(uint8\_t* src, Derived\& value)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{99     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} header\_bytes = \textcolor{keyword}{sizeof}(Header);}
+\DoxyCodeLine{100     Header header;}
+\DoxyCodeLine{101     EIGEN\_USING\_STD(memcpy)}
+\DoxyCodeLine{102     memcpy(\&header, src, header\_bytes);}
+\DoxyCodeLine{103     src += header\_bytes;}
+\DoxyCodeLine{104     value.resize(header.rows, header.cols);}
+\DoxyCodeLine{105     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} data\_bytes = \textcolor{keyword}{sizeof}(Scalar) * header.rows * header.cols;}
+\DoxyCodeLine{106     memcpy(value.data(), src, data\_bytes);}
+\DoxyCodeLine{107     \textcolor{keywordflow}{return} src + data\_bytes;}
+\DoxyCodeLine{108   \}}
+\DoxyCodeLine{109 \};}
+\DoxyCodeLine{110 }
+\DoxyCodeLine{111 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keywordtype}{int} Rows, \textcolor{keywordtype}{int} Cols, \textcolor{keywordtype}{int} Options, \textcolor{keywordtype}{int} MaxRows, \textcolor{keywordtype}{int} MaxCols>}
+\DoxyCodeLine{112 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1Serializer}{Serializer}}<\mbox{\hyperlink{classEigen_1_1Matrix}{Matrix}}<Scalar, Rows, Cols, Options, MaxRows, MaxCols> > : \textcolor{keyword}{public}}
+\DoxyCodeLine{113   \mbox{\hyperlink{classEigen_1_1Serializer}{Serializer}}<DenseBase<Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols> > > \{\};}
+\DoxyCodeLine{114   }
+\DoxyCodeLine{115 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keywordtype}{int} Rows, \textcolor{keywordtype}{int} Cols, \textcolor{keywordtype}{int} Options, \textcolor{keywordtype}{int} MaxRows, \textcolor{keywordtype}{int} MaxCols>}
+\DoxyCodeLine{116 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1Serializer}{Serializer}}<\mbox{\hyperlink{classEigen_1_1Array}{Array}}<Scalar, Rows, Cols, Options, MaxRows, MaxCols> > : \textcolor{keyword}{public}}
+\DoxyCodeLine{117   \mbox{\hyperlink{classEigen_1_1Serializer}{Serializer}}<DenseBase<Array<Scalar, Rows, Cols, Options, MaxRows, MaxCols> > > \{\};}
+\DoxyCodeLine{118   }
+\DoxyCodeLine{119 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{120  }
+\DoxyCodeLine{121 \textcolor{comment}{// Recursive serialization implementation helper.}}
+\DoxyCodeLine{122 \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t} N, \textcolor{keyword}{typename}... Types>}
+\DoxyCodeLine{123 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1serialize__impl}{serialize\_impl}};}
+\DoxyCodeLine{124 }
+\DoxyCodeLine{125 \textcolor{keyword}{template}<\textcolor{keywordtype}{size\_t} N, \textcolor{keyword}{typename} T1, \textcolor{keyword}{typename}... Ts>}
+\DoxyCodeLine{126 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1serialize__impl}{serialize\_impl}}<N, T1, Ts...> \{}
+\DoxyCodeLine{127   \textcolor{keyword}{using} \mbox{\hyperlink{classEigen_1_1Serializer}{Serializer}} = \mbox{\hyperlink{classEigen_1_1Serializer}{Eigen::Serializer<typename std::decay<T1>::type}}>;}
+\DoxyCodeLine{128   }
+\DoxyCodeLine{129   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{130   \textcolor{keywordtype}{size\_t} \mbox{\hyperlink{namespaceEigen_abe8ad90d69bf6d7d3fa04fd5ac69938b}{serialize\_size}}(\textcolor{keyword}{const} T1\& value, \textcolor{keyword}{const} Ts\&... args) \{}
+\DoxyCodeLine{131     \mbox{\hyperlink{classEigen_1_1Serializer}{Serializer}} serializer;}
+\DoxyCodeLine{132     \textcolor{keywordtype}{size\_t} size = serializer.size(value);}
+\DoxyCodeLine{133     \textcolor{keywordflow}{return} size + \mbox{\hyperlink{structEigen_1_1internal_1_1serialize__impl}{serialize\_impl<N-\/1, Ts...>::serialize\_size}}(args...);}
+\DoxyCodeLine{134   \}}
+\DoxyCodeLine{135   }
+\DoxyCodeLine{136   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{137   uint8\_t* \mbox{\hyperlink{namespaceEigen_a143da5eb2de9988152c58faef4f457d3}{serialize}}(uint8\_t* dest, \textcolor{keyword}{const} T1\& value, \textcolor{keyword}{const} Ts\&... args) \{}
+\DoxyCodeLine{138     \mbox{\hyperlink{classEigen_1_1Serializer}{Serializer}} serializer;}
+\DoxyCodeLine{139     dest = serializer.serialize(dest, value);}
+\DoxyCodeLine{140     \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1serialize__impl}{serialize\_impl<N-\/1, Ts...>::serialize}}(dest, args...);}
+\DoxyCodeLine{141   \}}
+\DoxyCodeLine{142   }
+\DoxyCodeLine{143   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{144   uint8\_t* \mbox{\hyperlink{namespaceEigen_a49d72a38d750419b5208bf1ef37a3537}{deserialize}}(uint8\_t* src, T1\& value, Ts\&... args) \{}
+\DoxyCodeLine{145     \mbox{\hyperlink{classEigen_1_1Serializer}{Serializer}} serializer;}
+\DoxyCodeLine{146     src = serializer.deserialize(src, value);}
+\DoxyCodeLine{147     \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1serialize__impl}{serialize\_impl<N-\/1, Ts...>::deserialize}}(src, args...);}
+\DoxyCodeLine{148   \}}
+\DoxyCodeLine{149 \};}
+\DoxyCodeLine{150 }
+\DoxyCodeLine{151 \textcolor{comment}{// Base case.}}
+\DoxyCodeLine{152 \textcolor{keyword}{template}<>}
+\DoxyCodeLine{153 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1serialize__impl}{serialize\_impl}}<0> \{}
+\DoxyCodeLine{154   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{155   \textcolor{keywordtype}{size\_t} \mbox{\hyperlink{namespaceEigen_abe8ad90d69bf6d7d3fa04fd5ac69938b}{serialize\_size}}() \{ \textcolor{keywordflow}{return} 0; \}}
+\DoxyCodeLine{156   }
+\DoxyCodeLine{157   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{158   uint8\_t* \mbox{\hyperlink{namespaceEigen_a143da5eb2de9988152c58faef4f457d3}{serialize}}(uint8\_t* dest) \{ \textcolor{keywordflow}{return} dest; \}}
+\DoxyCodeLine{159   }
+\DoxyCodeLine{160   \textcolor{keyword}{static} EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{161   uint8\_t* \mbox{\hyperlink{namespaceEigen_a49d72a38d750419b5208bf1ef37a3537}{deserialize}}(uint8\_t* src) \{ \textcolor{keywordflow}{return} src; \}}
+\DoxyCodeLine{162 \};}
+\DoxyCodeLine{163 }
+\DoxyCodeLine{164 \}  \textcolor{comment}{// namespace internal}}
+\DoxyCodeLine{165 }
+\DoxyCodeLine{166 }
+\DoxyCodeLine{173 \textcolor{keyword}{template}<\textcolor{keyword}{typename}... Args>}
+\DoxyCodeLine{174 EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{175 \textcolor{keywordtype}{size\_t} \mbox{\hyperlink{namespaceEigen_abe8ad90d69bf6d7d3fa04fd5ac69938b}{serialize\_size}}(\textcolor{keyword}{const} Args\&... args) \{}
+\DoxyCodeLine{176   \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1serialize__impl}{internal::serialize\_impl}}<\textcolor{keyword}{sizeof}...(args), Args...>::\mbox{\hyperlink{namespaceEigen_abe8ad90d69bf6d7d3fa04fd5ac69938b}{serialize\_size}}(args...);}
+\DoxyCodeLine{177 \}}
+\DoxyCodeLine{178 }
+\DoxyCodeLine{186 \textcolor{keyword}{template}<\textcolor{keyword}{typename}... Args>}
+\DoxyCodeLine{187 EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{188 uint8\_t* \mbox{\hyperlink{namespaceEigen_a143da5eb2de9988152c58faef4f457d3}{serialize}}(uint8\_t* dest, \textcolor{keyword}{const} Args\&... args) \{}
+\DoxyCodeLine{189   \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1serialize__impl}{internal::serialize\_impl}}<\textcolor{keyword}{sizeof}...(args), Args...>::\mbox{\hyperlink{namespaceEigen_a143da5eb2de9988152c58faef4f457d3}{serialize}}(dest, args...);}
+\DoxyCodeLine{190 \}}
+\DoxyCodeLine{191 }
+\DoxyCodeLine{199 \textcolor{keyword}{template}<\textcolor{keyword}{typename}... Args>}
+\DoxyCodeLine{200 EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{201 uint8\_t* \mbox{\hyperlink{namespaceEigen_a49d72a38d750419b5208bf1ef37a3537}{deserialize}}(uint8\_t* src, Args\&... args) \{}
+\DoxyCodeLine{202   \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1serialize__impl}{internal::serialize\_impl}}<\textcolor{keyword}{sizeof}...(args), Args...>::\mbox{\hyperlink{namespaceEigen_a49d72a38d750419b5208bf1ef37a3537}{deserialize}}(src, args...);}
+\DoxyCodeLine{203 \}}
+\DoxyCodeLine{204 }
+\DoxyCodeLine{205 \}  \textcolor{comment}{// namespace Eigen}}
+\DoxyCodeLine{206 }
+\DoxyCodeLine{207 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_SERIALIZER\_H}}
+
+\end{DoxyCode}

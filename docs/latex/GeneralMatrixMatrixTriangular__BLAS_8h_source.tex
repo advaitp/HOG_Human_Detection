@@ -1,0 +1,153 @@
+\hypertarget{GeneralMatrixMatrixTriangular__BLAS_8h_source}{}\doxysection{General\+Matrix\+Matrix\+Triangular\+\_\+\+BLAS.\+h}
+\label{GeneralMatrixMatrixTriangular__BLAS_8h_source}\index{include/Eigen/src/Core/products/GeneralMatrixMatrixTriangular\_BLAS.h@{include/Eigen/src/Core/products/GeneralMatrixMatrixTriangular\_BLAS.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{/*}}
+\DoxyCodeLine{2 \textcolor{comment}{ Copyright (c) 2011, Intel Corporation. All rights reserved.}}
+\DoxyCodeLine{3 \textcolor{comment}{}}
+\DoxyCodeLine{4 \textcolor{comment}{ Redistribution and use in source and binary forms, with or without modification,}}
+\DoxyCodeLine{5 \textcolor{comment}{ are permitted provided that the following conditions are met:}}
+\DoxyCodeLine{6 \textcolor{comment}{}}
+\DoxyCodeLine{7 \textcolor{comment}{ * Redistributions of source code must retain the above copyright notice, this}}
+\DoxyCodeLine{8 \textcolor{comment}{   list of conditions and the following disclaimer.}}
+\DoxyCodeLine{9 \textcolor{comment}{ * Redistributions in binary form must reproduce the above copyright notice,}}
+\DoxyCodeLine{10 \textcolor{comment}{   this list of conditions and the following disclaimer in the documentation}}
+\DoxyCodeLine{11 \textcolor{comment}{   and/or other materials provided with the distribution.}}
+\DoxyCodeLine{12 \textcolor{comment}{ * Neither the name of Intel Corporation nor the names of its contributors may}}
+\DoxyCodeLine{13 \textcolor{comment}{   be used to endorse or promote products derived from this software without}}
+\DoxyCodeLine{14 \textcolor{comment}{   specific prior written permission.}}
+\DoxyCodeLine{15 \textcolor{comment}{}}
+\DoxyCodeLine{16 \textcolor{comment}{ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "{}AS IS"{} AND}}
+\DoxyCodeLine{17 \textcolor{comment}{ ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED}}
+\DoxyCodeLine{18 \textcolor{comment}{ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE}}
+\DoxyCodeLine{19 \textcolor{comment}{ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR}}
+\DoxyCodeLine{20 \textcolor{comment}{ ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES}}
+\DoxyCodeLine{21 \textcolor{comment}{ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;}}
+\DoxyCodeLine{22 \textcolor{comment}{ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON}}
+\DoxyCodeLine{23 \textcolor{comment}{ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT}}
+\DoxyCodeLine{24 \textcolor{comment}{ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS}}
+\DoxyCodeLine{25 \textcolor{comment}{ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.}}
+\DoxyCodeLine{26 \textcolor{comment}{}}
+\DoxyCodeLine{27 \textcolor{comment}{ ********************************************************************************}}
+\DoxyCodeLine{28 \textcolor{comment}{ *   Content : Eigen bindings to BLAS F77}}
+\DoxyCodeLine{29 \textcolor{comment}{ *   Level 3 BLAS SYRK/HERK implementation.}}
+\DoxyCodeLine{30 \textcolor{comment}{ ********************************************************************************}}
+\DoxyCodeLine{31 \textcolor{comment}{*/}}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33 \textcolor{preprocessor}{\#ifndef EIGEN\_GENERAL\_MATRIX\_MATRIX\_TRIANGULAR\_BLAS\_H}}
+\DoxyCodeLine{34 \textcolor{preprocessor}{\#define EIGEN\_GENERAL\_MATRIX\_MATRIX\_TRIANGULAR\_BLAS\_H}}
+\DoxyCodeLine{35 }
+\DoxyCodeLine{36 \textcolor{preprocessor}{\#include "{}../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{37 }
+\DoxyCodeLine{38 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{39 }
+\DoxyCodeLine{40 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{41 }
+\DoxyCodeLine{42 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Index, \textcolor{keyword}{typename} Scalar, \textcolor{keywordtype}{int} AStorageOrder, \textcolor{keywordtype}{bool} ConjugateA, \textcolor{keywordtype}{int} ResStorageOrder, \textcolor{keywordtype}{int} UpLo>}
+\DoxyCodeLine{43 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1general__matrix__matrix__rankupdate}{general\_matrix\_matrix\_rankupdate}} :}
+\DoxyCodeLine{44        \mbox{\hyperlink{structEigen_1_1internal_1_1general__matrix__matrix__triangular__product}{general\_matrix\_matrix\_triangular\_product}}<}
+\DoxyCodeLine{45          Index,Scalar,AStorageOrder,ConjugateA,Scalar,AStorageOrder,ConjugateA,ResStorageOrder,1,UpLo,BuiltIn> \{\};}
+\DoxyCodeLine{46 }
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48 \textcolor{comment}{// try to go to BLAS specialization}}
+\DoxyCodeLine{49 \textcolor{preprocessor}{\#define EIGEN\_BLAS\_RANKUPDATE\_SPECIALIZE(Scalar) \(\backslash\)}}
+\DoxyCodeLine{50 \textcolor{preprocessor}{template <typename Index, int LhsStorageOrder, bool ConjugateLhs, \(\backslash\)}}
+\DoxyCodeLine{51 \textcolor{preprocessor}{                          int RhsStorageOrder, bool ConjugateRhs, int  UpLo> \(\backslash\)}}
+\DoxyCodeLine{52 \textcolor{preprocessor}{struct general\_matrix\_matrix\_triangular\_product<Index,Scalar,LhsStorageOrder,ConjugateLhs, \(\backslash\)}}
+\DoxyCodeLine{53 \textcolor{preprocessor}{               Scalar,RhsStorageOrder,ConjugateRhs,ColMajor,1,UpLo,Specialized> \{ \(\backslash\)}}
+\DoxyCodeLine{54 \textcolor{preprocessor}{  static EIGEN\_STRONG\_INLINE void run(Index size, Index depth,const Scalar* lhs, Index lhsStride, \(\backslash\)}}
+\DoxyCodeLine{55 \textcolor{preprocessor}{                          const Scalar* rhs, Index rhsStride, Scalar* res, Index resIncr, Index resStride, Scalar alpha, level3\_blocking<Scalar, Scalar>\& blocking) \(\backslash\)}}
+\DoxyCodeLine{56 \textcolor{preprocessor}{  \{ \(\backslash\)}}
+\DoxyCodeLine{57 \textcolor{preprocessor}{    if ( lhs==rhs \&\& ((UpLo\&(Lower|Upper))==UpLo) ) \{ \(\backslash\)}}
+\DoxyCodeLine{58 \textcolor{preprocessor}{      general\_matrix\_matrix\_rankupdate<Index,Scalar,LhsStorageOrder,ConjugateLhs,ColMajor,UpLo> \(\backslash\)}}
+\DoxyCodeLine{59 \textcolor{preprocessor}{      ::run(size,depth,lhs,lhsStride,rhs,rhsStride,res,resStride,alpha,blocking); \(\backslash\)}}
+\DoxyCodeLine{60 \textcolor{preprocessor}{    \} else \{ \(\backslash\)}}
+\DoxyCodeLine{61 \textcolor{preprocessor}{      general\_matrix\_matrix\_triangular\_product<Index, \(\backslash\)}}
+\DoxyCodeLine{62 \textcolor{preprocessor}{        Scalar, LhsStorageOrder, ConjugateLhs, \(\backslash\)}}
+\DoxyCodeLine{63 \textcolor{preprocessor}{        Scalar, RhsStorageOrder, ConjugateRhs, \(\backslash\)}}
+\DoxyCodeLine{64 \textcolor{preprocessor}{        ColMajor, 1, UpLo, BuiltIn> \(\backslash\)}}
+\DoxyCodeLine{65 \textcolor{preprocessor}{      ::run(size,depth,lhs,lhsStride,rhs,rhsStride,res,resIncr,resStride,alpha,blocking); \(\backslash\)}}
+\DoxyCodeLine{66 \textcolor{preprocessor}{    \} \(\backslash\)}}
+\DoxyCodeLine{67 \textcolor{preprocessor}{  \} \(\backslash\)}}
+\DoxyCodeLine{68 \textcolor{preprocessor}{\};}}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70 EIGEN\_BLAS\_RANKUPDATE\_SPECIALIZE(\textcolor{keywordtype}{double})}
+\DoxyCodeLine{71 EIGEN\_BLAS\_RANKUPDATE\_SPECIALIZE(\textcolor{keywordtype}{float})}
+\DoxyCodeLine{72 \textcolor{comment}{// TODO handle complex cases}}
+\DoxyCodeLine{73 \textcolor{comment}{// EIGEN\_BLAS\_RANKUPDATE\_SPECIALIZE(dcomplex)}}
+\DoxyCodeLine{74 \textcolor{comment}{// EIGEN\_BLAS\_RANKUPDATE\_SPECIALIZE(scomplex)}}
+\DoxyCodeLine{75 }
+\DoxyCodeLine{76 \textcolor{comment}{// SYRK for float/double}}
+\DoxyCodeLine{77 \textcolor{preprocessor}{\#define EIGEN\_BLAS\_RANKUPDATE\_R(EIGTYPE, BLASTYPE, BLASFUNC) \(\backslash\)}}
+\DoxyCodeLine{78 \textcolor{preprocessor}{template <typename Index, int AStorageOrder, bool ConjugateA, int  UpLo> \(\backslash\)}}
+\DoxyCodeLine{79 \textcolor{preprocessor}{struct general\_matrix\_matrix\_rankupdate<Index,EIGTYPE,AStorageOrder,ConjugateA,ColMajor,UpLo> \{ \(\backslash\)}}
+\DoxyCodeLine{80 \textcolor{preprocessor}{  enum \{ \(\backslash\)}}
+\DoxyCodeLine{81 \textcolor{preprocessor}{    IsLower = (UpLo\&Lower) == Lower, \(\backslash\)}}
+\DoxyCodeLine{82 \textcolor{preprocessor}{    LowUp = IsLower ? Lower : Upper, \(\backslash\)}}
+\DoxyCodeLine{83 \textcolor{preprocessor}{    conjA = ((AStorageOrder==ColMajor) \&\& ConjugateA) ? 1 : 0 \(\backslash\)}}
+\DoxyCodeLine{84 \textcolor{preprocessor}{  \}; \(\backslash\)}}
+\DoxyCodeLine{85 \textcolor{preprocessor}{  static EIGEN\_STRONG\_INLINE void run(Index size, Index depth,const EIGTYPE* lhs, Index lhsStride, \(\backslash\)}}
+\DoxyCodeLine{86 \textcolor{preprocessor}{                          const EIGTYPE* }\textcolor{comment}{/*rhs*/}\textcolor{preprocessor}{, Index }\textcolor{comment}{/*rhsStride*/}\textcolor{preprocessor}{, EIGTYPE* res, Index resStride, EIGTYPE alpha, level3\_blocking<EIGTYPE, EIGTYPE>\& }\textcolor{comment}{/*blocking*/}\textcolor{preprocessor}{) \(\backslash\)}}
+\DoxyCodeLine{87 \textcolor{preprocessor}{  \{ \(\backslash\)}}
+\DoxyCodeLine{88 \textcolor{preprocessor}{  }\textcolor{comment}{/* typedef Matrix<EIGTYPE, Dynamic, Dynamic, RhsStorageOrder> MatrixRhs;*/}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{89 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{90 \textcolor{preprocessor}{   BlasIndex lda=convert\_index<BlasIndex>(lhsStride), ldc=convert\_index<BlasIndex>(resStride), n=convert\_index<BlasIndex>(size), k=convert\_index<BlasIndex>(depth); \(\backslash\)}}
+\DoxyCodeLine{91 \textcolor{preprocessor}{   char uplo=((IsLower) ? 'L' : 'U'), trans=((AStorageOrder==RowMajor) ? 'T':'N'); \(\backslash\)}}
+\DoxyCodeLine{92 \textcolor{preprocessor}{   EIGTYPE beta(1); \(\backslash\)}}
+\DoxyCodeLine{93 \textcolor{preprocessor}{   BLASFUNC(\&uplo, \&trans, \&n, \&k, (const BLASTYPE*)\&numext::real\_ref(alpha), lhs, \&lda, (const BLASTYPE*)\&numext::real\_ref(beta), res, \&ldc); \(\backslash\)}}
+\DoxyCodeLine{94 \textcolor{preprocessor}{  \} \(\backslash\)}}
+\DoxyCodeLine{95 \textcolor{preprocessor}{\};}}
+\DoxyCodeLine{96 }
+\DoxyCodeLine{97 \textcolor{comment}{// HERK for complex data}}
+\DoxyCodeLine{98 \textcolor{preprocessor}{\#define EIGEN\_BLAS\_RANKUPDATE\_C(EIGTYPE, BLASTYPE, RTYPE, BLASFUNC) \(\backslash\)}}
+\DoxyCodeLine{99 \textcolor{preprocessor}{template <typename Index, int AStorageOrder, bool ConjugateA, int  UpLo> \(\backslash\)}}
+\DoxyCodeLine{100 \textcolor{preprocessor}{struct general\_matrix\_matrix\_rankupdate<Index,EIGTYPE,AStorageOrder,ConjugateA,ColMajor,UpLo> \{ \(\backslash\)}}
+\DoxyCodeLine{101 \textcolor{preprocessor}{  enum \{ \(\backslash\)}}
+\DoxyCodeLine{102 \textcolor{preprocessor}{    IsLower = (UpLo\&Lower) == Lower, \(\backslash\)}}
+\DoxyCodeLine{103 \textcolor{preprocessor}{    LowUp = IsLower ? Lower : Upper, \(\backslash\)}}
+\DoxyCodeLine{104 \textcolor{preprocessor}{    conjA = (((AStorageOrder==ColMajor) \&\& ConjugateA) || ((AStorageOrder==RowMajor) \&\& !ConjugateA)) ? 1 : 0 \(\backslash\)}}
+\DoxyCodeLine{105 \textcolor{preprocessor}{  \}; \(\backslash\)}}
+\DoxyCodeLine{106 \textcolor{preprocessor}{  static EIGEN\_STRONG\_INLINE void run(Index size, Index depth,const EIGTYPE* lhs, Index lhsStride, \(\backslash\)}}
+\DoxyCodeLine{107 \textcolor{preprocessor}{                          const EIGTYPE* }\textcolor{comment}{/*rhs*/}\textcolor{preprocessor}{, Index }\textcolor{comment}{/*rhsStride*/}\textcolor{preprocessor}{, EIGTYPE* res, Index resStride, EIGTYPE alpha, level3\_blocking<EIGTYPE, EIGTYPE>\& }\textcolor{comment}{/*blocking*/}\textcolor{preprocessor}{) \(\backslash\)}}
+\DoxyCodeLine{108 \textcolor{preprocessor}{  \{ \(\backslash\)}}
+\DoxyCodeLine{109 \textcolor{preprocessor}{   typedef Matrix<EIGTYPE, Dynamic, Dynamic, AStorageOrder> MatrixType; \(\backslash\)}}
+\DoxyCodeLine{110 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{111 \textcolor{preprocessor}{   BlasIndex lda=convert\_index<BlasIndex>(lhsStride), ldc=convert\_index<BlasIndex>(resStride), n=convert\_index<BlasIndex>(size), k=convert\_index<BlasIndex>(depth); \(\backslash\)}}
+\DoxyCodeLine{112 \textcolor{preprocessor}{   char uplo=((IsLower) ? 'L' : 'U'), trans=((AStorageOrder==RowMajor) ? 'C':'N'); \(\backslash\)}}
+\DoxyCodeLine{113 \textcolor{preprocessor}{   RTYPE alpha\_, beta\_; \(\backslash\)}}
+\DoxyCodeLine{114 \textcolor{preprocessor}{   const EIGTYPE* a\_ptr; \(\backslash\)}}
+\DoxyCodeLine{115 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{116 \textcolor{preprocessor}{   alpha\_ = alpha.real(); \(\backslash\)}}
+\DoxyCodeLine{117 \textcolor{preprocessor}{   beta\_ = 1.0; \(\backslash\)}}
+\DoxyCodeLine{118 \textcolor{preprocessor}{}\textcolor{comment}{/* Copy with conjugation in some cases*/}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{119 \textcolor{preprocessor}{   MatrixType a; \(\backslash\)}}
+\DoxyCodeLine{120 \textcolor{preprocessor}{   if (conjA) \{ \(\backslash\)}}
+\DoxyCodeLine{121 \textcolor{preprocessor}{     Map<const MatrixType, 0, OuterStride<> > mapA(lhs,n,k,OuterStride<>(lhsStride)); \(\backslash\)}}
+\DoxyCodeLine{122 \textcolor{preprocessor}{     a = mapA.conjugate(); \(\backslash\)}}
+\DoxyCodeLine{123 \textcolor{preprocessor}{     lda = a.outerStride(); \(\backslash\)}}
+\DoxyCodeLine{124 \textcolor{preprocessor}{     a\_ptr = a.data(); \(\backslash\)}}
+\DoxyCodeLine{125 \textcolor{preprocessor}{   \} else a\_ptr=lhs; \(\backslash\)}}
+\DoxyCodeLine{126 \textcolor{preprocessor}{   BLASFUNC(\&uplo, \&trans, \&n, \&k, \&alpha\_, (BLASTYPE*)a\_ptr, \&lda, \&beta\_, (BLASTYPE*)res, \&ldc); \(\backslash\)}}
+\DoxyCodeLine{127 \textcolor{preprocessor}{  \} \(\backslash\)}}
+\DoxyCodeLine{128 \textcolor{preprocessor}{\};}}
+\DoxyCodeLine{129 }
+\DoxyCodeLine{130 \textcolor{preprocessor}{\#ifdef EIGEN\_USE\_MKL}}
+\DoxyCodeLine{131 EIGEN\_BLAS\_RANKUPDATE\_R(\textcolor{keywordtype}{double}, \textcolor{keywordtype}{double}, dsyrk)}
+\DoxyCodeLine{132 EIGEN\_BLAS\_RANKUPDATE\_R(\textcolor{keywordtype}{float},  \textcolor{keywordtype}{float},  ssyrk)}
+\DoxyCodeLine{133 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{134 EIGEN\_BLAS\_RANKUPDATE\_R(\textcolor{keywordtype}{double}, \textcolor{keywordtype}{double}, dsyrk\_)}
+\DoxyCodeLine{135 EIGEN\_BLAS\_RANKUPDATE\_R(\textcolor{keywordtype}{float},  \textcolor{keywordtype}{float},  ssyrk\_)}
+\DoxyCodeLine{136 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{137 }
+\DoxyCodeLine{138 \textcolor{comment}{// TODO hanlde complex cases}}
+\DoxyCodeLine{139 \textcolor{comment}{// EIGEN\_BLAS\_RANKUPDATE\_C(dcomplex, double, double, zherk\_)}}
+\DoxyCodeLine{140 \textcolor{comment}{// EIGEN\_BLAS\_RANKUPDATE\_C(scomplex, float,  float, cherk\_)}}
+\DoxyCodeLine{141 }
+\DoxyCodeLine{142 }
+\DoxyCodeLine{143 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{144 }
+\DoxyCodeLine{145 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{146 }
+\DoxyCodeLine{147 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_GENERAL\_MATRIX\_MATRIX\_TRIANGULAR\_BLAS\_H}}
+
+\end{DoxyCode}

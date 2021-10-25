@@ -1,0 +1,565 @@
+\hypertarget{RealQZ_8h_source}{}\doxysection{Real\+QZ.\+h}
+\label{RealQZ_8h_source}\index{include/Eigen/src/Eigenvalues/RealQZ.h@{include/Eigen/src/Eigenvalues/RealQZ.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2012 Alexey Korepanov <kaikaikai@yandex.ru>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_REAL\_QZ\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_REAL\_QZ\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{59   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1RealQZ}{RealQZ}}}
+\DoxyCodeLine{60   \{}
+\DoxyCodeLine{61     \textcolor{keyword}{public}:}
+\DoxyCodeLine{62       \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{63       \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{64         RowsAtCompileTime = MatrixType::RowsAtCompileTime,}
+\DoxyCodeLine{65         ColsAtCompileTime = MatrixType::ColsAtCompileTime,}
+\DoxyCodeLine{66         Options = MatrixType::Options,}
+\DoxyCodeLine{67         MaxRowsAtCompileTime = MatrixType::MaxRowsAtCompileTime,}
+\DoxyCodeLine{68         MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime}
+\DoxyCodeLine{69       \};}
+\DoxyCodeLine{70       \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar Scalar;}
+\DoxyCodeLine{71       \textcolor{keyword}{typedef} std::complex<typename NumTraits<Scalar>::Real> ComplexScalar;}
+\DoxyCodeLine{72       \textcolor{keyword}{typedef} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Eigen::Index}} \mbox{\hyperlink{classEigen_1_1RealQZ_ab2c1b2ec46cea435743e30c4aa591f89}{Index}}; }
+\DoxyCodeLine{73 }
+\DoxyCodeLine{74       \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<ComplexScalar, ColsAtCompileTime, 1, Options \& \string~RowMajor, MaxColsAtCompileTime, 1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{EigenvalueType}};}
+\DoxyCodeLine{75       \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar, ColsAtCompileTime, 1, Options \& \string~RowMajor, MaxColsAtCompileTime, 1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{ColumnVectorType}};}
+\DoxyCodeLine{76 }
+\DoxyCodeLine{88       \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1RealQZ_a96d4dcf9874f8b805371f13720f8bade}{RealQZ}}(\mbox{\hyperlink{classEigen_1_1RealQZ_ab2c1b2ec46cea435743e30c4aa591f89}{Index}} size = RowsAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} ? 1 : RowsAtCompileTime) :}
+\DoxyCodeLine{89         m\_S(size, size),}
+\DoxyCodeLine{90         m\_T(size, size),}
+\DoxyCodeLine{91         m\_Q(size, size),}
+\DoxyCodeLine{92         m\_Z(size, size),}
+\DoxyCodeLine{93         m\_workspace(size*2),}
+\DoxyCodeLine{94         m\_maxIters(400),}
+\DoxyCodeLine{95         m\_isInitialized(false),}
+\DoxyCodeLine{96         m\_computeQZ(true)}
+\DoxyCodeLine{97       \{\}}
+\DoxyCodeLine{98 }
+\DoxyCodeLine{107       \mbox{\hyperlink{classEigen_1_1RealQZ_a688586043e36245cfac8d733923808b2}{RealQZ}}(\textcolor{keyword}{const} MatrixType\& A, \textcolor{keyword}{const} MatrixType\& B, \textcolor{keywordtype}{bool} computeQZ = \textcolor{keyword}{true}) :}
+\DoxyCodeLine{108         m\_S(A.rows(),A.cols()),}
+\DoxyCodeLine{109         m\_T(A.rows(),A.cols()),}
+\DoxyCodeLine{110         m\_Q(A.rows(),A.cols()),}
+\DoxyCodeLine{111         m\_Z(A.rows(),A.cols()),}
+\DoxyCodeLine{112         m\_workspace(A.rows()*2),}
+\DoxyCodeLine{113         m\_maxIters(400),}
+\DoxyCodeLine{114         m\_isInitialized(false),}
+\DoxyCodeLine{115         m\_computeQZ(true)}
+\DoxyCodeLine{116       \{}
+\DoxyCodeLine{117         \mbox{\hyperlink{classEigen_1_1RealQZ_a2b6847964d9f1903193cc3e67c196849}{compute}}(A, B, computeQZ);}
+\DoxyCodeLine{118       \}}
+\DoxyCodeLine{119 }
+\DoxyCodeLine{124       \textcolor{keyword}{const} MatrixType\& \mbox{\hyperlink{classEigen_1_1RealQZ_af5853c9e432e3222a39e03493c7af53d}{matrixQ}}()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{125         eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}RealQZ is not initialized."{}});}
+\DoxyCodeLine{126         eigen\_assert(m\_computeQZ \&\& \textcolor{stringliteral}{"{}The matrices Q and Z have not been computed during the QZ decomposition."{}});}
+\DoxyCodeLine{127         \textcolor{keywordflow}{return} m\_Q;}
+\DoxyCodeLine{128       \}}
+\DoxyCodeLine{129 }
+\DoxyCodeLine{134       \textcolor{keyword}{const} MatrixType\& \mbox{\hyperlink{classEigen_1_1RealQZ_aa16e24e4763eef3e78edb78afd3487bf}{matrixZ}}()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{135         eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}RealQZ is not initialized."{}});}
+\DoxyCodeLine{136         eigen\_assert(m\_computeQZ \&\& \textcolor{stringliteral}{"{}The matrices Q and Z have not been computed during the QZ decomposition."{}});}
+\DoxyCodeLine{137         \textcolor{keywordflow}{return} m\_Z;}
+\DoxyCodeLine{138       \}}
+\DoxyCodeLine{139 }
+\DoxyCodeLine{144       \textcolor{keyword}{const} MatrixType\& \mbox{\hyperlink{classEigen_1_1RealQZ_a2a48867bbb840ae05cc041725f51def1}{matrixS}}()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{145         eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}RealQZ is not initialized."{}});}
+\DoxyCodeLine{146         \textcolor{keywordflow}{return} m\_S;}
+\DoxyCodeLine{147       \}}
+\DoxyCodeLine{148 }
+\DoxyCodeLine{153       \textcolor{keyword}{const} MatrixType\& \mbox{\hyperlink{classEigen_1_1RealQZ_a22468a82633dcceafc0e217d66425d91}{matrixT}}()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{154         eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}RealQZ is not initialized."{}});}
+\DoxyCodeLine{155         \textcolor{keywordflow}{return} m\_T;}
+\DoxyCodeLine{156       \}}
+\DoxyCodeLine{157 }
+\DoxyCodeLine{165       \mbox{\hyperlink{classEigen_1_1RealQZ}{RealQZ}}\& \mbox{\hyperlink{classEigen_1_1RealQZ_a2b6847964d9f1903193cc3e67c196849}{compute}}(\textcolor{keyword}{const} MatrixType\& A, \textcolor{keyword}{const} MatrixType\& B, \textcolor{keywordtype}{bool} computeQZ = \textcolor{keyword}{true});}
+\DoxyCodeLine{166 }
+\DoxyCodeLine{171       \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} \mbox{\hyperlink{classEigen_1_1RealQZ_a6cbe25b548c8ad20c3ae76c70846b4a0}{info}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{172 \textcolor{keyword}{      }\{}
+\DoxyCodeLine{173         eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}RealQZ is not initialized."{}});}
+\DoxyCodeLine{174         \textcolor{keywordflow}{return} m\_info;}
+\DoxyCodeLine{175       \}}
+\DoxyCodeLine{176 }
+\DoxyCodeLine{179       \mbox{\hyperlink{classEigen_1_1RealQZ_ab2c1b2ec46cea435743e30c4aa591f89}{Index}} \mbox{\hyperlink{classEigen_1_1RealQZ_a2bbdd64125ea10d18a6fd6b25a8be882}{iterations}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{180 \textcolor{keyword}{      }\{}
+\DoxyCodeLine{181         eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}RealQZ is not initialized."{}});}
+\DoxyCodeLine{182         \textcolor{keywordflow}{return} m\_global\_iter;}
+\DoxyCodeLine{183       \}}
+\DoxyCodeLine{184 }
+\DoxyCodeLine{188       \mbox{\hyperlink{classEigen_1_1RealQZ}{RealQZ}}\& \mbox{\hyperlink{classEigen_1_1RealQZ_acf27447d22e1013cd91d66fa1384a4c1}{setMaxIterations}}(\mbox{\hyperlink{classEigen_1_1RealQZ_ab2c1b2ec46cea435743e30c4aa591f89}{Index}} maxIters)}
+\DoxyCodeLine{189       \{}
+\DoxyCodeLine{190         m\_maxIters = maxIters;}
+\DoxyCodeLine{191         \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{192       \}}
+\DoxyCodeLine{193 }
+\DoxyCodeLine{194     \textcolor{keyword}{private}:}
+\DoxyCodeLine{195 }
+\DoxyCodeLine{196       MatrixType m\_S, m\_T, m\_Q, m\_Z;}
+\DoxyCodeLine{197       \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar,Dynamic,1>}} m\_workspace;}
+\DoxyCodeLine{198       \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} m\_info;}
+\DoxyCodeLine{199       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m\_maxIters;}
+\DoxyCodeLine{200       \textcolor{keywordtype}{bool} m\_isInitialized;}
+\DoxyCodeLine{201       \textcolor{keywordtype}{bool} m\_computeQZ;}
+\DoxyCodeLine{202       Scalar m\_normOfT, m\_normOfS;}
+\DoxyCodeLine{203       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m\_global\_iter;}
+\DoxyCodeLine{204 }
+\DoxyCodeLine{205       \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar,3,1>}} Vector3s;}
+\DoxyCodeLine{206       \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar,2,1>}} Vector2s;}
+\DoxyCodeLine{207       \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar,2,2>}} Matrix2s;}
+\DoxyCodeLine{208       \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1JacobiRotation}{JacobiRotation<Scalar>}} JRs;}
+\DoxyCodeLine{209 }
+\DoxyCodeLine{210       \textcolor{keywordtype}{void} hessenbergTriangular();}
+\DoxyCodeLine{211       \textcolor{keywordtype}{void} computeNorms();}
+\DoxyCodeLine{212       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} findSmallSubdiagEntry(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} iu);}
+\DoxyCodeLine{213       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} findSmallDiagEntry(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} f, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} l);}
+\DoxyCodeLine{214       \textcolor{keywordtype}{void} splitOffTwoRows(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i);}
+\DoxyCodeLine{215       \textcolor{keywordtype}{void} pushDownZero(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} z, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} f, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} l);}
+\DoxyCodeLine{216       \textcolor{keywordtype}{void} step(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} f, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} l, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} iter);}
+\DoxyCodeLine{217 }
+\DoxyCodeLine{218   \}; \textcolor{comment}{// RealQZ}}
+\DoxyCodeLine{219 }
+\DoxyCodeLine{221   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{222     \textcolor{keywordtype}{void} RealQZ<MatrixType>::hessenbergTriangular()}
+\DoxyCodeLine{223     \{}
+\DoxyCodeLine{224 }
+\DoxyCodeLine{225       \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} dim = m\_S.cols();}
+\DoxyCodeLine{226 }
+\DoxyCodeLine{227       \textcolor{comment}{// perform QR decomposition of T, overwrite T with R, save Q}}
+\DoxyCodeLine{228       HouseholderQR<MatrixType> qrT(m\_T);}
+\DoxyCodeLine{229       m\_T = qrT.matrixQR();}
+\DoxyCodeLine{230       m\_T.template triangularView<StrictlyLower>().setZero();}
+\DoxyCodeLine{231       m\_Q = qrT.householderQ();}
+\DoxyCodeLine{232       \textcolor{comment}{// overwrite S with Q* S}}
+\DoxyCodeLine{233       m\_S.applyOnTheLeft(m\_Q.adjoint());}
+\DoxyCodeLine{234       \textcolor{comment}{// init Z as Identity}}
+\DoxyCodeLine{235       \textcolor{keywordflow}{if} (m\_computeQZ)}
+\DoxyCodeLine{236         m\_Z = MatrixType::Identity(dim,dim);}
+\DoxyCodeLine{237       \textcolor{comment}{// reduce S to upper Hessenberg with Givens rotations}}
+\DoxyCodeLine{238       \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j=0; j<=dim-\/3; j++) \{}
+\DoxyCodeLine{239         \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i=dim-\/1; i>=j+2; i-\/-\/) \{}
+\DoxyCodeLine{240           JRs G;}
+\DoxyCodeLine{241           \textcolor{comment}{// kill S(i,j)}}
+\DoxyCodeLine{242           \textcolor{keywordflow}{if}(m\_S.coeff(i,j) != 0)}
+\DoxyCodeLine{243           \{}
+\DoxyCodeLine{244             G.makeGivens(m\_S.coeff(i-\/1,j), m\_S.coeff(i,j), \&m\_S.coeffRef(i-\/1, j));}
+\DoxyCodeLine{245             m\_S.coeffRef(i,j) = Scalar(0.0);}
+\DoxyCodeLine{246             m\_S.rightCols(dim-\/j-\/1).applyOnTheLeft(i-\/1,i,G.adjoint());}
+\DoxyCodeLine{247             m\_T.rightCols(dim-\/i+1).applyOnTheLeft(i-\/1,i,G.adjoint());}
+\DoxyCodeLine{248             \textcolor{comment}{// update Q}}
+\DoxyCodeLine{249             \textcolor{keywordflow}{if} (m\_computeQZ)}
+\DoxyCodeLine{250               m\_Q.applyOnTheRight(i-\/1,i,G);}
+\DoxyCodeLine{251           \}}
+\DoxyCodeLine{252           \textcolor{comment}{// kill T(i,i-\/1)}}
+\DoxyCodeLine{253           \textcolor{keywordflow}{if}(m\_T.coeff(i,i-\/1)!=Scalar(0))}
+\DoxyCodeLine{254           \{}
+\DoxyCodeLine{255             G.makeGivens(m\_T.coeff(i,i), m\_T.coeff(i,i-\/1), \&m\_T.coeffRef(i,i));}
+\DoxyCodeLine{256             m\_T.coeffRef(i,i-\/1) = Scalar(0.0);}
+\DoxyCodeLine{257             m\_S.applyOnTheRight(i,i-\/1,G);}
+\DoxyCodeLine{258             m\_T.topRows(i).applyOnTheRight(i,i-\/1,G);}
+\DoxyCodeLine{259             \textcolor{comment}{// update Z}}
+\DoxyCodeLine{260             \textcolor{keywordflow}{if} (m\_computeQZ)}
+\DoxyCodeLine{261               m\_Z.applyOnTheLeft(i,i-\/1,G.adjoint());}
+\DoxyCodeLine{262           \}}
+\DoxyCodeLine{263         \}}
+\DoxyCodeLine{264       \}}
+\DoxyCodeLine{265     \}}
+\DoxyCodeLine{266 }
+\DoxyCodeLine{268   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{269     \textcolor{keyword}{inline} \textcolor{keywordtype}{void} RealQZ<MatrixType>::computeNorms()}
+\DoxyCodeLine{270     \{}
+\DoxyCodeLine{271       \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size = m\_S.cols();}
+\DoxyCodeLine{272       m\_normOfS = Scalar(0.0);}
+\DoxyCodeLine{273       m\_normOfT = Scalar(0.0);}
+\DoxyCodeLine{274       \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < size; ++j)}
+\DoxyCodeLine{275       \{}
+\DoxyCodeLine{276         m\_normOfS += m\_S.col(j).segment(0, (std::min)(size,j+2)).cwiseAbs().sum();}
+\DoxyCodeLine{277         m\_normOfT += m\_T.row(j).segment(j, size -\/ j).cwiseAbs().sum();}
+\DoxyCodeLine{278       \}}
+\DoxyCodeLine{279     \}}
+\DoxyCodeLine{280 }
+\DoxyCodeLine{281 }
+\DoxyCodeLine{283   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{284     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} RealQZ<MatrixType>::findSmallSubdiagEntry(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} iu)}
+\DoxyCodeLine{285     \{}
+\DoxyCodeLine{286       \textcolor{keyword}{using} std::abs;}
+\DoxyCodeLine{287       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} res = iu;}
+\DoxyCodeLine{288       \textcolor{keywordflow}{while} (res > 0)}
+\DoxyCodeLine{289       \{}
+\DoxyCodeLine{290         Scalar s = abs(m\_S.coeff(res-\/1,res-\/1)) + abs(m\_S.coeff(res,res));}
+\DoxyCodeLine{291         \textcolor{keywordflow}{if} (s == Scalar(0.0))}
+\DoxyCodeLine{292           s = m\_normOfS;}
+\DoxyCodeLine{293         \textcolor{keywordflow}{if} (abs(m\_S.coeff(res,res-\/1)) < NumTraits<Scalar>::epsilon() * s)}
+\DoxyCodeLine{294           \textcolor{keywordflow}{break};}
+\DoxyCodeLine{295         res-\/-\/;}
+\DoxyCodeLine{296       \}}
+\DoxyCodeLine{297       \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{298     \}}
+\DoxyCodeLine{299 }
+\DoxyCodeLine{301   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{302     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} RealQZ<MatrixType>::findSmallDiagEntry(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} f, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} l)}
+\DoxyCodeLine{303     \{}
+\DoxyCodeLine{304       \textcolor{keyword}{using} std::abs;}
+\DoxyCodeLine{305       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} res = l;}
+\DoxyCodeLine{306       \textcolor{keywordflow}{while} (res >= f) \{}
+\DoxyCodeLine{307         \textcolor{keywordflow}{if} (abs(m\_T.coeff(res,res)) <= NumTraits<Scalar>::epsilon() * m\_normOfT)}
+\DoxyCodeLine{308           \textcolor{keywordflow}{break};}
+\DoxyCodeLine{309         res-\/-\/;}
+\DoxyCodeLine{310       \}}
+\DoxyCodeLine{311       \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{312     \}}
+\DoxyCodeLine{313 }
+\DoxyCodeLine{315   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{316     \textcolor{keyword}{inline} \textcolor{keywordtype}{void} RealQZ<MatrixType>::splitOffTwoRows(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i)}
+\DoxyCodeLine{317     \{}
+\DoxyCodeLine{318       \textcolor{keyword}{using} std::abs;}
+\DoxyCodeLine{319       \textcolor{keyword}{using} std::sqrt;}
+\DoxyCodeLine{320       \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} dim=m\_S.cols();}
+\DoxyCodeLine{321       \textcolor{keywordflow}{if} (abs(m\_S.coeff(i+1,i))==Scalar(0))}
+\DoxyCodeLine{322         \textcolor{keywordflow}{return};}
+\DoxyCodeLine{323       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = findSmallDiagEntry(i,i+1);}
+\DoxyCodeLine{324       \textcolor{keywordflow}{if} (j==i-\/1)}
+\DoxyCodeLine{325       \{}
+\DoxyCodeLine{326         \textcolor{comment}{// block of (S T\string^\{-\/1\})}}
+\DoxyCodeLine{327         Matrix2s STi = m\_T.template block<2,2>(i,i).template triangularView<Upper>().}
+\DoxyCodeLine{328           \textcolor{keyword}{template} solve<OnTheRight>(m\_S.template block<2,2>(i,i));}
+\DoxyCodeLine{329         Scalar p = Scalar(0.5)*(STi(0,0)-\/STi(1,1));}
+\DoxyCodeLine{330         Scalar q = p*p + STi(1,0)*STi(0,1);}
+\DoxyCodeLine{331         \textcolor{keywordflow}{if} (q>=0) \{}
+\DoxyCodeLine{332           Scalar z = sqrt(q);}
+\DoxyCodeLine{333           \textcolor{comment}{// one QR-\/like iteration for ABi -\/ lambda I}}
+\DoxyCodeLine{334           \textcolor{comment}{// is enough -\/ when we know exact eigenvalue in advance,}}
+\DoxyCodeLine{335           \textcolor{comment}{// convergence is immediate}}
+\DoxyCodeLine{336           JRs G;}
+\DoxyCodeLine{337           \textcolor{keywordflow}{if} (p>=0)}
+\DoxyCodeLine{338             G.makeGivens(p + z, STi(1,0));}
+\DoxyCodeLine{339           \textcolor{keywordflow}{else}}
+\DoxyCodeLine{340             G.makeGivens(p -\/ z, STi(1,0));}
+\DoxyCodeLine{341           m\_S.rightCols(dim-\/i).applyOnTheLeft(i,i+1,G.adjoint());}
+\DoxyCodeLine{342           m\_T.rightCols(dim-\/i).applyOnTheLeft(i,i+1,G.adjoint());}
+\DoxyCodeLine{343           \textcolor{comment}{// update Q}}
+\DoxyCodeLine{344           \textcolor{keywordflow}{if} (m\_computeQZ)}
+\DoxyCodeLine{345             m\_Q.applyOnTheRight(i,i+1,G);}
+\DoxyCodeLine{346 }
+\DoxyCodeLine{347           G.makeGivens(m\_T.coeff(i+1,i+1), m\_T.coeff(i+1,i));}
+\DoxyCodeLine{348           m\_S.topRows(i+2).applyOnTheRight(i+1,i,G);}
+\DoxyCodeLine{349           m\_T.topRows(i+2).applyOnTheRight(i+1,i,G);}
+\DoxyCodeLine{350           \textcolor{comment}{// update Z}}
+\DoxyCodeLine{351           \textcolor{keywordflow}{if} (m\_computeQZ)}
+\DoxyCodeLine{352             m\_Z.applyOnTheLeft(i+1,i,G.adjoint());}
+\DoxyCodeLine{353 }
+\DoxyCodeLine{354           m\_S.coeffRef(i+1,i) = Scalar(0.0);}
+\DoxyCodeLine{355           m\_T.coeffRef(i+1,i) = Scalar(0.0);}
+\DoxyCodeLine{356         \}}
+\DoxyCodeLine{357       \}}
+\DoxyCodeLine{358       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{359       \{}
+\DoxyCodeLine{360         pushDownZero(j,i,i+1);}
+\DoxyCodeLine{361       \}}
+\DoxyCodeLine{362     \}}
+\DoxyCodeLine{363 }
+\DoxyCodeLine{365   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{366     \textcolor{keyword}{inline} \textcolor{keywordtype}{void} RealQZ<MatrixType>::pushDownZero(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} z, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} f, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} l)}
+\DoxyCodeLine{367     \{}
+\DoxyCodeLine{368       JRs G;}
+\DoxyCodeLine{369       \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} dim = m\_S.cols();}
+\DoxyCodeLine{370       \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} zz=z; zz<l; zz++)}
+\DoxyCodeLine{371       \{}
+\DoxyCodeLine{372         \textcolor{comment}{// push 0 down}}
+\DoxyCodeLine{373         \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} firstColS = zz>f ? (zz-\/1) : zz;}
+\DoxyCodeLine{374         G.makeGivens(m\_T.coeff(zz, zz+1), m\_T.coeff(zz+1, zz+1));}
+\DoxyCodeLine{375         m\_S.rightCols(dim-\/firstColS).applyOnTheLeft(zz,zz+1,G.adjoint());}
+\DoxyCodeLine{376         m\_T.rightCols(dim-\/zz).applyOnTheLeft(zz,zz+1,G.adjoint());}
+\DoxyCodeLine{377         m\_T.coeffRef(zz+1,zz+1) = Scalar(0.0);}
+\DoxyCodeLine{378         \textcolor{comment}{// update Q}}
+\DoxyCodeLine{379         \textcolor{keywordflow}{if} (m\_computeQZ)}
+\DoxyCodeLine{380           m\_Q.applyOnTheRight(zz,zz+1,G);}
+\DoxyCodeLine{381         \textcolor{comment}{// kill S(zz+1, zz-\/1)}}
+\DoxyCodeLine{382         \textcolor{keywordflow}{if} (zz>f)}
+\DoxyCodeLine{383         \{}
+\DoxyCodeLine{384           G.makeGivens(m\_S.coeff(zz+1, zz), m\_S.coeff(zz+1,zz-\/1));}
+\DoxyCodeLine{385           m\_S.topRows(zz+2).applyOnTheRight(zz, zz-\/1,G);}
+\DoxyCodeLine{386           m\_T.topRows(zz+1).applyOnTheRight(zz, zz-\/1,G);}
+\DoxyCodeLine{387           m\_S.coeffRef(zz+1,zz-\/1) = Scalar(0.0);}
+\DoxyCodeLine{388           \textcolor{comment}{// update Z}}
+\DoxyCodeLine{389           \textcolor{keywordflow}{if} (m\_computeQZ)}
+\DoxyCodeLine{390             m\_Z.applyOnTheLeft(zz,zz-\/1,G.adjoint());}
+\DoxyCodeLine{391         \}}
+\DoxyCodeLine{392       \}}
+\DoxyCodeLine{393       \textcolor{comment}{// finally kill S(l,l-\/1)}}
+\DoxyCodeLine{394       G.makeGivens(m\_S.coeff(l,l), m\_S.coeff(l,l-\/1));}
+\DoxyCodeLine{395       m\_S.applyOnTheRight(l,l-\/1,G);}
+\DoxyCodeLine{396       m\_T.applyOnTheRight(l,l-\/1,G);}
+\DoxyCodeLine{397       m\_S.coeffRef(l,l-\/1)=Scalar(0.0);}
+\DoxyCodeLine{398       \textcolor{comment}{// update Z}}
+\DoxyCodeLine{399       \textcolor{keywordflow}{if} (m\_computeQZ)}
+\DoxyCodeLine{400         m\_Z.applyOnTheLeft(l,l-\/1,G.adjoint());}
+\DoxyCodeLine{401     \}}
+\DoxyCodeLine{402 }
+\DoxyCodeLine{404   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{405     \textcolor{keyword}{inline} \textcolor{keywordtype}{void} RealQZ<MatrixType>::step(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} f, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} l, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} iter)}
+\DoxyCodeLine{406     \{}
+\DoxyCodeLine{407       \textcolor{keyword}{using} std::abs;}
+\DoxyCodeLine{408       \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} dim = m\_S.cols();}
+\DoxyCodeLine{409 }
+\DoxyCodeLine{410       \textcolor{comment}{// x, y, z}}
+\DoxyCodeLine{411       Scalar x, y, z;}
+\DoxyCodeLine{412       \textcolor{keywordflow}{if} (iter==10)}
+\DoxyCodeLine{413       \{}
+\DoxyCodeLine{414         \textcolor{comment}{// Wilkinson ad hoc shift}}
+\DoxyCodeLine{415         \textcolor{keyword}{const} Scalar}
+\DoxyCodeLine{416           a11=m\_S.coeff(f+0,f+0), a12=m\_S.coeff(f+0,f+1),}
+\DoxyCodeLine{417           a21=m\_S.coeff(f+1,f+0), a22=m\_S.coeff(f+1,f+1), a32=m\_S.coeff(f+2,f+1),}
+\DoxyCodeLine{418           b12=m\_T.coeff(f+0,f+1),}
+\DoxyCodeLine{419           b11i=Scalar(1.0)/m\_T.coeff(f+0,f+0),}
+\DoxyCodeLine{420           b22i=Scalar(1.0)/m\_T.coeff(f+1,f+1),}
+\DoxyCodeLine{421           a87=m\_S.coeff(l-\/1,l-\/2),}
+\DoxyCodeLine{422           a98=m\_S.coeff(l-\/0,l-\/1),}
+\DoxyCodeLine{423           b77i=Scalar(1.0)/m\_T.coeff(l-\/2,l-\/2),}
+\DoxyCodeLine{424           b88i=Scalar(1.0)/m\_T.coeff(l-\/1,l-\/1);}
+\DoxyCodeLine{425         Scalar ss = abs(a87*b77i) + abs(a98*b88i),}
+\DoxyCodeLine{426                lpl = Scalar(1.5)*ss,}
+\DoxyCodeLine{427                ll = ss*ss;}
+\DoxyCodeLine{428         x = ll + a11*a11*b11i*b11i -\/ lpl*a11*b11i + a12*a21*b11i*b22i}
+\DoxyCodeLine{429           -\/ a11*a21*b12*b11i*b11i*b22i;}
+\DoxyCodeLine{430         y = a11*a21*b11i*b11i -\/ lpl*a21*b11i + a21*a22*b11i*b22i }
+\DoxyCodeLine{431           -\/ a21*a21*b12*b11i*b11i*b22i;}
+\DoxyCodeLine{432         z = a21*a32*b11i*b22i;}
+\DoxyCodeLine{433       \}}
+\DoxyCodeLine{434       \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (iter==16)}
+\DoxyCodeLine{435       \{}
+\DoxyCodeLine{436         \textcolor{comment}{// another exceptional shift}}
+\DoxyCodeLine{437         x = m\_S.coeff(f,f)/m\_T.coeff(f,f)-\/m\_S.coeff(l,l)/m\_T.coeff(l,l) + m\_S.coeff(l,l-\/1)*m\_T.coeff(l-\/1,l) /}
+\DoxyCodeLine{438           (m\_T.coeff(l-\/1,l-\/1)*m\_T.coeff(l,l));}
+\DoxyCodeLine{439         y = m\_S.coeff(f+1,f)/m\_T.coeff(f,f);}
+\DoxyCodeLine{440         z = 0;}
+\DoxyCodeLine{441       \}}
+\DoxyCodeLine{442       \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (iter>23 \&\& !(iter\%8))}
+\DoxyCodeLine{443       \{}
+\DoxyCodeLine{444         \textcolor{comment}{// extremely exceptional shift}}
+\DoxyCodeLine{445         x = internal::random<Scalar>(-\/1.0,1.0);}
+\DoxyCodeLine{446         y = internal::random<Scalar>(-\/1.0,1.0);}
+\DoxyCodeLine{447         z = internal::random<Scalar>(-\/1.0,1.0);}
+\DoxyCodeLine{448       \}}
+\DoxyCodeLine{449       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{450       \{}
+\DoxyCodeLine{451         \textcolor{comment}{// Compute the shifts: (x,y,z,0...) = (AB\string^-\/1 -\/ l1 I) (AB\string^-\/1 -\/ l2 I) e1}}
+\DoxyCodeLine{452         \textcolor{comment}{// where l1 and l2 are the eigenvalues of the 2x2 matrix C = U V\string^-\/1 where}}
+\DoxyCodeLine{453         \textcolor{comment}{// U and V are 2x2 bottom right sub matrices of A and B. Thus:}}
+\DoxyCodeLine{454         \textcolor{comment}{//  = AB\string^-\/1AB\string^-\/1 + l1 l2 I -\/ (l1+l2)(AB\string^-\/1)}}
+\DoxyCodeLine{455         \textcolor{comment}{//  = AB\string^-\/1AB\string^-\/1 + det(M) -\/ tr(M)(AB\string^-\/1)}}
+\DoxyCodeLine{456         \textcolor{comment}{// Since we are only interested in having x, y, z with a correct ratio, we have:}}
+\DoxyCodeLine{457         \textcolor{keyword}{const} Scalar}
+\DoxyCodeLine{458           a11 = m\_S.coeff(f,f),     a12 = m\_S.coeff(f,f+1),}
+\DoxyCodeLine{459           a21 = m\_S.coeff(f+1,f),   a22 = m\_S.coeff(f+1,f+1),}
+\DoxyCodeLine{460                                     a32 = m\_S.coeff(f+2,f+1),}
+\DoxyCodeLine{461 }
+\DoxyCodeLine{462           a88 = m\_S.coeff(l-\/1,l-\/1), a89 = m\_S.coeff(l-\/1,l),}
+\DoxyCodeLine{463           a98 = m\_S.coeff(l,l-\/1),   a99 = m\_S.coeff(l,l),}
+\DoxyCodeLine{464 }
+\DoxyCodeLine{465           b11 = m\_T.coeff(f,f),     b12 = m\_T.coeff(f,f+1),}
+\DoxyCodeLine{466                                     b22 = m\_T.coeff(f+1,f+1),}
+\DoxyCodeLine{467 }
+\DoxyCodeLine{468           b88 = m\_T.coeff(l-\/1,l-\/1), b89 = m\_T.coeff(l-\/1,l),}
+\DoxyCodeLine{469                                     b99 = m\_T.coeff(l,l);}
+\DoxyCodeLine{470 }
+\DoxyCodeLine{471         x = ( (a88/b88 -\/ a11/b11)*(a99/b99 -\/ a11/b11) -\/ (a89/b99)*(a98/b88) + (a98/b88)*(b89/b99)*(a11/b11) ) * (b11/a21)}
+\DoxyCodeLine{472           + a12/b22 -\/ (a11/b11)*(b12/b22);}
+\DoxyCodeLine{473         y = (a22/b22-\/a11/b11) -\/ (a21/b11)*(b12/b22) -\/ (a88/b88-\/a11/b11) -\/ (a99/b99-\/a11/b11) + (a98/b88)*(b89/b99);}
+\DoxyCodeLine{474         z = a32/b22;}
+\DoxyCodeLine{475       \}}
+\DoxyCodeLine{476 }
+\DoxyCodeLine{477       JRs G;}
+\DoxyCodeLine{478 }
+\DoxyCodeLine{479       \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} k=f; k<=l-\/2; k++)}
+\DoxyCodeLine{480       \{}
+\DoxyCodeLine{481         \textcolor{comment}{// variables for Householder reflections}}
+\DoxyCodeLine{482         Vector2s essential2;}
+\DoxyCodeLine{483         Scalar tau, beta;}
+\DoxyCodeLine{484 }
+\DoxyCodeLine{485         Vector3s hr(x,y,z);}
+\DoxyCodeLine{486 }
+\DoxyCodeLine{487         \textcolor{comment}{// Q\_k to annihilate S(k+1,k-\/1) and S(k+2,k-\/1)}}
+\DoxyCodeLine{488         hr.makeHouseholderInPlace(tau, beta);}
+\DoxyCodeLine{489         essential2 = hr.template bottomRows<2>();}
+\DoxyCodeLine{490         \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} fc=(std::max)(k-\/1,\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}(0));  \textcolor{comment}{// first col to update}}
+\DoxyCodeLine{491         m\_S.template middleRows<3>(k).rightCols(dim-\/fc).applyHouseholderOnTheLeft(essential2, tau, m\_workspace.data());}
+\DoxyCodeLine{492         m\_T.template middleRows<3>(k).rightCols(dim-\/fc).applyHouseholderOnTheLeft(essential2, tau, m\_workspace.data());}
+\DoxyCodeLine{493         \textcolor{keywordflow}{if} (m\_computeQZ)}
+\DoxyCodeLine{494           m\_Q.template middleCols<3>(k).applyHouseholderOnTheRight(essential2, tau, m\_workspace.data());}
+\DoxyCodeLine{495         \textcolor{keywordflow}{if} (k>f)}
+\DoxyCodeLine{496           m\_S.coeffRef(k+2,k-\/1) = m\_S.coeffRef(k+1,k-\/1) = Scalar(0.0);}
+\DoxyCodeLine{497 }
+\DoxyCodeLine{498         \textcolor{comment}{// Z\_\{k1\} to annihilate T(k+2,k+1) and T(k+2,k)}}
+\DoxyCodeLine{499         hr << m\_T.coeff(k+2,k+2),m\_T.coeff(k+2,k),m\_T.coeff(k+2,k+1);}
+\DoxyCodeLine{500         hr.makeHouseholderInPlace(tau, beta);}
+\DoxyCodeLine{501         essential2 = hr.template bottomRows<2>();}
+\DoxyCodeLine{502         \{}
+\DoxyCodeLine{503           \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} lr = (std::min)(k+4,dim); \textcolor{comment}{// last row to update}}
+\DoxyCodeLine{504           Map<Matrix<Scalar,Dynamic,1> > tmp(m\_workspace.data(),lr);}
+\DoxyCodeLine{505           \textcolor{comment}{// S}}
+\DoxyCodeLine{506           tmp = m\_S.template middleCols<2>(k).topRows(lr) * essential2;}
+\DoxyCodeLine{507           tmp += m\_S.col(k+2).head(lr);}
+\DoxyCodeLine{508           m\_S.col(k+2).head(lr) -\/= tau*tmp;}
+\DoxyCodeLine{509           m\_S.template middleCols<2>(k).topRows(lr) -\/= (tau*tmp) * essential2.adjoint();}
+\DoxyCodeLine{510           \textcolor{comment}{// T}}
+\DoxyCodeLine{511           tmp = m\_T.template middleCols<2>(k).topRows(lr) * essential2;}
+\DoxyCodeLine{512           tmp += m\_T.col(k+2).head(lr);}
+\DoxyCodeLine{513           m\_T.col(k+2).head(lr) -\/= tau*tmp;}
+\DoxyCodeLine{514           m\_T.template middleCols<2>(k).topRows(lr) -\/= (tau*tmp) * essential2.adjoint();}
+\DoxyCodeLine{515         \}}
+\DoxyCodeLine{516         \textcolor{keywordflow}{if} (m\_computeQZ)}
+\DoxyCodeLine{517         \{}
+\DoxyCodeLine{518           \textcolor{comment}{// Z}}
+\DoxyCodeLine{519           Map<Matrix<Scalar,1,Dynamic> > tmp(m\_workspace.data(),dim);}
+\DoxyCodeLine{520           tmp = essential2.adjoint()*(m\_Z.template middleRows<2>(k));}
+\DoxyCodeLine{521           tmp += m\_Z.row(k+2);}
+\DoxyCodeLine{522           m\_Z.row(k+2) -\/= tau*tmp;}
+\DoxyCodeLine{523           m\_Z.template middleRows<2>(k) -\/= essential2 * (tau*tmp);}
+\DoxyCodeLine{524         \}}
+\DoxyCodeLine{525         m\_T.coeffRef(k+2,k) = m\_T.coeffRef(k+2,k+1) = Scalar(0.0);}
+\DoxyCodeLine{526 }
+\DoxyCodeLine{527         \textcolor{comment}{// Z\_\{k2\} to annihilate T(k+1,k)}}
+\DoxyCodeLine{528         G.makeGivens(m\_T.coeff(k+1,k+1), m\_T.coeff(k+1,k));}
+\DoxyCodeLine{529         m\_S.applyOnTheRight(k+1,k,G);}
+\DoxyCodeLine{530         m\_T.applyOnTheRight(k+1,k,G);}
+\DoxyCodeLine{531         \textcolor{comment}{// update Z}}
+\DoxyCodeLine{532         \textcolor{keywordflow}{if} (m\_computeQZ)}
+\DoxyCodeLine{533           m\_Z.applyOnTheLeft(k+1,k,G.adjoint());}
+\DoxyCodeLine{534         m\_T.coeffRef(k+1,k) = Scalar(0.0);}
+\DoxyCodeLine{535 }
+\DoxyCodeLine{536         \textcolor{comment}{// update x,y,z}}
+\DoxyCodeLine{537         x = m\_S.coeff(k+1,k);}
+\DoxyCodeLine{538         y = m\_S.coeff(k+2,k);}
+\DoxyCodeLine{539         \textcolor{keywordflow}{if} (k < l-\/2)}
+\DoxyCodeLine{540           z = m\_S.coeff(k+3,k);}
+\DoxyCodeLine{541       \} \textcolor{comment}{// loop over k}}
+\DoxyCodeLine{542 }
+\DoxyCodeLine{543       \textcolor{comment}{// Q\_\{n-\/1\} to annihilate y = S(l,l-\/2)}}
+\DoxyCodeLine{544       G.makeGivens(x,y);}
+\DoxyCodeLine{545       m\_S.applyOnTheLeft(l-\/1,l,G.adjoint());}
+\DoxyCodeLine{546       m\_T.applyOnTheLeft(l-\/1,l,G.adjoint());}
+\DoxyCodeLine{547       \textcolor{keywordflow}{if} (m\_computeQZ)}
+\DoxyCodeLine{548         m\_Q.applyOnTheRight(l-\/1,l,G);}
+\DoxyCodeLine{549       m\_S.coeffRef(l,l-\/2) = Scalar(0.0);}
+\DoxyCodeLine{550 }
+\DoxyCodeLine{551       \textcolor{comment}{// Z\_\{n-\/1\} to annihilate T(l,l-\/1)}}
+\DoxyCodeLine{552       G.makeGivens(m\_T.coeff(l,l),m\_T.coeff(l,l-\/1));}
+\DoxyCodeLine{553       m\_S.applyOnTheRight(l,l-\/1,G);}
+\DoxyCodeLine{554       m\_T.applyOnTheRight(l,l-\/1,G);}
+\DoxyCodeLine{555       \textcolor{keywordflow}{if} (m\_computeQZ)}
+\DoxyCodeLine{556         m\_Z.applyOnTheLeft(l,l-\/1,G.adjoint());}
+\DoxyCodeLine{557       m\_T.coeffRef(l,l-\/1) = Scalar(0.0);}
+\DoxyCodeLine{558     \}}
+\DoxyCodeLine{559 }
+\DoxyCodeLine{560   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{561     \mbox{\hyperlink{classEigen_1_1RealQZ}{RealQZ<MatrixType>}}\& \mbox{\hyperlink{classEigen_1_1RealQZ_a2b6847964d9f1903193cc3e67c196849}{RealQZ<MatrixType>::compute}}(\textcolor{keyword}{const} MatrixType\& A\_in, \textcolor{keyword}{const} MatrixType\& B\_in, \textcolor{keywordtype}{bool} computeQZ)}
+\DoxyCodeLine{562     \{}
+\DoxyCodeLine{563 }
+\DoxyCodeLine{564       \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1RealQZ_ab2c1b2ec46cea435743e30c4aa591f89}{Index}} dim = A\_in.cols();}
+\DoxyCodeLine{565 }
+\DoxyCodeLine{566       eigen\_assert (A\_in.rows()==dim \&\& A\_in.cols()==dim }
+\DoxyCodeLine{567           \&\& B\_in.rows()==dim \&\& B\_in.cols()==dim }
+\DoxyCodeLine{568           \&\& \textcolor{stringliteral}{"{}Need square matrices of the same dimension"{}});}
+\DoxyCodeLine{569 }
+\DoxyCodeLine{570       m\_isInitialized = \textcolor{keyword}{true};}
+\DoxyCodeLine{571       m\_computeQZ = computeQZ;}
+\DoxyCodeLine{572       m\_S = A\_in; m\_T = B\_in;}
+\DoxyCodeLine{573       m\_workspace.resize(dim*2);}
+\DoxyCodeLine{574       m\_global\_iter = 0;}
+\DoxyCodeLine{575 }
+\DoxyCodeLine{576       \textcolor{comment}{// entrance point: hessenberg triangular decomposition}}
+\DoxyCodeLine{577       hessenbergTriangular();}
+\DoxyCodeLine{578       \textcolor{comment}{// compute L1 vector norms of T, S into m\_normOfS, m\_normOfT}}
+\DoxyCodeLine{579       computeNorms();}
+\DoxyCodeLine{580 }
+\DoxyCodeLine{581       \mbox{\hyperlink{classEigen_1_1RealQZ_ab2c1b2ec46cea435743e30c4aa591f89}{Index}} l = dim-\/1, }
+\DoxyCodeLine{582             f, }
+\DoxyCodeLine{583             local\_iter = 0;}
+\DoxyCodeLine{584 }
+\DoxyCodeLine{585       \textcolor{keywordflow}{while} (l>0 \&\& local\_iter<m\_maxIters)}
+\DoxyCodeLine{586       \{}
+\DoxyCodeLine{587         f = findSmallSubdiagEntry(l);}
+\DoxyCodeLine{588         \textcolor{comment}{// now rows and columns f..l (including) decouple from the rest of the problem}}
+\DoxyCodeLine{589         \textcolor{keywordflow}{if} (f>0) m\_S.coeffRef(f,f-\/1) = Scalar(0.0);}
+\DoxyCodeLine{590         \textcolor{keywordflow}{if} (f == l) \textcolor{comment}{// One root found}}
+\DoxyCodeLine{591         \{}
+\DoxyCodeLine{592           l-\/-\/;}
+\DoxyCodeLine{593           local\_iter = 0;}
+\DoxyCodeLine{594         \}}
+\DoxyCodeLine{595         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (f == l-\/1) \textcolor{comment}{// Two roots found}}
+\DoxyCodeLine{596         \{}
+\DoxyCodeLine{597           splitOffTwoRows(f);}
+\DoxyCodeLine{598           l -\/= 2;}
+\DoxyCodeLine{599           local\_iter = 0;}
+\DoxyCodeLine{600         \}}
+\DoxyCodeLine{601         \textcolor{keywordflow}{else} \textcolor{comment}{// No convergence yet}}
+\DoxyCodeLine{602         \{}
+\DoxyCodeLine{603           \textcolor{comment}{// if there's zero on diagonal of T, we can isolate an eigenvalue with Givens rotations}}
+\DoxyCodeLine{604           \mbox{\hyperlink{classEigen_1_1RealQZ_ab2c1b2ec46cea435743e30c4aa591f89}{Index}} z = findSmallDiagEntry(f,l);}
+\DoxyCodeLine{605           \textcolor{keywordflow}{if} (z>=f)}
+\DoxyCodeLine{606           \{}
+\DoxyCodeLine{607             \textcolor{comment}{// zero found}}
+\DoxyCodeLine{608             pushDownZero(z,f,l);}
+\DoxyCodeLine{609           \}}
+\DoxyCodeLine{610           \textcolor{keywordflow}{else}}
+\DoxyCodeLine{611           \{}
+\DoxyCodeLine{612             \textcolor{comment}{// We are sure now that S.block(f,f, l-\/f+1,l-\/f+1) is underuced upper-\/Hessenberg }}
+\DoxyCodeLine{613             \textcolor{comment}{// and T.block(f,f, l-\/f+1,l-\/f+1) is invertible uper-\/triangular, which allows to}}
+\DoxyCodeLine{614             \textcolor{comment}{// apply a QR-\/like iteration to rows and columns f..l.}}
+\DoxyCodeLine{615             step(f,l, local\_iter);}
+\DoxyCodeLine{616             local\_iter++;}
+\DoxyCodeLine{617             m\_global\_iter++;}
+\DoxyCodeLine{618           \}}
+\DoxyCodeLine{619         \}}
+\DoxyCodeLine{620       \}}
+\DoxyCodeLine{621       \textcolor{comment}{// check if we converged before reaching iterations limit}}
+\DoxyCodeLine{622       m\_info = (local\_iter<m\_maxIters) ? \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}} : \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea6a68dfb88a8336108a30588bdf356c57}{NoConvergence}};}
+\DoxyCodeLine{623 }
+\DoxyCodeLine{624       \textcolor{comment}{// For each non triangular 2x2 diagonal block of S,}}
+\DoxyCodeLine{625       \textcolor{comment}{//    reduce the respective 2x2 diagonal block of T to positive diagonal form using 2x2 SVD.}}
+\DoxyCodeLine{626       \textcolor{comment}{// This step is not mandatory for QZ, but it does help further extraction of eigenvalues/eigenvectors,}}
+\DoxyCodeLine{627       \textcolor{comment}{// and is in par with Lapack/Matlab QZ.}}
+\DoxyCodeLine{628       \textcolor{keywordflow}{if}(m\_info==\mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}})}
+\DoxyCodeLine{629       \{}
+\DoxyCodeLine{630         \textcolor{keywordflow}{for}(\mbox{\hyperlink{classEigen_1_1RealQZ_ab2c1b2ec46cea435743e30c4aa591f89}{Index}} i=0; i<dim-\/1; ++i)}
+\DoxyCodeLine{631         \{}
+\DoxyCodeLine{632           \textcolor{keywordflow}{if}(m\_S.coeff(i+1, i) != Scalar(0))}
+\DoxyCodeLine{633           \{}
+\DoxyCodeLine{634             \mbox{\hyperlink{classEigen_1_1JacobiRotation}{JacobiRotation<Scalar>}} j\_left, j\_right;}
+\DoxyCodeLine{635             internal::real\_2x2\_jacobi\_svd(m\_T, i, i+1, \&j\_left, \&j\_right);}
+\DoxyCodeLine{636 }
+\DoxyCodeLine{637             \textcolor{comment}{// Apply resulting Jacobi rotations}}
+\DoxyCodeLine{638             m\_S.applyOnTheLeft(i,i+1,j\_left);}
+\DoxyCodeLine{639             m\_S.applyOnTheRight(i,i+1,j\_right);}
+\DoxyCodeLine{640             m\_T.applyOnTheLeft(i,i+1,j\_left);}
+\DoxyCodeLine{641             m\_T.applyOnTheRight(i,i+1,j\_right);}
+\DoxyCodeLine{642             m\_T(i+1,i) = m\_T(i,i+1) = Scalar(0);}
+\DoxyCodeLine{643 }
+\DoxyCodeLine{644             \textcolor{keywordflow}{if}(m\_computeQZ) \{}
+\DoxyCodeLine{645               m\_Q.applyOnTheRight(i,i+1,j\_left.\mbox{\hyperlink{classEigen_1_1JacobiRotation_a3ad513485f7426761ab80fc845f9946e}{transpose}}());}
+\DoxyCodeLine{646               m\_Z.applyOnTheLeft(i,i+1,j\_right.\mbox{\hyperlink{classEigen_1_1JacobiRotation_a3ad513485f7426761ab80fc845f9946e}{transpose}}());}
+\DoxyCodeLine{647             \}}
+\DoxyCodeLine{648 }
+\DoxyCodeLine{649             i++;}
+\DoxyCodeLine{650           \}}
+\DoxyCodeLine{651         \}}
+\DoxyCodeLine{652       \}}
+\DoxyCodeLine{653 }
+\DoxyCodeLine{654       \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{655     \} \textcolor{comment}{// end compute}}
+\DoxyCodeLine{656 }
+\DoxyCodeLine{657 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{658 }
+\DoxyCodeLine{659 \textcolor{preprocessor}{\#endif }\textcolor{comment}{//EIGEN\_REAL\_QZ}}
+
+\end{DoxyCode}

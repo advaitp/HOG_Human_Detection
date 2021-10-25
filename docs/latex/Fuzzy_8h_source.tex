@@ -1,0 +1,123 @@
+\hypertarget{Fuzzy_8h_source}{}\doxysection{Fuzzy.\+h}
+\label{Fuzzy_8h_source}\index{include/Eigen/src/Core/Fuzzy.h@{include/Eigen/src/Core/Fuzzy.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2006-\/2008 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_FUZZY\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_FUZZY\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{namespace }internal}
+\DoxyCodeLine{19 \{}
+\DoxyCodeLine{20 }
+\DoxyCodeLine{21 template<typename Derived, typename OtherDerived, bool is\_integer = NumTraits<typename Derived::Scalar>::IsInteger>}
+\DoxyCodeLine{22 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1isApprox__selector}{isApprox\_selector}}}
+\DoxyCodeLine{23 \{}
+\DoxyCodeLine{24   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{25   \textcolor{keyword}{static} \textcolor{keywordtype}{bool} run(\textcolor{keyword}{const} Derived\& x, \textcolor{keyword}{const} OtherDerived\& y, \textcolor{keyword}{const} \textcolor{keyword}{typename} Derived::RealScalar\& prec)}
+\DoxyCodeLine{26   \{}
+\DoxyCodeLine{27     \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::nested\_eval<Derived,2>::type}} nested(x);}
+\DoxyCodeLine{28     \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::nested\_eval<OtherDerived,2>::type}} otherNested(y);}
+\DoxyCodeLine{29     \textcolor{keywordflow}{return} (nested -\/ otherNested).cwiseAbs2().sum() <= prec * prec * numext::mini(nested.cwiseAbs2().sum(), otherNested.cwiseAbs2().sum());}
+\DoxyCodeLine{30   \}}
+\DoxyCodeLine{31 \};}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived, \textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{34 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1isApprox__selector}{isApprox\_selector}}<Derived, OtherDerived, true>}
+\DoxyCodeLine{35 \{}
+\DoxyCodeLine{36   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{37   \textcolor{keyword}{static} \textcolor{keywordtype}{bool} run(\textcolor{keyword}{const} Derived\& x, \textcolor{keyword}{const} OtherDerived\& y, \textcolor{keyword}{const} \textcolor{keyword}{typename} Derived::RealScalar\&)}
+\DoxyCodeLine{38   \{}
+\DoxyCodeLine{39     \textcolor{keywordflow}{return} x.matrix() == y.matrix();}
+\DoxyCodeLine{40   \}}
+\DoxyCodeLine{41 \};}
+\DoxyCodeLine{42 }
+\DoxyCodeLine{43 template<typename Derived, typename OtherDerived, bool is\_integer = NumTraits<typename Derived::Scalar>::IsInteger>}
+\DoxyCodeLine{44 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1isMuchSmallerThan__object__selector}{isMuchSmallerThan\_object\_selector}}}
+\DoxyCodeLine{45 \{}
+\DoxyCodeLine{46   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{47   \textcolor{keyword}{static} \textcolor{keywordtype}{bool} run(\textcolor{keyword}{const} Derived\& x, \textcolor{keyword}{const} OtherDerived\& y, \textcolor{keyword}{const} \textcolor{keyword}{typename} Derived::RealScalar\& prec)}
+\DoxyCodeLine{48   \{}
+\DoxyCodeLine{49     \textcolor{keywordflow}{return} x.cwiseAbs2().sum() <= numext::abs2(prec) * y.cwiseAbs2().sum();}
+\DoxyCodeLine{50   \}}
+\DoxyCodeLine{51 \};}
+\DoxyCodeLine{52 }
+\DoxyCodeLine{53 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived, \textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{54 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1isMuchSmallerThan__object__selector}{isMuchSmallerThan\_object\_selector}}<Derived, OtherDerived, true>}
+\DoxyCodeLine{55 \{}
+\DoxyCodeLine{56   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{57   \textcolor{keyword}{static} \textcolor{keywordtype}{bool} run(\textcolor{keyword}{const} Derived\& x, \textcolor{keyword}{const} OtherDerived\&, \textcolor{keyword}{const} \textcolor{keyword}{typename} Derived::RealScalar\&)}
+\DoxyCodeLine{58   \{}
+\DoxyCodeLine{59     \textcolor{keywordflow}{return} x.matrix() == Derived::Zero(x.rows(), x.cols()).matrix();}
+\DoxyCodeLine{60   \}}
+\DoxyCodeLine{61 \};}
+\DoxyCodeLine{62 }
+\DoxyCodeLine{63 template<typename Derived, bool is\_integer = NumTraits<typename Derived::Scalar>::IsInteger>}
+\DoxyCodeLine{64 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1isMuchSmallerThan__scalar__selector}{isMuchSmallerThan\_scalar\_selector}}}
+\DoxyCodeLine{65 \{}
+\DoxyCodeLine{66   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{67   \textcolor{keyword}{static} \textcolor{keywordtype}{bool} run(\textcolor{keyword}{const} Derived\& x, \textcolor{keyword}{const} \textcolor{keyword}{typename} Derived::RealScalar\& y, \textcolor{keyword}{const} \textcolor{keyword}{typename} Derived::RealScalar\& prec)}
+\DoxyCodeLine{68   \{}
+\DoxyCodeLine{69     \textcolor{keywordflow}{return} x.cwiseAbs2().sum() <= numext::abs2(prec * y);}
+\DoxyCodeLine{70   \}}
+\DoxyCodeLine{71 \};}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{74 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1isMuchSmallerThan__scalar__selector}{isMuchSmallerThan\_scalar\_selector}}<Derived, true>}
+\DoxyCodeLine{75 \{}
+\DoxyCodeLine{76   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{77   \textcolor{keyword}{static} \textcolor{keywordtype}{bool} run(\textcolor{keyword}{const} Derived\& x, \textcolor{keyword}{const} \textcolor{keyword}{typename} Derived::RealScalar\&, \textcolor{keyword}{const} \textcolor{keyword}{typename} Derived::RealScalar\&)}
+\DoxyCodeLine{78   \{}
+\DoxyCodeLine{79     \textcolor{keywordflow}{return} x.matrix() == Derived::Zero(x.rows(), x.cols()).matrix();}
+\DoxyCodeLine{80   \}}
+\DoxyCodeLine{81 \};}
+\DoxyCodeLine{82 }
+\DoxyCodeLine{83 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{84 }
+\DoxyCodeLine{85 }
+\DoxyCodeLine{103 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{104 \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{105 EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{bool} \mbox{\hyperlink{classEigen_1_1DenseBase_af3793521d788a946cb9c5f4f92bab4d3}{DenseBase<Derived>::isApprox}}(}
+\DoxyCodeLine{106   \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1DenseBase}{DenseBase<OtherDerived>}}\& other,}
+\DoxyCodeLine{107   \textcolor{keyword}{const} RealScalar\& prec}
+\DoxyCodeLine{108 )\textcolor{keyword}{ const}}
+\DoxyCodeLine{109 \textcolor{keyword}{}\{}
+\DoxyCodeLine{110   \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1isApprox__selector}{internal::isApprox\_selector<Derived, OtherDerived>::run}}(derived(), other.derived(), prec);}
+\DoxyCodeLine{111 \}}
+\DoxyCodeLine{112 }
+\DoxyCodeLine{126 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{127 EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{bool} \mbox{\hyperlink{classEigen_1_1DenseBase}{DenseBase<Derived>::isMuchSmallerThan}}(}
+\DoxyCodeLine{128   \textcolor{keyword}{const} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}}\& other,}
+\DoxyCodeLine{129   \textcolor{keyword}{const} RealScalar\& prec}
+\DoxyCodeLine{130 )\textcolor{keyword}{ const}}
+\DoxyCodeLine{131 \textcolor{keyword}{}\{}
+\DoxyCodeLine{132   \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1isMuchSmallerThan__scalar__selector}{internal::isMuchSmallerThan\_scalar\_selector<Derived>::run}}(derived(), other, prec);}
+\DoxyCodeLine{133 \}}
+\DoxyCodeLine{134 }
+\DoxyCodeLine{145 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{146 \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{147 EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{bool} \mbox{\hyperlink{classEigen_1_1DenseBase}{DenseBase<Derived>::isMuchSmallerThan}}(}
+\DoxyCodeLine{148   \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1DenseBase}{DenseBase<OtherDerived>}}\& other,}
+\DoxyCodeLine{149   \textcolor{keyword}{const} RealScalar\& prec}
+\DoxyCodeLine{150 )\textcolor{keyword}{ const}}
+\DoxyCodeLine{151 \textcolor{keyword}{}\{}
+\DoxyCodeLine{152   \textcolor{keywordflow}{return} \mbox{\hyperlink{structEigen_1_1internal_1_1isMuchSmallerThan__object__selector}{internal::isMuchSmallerThan\_object\_selector<Derived, OtherDerived>::run}}(derived(), other.derived(), prec);}
+\DoxyCodeLine{153 \}}
+\DoxyCodeLine{154 }
+\DoxyCodeLine{155 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{156 }
+\DoxyCodeLine{157 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_FUZZY\_H}}
+
+\end{DoxyCode}

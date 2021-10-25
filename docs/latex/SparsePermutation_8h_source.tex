@@ -1,0 +1,178 @@
+\hypertarget{SparsePermutation_8h_source}{}\doxysection{Sparse\+Permutation.\+h}
+\label{SparsePermutation_8h_source}\index{include/Eigen/src/SparseCore/SparsePermutation.h@{include/Eigen/src/SparseCore/SparsePermutation.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2012 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_SPARSE\_PERMUTATION\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_SPARSE\_PERMUTATION\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{comment}{// This file implements sparse * permutation products}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{20 }
+\DoxyCodeLine{21 \textcolor{keyword}{template}<\textcolor{keyword}{typename} ExpressionType, \textcolor{keywordtype}{int} S\textcolor{keywordtype}{id}e, \textcolor{keywordtype}{bool} Transposed>}
+\DoxyCodeLine{22 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1permutation__matrix__product}{permutation\_matrix\_product}}<ExpressionType, Side, Transposed, \mbox{\hyperlink{structEigen_1_1SparseShape}{SparseShape}}>}
+\DoxyCodeLine{23 \{}
+\DoxyCodeLine{24     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{nested\_eval<ExpressionType, 1>::type}} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{MatrixType}};}
+\DoxyCodeLine{25     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<MatrixType>::type MatrixTypeCleaned;}
+\DoxyCodeLine{26 }
+\DoxyCodeLine{27     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixTypeCleaned::Scalar Scalar;}
+\DoxyCodeLine{28     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixTypeCleaned::StorageIndex StorageIndex;}
+\DoxyCodeLine{29 }
+\DoxyCodeLine{30     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{31       SrcStorageOrder = MatrixTypeCleaned::Flags\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}} ? \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}} : \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}},}
+\DoxyCodeLine{32       MoveOuter = SrcStorageOrder==\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}} ? Side==\mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba21b30a61e9cb10c967aec17567804007}{OnTheLeft}} : Side==\mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba329fc3a54ceb2b6e0e73b400998b8a82}{OnTheRight}}}
+\DoxyCodeLine{33     \};}
+\DoxyCodeLine{34     }
+\DoxyCodeLine{35     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1conditional}{internal::conditional}}<MoveOuter,}
+\DoxyCodeLine{36         \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<Scalar,SrcStorageOrder,StorageIndex>}},}
+\DoxyCodeLine{37         \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix}}<Scalar,int(SrcStorageOrder)==\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}}?\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}:\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}},StorageIndex> >::type \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{ReturnType}};}
+\DoxyCodeLine{38 }
+\DoxyCodeLine{39     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest,\textcolor{keyword}{typename} PermutationType>}
+\DoxyCodeLine{40     \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{void} run(Dest\& dst, \textcolor{keyword}{const} PermutationType\& perm, \textcolor{keyword}{const} ExpressionType\& xpr)}
+\DoxyCodeLine{41     \{}
+\DoxyCodeLine{42       \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{MatrixType}} mat(xpr);}
+\DoxyCodeLine{43       \textcolor{keywordflow}{if}(MoveOuter)}
+\DoxyCodeLine{44       \{}
+\DoxyCodeLine{45         \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<Scalar,SrcStorageOrder,StorageIndex>}} tmp(mat.rows(), mat.cols());}
+\DoxyCodeLine{46         \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<StorageIndex,Dynamic,1>}} sizes(mat.outerSize());}
+\DoxyCodeLine{47         \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j=0; j<mat.outerSize(); ++j)}
+\DoxyCodeLine{48         \{}
+\DoxyCodeLine{49           \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} jp = perm.indices().coeff(j);}
+\DoxyCodeLine{50           sizes[((Side==\mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba21b30a61e9cb10c967aec17567804007}{OnTheLeft}}) \string^ Transposed) ? jp : j] = StorageIndex(mat.innerVector(((Side==\mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba329fc3a54ceb2b6e0e73b400998b8a82}{OnTheRight}}) \string^ Transposed) ? jp : j).nonZeros());}
+\DoxyCodeLine{51         \}}
+\DoxyCodeLine{52         tmp.\mbox{\hyperlink{classEigen_1_1SparseMatrix_ad9e36e669468663012b77bf1bff8cc4f}{reserve}}(sizes);}
+\DoxyCodeLine{53         \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j=0; j<mat.outerSize(); ++j)}
+\DoxyCodeLine{54         \{}
+\DoxyCodeLine{55           \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} jp = perm.indices().coeff(j);}
+\DoxyCodeLine{56           \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} jsrc = ((Side==\mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba329fc3a54ceb2b6e0e73b400998b8a82}{OnTheRight}}) \string^ Transposed) ? jp : j;}
+\DoxyCodeLine{57           \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} jdst = ((Side==\mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba21b30a61e9cb10c967aec17567804007}{OnTheLeft}}) \string^ Transposed) ? jp : j;}
+\DoxyCodeLine{58           \textcolor{keywordflow}{for}(\textcolor{keyword}{typename} MatrixTypeCleaned::InnerIterator it(mat,jsrc); it; ++it)}
+\DoxyCodeLine{59             tmp.insertByOuterInner(jdst,it.index()) = it.value();}
+\DoxyCodeLine{60         \}}
+\DoxyCodeLine{61         dst = tmp;}
+\DoxyCodeLine{62       \}}
+\DoxyCodeLine{63       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{64       \{}
+\DoxyCodeLine{65         \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix}}<Scalar,int(SrcStorageOrder)==\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}}?\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}:\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}},StorageIndex> tmp(mat.rows(), mat.cols());}
+\DoxyCodeLine{66         \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<StorageIndex,Dynamic,1>}} sizes(tmp.outerSize());}
+\DoxyCodeLine{67         sizes.\mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac21ad5f989f320e46958b75ac8d9a1da}{setZero}}();}
+\DoxyCodeLine{68         \mbox{\hyperlink{classEigen_1_1PermutationMatrix}{PermutationMatrix<Dynamic,Dynamic,StorageIndex>}} perm\_cpy;}
+\DoxyCodeLine{69         \textcolor{keywordflow}{if}((Side==\mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba21b30a61e9cb10c967aec17567804007}{OnTheLeft}}) \string^ Transposed)}
+\DoxyCodeLine{70           perm\_cpy = perm;}
+\DoxyCodeLine{71         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{72           perm\_cpy = perm.\mbox{\hyperlink{classEigen_1_1PermutationBase_a05805e9f4182eec3f6632e1c765b5ffe}{transpose}}();}
+\DoxyCodeLine{73 }
+\DoxyCodeLine{74         \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j=0; j<mat.outerSize(); ++j)}
+\DoxyCodeLine{75           \textcolor{keywordflow}{for}(\textcolor{keyword}{typename} MatrixTypeCleaned::InnerIterator it(mat,j); it; ++it)}
+\DoxyCodeLine{76             sizes[perm\_cpy.\mbox{\hyperlink{classEigen_1_1PermutationMatrix_add5183846b9d0b236291b75d3d1a36d9}{indices}}().coeff(it.index())]++;}
+\DoxyCodeLine{77         tmp.reserve(sizes);}
+\DoxyCodeLine{78         \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j=0; j<mat.outerSize(); ++j)}
+\DoxyCodeLine{79           \textcolor{keywordflow}{for}(\textcolor{keyword}{typename} MatrixTypeCleaned::InnerIterator it(mat,j); it; ++it)}
+\DoxyCodeLine{80             tmp.insertByOuterInner(perm\_cpy.\mbox{\hyperlink{classEigen_1_1PermutationMatrix_add5183846b9d0b236291b75d3d1a36d9}{indices}}().coeff(it.index()),j) = it.value();}
+\DoxyCodeLine{81         dst = tmp;}
+\DoxyCodeLine{82       \}}
+\DoxyCodeLine{83     \}}
+\DoxyCodeLine{84 \};}
+\DoxyCodeLine{85 }
+\DoxyCodeLine{86 \}}
+\DoxyCodeLine{87 }
+\DoxyCodeLine{88 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{89 }
+\DoxyCodeLine{90 \textcolor{keyword}{template} <\textcolor{keywordtype}{int} ProductTag> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1product__promote__storage__type}{product\_promote\_storage\_type}}<\mbox{\hyperlink{structEigen_1_1Sparse}{Sparse}},             \mbox{\hyperlink{structEigen_1_1PermutationStorage}{PermutationStorage}}, ProductTag> \{ \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1Sparse}{Sparse}} \mbox{\hyperlink{structEigen_1_1Sparse}{ret}}; \};}
+\DoxyCodeLine{91 \textcolor{keyword}{template} <\textcolor{keywordtype}{int} ProductTag> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1product__promote__storage__type}{product\_promote\_storage\_type}}<\mbox{\hyperlink{structEigen_1_1PermutationStorage}{PermutationStorage}}, \mbox{\hyperlink{structEigen_1_1Sparse}{Sparse}},             ProductTag> \{ \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1Sparse}{Sparse}} \mbox{\hyperlink{structEigen_1_1Sparse}{ret}}; \};}
+\DoxyCodeLine{92 }
+\DoxyCodeLine{93 \textcolor{comment}{// TODO, the following two overloads are only needed to define the right temporary type through }}
+\DoxyCodeLine{94 \textcolor{comment}{// typename traits<permutation\_sparse\_matrix\_product<Rhs,Lhs,OnTheRight,false> >::ReturnType}}
+\DoxyCodeLine{95 \textcolor{comment}{// whereas it should be correctly handled by traits<Product<> >::PlainObject}}
+\DoxyCodeLine{96 }
+\DoxyCodeLine{97 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} ProductTag>}
+\DoxyCodeLine{98 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1product__evaluator}{product\_evaluator}}<\mbox{\hyperlink{classEigen_1_1Product}{Product}}<Lhs, Rhs, AliasFreeProduct>, ProductTag, \mbox{\hyperlink{structEigen_1_1PermutationShape}{PermutationShape}}, \mbox{\hyperlink{structEigen_1_1SparseShape}{SparseShape}}>}
+\DoxyCodeLine{99   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<typename permutation\_matrix\_product<Rhs,OnTheLeft,false,SparseShape>::ReturnType>}
+\DoxyCodeLine{100 \{}
+\DoxyCodeLine{101   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs, Rhs, AliasFreeProduct>}} \mbox{\hyperlink{classEigen_1_1Product}{XprType}};}
+\DoxyCodeLine{102   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1permutation__matrix__product}{permutation\_matrix\_product<Rhs,OnTheLeft,false,SparseShape>::ReturnType}} PlainObject;}
+\DoxyCodeLine{103   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<PlainObject>}} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}};}
+\DoxyCodeLine{104 }
+\DoxyCodeLine{105   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{106     Flags = Base::Flags | \mbox{\hyperlink{group__flags_gaa34e83bae46a8eeae4e69ebe3aaecbed}{EvalBeforeNestingBit}}}
+\DoxyCodeLine{107   \};}
+\DoxyCodeLine{108 }
+\DoxyCodeLine{109   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1product__evaluator}{product\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Product}{XprType}}\& xpr)}
+\DoxyCodeLine{110     : m\_result(xpr.rows(), xpr.cols())}
+\DoxyCodeLine{111   \{}
+\DoxyCodeLine{112     ::new (\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})) \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}(m\_result);}
+\DoxyCodeLine{113     \mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl<Lhs, Rhs, PermutationShape, SparseShape, ProductTag>::evalTo}}(m\_result, xpr.lhs(), xpr.rhs());}
+\DoxyCodeLine{114   \}}
+\DoxyCodeLine{115 }
+\DoxyCodeLine{116 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{117   PlainObject m\_result;}
+\DoxyCodeLine{118 \};}
+\DoxyCodeLine{119 }
+\DoxyCodeLine{120 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{int} ProductTag>}
+\DoxyCodeLine{121 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1product__evaluator}{product\_evaluator}}<\mbox{\hyperlink{classEigen_1_1Product}{Product}}<Lhs, Rhs, AliasFreeProduct>, ProductTag, \mbox{\hyperlink{structEigen_1_1SparseShape}{SparseShape}}, \mbox{\hyperlink{structEigen_1_1PermutationShape}{PermutationShape}} >}
+\DoxyCodeLine{122   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<typename permutation\_matrix\_product<Lhs,OnTheRight,false,SparseShape>::ReturnType>}
+\DoxyCodeLine{123 \{}
+\DoxyCodeLine{124   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs, Rhs, AliasFreeProduct>}} \mbox{\hyperlink{classEigen_1_1Product}{XprType}};}
+\DoxyCodeLine{125   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1permutation__matrix__product}{permutation\_matrix\_product<Lhs,OnTheRight,false,SparseShape>::ReturnType}} PlainObject;}
+\DoxyCodeLine{126   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<PlainObject>}} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}};}
+\DoxyCodeLine{127 }
+\DoxyCodeLine{128   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{129     Flags = Base::Flags | \mbox{\hyperlink{group__flags_gaa34e83bae46a8eeae4e69ebe3aaecbed}{EvalBeforeNestingBit}}}
+\DoxyCodeLine{130   \};}
+\DoxyCodeLine{131 }
+\DoxyCodeLine{132   \textcolor{keyword}{explicit} \mbox{\hyperlink{structEigen_1_1internal_1_1product__evaluator}{product\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Product}{XprType}}\& xpr)}
+\DoxyCodeLine{133     : m\_result(xpr.rows(), xpr.cols())}
+\DoxyCodeLine{134   \{}
+\DoxyCodeLine{135     ::new (\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})) \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}(m\_result);}
+\DoxyCodeLine{136     \mbox{\hyperlink{structEigen_1_1internal_1_1generic__product__impl}{generic\_product\_impl<Lhs, Rhs, SparseShape, PermutationShape, ProductTag>::evalTo}}(m\_result, xpr.lhs(), xpr.rhs());}
+\DoxyCodeLine{137   \}}
+\DoxyCodeLine{138 }
+\DoxyCodeLine{139 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{140   PlainObject m\_result;}
+\DoxyCodeLine{141 \};}
+\DoxyCodeLine{142 }
+\DoxyCodeLine{143 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{144 }
+\DoxyCodeLine{147 \textcolor{keyword}{template}<\textcolor{keyword}{typename} SparseDerived, \textcolor{keyword}{typename} PermDerived>}
+\DoxyCodeLine{148 \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Product}{Product<SparseDerived, PermDerived, AliasFreeProduct>}}}
+\DoxyCodeLine{149 \mbox{\hyperlink{namespaceEigen_a32970f7eb62fe31eeefee72d24a046d0}{operator*}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{SparseMatrixBase<SparseDerived>}}\& matrix, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1PermutationBase}{PermutationBase<PermDerived>}}\& perm)}
+\DoxyCodeLine{150 \{ \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Product}{Product<SparseDerived, PermDerived, AliasFreeProduct>}}(matrix.derived(), perm.\mbox{\hyperlink{classEigen_1_1PermutationBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}()); \}}
+\DoxyCodeLine{151 }
+\DoxyCodeLine{154 \textcolor{keyword}{template}<\textcolor{keyword}{typename} SparseDerived, \textcolor{keyword}{typename} PermDerived>}
+\DoxyCodeLine{155 \textcolor{keyword}{inline} \textcolor{keyword}{const} Product<PermDerived, SparseDerived, AliasFreeProduct>}
+\DoxyCodeLine{156 \mbox{\hyperlink{namespaceEigen_a32970f7eb62fe31eeefee72d24a046d0}{operator*}}( \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1PermutationBase}{PermutationBase<PermDerived>}}\& perm, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{SparseMatrixBase<SparseDerived>}}\& matrix)}
+\DoxyCodeLine{157 \{ \textcolor{keywordflow}{return}  \mbox{\hyperlink{classEigen_1_1Product}{Product<PermDerived, SparseDerived, AliasFreeProduct>}}(perm.\mbox{\hyperlink{classEigen_1_1PermutationBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}(), matrix.derived()); \}}
+\DoxyCodeLine{158 }
+\DoxyCodeLine{159 }
+\DoxyCodeLine{162 \textcolor{keyword}{template}<\textcolor{keyword}{typename} SparseDerived, \textcolor{keyword}{typename} PermutationType>}
+\DoxyCodeLine{163 \textcolor{keyword}{inline} \textcolor{keyword}{const} Product<SparseDerived, Inverse<PermutationType>, AliasFreeProduct>}
+\DoxyCodeLine{164 \mbox{\hyperlink{namespaceEigen_a32970f7eb62fe31eeefee72d24a046d0}{operator*}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{SparseMatrixBase<SparseDerived>}}\& matrix, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1InverseImpl_3_01PermutationType_00_01PermutationStorage_01_4}{InverseImpl<PermutationType, PermutationStorage>}}\& tperm)}
+\DoxyCodeLine{165 \{}
+\DoxyCodeLine{166   \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Product}{Product<SparseDerived, Inverse<PermutationType>}}, AliasFreeProduct>(matrix.derived(), tperm.\mbox{\hyperlink{structEigen_1_1EigenBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}());}
+\DoxyCodeLine{167 \}}
+\DoxyCodeLine{168 }
+\DoxyCodeLine{171 \textcolor{keyword}{template}<\textcolor{keyword}{typename} SparseDerived, \textcolor{keyword}{typename} PermutationType>}
+\DoxyCodeLine{172 \textcolor{keyword}{inline} \textcolor{keyword}{const} Product<Inverse<PermutationType>, SparseDerived, AliasFreeProduct>}
+\DoxyCodeLine{173 \mbox{\hyperlink{namespaceEigen_a32970f7eb62fe31eeefee72d24a046d0}{operator*}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1InverseImpl_3_01PermutationType_00_01PermutationStorage_01_4}{InverseImpl<PermutationType,PermutationStorage>}}\& tperm, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{SparseMatrixBase<SparseDerived>}}\& matrix)}
+\DoxyCodeLine{174 \{}
+\DoxyCodeLine{175   \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Product}{Product<Inverse<PermutationType>}}, SparseDerived, AliasFreeProduct>(tperm.\mbox{\hyperlink{structEigen_1_1EigenBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}(), matrix.derived());}
+\DoxyCodeLine{176 \}}
+\DoxyCodeLine{177 }
+\DoxyCodeLine{178 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{179 }
+\DoxyCodeLine{180 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_SPARSE\_SELFADJOINTVIEW\_H}}
+
+\end{DoxyCode}

@@ -1,0 +1,434 @@
+\hypertarget{EigenSolver_8h_source}{}\doxysection{Eigen\+Solver.\+h}
+\label{EigenSolver_8h_source}\index{include/Eigen/src/Eigenvalues/EigenSolver.h@{include/Eigen/src/Eigenvalues/EigenSolver.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2010,2012 Jitse Niesen <jitse@maths.leeds.ac.uk>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_EIGENSOLVER\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_EIGENSOLVER\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}./RealSchur.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{19 }
+\DoxyCodeLine{66 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1EigenSolver}{EigenSolver}}}
+\DoxyCodeLine{67 \{}
+\DoxyCodeLine{68   \textcolor{keyword}{public}:}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{71     \textcolor{keyword}{typedef} MatrixType\_ \mbox{\hyperlink{classEigen_1_1EigenSolver_af54c1d4e3e7faec5c1550056b7549fb7}{MatrixType}};}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{74       RowsAtCompileTime = MatrixType::RowsAtCompileTime,}
+\DoxyCodeLine{75       ColsAtCompileTime = MatrixType::ColsAtCompileTime,}
+\DoxyCodeLine{76       Options = MatrixType::Options,}
+\DoxyCodeLine{77       MaxRowsAtCompileTime = MatrixType::MaxRowsAtCompileTime,}
+\DoxyCodeLine{78       MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime}
+\DoxyCodeLine{79     \};}
+\DoxyCodeLine{80 }
+\DoxyCodeLine{82     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar \mbox{\hyperlink{classEigen_1_1EigenSolver_a066f584d04b0b8ef1411e3eea9cda7f2}{Scalar}};}
+\DoxyCodeLine{83     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}} RealScalar;}
+\DoxyCodeLine{84     \textcolor{keyword}{typedef} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Eigen::Index}} \mbox{\hyperlink{classEigen_1_1EigenSolver_a9d3d4fb53bbfeb9e96e0f150471a0e81}{Index}}; }
+\DoxyCodeLine{85 }
+\DoxyCodeLine{92     \textcolor{keyword}{typedef} std::complex<RealScalar> \mbox{\hyperlink{classEigen_1_1EigenSolver_a789af79c9427e6617fa8cbd96a6a258e}{ComplexScalar}};}
+\DoxyCodeLine{93 }
+\DoxyCodeLine{99     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<ComplexScalar, ColsAtCompileTime, 1, Options \& \string~RowMajor, MaxColsAtCompileTime, 1>}} \mbox{\hyperlink{classEigen_1_1EigenSolver_a97733b9f7b4a2cc4496d4066e320c50c}{EigenvalueType}};}
+\DoxyCodeLine{100 }
+\DoxyCodeLine{106     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<ComplexScalar, RowsAtCompileTime, ColsAtCompileTime, Options, MaxRowsAtCompileTime, MaxColsAtCompileTime>}} \mbox{\hyperlink{classEigen_1_1EigenSolver_ae1f52c25907e5f00abe236be002eeb89}{EigenvectorsType}};}
+\DoxyCodeLine{107 }
+\DoxyCodeLine{115     \mbox{\hyperlink{classEigen_1_1EigenSolver_a85cf52711e7100b01fda3e329eb86e5e}{EigenSolver}}() : m\_eivec(), m\_eivalues(), m\_isInitialized(false), m\_eigenvectorsOk(false), m\_realSchur(), m\_matT(), m\_tmp() \{\}}
+\DoxyCodeLine{116 }
+\DoxyCodeLine{123     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1EigenSolver_a311f148c5d12ecda1eec61e31ea8c3ed}{EigenSolver}}(\mbox{\hyperlink{classEigen_1_1EigenSolver_a9d3d4fb53bbfeb9e96e0f150471a0e81}{Index}} size)}
+\DoxyCodeLine{124       : m\_eivec(size, size),}
+\DoxyCodeLine{125         m\_eivalues(size),}
+\DoxyCodeLine{126         m\_isInitialized(false),}
+\DoxyCodeLine{127         m\_eigenvectorsOk(false),}
+\DoxyCodeLine{128         m\_realSchur(size),}
+\DoxyCodeLine{129         m\_matT(size, size), }
+\DoxyCodeLine{130         m\_tmp(size)}
+\DoxyCodeLine{131     \{\}}
+\DoxyCodeLine{132 }
+\DoxyCodeLine{148     \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputType>}
+\DoxyCodeLine{149     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1EigenSolver_a0ccaeb4f7d44c18af60a7b3a1dd91f7a}{EigenSolver}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<InputType>}}\& matrix, \textcolor{keywordtype}{bool} computeEigenvectors = \textcolor{keyword}{true})}
+\DoxyCodeLine{150       : m\_eivec(matrix.rows(), matrix.cols()),}
+\DoxyCodeLine{151         m\_eivalues(matrix.cols()),}
+\DoxyCodeLine{152         m\_isInitialized(false),}
+\DoxyCodeLine{153         m\_eigenvectorsOk(false),}
+\DoxyCodeLine{154         m\_realSchur(matrix.cols()),}
+\DoxyCodeLine{155         m\_matT(matrix.rows(), matrix.cols()), }
+\DoxyCodeLine{156         m\_tmp(matrix.cols())}
+\DoxyCodeLine{157     \{}
+\DoxyCodeLine{158       \mbox{\hyperlink{classEigen_1_1EigenSolver_ab75f76d53cdf0cf94bffa3a041b6a410}{compute}}(matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}(), computeEigenvectors);}
+\DoxyCodeLine{159     \}}
+\DoxyCodeLine{160 }
+\DoxyCodeLine{181     \mbox{\hyperlink{classEigen_1_1EigenSolver_ae1f52c25907e5f00abe236be002eeb89}{EigenvectorsType}} \mbox{\hyperlink{classEigen_1_1EigenSolver_a66288022802172e3ee059283b26201d7}{eigenvectors}}() \textcolor{keyword}{const};}
+\DoxyCodeLine{182 }
+\DoxyCodeLine{201     \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1EigenSolver_af54c1d4e3e7faec5c1550056b7549fb7}{MatrixType}}\& \mbox{\hyperlink{classEigen_1_1EigenSolver_ab5e03bbaeef37e48f8cf061a9c3cd6c0}{pseudoEigenvectors}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{202 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{203       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}EigenSolver is not initialized."{}});}
+\DoxyCodeLine{204       eigen\_assert(m\_eigenvectorsOk \&\& \textcolor{stringliteral}{"{}The eigenvectors have not been computed together with the eigenvalues."{}});}
+\DoxyCodeLine{205       \textcolor{keywordflow}{return} m\_eivec;}
+\DoxyCodeLine{206     \}}
+\DoxyCodeLine{207 }
+\DoxyCodeLine{226     \mbox{\hyperlink{classEigen_1_1EigenSolver_af54c1d4e3e7faec5c1550056b7549fb7}{MatrixType}} \mbox{\hyperlink{classEigen_1_1EigenSolver_a4979eafe0aeef06b19ada7fa5e19db17}{pseudoEigenvalueMatrix}}() \textcolor{keyword}{const};}
+\DoxyCodeLine{227 }
+\DoxyCodeLine{246     \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Matrix}{EigenvalueType}}\& \mbox{\hyperlink{classEigen_1_1EigenSolver_acde413bed622b0bfeb533737de32f0fb}{eigenvalues}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{247 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{248       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}EigenSolver is not initialized."{}});}
+\DoxyCodeLine{249       \textcolor{keywordflow}{return} m\_eivalues;}
+\DoxyCodeLine{250     \}}
+\DoxyCodeLine{251 }
+\DoxyCodeLine{279     \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputType>}
+\DoxyCodeLine{280     \mbox{\hyperlink{classEigen_1_1EigenSolver}{EigenSolver}}\& \mbox{\hyperlink{classEigen_1_1EigenSolver_ab75f76d53cdf0cf94bffa3a041b6a410}{compute}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<InputType>}}\& matrix, \textcolor{keywordtype}{bool} computeEigenvectors = \textcolor{keyword}{true});}
+\DoxyCodeLine{281 }
+\DoxyCodeLine{283     \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} \mbox{\hyperlink{classEigen_1_1EigenSolver_a5c28d646d456a22a2726f49e4e5e8536}{info}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{284 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{285       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}EigenSolver is not initialized."{}});}
+\DoxyCodeLine{286       \textcolor{keywordflow}{return} m\_info;}
+\DoxyCodeLine{287     \}}
+\DoxyCodeLine{288 }
+\DoxyCodeLine{290     \mbox{\hyperlink{classEigen_1_1EigenSolver}{EigenSolver}}\& \mbox{\hyperlink{classEigen_1_1EigenSolver_a941311df881c4fa1605bf7de05444bdf}{setMaxIterations}}(\mbox{\hyperlink{classEigen_1_1EigenSolver_a9d3d4fb53bbfeb9e96e0f150471a0e81}{Index}} maxIters)}
+\DoxyCodeLine{291     \{}
+\DoxyCodeLine{292       m\_realSchur.setMaxIterations(maxIters);}
+\DoxyCodeLine{293       \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{294     \}}
+\DoxyCodeLine{295 }
+\DoxyCodeLine{297     \mbox{\hyperlink{classEigen_1_1EigenSolver_a9d3d4fb53bbfeb9e96e0f150471a0e81}{Index}} \mbox{\hyperlink{classEigen_1_1EigenSolver_acfebb3f08831cb923511dad5a6e78401}{getMaxIterations}}()}
+\DoxyCodeLine{298     \{}
+\DoxyCodeLine{299       \textcolor{keywordflow}{return} m\_realSchur.getMaxIterations();}
+\DoxyCodeLine{300     \}}
+\DoxyCodeLine{301 }
+\DoxyCodeLine{302   \textcolor{keyword}{private}:}
+\DoxyCodeLine{303     \textcolor{keywordtype}{void} doComputeEigenvectors();}
+\DoxyCodeLine{304 }
+\DoxyCodeLine{305   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{306     }
+\DoxyCodeLine{307     \textcolor{keyword}{static} \textcolor{keywordtype}{void} check\_template\_parameters()}
+\DoxyCodeLine{308     \{}
+\DoxyCodeLine{309       EIGEN\_STATIC\_ASSERT\_NON\_INTEGER(\mbox{\hyperlink{classEigen_1_1EigenSolver_a066f584d04b0b8ef1411e3eea9cda7f2}{Scalar}});}
+\DoxyCodeLine{310       EIGEN\_STATIC\_ASSERT(!\mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::IsComplex}}, NUMERIC\_TYPE\_MUST\_BE\_REAL);}
+\DoxyCodeLine{311     \}}
+\DoxyCodeLine{312     }
+\DoxyCodeLine{313     \mbox{\hyperlink{classEigen_1_1EigenSolver_af54c1d4e3e7faec5c1550056b7549fb7}{MatrixType}} m\_eivec;}
+\DoxyCodeLine{314     \mbox{\hyperlink{classEigen_1_1EigenSolver_a97733b9f7b4a2cc4496d4066e320c50c}{EigenvalueType}} m\_eivalues;}
+\DoxyCodeLine{315     \textcolor{keywordtype}{bool} m\_isInitialized;}
+\DoxyCodeLine{316     \textcolor{keywordtype}{bool} m\_eigenvectorsOk;}
+\DoxyCodeLine{317     \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} m\_info;}
+\DoxyCodeLine{318     RealSchur<MatrixType> m\_realSchur;}
+\DoxyCodeLine{319     \mbox{\hyperlink{classEigen_1_1EigenSolver_af54c1d4e3e7faec5c1550056b7549fb7}{MatrixType}} m\_matT;}
+\DoxyCodeLine{320 }
+\DoxyCodeLine{321     \textcolor{keyword}{typedef} Matrix<Scalar, ColsAtCompileTime, 1, Options \& \string~RowMajor, MaxColsAtCompileTime, 1> ColumnVectorType;}
+\DoxyCodeLine{322     ColumnVectorType m\_tmp;}
+\DoxyCodeLine{323 \};}
+\DoxyCodeLine{324 }
+\DoxyCodeLine{325 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{326 \mbox{\hyperlink{classEigen_1_1EigenSolver_af54c1d4e3e7faec5c1550056b7549fb7}{MatrixType}} \mbox{\hyperlink{classEigen_1_1EigenSolver_a4979eafe0aeef06b19ada7fa5e19db17}{EigenSolver<MatrixType>::pseudoEigenvalueMatrix}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{327 \textcolor{keyword}{}\{}
+\DoxyCodeLine{328   eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}EigenSolver is not initialized."{}});}
+\DoxyCodeLine{329   \textcolor{keyword}{const} RealScalar precision = RealScalar(2)*\mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<RealScalar>::epsilon}}();}
+\DoxyCodeLine{330   \mbox{\hyperlink{classEigen_1_1EigenSolver_a9d3d4fb53bbfeb9e96e0f150471a0e81}{Index}} n = m\_eivalues.rows();}
+\DoxyCodeLine{331   \mbox{\hyperlink{classEigen_1_1EigenSolver_af54c1d4e3e7faec5c1550056b7549fb7}{MatrixType}} matD = MatrixType::Zero(n,n);}
+\DoxyCodeLine{332   \textcolor{keywordflow}{for} (\mbox{\hyperlink{classEigen_1_1EigenSolver_a9d3d4fb53bbfeb9e96e0f150471a0e81}{Index}} i=0; i<n; ++i)}
+\DoxyCodeLine{333   \{}
+\DoxyCodeLine{334     \textcolor{keywordflow}{if} (internal::isMuchSmallerThan(numext::imag(m\_eivalues.coeff(i)), numext::real(m\_eivalues.coeff(i)), precision))}
+\DoxyCodeLine{335       matD.coeffRef(i,i) = numext::real(m\_eivalues.coeff(i));}
+\DoxyCodeLine{336     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{337     \{}
+\DoxyCodeLine{338       matD.template block<2,2>(i,i) <<  numext::real(m\_eivalues.coeff(i)), numext::imag(m\_eivalues.coeff(i)),}
+\DoxyCodeLine{339                                        -\/numext::imag(m\_eivalues.coeff(i)), numext::real(m\_eivalues.coeff(i));}
+\DoxyCodeLine{340       ++i;}
+\DoxyCodeLine{341     \}}
+\DoxyCodeLine{342   \}}
+\DoxyCodeLine{343   \textcolor{keywordflow}{return} matD;}
+\DoxyCodeLine{344 \}}
+\DoxyCodeLine{345 }
+\DoxyCodeLine{346 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{347 \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Matrix}{EigenSolver<MatrixType>::EigenvectorsType}} \mbox{\hyperlink{classEigen_1_1EigenSolver_a66288022802172e3ee059283b26201d7}{EigenSolver<MatrixType>::eigenvectors}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{348 \textcolor{keyword}{}\{}
+\DoxyCodeLine{349   eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}EigenSolver is not initialized."{}});}
+\DoxyCodeLine{350   eigen\_assert(m\_eigenvectorsOk \&\& \textcolor{stringliteral}{"{}The eigenvectors have not been computed together with the eigenvalues."{}});}
+\DoxyCodeLine{351   \textcolor{keyword}{const} RealScalar precision = RealScalar(2)*\mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<RealScalar>::epsilon}}();}
+\DoxyCodeLine{352   \mbox{\hyperlink{classEigen_1_1EigenSolver_a9d3d4fb53bbfeb9e96e0f150471a0e81}{Index}} n = m\_eivec.cols();}
+\DoxyCodeLine{353   \mbox{\hyperlink{classEigen_1_1Matrix}{EigenvectorsType}} matV(n,n);}
+\DoxyCodeLine{354   \textcolor{keywordflow}{for} (\mbox{\hyperlink{classEigen_1_1EigenSolver_a9d3d4fb53bbfeb9e96e0f150471a0e81}{Index}} j=0; j<n; ++j)}
+\DoxyCodeLine{355   \{}
+\DoxyCodeLine{356     \textcolor{keywordflow}{if} (internal::isMuchSmallerThan(numext::imag(m\_eivalues.coeff(j)), numext::real(m\_eivalues.coeff(j)), precision) || j+1==n)}
+\DoxyCodeLine{357     \{}
+\DoxyCodeLine{358       \textcolor{comment}{// we have a real eigen value}}
+\DoxyCodeLine{359       matV.col(j) = m\_eivec.col(j).template cast<ComplexScalar>();}
+\DoxyCodeLine{360       matV.col(j).normalize();}
+\DoxyCodeLine{361     \}}
+\DoxyCodeLine{362     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{363     \{}
+\DoxyCodeLine{364       \textcolor{comment}{// we have a pair of complex eigen values}}
+\DoxyCodeLine{365       \textcolor{keywordflow}{for} (\mbox{\hyperlink{classEigen_1_1EigenSolver_a9d3d4fb53bbfeb9e96e0f150471a0e81}{Index}} i=0; i<n; ++i)}
+\DoxyCodeLine{366       \{}
+\DoxyCodeLine{367         matV.coeffRef(i,j)   = \mbox{\hyperlink{classEigen_1_1EigenSolver_a789af79c9427e6617fa8cbd96a6a258e}{ComplexScalar}}(m\_eivec.coeff(i,j),  m\_eivec.coeff(i,j+1));}
+\DoxyCodeLine{368         matV.coeffRef(i,j+1) = \mbox{\hyperlink{classEigen_1_1EigenSolver_a789af79c9427e6617fa8cbd96a6a258e}{ComplexScalar}}(m\_eivec.coeff(i,j), -\/m\_eivec.coeff(i,j+1));}
+\DoxyCodeLine{369       \}}
+\DoxyCodeLine{370       matV.col(j).normalize();}
+\DoxyCodeLine{371       matV.col(j+1).normalize();}
+\DoxyCodeLine{372       ++j;}
+\DoxyCodeLine{373     \}}
+\DoxyCodeLine{374   \}}
+\DoxyCodeLine{375   \textcolor{keywordflow}{return} matV;}
+\DoxyCodeLine{376 \}}
+\DoxyCodeLine{377 }
+\DoxyCodeLine{378 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{379 \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputType>}
+\DoxyCodeLine{380 \mbox{\hyperlink{classEigen_1_1EigenSolver}{EigenSolver<MatrixType>}}\& }
+\DoxyCodeLine{381 \mbox{\hyperlink{classEigen_1_1EigenSolver_ab75f76d53cdf0cf94bffa3a041b6a410}{EigenSolver<MatrixType>::compute}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<InputType>}}\& matrix, \textcolor{keywordtype}{bool} computeEigenvectors)}
+\DoxyCodeLine{382 \{}
+\DoxyCodeLine{383   check\_template\_parameters();}
+\DoxyCodeLine{384   }
+\DoxyCodeLine{385   \textcolor{keyword}{using} std::sqrt;}
+\DoxyCodeLine{386   \textcolor{keyword}{using} std::abs;}
+\DoxyCodeLine{387   \textcolor{keyword}{using} numext::isfinite;}
+\DoxyCodeLine{388   eigen\_assert(matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_a50c19c45f15acdfe1cb66ab5e879b8e3}{cols}}() == matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_af1d12fdb3361e150427e1fd94ebb1f14}{rows}}());}
+\DoxyCodeLine{389 }
+\DoxyCodeLine{390   \textcolor{comment}{// Reduce to real Schur form.}}
+\DoxyCodeLine{391   m\_realSchur.compute(matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}(), computeEigenvectors);}
+\DoxyCodeLine{392   }
+\DoxyCodeLine{393   m\_info = m\_realSchur.info();}
+\DoxyCodeLine{394 }
+\DoxyCodeLine{395   \textcolor{keywordflow}{if} (m\_info == \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}})}
+\DoxyCodeLine{396   \{}
+\DoxyCodeLine{397     m\_matT = m\_realSchur.matrixT();}
+\DoxyCodeLine{398     \textcolor{keywordflow}{if} (computeEigenvectors)}
+\DoxyCodeLine{399       m\_eivec = m\_realSchur.matrixU();}
+\DoxyCodeLine{400   }
+\DoxyCodeLine{401     \textcolor{comment}{// Compute eigenvalues from matT}}
+\DoxyCodeLine{402     m\_eivalues.resize(matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_a50c19c45f15acdfe1cb66ab5e879b8e3}{cols}}());}
+\DoxyCodeLine{403     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = 0;}
+\DoxyCodeLine{404     \textcolor{keywordflow}{while} (i < matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_a50c19c45f15acdfe1cb66ab5e879b8e3}{cols}}()) }
+\DoxyCodeLine{405     \{}
+\DoxyCodeLine{406       \textcolor{keywordflow}{if} (i == matrix.\mbox{\hyperlink{structEigen_1_1EigenBase_a50c19c45f15acdfe1cb66ab5e879b8e3}{cols}}() -\/ 1 || m\_matT.coeff(i+1, i) == Scalar(0)) }
+\DoxyCodeLine{407       \{}
+\DoxyCodeLine{408         m\_eivalues.coeffRef(i) = m\_matT.coeff(i, i);}
+\DoxyCodeLine{409         \textcolor{keywordflow}{if}(!(isfinite)(m\_eivalues.coeffRef(i)))}
+\DoxyCodeLine{410         \{}
+\DoxyCodeLine{411           m\_isInitialized = \textcolor{keyword}{true};}
+\DoxyCodeLine{412           m\_eigenvectorsOk = \textcolor{keyword}{false};}
+\DoxyCodeLine{413           m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea1c6e20706575a629b27a105f07f1883b}{NumericalIssue}};}
+\DoxyCodeLine{414           \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{415         \}}
+\DoxyCodeLine{416         ++i;}
+\DoxyCodeLine{417       \}}
+\DoxyCodeLine{418       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{419       \{}
+\DoxyCodeLine{420         Scalar p = Scalar(0.5) * (m\_matT.coeff(i, i) -\/ m\_matT.coeff(i+1, i+1));}
+\DoxyCodeLine{421         Scalar z;}
+\DoxyCodeLine{422         \textcolor{comment}{// Compute z = sqrt(abs(p * p + m\_matT.coeff(i+1, i) * m\_matT.coeff(i, i+1)));}}
+\DoxyCodeLine{423         \textcolor{comment}{// without overflow}}
+\DoxyCodeLine{424         \{}
+\DoxyCodeLine{425           Scalar t0 = m\_matT.coeff(i+1, i);}
+\DoxyCodeLine{426           Scalar t1 = m\_matT.coeff(i, i+1);}
+\DoxyCodeLine{427           Scalar maxval = numext::maxi<Scalar>(abs(p),numext::maxi<Scalar>(abs(t0),abs(t1)));}
+\DoxyCodeLine{428           t0 /= maxval;}
+\DoxyCodeLine{429           t1 /= maxval;}
+\DoxyCodeLine{430           Scalar p0 = p/maxval;}
+\DoxyCodeLine{431           z = maxval * sqrt(abs(p0 * p0 + t0 * t1));}
+\DoxyCodeLine{432         \}}
+\DoxyCodeLine{433         }
+\DoxyCodeLine{434         m\_eivalues.coeffRef(i)   = ComplexScalar(m\_matT.coeff(i+1, i+1) + p, z);}
+\DoxyCodeLine{435         m\_eivalues.coeffRef(i+1) = ComplexScalar(m\_matT.coeff(i+1, i+1) + p, -\/z);}
+\DoxyCodeLine{436         \textcolor{keywordflow}{if}(!((isfinite)(m\_eivalues.coeffRef(i)) \&\& (isfinite)(m\_eivalues.coeffRef(i+1))))}
+\DoxyCodeLine{437         \{}
+\DoxyCodeLine{438           m\_isInitialized = \textcolor{keyword}{true};}
+\DoxyCodeLine{439           m\_eigenvectorsOk = \textcolor{keyword}{false};}
+\DoxyCodeLine{440           m\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea1c6e20706575a629b27a105f07f1883b}{NumericalIssue}};}
+\DoxyCodeLine{441           \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{442         \}}
+\DoxyCodeLine{443         i += 2;}
+\DoxyCodeLine{444       \}}
+\DoxyCodeLine{445     \}}
+\DoxyCodeLine{446     }
+\DoxyCodeLine{447     \textcolor{comment}{// Compute eigenvectors.}}
+\DoxyCodeLine{448     \textcolor{keywordflow}{if} (computeEigenvectors)}
+\DoxyCodeLine{449       doComputeEigenvectors();}
+\DoxyCodeLine{450   \}}
+\DoxyCodeLine{451 }
+\DoxyCodeLine{452   m\_isInitialized = \textcolor{keyword}{true};}
+\DoxyCodeLine{453   m\_eigenvectorsOk = computeEigenvectors;}
+\DoxyCodeLine{454 }
+\DoxyCodeLine{455   \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{456 \}}
+\DoxyCodeLine{457 }
+\DoxyCodeLine{458 }
+\DoxyCodeLine{459 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{460 \textcolor{keywordtype}{void} EigenSolver<MatrixType>::doComputeEigenvectors()}
+\DoxyCodeLine{461 \{}
+\DoxyCodeLine{462   \textcolor{keyword}{using} std::abs;}
+\DoxyCodeLine{463   \textcolor{keyword}{const} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size = m\_eivec.cols();}
+\DoxyCodeLine{464   \textcolor{keyword}{const} Scalar eps = NumTraits<Scalar>::epsilon();}
+\DoxyCodeLine{465 }
+\DoxyCodeLine{466   \textcolor{comment}{// inefficient! this is already computed in RealSchur}}
+\DoxyCodeLine{467   Scalar norm(0);}
+\DoxyCodeLine{468   \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < size; ++j)}
+\DoxyCodeLine{469   \{}
+\DoxyCodeLine{470     norm += m\_matT.row(j).segment((std::max)(j-\/1,\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}(0)), size-\/(std::max)(j-\/1,\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}}(0))).cwiseAbs().sum();}
+\DoxyCodeLine{471   \}}
+\DoxyCodeLine{472   }
+\DoxyCodeLine{473   \textcolor{comment}{// Backsubstitute to find vectors of upper triangular form}}
+\DoxyCodeLine{474   \textcolor{keywordflow}{if} (norm == Scalar(0))}
+\DoxyCodeLine{475   \{}
+\DoxyCodeLine{476     \textcolor{keywordflow}{return};}
+\DoxyCodeLine{477   \}}
+\DoxyCodeLine{478 }
+\DoxyCodeLine{479   \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} n = size-\/1; n >= 0; n-\/-\/)}
+\DoxyCodeLine{480   \{}
+\DoxyCodeLine{481     Scalar p = m\_eivalues.coeff(n).real();}
+\DoxyCodeLine{482     Scalar q = m\_eivalues.coeff(n).imag();}
+\DoxyCodeLine{483 }
+\DoxyCodeLine{484     \textcolor{comment}{// Scalar vector}}
+\DoxyCodeLine{485     \textcolor{keywordflow}{if} (q == Scalar(0))}
+\DoxyCodeLine{486     \{}
+\DoxyCodeLine{487       Scalar lastr(0), lastw(0);}
+\DoxyCodeLine{488       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} l = n;}
+\DoxyCodeLine{489 }
+\DoxyCodeLine{490       m\_matT.coeffRef(n,n) = Scalar(1);}
+\DoxyCodeLine{491       \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = n-\/1; i >= 0; i-\/-\/)}
+\DoxyCodeLine{492       \{}
+\DoxyCodeLine{493         Scalar w = m\_matT.coeff(i,i) -\/ p;}
+\DoxyCodeLine{494         Scalar r = m\_matT.row(i).segment(l,n-\/l+1).dot(m\_matT.col(n).segment(l, n-\/l+1));}
+\DoxyCodeLine{495 }
+\DoxyCodeLine{496         \textcolor{keywordflow}{if} (m\_eivalues.coeff(i).imag() < Scalar(0))}
+\DoxyCodeLine{497         \{}
+\DoxyCodeLine{498           lastw = w;}
+\DoxyCodeLine{499           lastr = r;}
+\DoxyCodeLine{500         \}}
+\DoxyCodeLine{501         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{502         \{}
+\DoxyCodeLine{503           l = i;}
+\DoxyCodeLine{504           \textcolor{keywordflow}{if} (m\_eivalues.coeff(i).imag() == Scalar(0))}
+\DoxyCodeLine{505           \{}
+\DoxyCodeLine{506             \textcolor{keywordflow}{if} (w != Scalar(0))}
+\DoxyCodeLine{507               m\_matT.coeffRef(i,n) = -\/r / w;}
+\DoxyCodeLine{508             \textcolor{keywordflow}{else}}
+\DoxyCodeLine{509               m\_matT.coeffRef(i,n) = -\/r / (eps * norm);}
+\DoxyCodeLine{510           \}}
+\DoxyCodeLine{511           \textcolor{keywordflow}{else} \textcolor{comment}{// Solve real equations}}
+\DoxyCodeLine{512           \{}
+\DoxyCodeLine{513             Scalar x = m\_matT.coeff(i,i+1);}
+\DoxyCodeLine{514             Scalar y = m\_matT.coeff(i+1,i);}
+\DoxyCodeLine{515             Scalar denom = (m\_eivalues.coeff(i).real() -\/ p) * (m\_eivalues.coeff(i).real() -\/ p) + m\_eivalues.coeff(i).imag() * m\_eivalues.coeff(i).imag();}
+\DoxyCodeLine{516             Scalar t = (x * lastr -\/ lastw * r) / denom;}
+\DoxyCodeLine{517             m\_matT.coeffRef(i,n) = t;}
+\DoxyCodeLine{518             \textcolor{keywordflow}{if} (abs(x) > abs(lastw))}
+\DoxyCodeLine{519               m\_matT.coeffRef(i+1,n) = (-\/r -\/ w * t) / x;}
+\DoxyCodeLine{520             \textcolor{keywordflow}{else}}
+\DoxyCodeLine{521               m\_matT.coeffRef(i+1,n) = (-\/lastr -\/ y * t) / lastw;}
+\DoxyCodeLine{522           \}}
+\DoxyCodeLine{523 }
+\DoxyCodeLine{524           \textcolor{comment}{// Overflow control}}
+\DoxyCodeLine{525           Scalar t = abs(m\_matT.coeff(i,n));}
+\DoxyCodeLine{526           \textcolor{keywordflow}{if} ((eps * t) * t > Scalar(1))}
+\DoxyCodeLine{527             m\_matT.col(n).tail(size-\/i) /= t;}
+\DoxyCodeLine{528         \}}
+\DoxyCodeLine{529       \}}
+\DoxyCodeLine{530     \}}
+\DoxyCodeLine{531     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (q < Scalar(0) \&\& n > 0) \textcolor{comment}{// Complex vector}}
+\DoxyCodeLine{532     \{}
+\DoxyCodeLine{533       Scalar lastra(0), lastsa(0), lastw(0);}
+\DoxyCodeLine{534       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} l = n-\/1;}
+\DoxyCodeLine{535 }
+\DoxyCodeLine{536       \textcolor{comment}{// Last vector component imaginary so matrix is triangular}}
+\DoxyCodeLine{537       \textcolor{keywordflow}{if} (abs(m\_matT.coeff(n,n-\/1)) > abs(m\_matT.coeff(n-\/1,n)))}
+\DoxyCodeLine{538       \{}
+\DoxyCodeLine{539         m\_matT.coeffRef(n-\/1,n-\/1) = q / m\_matT.coeff(n,n-\/1);}
+\DoxyCodeLine{540         m\_matT.coeffRef(n-\/1,n) = -\/(m\_matT.coeff(n,n) -\/ p) / m\_matT.coeff(n,n-\/1);}
+\DoxyCodeLine{541       \}}
+\DoxyCodeLine{542       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{543       \{}
+\DoxyCodeLine{544         ComplexScalar cc = ComplexScalar(Scalar(0),-\/m\_matT.coeff(n-\/1,n)) / ComplexScalar(m\_matT.coeff(n-\/1,n-\/1)-\/p,q);}
+\DoxyCodeLine{545         m\_matT.coeffRef(n-\/1,n-\/1) = numext::real(cc);}
+\DoxyCodeLine{546         m\_matT.coeffRef(n-\/1,n) = numext::imag(cc);}
+\DoxyCodeLine{547       \}}
+\DoxyCodeLine{548       m\_matT.coeffRef(n,n-\/1) = Scalar(0);}
+\DoxyCodeLine{549       m\_matT.coeffRef(n,n) = Scalar(1);}
+\DoxyCodeLine{550       \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = n-\/2; i >= 0; i-\/-\/)}
+\DoxyCodeLine{551       \{}
+\DoxyCodeLine{552         Scalar ra = m\_matT.row(i).segment(l, n-\/l+1).dot(m\_matT.col(n-\/1).segment(l, n-\/l+1));}
+\DoxyCodeLine{553         Scalar sa = m\_matT.row(i).segment(l, n-\/l+1).dot(m\_matT.col(n).segment(l, n-\/l+1));}
+\DoxyCodeLine{554         Scalar w = m\_matT.coeff(i,i) -\/ p;}
+\DoxyCodeLine{555 }
+\DoxyCodeLine{556         \textcolor{keywordflow}{if} (m\_eivalues.coeff(i).imag() < Scalar(0))}
+\DoxyCodeLine{557         \{}
+\DoxyCodeLine{558           lastw = w;}
+\DoxyCodeLine{559           lastra = ra;}
+\DoxyCodeLine{560           lastsa = sa;}
+\DoxyCodeLine{561         \}}
+\DoxyCodeLine{562         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{563         \{}
+\DoxyCodeLine{564           l = i;}
+\DoxyCodeLine{565           \textcolor{keywordflow}{if} (m\_eivalues.coeff(i).imag() == RealScalar(0))}
+\DoxyCodeLine{566           \{}
+\DoxyCodeLine{567             ComplexScalar cc = ComplexScalar(-\/ra,-\/sa) / ComplexScalar(w,q);}
+\DoxyCodeLine{568             m\_matT.coeffRef(i,n-\/1) = numext::real(cc);}
+\DoxyCodeLine{569             m\_matT.coeffRef(i,n) = numext::imag(cc);}
+\DoxyCodeLine{570           \}}
+\DoxyCodeLine{571           \textcolor{keywordflow}{else}}
+\DoxyCodeLine{572           \{}
+\DoxyCodeLine{573             \textcolor{comment}{// Solve complex equations}}
+\DoxyCodeLine{574             Scalar x = m\_matT.coeff(i,i+1);}
+\DoxyCodeLine{575             Scalar y = m\_matT.coeff(i+1,i);}
+\DoxyCodeLine{576             Scalar vr = (m\_eivalues.coeff(i).real() -\/ p) * (m\_eivalues.coeff(i).real() -\/ p) + m\_eivalues.coeff(i).imag() * m\_eivalues.coeff(i).imag() -\/ q * q;}
+\DoxyCodeLine{577             Scalar vi = (m\_eivalues.coeff(i).real() -\/ p) * Scalar(2) * q;}
+\DoxyCodeLine{578             \textcolor{keywordflow}{if} ((vr == Scalar(0)) \&\& (vi == Scalar(0)))}
+\DoxyCodeLine{579               vr = eps * norm * (abs(w) + abs(q) + abs(x) + abs(y) + abs(lastw));}
+\DoxyCodeLine{580 }
+\DoxyCodeLine{581             ComplexScalar cc = ComplexScalar(x*lastra-\/lastw*ra+q*sa,x*lastsa-\/lastw*sa-\/q*ra) / ComplexScalar(vr,vi);}
+\DoxyCodeLine{582             m\_matT.coeffRef(i,n-\/1) = numext::real(cc);}
+\DoxyCodeLine{583             m\_matT.coeffRef(i,n) = numext::imag(cc);}
+\DoxyCodeLine{584             \textcolor{keywordflow}{if} (abs(x) > (abs(lastw) + abs(q)))}
+\DoxyCodeLine{585             \{}
+\DoxyCodeLine{586               m\_matT.coeffRef(i+1,n-\/1) = (-\/ra -\/ w * m\_matT.coeff(i,n-\/1) + q * m\_matT.coeff(i,n)) / x;}
+\DoxyCodeLine{587               m\_matT.coeffRef(i+1,n) = (-\/sa -\/ w * m\_matT.coeff(i,n) -\/ q * m\_matT.coeff(i,n-\/1)) / x;}
+\DoxyCodeLine{588             \}}
+\DoxyCodeLine{589             \textcolor{keywordflow}{else}}
+\DoxyCodeLine{590             \{}
+\DoxyCodeLine{591               cc = ComplexScalar(-\/lastra-\/y*m\_matT.coeff(i,n-\/1),-\/lastsa-\/y*m\_matT.coeff(i,n)) / ComplexScalar(lastw,q);}
+\DoxyCodeLine{592               m\_matT.coeffRef(i+1,n-\/1) = numext::real(cc);}
+\DoxyCodeLine{593               m\_matT.coeffRef(i+1,n) = numext::imag(cc);}
+\DoxyCodeLine{594             \}}
+\DoxyCodeLine{595           \}}
+\DoxyCodeLine{596 }
+\DoxyCodeLine{597           \textcolor{comment}{// Overflow control}}
+\DoxyCodeLine{598           Scalar t = numext::maxi<Scalar>(abs(m\_matT.coeff(i,n-\/1)),abs(m\_matT.coeff(i,n)));}
+\DoxyCodeLine{599           \textcolor{keywordflow}{if} ((eps * t) * t > Scalar(1))}
+\DoxyCodeLine{600             m\_matT.block(i, n-\/1, size-\/i, 2) /= t;}
+\DoxyCodeLine{601 }
+\DoxyCodeLine{602         \}}
+\DoxyCodeLine{603       \}}
+\DoxyCodeLine{604       }
+\DoxyCodeLine{605       \textcolor{comment}{// We handled a pair of complex conjugate eigenvalues, so need to skip them both}}
+\DoxyCodeLine{606       n-\/-\/;}
+\DoxyCodeLine{607     \}}
+\DoxyCodeLine{608     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{609     \{}
+\DoxyCodeLine{610       eigen\_assert(0 \&\& \textcolor{stringliteral}{"{}Internal bug in EigenSolver (INF or NaN has not been detected)"{}}); \textcolor{comment}{// this should not happen}}
+\DoxyCodeLine{611     \}}
+\DoxyCodeLine{612   \}}
+\DoxyCodeLine{613 }
+\DoxyCodeLine{614   \textcolor{comment}{// Back transformation to get eigenvectors of original matrix}}
+\DoxyCodeLine{615   \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = size-\/1; j >= 0; j-\/-\/)}
+\DoxyCodeLine{616   \{}
+\DoxyCodeLine{617     m\_tmp.noalias() = m\_eivec.leftCols(j+1) * m\_matT.col(j).segment(0, j+1);}
+\DoxyCodeLine{618     m\_eivec.col(j) = m\_tmp;}
+\DoxyCodeLine{619   \}}
+\DoxyCodeLine{620 \}}
+\DoxyCodeLine{621 }
+\DoxyCodeLine{622 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{623 }
+\DoxyCodeLine{624 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_EIGENSOLVER\_H}}
+
+\end{DoxyCode}

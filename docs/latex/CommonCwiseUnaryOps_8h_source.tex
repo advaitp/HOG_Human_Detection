@@ -1,0 +1,111 @@
+\hypertarget{CommonCwiseUnaryOps_8h_source}{}\doxysection{Common\+Cwise\+Unary\+Ops.\+h}
+\label{CommonCwiseUnaryOps_8h_source}\index{include/Eigen/src/plugins/CommonCwiseUnaryOps.h@{include/Eigen/src/plugins/CommonCwiseUnaryOps.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2008-\/2009 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2006-\/2008 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{comment}{// This file is a base class plugin containing common coefficient wise functions.}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{16 \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::conditional<NumTraits<Scalar>::IsComplex,}
+\DoxyCodeLine{17                     \textcolor{keyword}{const} CwiseUnaryOp<internal::scalar\_conjugate\_op<Scalar>, \textcolor{keyword}{const} Derived>,}
+\DoxyCodeLine{18                     \textcolor{keyword}{const} Derived\&}
+\DoxyCodeLine{19                   >::type ConjugateReturnType;}
+\DoxyCodeLine{21 \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::conditional<NumTraits<Scalar>::IsComplex,}
+\DoxyCodeLine{22                     \textcolor{keyword}{const} CwiseUnaryOp<internal::scalar\_real\_op<Scalar>, \textcolor{keyword}{const} Derived>,}
+\DoxyCodeLine{23                     \textcolor{keyword}{const} Derived\&}
+\DoxyCodeLine{24                   >::type RealReturnType;}
+\DoxyCodeLine{26 \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::conditional<NumTraits<Scalar>::IsComplex,}
+\DoxyCodeLine{27                     CwiseUnaryView<internal::scalar\_real\_ref\_op<Scalar>, Derived>,}
+\DoxyCodeLine{28                     Derived\&}
+\DoxyCodeLine{29                   >::type NonConstRealReturnType;}
+\DoxyCodeLine{31 \textcolor{keyword}{typedef} CwiseUnaryOp<internal::scalar\_imag\_op<Scalar>, \textcolor{keyword}{const} Derived> ImagReturnType;}
+\DoxyCodeLine{33 \textcolor{keyword}{typedef} CwiseUnaryView<internal::scalar\_imag\_ref\_op<Scalar>, Derived> NonConstImagReturnType;}
+\DoxyCodeLine{34 }
+\DoxyCodeLine{35 \textcolor{keyword}{typedef} CwiseUnaryOp<internal::scalar\_opposite\_op<Scalar>, \textcolor{keyword}{const} Derived> NegativeReturnType;}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{37 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// not EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{38 }
+\DoxyCodeLine{41 EIGEN\_DOC\_UNARY\_ADDONS(\textcolor{keyword}{operator}-\/,opposite)}
+\DoxyCodeLine{43 EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{44 \textcolor{keyword}{inline} \textcolor{keyword}{const} NegativeReturnType}
+\DoxyCodeLine{45 operator-\/()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} NegativeReturnType(derived()); \}}
+\DoxyCodeLine{46 }
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48 \textcolor{keyword}{template}<\textcolor{keyword}{class} NewType> \textcolor{keyword}{struct }\mbox{\hyperlink{structCastXpr}{CastXpr}} \{ \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::cast\_return\_type<Derived,const CwiseUnaryOp<internal::scalar\_cast\_op<Scalar, NewType>, \textcolor{keyword}{const} Derived> >::type Type; \};}
+\DoxyCodeLine{49 }
+\DoxyCodeLine{55 EIGEN\_DOC\_UNARY\_ADDONS(cast,conversion function)}
+\DoxyCodeLine{59 \textcolor{keyword}{template}<\textcolor{keyword}{typename} NewType>}
+\DoxyCodeLine{60 EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{61 \textcolor{keyword}{typename} CastXpr<NewType>::Type}
+\DoxyCodeLine{62 cast()\textcolor{keyword}{ const}}
+\DoxyCodeLine{63 \textcolor{keyword}{}\{}
+\DoxyCodeLine{64   \textcolor{keywordflow}{return} \textcolor{keyword}{typename} CastXpr<NewType>::Type(derived());}
+\DoxyCodeLine{65 \}}
+\DoxyCodeLine{66 }
+\DoxyCodeLine{69 EIGEN\_DOC\_UNARY\_ADDONS(conjugate,complex conjugate)}
+\DoxyCodeLine{72 EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{73 \textcolor{keyword}{inline} ConjugateReturnType}
+\DoxyCodeLine{74 conjugate()\textcolor{keyword}{ const}}
+\DoxyCodeLine{75 \textcolor{keyword}{}\{}
+\DoxyCodeLine{76   \textcolor{keywordflow}{return} ConjugateReturnType(derived());}
+\DoxyCodeLine{77 \}}
+\DoxyCodeLine{78 }
+\DoxyCodeLine{81 EIGEN\_DOC\_UNARY\_ADDONS(conjugate,complex conjugate)}
+\DoxyCodeLine{84 \textcolor{keyword}{template}<\textcolor{keywordtype}{bool} Cond>}
+\DoxyCodeLine{85 EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{86 \textcolor{keyword}{inline} \textcolor{keyword}{typename} internal::conditional<Cond,ConjugateReturnType,const Derived\&>::type}
+\DoxyCodeLine{87 conjugateIf()\textcolor{keyword}{ const}}
+\DoxyCodeLine{88 \textcolor{keyword}{}\{}
+\DoxyCodeLine{89   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::conditional<Cond,ConjugateReturnType,const Derived\&>::type ReturnType;}
+\DoxyCodeLine{90   \textcolor{keywordflow}{return} ReturnType(derived());}
+\DoxyCodeLine{91 \}}
+\DoxyCodeLine{92 }
+\DoxyCodeLine{95 EIGEN\_DOC\_UNARY\_ADDONS(real,real part function)}
+\DoxyCodeLine{98 EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{99 \textcolor{keyword}{inline} RealReturnType}
+\DoxyCodeLine{100 real()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} RealReturnType(derived()); \}}
+\DoxyCodeLine{101 }
+\DoxyCodeLine{104 EIGEN\_DOC\_UNARY\_ADDONS(imag,imaginary part function)}
+\DoxyCodeLine{107 EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{108 \textcolor{keyword}{inline} \textcolor{keyword}{const} ImagReturnType}
+\DoxyCodeLine{109 imag()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} ImagReturnType(derived()); \}}
+\DoxyCodeLine{110 }
+\DoxyCodeLine{128 EIGEN\_DOC\_UNARY\_ADDONS(unaryExpr,unary function)}
+\DoxyCodeLine{132 \textcolor{keyword}{template}<\textcolor{keyword}{typename} CustomUnaryOp>}
+\DoxyCodeLine{133 EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{134 \textcolor{keyword}{inline} \textcolor{keyword}{const} CwiseUnaryOp<CustomUnaryOp, const Derived>}
+\DoxyCodeLine{135 unaryExpr(\textcolor{keyword}{const} CustomUnaryOp\& func = CustomUnaryOp())\textcolor{keyword}{ const}}
+\DoxyCodeLine{136 \textcolor{keyword}{}\{}
+\DoxyCodeLine{137   \textcolor{keywordflow}{return} CwiseUnaryOp<CustomUnaryOp, const Derived>(derived(), func);}
+\DoxyCodeLine{138 \}}
+\DoxyCodeLine{139 }
+\DoxyCodeLine{149 EIGEN\_DOC\_UNARY\_ADDONS(unaryViewExpr,unary function)}
+\DoxyCodeLine{153 \textcolor{keyword}{template}<\textcolor{keyword}{typename} CustomViewOp>}
+\DoxyCodeLine{154 EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{155 \textcolor{keyword}{inline} \textcolor{keyword}{const} CwiseUnaryView<CustomViewOp, const Derived>}
+\DoxyCodeLine{156 unaryViewExpr(\textcolor{keyword}{const} CustomViewOp\& func = CustomViewOp())\textcolor{keyword}{ const}}
+\DoxyCodeLine{157 \textcolor{keyword}{}\{}
+\DoxyCodeLine{158   \textcolor{keywordflow}{return} CwiseUnaryView<CustomViewOp, const Derived>(derived(), func);}
+\DoxyCodeLine{159 \}}
+\DoxyCodeLine{160 }
+\DoxyCodeLine{163 EIGEN\_DOC\_UNARY\_ADDONS(real,real part function)}
+\DoxyCodeLine{166 EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{167 \textcolor{keyword}{inline} NonConstRealReturnType}
+\DoxyCodeLine{168 real() \{ \textcolor{keywordflow}{return} NonConstRealReturnType(derived()); \}}
+\DoxyCodeLine{169 }
+\DoxyCodeLine{172 EIGEN\_DOC\_UNARY\_ADDONS(imag,imaginary part function)}
+\DoxyCodeLine{175 EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{176 \textcolor{keyword}{inline} NonConstImagReturnType}
+\DoxyCodeLine{177 imag() \{ \textcolor{keywordflow}{return} NonConstImagReturnType(derived()); \}}
+
+\end{DoxyCode}

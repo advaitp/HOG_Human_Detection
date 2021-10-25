@@ -1,0 +1,387 @@
+\hypertarget{UpperBidiagonalization_8h_source}{}\doxysection{Upper\+Bidiagonalization.\+h}
+\label{UpperBidiagonalization_8h_source}\index{include/Eigen/src/SVD/UpperBidiagonalization.h@{include/Eigen/src/SVD/UpperBidiagonalization.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2010 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2013-\/2014 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_BIDIAGONALIZATION\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_BIDIAGONALIZATION\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{19 \textcolor{comment}{// UpperBidiagonalization will probably be replaced by a Bidiagonalization class, don't want to make it stable API.}}
+\DoxyCodeLine{20 \textcolor{comment}{// At the same time, it's useful to keep for now as it's about the only thing that is testing the BandMatrix class.}}
+\DoxyCodeLine{21 }
+\DoxyCodeLine{22 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1UpperBidiagonalization}{UpperBidiagonalization}}}
+\DoxyCodeLine{23 \{}
+\DoxyCodeLine{24   \textcolor{keyword}{public}:}
+\DoxyCodeLine{25 }
+\DoxyCodeLine{26     \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{27     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{28       RowsAtCompileTime = MatrixType::RowsAtCompileTime,}
+\DoxyCodeLine{29       ColsAtCompileTime = MatrixType::ColsAtCompileTime,}
+\DoxyCodeLine{30       ColsAtCompileTimeMinusOne = \mbox{\hyperlink{structEigen_1_1internal_1_1decrement__size}{internal::decrement\_size<ColsAtCompileTime>::ret}}}
+\DoxyCodeLine{31     \};}
+\DoxyCodeLine{32     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar Scalar;}
+\DoxyCodeLine{33     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::RealScalar RealScalar;}
+\DoxyCodeLine{34     \textcolor{keyword}{typedef} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Eigen::Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1UpperBidiagonalization_a1fc11f1a7c87ffaacf325d7a55b414ae}{Index}}; }
+\DoxyCodeLine{35     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar, 1, ColsAtCompileTime>}} \mbox{\hyperlink{classEigen_1_1Matrix}{RowVectorType}};}
+\DoxyCodeLine{36     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar, RowsAtCompileTime, 1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{ColVectorType}};}
+\DoxyCodeLine{37     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrix}{BandMatrix<RealScalar, ColsAtCompileTime, ColsAtCompileTime, 1, 0, RowMajor>}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrix}{BidiagonalType}};}
+\DoxyCodeLine{38     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar, ColsAtCompileTime, 1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{DiagVectorType}};}
+\DoxyCodeLine{39     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar, ColsAtCompileTimeMinusOne, 1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{SuperDiagVectorType}};}
+\DoxyCodeLine{40     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1HouseholderSequence}{HouseholderSequence}}<}
+\DoxyCodeLine{41               \textcolor{keyword}{const} MatrixType,}
+\DoxyCodeLine{42               \textcolor{keyword}{const} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1remove__all}{internal::remove\_all<typename Diagonal<const MatrixType,0>::ConjugateReturnType}}>::type}
+\DoxyCodeLine{43             > \mbox{\hyperlink{classEigen_1_1HouseholderSequence}{HouseholderUSequenceType}};}
+\DoxyCodeLine{44     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1HouseholderSequence}{HouseholderSequence}}<}
+\DoxyCodeLine{45               \textcolor{keyword}{const} \textcolor{keyword}{typename} internal::remove\_all<typename MatrixType::ConjugateReturnType>::type,}
+\DoxyCodeLine{46               \mbox{\hyperlink{classEigen_1_1Diagonal}{Diagonal<const MatrixType,1>}},}
+\DoxyCodeLine{47               \mbox{\hyperlink{group__enums_ggac22de43beeac7a78b384f99bed5cee0ba329fc3a54ceb2b6e0e73b400998b8a82}{OnTheRight}}}
+\DoxyCodeLine{48             > \mbox{\hyperlink{classEigen_1_1HouseholderSequence}{HouseholderVSequenceType}};}
+\DoxyCodeLine{49     }
+\DoxyCodeLine{56     \mbox{\hyperlink{classEigen_1_1internal_1_1UpperBidiagonalization_a90fb357488686c2927dfe8efdf591694}{UpperBidiagonalization}}() : m\_householder(), m\_bidiagonal(), m\_isInitialized(false) \{\}}
+\DoxyCodeLine{57 }
+\DoxyCodeLine{58     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1internal_1_1UpperBidiagonalization_a90fb357488686c2927dfe8efdf591694}{UpperBidiagonalization}}(\textcolor{keyword}{const} MatrixType\& matrix)}
+\DoxyCodeLine{59       : m\_householder(matrix.rows(), matrix.cols()),}
+\DoxyCodeLine{60         m\_bidiagonal(matrix.cols(), matrix.cols()),}
+\DoxyCodeLine{61         m\_isInitialized(false)}
+\DoxyCodeLine{62     \{}
+\DoxyCodeLine{63       compute(matrix);}
+\DoxyCodeLine{64     \}}
+\DoxyCodeLine{65     }
+\DoxyCodeLine{66     \mbox{\hyperlink{classEigen_1_1internal_1_1UpperBidiagonalization_a90fb357488686c2927dfe8efdf591694}{UpperBidiagonalization}}\& compute(\textcolor{keyword}{const} MatrixType\& matrix);}
+\DoxyCodeLine{67     \mbox{\hyperlink{classEigen_1_1internal_1_1UpperBidiagonalization_a90fb357488686c2927dfe8efdf591694}{UpperBidiagonalization}}\& computeUnblocked(\textcolor{keyword}{const} MatrixType\& matrix);}
+\DoxyCodeLine{68     }
+\DoxyCodeLine{69     \textcolor{keyword}{const} MatrixType\& householder()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_householder; \}}
+\DoxyCodeLine{70     \textcolor{keyword}{const} BidiagonalType\& bidiagonal()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_bidiagonal; \}}
+\DoxyCodeLine{71     }
+\DoxyCodeLine{72     \textcolor{keyword}{const} HouseholderUSequenceType householderU()\textcolor{keyword}{ const}}
+\DoxyCodeLine{73 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{74       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}UpperBidiagonalization is not initialized."{}});}
+\DoxyCodeLine{75       \textcolor{keywordflow}{return} HouseholderUSequenceType(m\_householder, m\_householder.diagonal().conjugate());}
+\DoxyCodeLine{76     \}}
+\DoxyCodeLine{77 }
+\DoxyCodeLine{78     \textcolor{keyword}{const} HouseholderVSequenceType householderV() \textcolor{comment}{// const here gives nasty errors and i'm lazy}}
+\DoxyCodeLine{79     \{}
+\DoxyCodeLine{80       eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}UpperBidiagonalization is not initialized."{}});}
+\DoxyCodeLine{81       \textcolor{keywordflow}{return} HouseholderVSequenceType(m\_householder.conjugate(), m\_householder.const\_derived().template diagonal<1>())}
+\DoxyCodeLine{82              .setLength(m\_householder.cols()-\/1)}
+\DoxyCodeLine{83              .setShift(1);}
+\DoxyCodeLine{84     \}}
+\DoxyCodeLine{85     }
+\DoxyCodeLine{86   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{87     MatrixType m\_householder;}
+\DoxyCodeLine{88     BidiagonalType m\_bidiagonal;}
+\DoxyCodeLine{89     \textcolor{keywordtype}{bool} m\_isInitialized;}
+\DoxyCodeLine{90 \};}
+\DoxyCodeLine{91 }
+\DoxyCodeLine{92 \textcolor{comment}{// Standard upper bidiagonalization without fancy optimizations}}
+\DoxyCodeLine{93 \textcolor{comment}{// This version should be faster for small matrix size}}
+\DoxyCodeLine{94 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{95 \textcolor{keywordtype}{void} upperbidiagonalization\_inplace\_unblocked(MatrixType\& mat,}
+\DoxyCodeLine{96                                               \textcolor{keyword}{typename} MatrixType::RealScalar *diagonal,}
+\DoxyCodeLine{97                                               \textcolor{keyword}{typename} MatrixType::RealScalar *upper\_diagonal,}
+\DoxyCodeLine{98                                               \textcolor{keyword}{typename} MatrixType::Scalar* tempData = 0)}
+\DoxyCodeLine{99 \{}
+\DoxyCodeLine{100   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar Scalar;}
+\DoxyCodeLine{101 }
+\DoxyCodeLine{102   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows = mat.rows();}
+\DoxyCodeLine{103   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols = mat.cols();}
+\DoxyCodeLine{104 }
+\DoxyCodeLine{105   \textcolor{keyword}{typedef} Matrix<Scalar,Dynamic,1,ColMajor,MatrixType::MaxRowsAtCompileTime,1> TempType;}
+\DoxyCodeLine{106   TempType tempVector;}
+\DoxyCodeLine{107   \textcolor{keywordflow}{if}(tempData==0)}
+\DoxyCodeLine{108   \{}
+\DoxyCodeLine{109     tempVector.resize(rows);}
+\DoxyCodeLine{110     tempData = tempVector.data();}
+\DoxyCodeLine{111   \}}
+\DoxyCodeLine{112 }
+\DoxyCodeLine{113   \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} k = 0; \textcolor{comment}{/* breaks at k==cols-\/1 below */} ; ++k)}
+\DoxyCodeLine{114   \{}
+\DoxyCodeLine{115     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} remainingRows = rows -\/ k;}
+\DoxyCodeLine{116     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} remainingCols = cols -\/ k -\/ 1;}
+\DoxyCodeLine{117 }
+\DoxyCodeLine{118     \textcolor{comment}{// construct left householder transform in-\/place in A}}
+\DoxyCodeLine{119     mat.col(k).tail(remainingRows)}
+\DoxyCodeLine{120        .makeHouseholderInPlace(mat.coeffRef(k,k), diagonal[k]);}
+\DoxyCodeLine{121     \textcolor{comment}{// apply householder transform to remaining part of A on the left}}
+\DoxyCodeLine{122     mat.bottomRightCorner(remainingRows, remainingCols)}
+\DoxyCodeLine{123        .applyHouseholderOnTheLeft(mat.col(k).tail(remainingRows-\/1), mat.coeff(k,k), tempData);}
+\DoxyCodeLine{124 }
+\DoxyCodeLine{125     \textcolor{keywordflow}{if}(k == cols-\/1) \textcolor{keywordflow}{break};}
+\DoxyCodeLine{126 }
+\DoxyCodeLine{127     \textcolor{comment}{// construct right householder transform in-\/place in mat}}
+\DoxyCodeLine{128     mat.row(k).tail(remainingCols)}
+\DoxyCodeLine{129        .makeHouseholderInPlace(mat.coeffRef(k,k+1), upper\_diagonal[k]);}
+\DoxyCodeLine{130     \textcolor{comment}{// apply householder transform to remaining part of mat on the left}}
+\DoxyCodeLine{131     mat.bottomRightCorner(remainingRows-\/1, remainingCols)}
+\DoxyCodeLine{132        .applyHouseholderOnTheRight(mat.row(k).tail(remainingCols-\/1).adjoint(), mat.coeff(k,k+1), tempData);}
+\DoxyCodeLine{133   \}}
+\DoxyCodeLine{134 \}}
+\DoxyCodeLine{135 }
+\DoxyCodeLine{153 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{154 \textcolor{keywordtype}{void} upperbidiagonalization\_blocked\_helper(MatrixType\& A,}
+\DoxyCodeLine{155                                            \textcolor{keyword}{typename} MatrixType::RealScalar *diagonal,}
+\DoxyCodeLine{156                                            \textcolor{keyword}{typename} MatrixType::RealScalar *upper\_diagonal,}
+\DoxyCodeLine{157                                            \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} bs,}
+\DoxyCodeLine{158                                            Ref<Matrix<\textcolor{keyword}{typename} MatrixType::Scalar, \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}, \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}},}
+\DoxyCodeLine{159                                                       traits<MatrixType>::Flags \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}> > X,}
+\DoxyCodeLine{160                                            Ref<Matrix<\textcolor{keyword}{typename} MatrixType::Scalar, \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}, \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}},}
+\DoxyCodeLine{161                                                       traits<MatrixType>::Flags \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}> > Y)}
+\DoxyCodeLine{162 \{}
+\DoxyCodeLine{163   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar Scalar;}
+\DoxyCodeLine{164   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::RealScalar RealScalar;}
+\DoxyCodeLine{165   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} NumTraits<RealScalar>::Literal Literal;}
+\DoxyCodeLine{166   \textcolor{keyword}{enum} \{ StorageOrder = traits<MatrixType>::Flags \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}} \};}
+\DoxyCodeLine{167   \textcolor{keyword}{typedef} InnerStride<int(StorageOrder) == int(\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}) ? 1 : \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}> ColInnerStride;}
+\DoxyCodeLine{168   \textcolor{keyword}{typedef} InnerStride<int(StorageOrder) == int(\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}) ? \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} : 1> RowInnerStride;}
+\DoxyCodeLine{169   \textcolor{keyword}{typedef} Ref<Matrix<Scalar, Dynamic, 1>, 0, ColInnerStride>    SubColumnType;}
+\DoxyCodeLine{170   \textcolor{keyword}{typedef} Ref<Matrix<Scalar, 1, Dynamic>, 0, RowInnerStride>    SubRowType;}
+\DoxyCodeLine{171   \textcolor{keyword}{typedef} Ref<Matrix<Scalar, Dynamic, Dynamic, StorageOrder > > SubMatType;}
+\DoxyCodeLine{172   }
+\DoxyCodeLine{173   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} brows = A.rows();}
+\DoxyCodeLine{174   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} bcols = A.cols();}
+\DoxyCodeLine{175 }
+\DoxyCodeLine{176   Scalar tau\_u, tau\_u\_prev(0), tau\_v;}
+\DoxyCodeLine{177 }
+\DoxyCodeLine{178   \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} k = 0; k < bs; ++k)}
+\DoxyCodeLine{179   \{}
+\DoxyCodeLine{180     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} remainingRows = brows -\/ k;}
+\DoxyCodeLine{181     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} remainingCols = bcols -\/ k -\/ 1;}
+\DoxyCodeLine{182 }
+\DoxyCodeLine{183     SubMatType X\_k1( X.block(k,0, remainingRows,k) );}
+\DoxyCodeLine{184     SubMatType V\_k1( A.block(k,0, remainingRows,k) );}
+\DoxyCodeLine{185 }
+\DoxyCodeLine{186     \textcolor{comment}{// 1 -\/ update the k-\/th column of A}}
+\DoxyCodeLine{187     SubColumnType v\_k = A.col(k).tail(remainingRows);}
+\DoxyCodeLine{188           v\_k -\/= V\_k1 * Y.row(k).head(k).adjoint();}
+\DoxyCodeLine{189     \textcolor{keywordflow}{if}(k) v\_k -\/= X\_k1 * A.col(k).head(k);}
+\DoxyCodeLine{190     }
+\DoxyCodeLine{191     \textcolor{comment}{// 2 -\/ construct left Householder transform in-\/place}}
+\DoxyCodeLine{192     v\_k.makeHouseholderInPlace(tau\_v, diagonal[k]);}
+\DoxyCodeLine{193        }
+\DoxyCodeLine{194     \textcolor{keywordflow}{if}(k+1<bcols)}
+\DoxyCodeLine{195     \{}
+\DoxyCodeLine{196       SubMatType Y\_k  ( Y.block(k+1,0, remainingCols, k+1) );}
+\DoxyCodeLine{197       SubMatType U\_k1 ( A.block(0,k+1, k,remainingCols) );}
+\DoxyCodeLine{198       }
+\DoxyCodeLine{199       \textcolor{comment}{// this eases the application of Householder transforAions}}
+\DoxyCodeLine{200       \textcolor{comment}{// A(k,k) will store tau\_v later}}
+\DoxyCodeLine{201       A(k,k) = Scalar(1);}
+\DoxyCodeLine{202 }
+\DoxyCodeLine{203       \textcolor{comment}{// 3 -\/ Compute y\_k\string^T = tau\_v * ( A\string^T*v\_k -\/ Y\_k-\/1*V\_k-\/1\string^T*v\_k -\/ U\_k-\/1*X\_k-\/1\string^T*v\_k )}}
+\DoxyCodeLine{204       \{}
+\DoxyCodeLine{205         SubColumnType y\_k( Y.col(k).tail(remainingCols) );}
+\DoxyCodeLine{206         }
+\DoxyCodeLine{207         \textcolor{comment}{// let's use the beginning of column k of Y as a temporary vector}}
+\DoxyCodeLine{208         SubColumnType tmp( Y.col(k).head(k) );}
+\DoxyCodeLine{209         y\_k.noalias()  = A.block(k,k+1, remainingRows,remainingCols).adjoint() * v\_k; \textcolor{comment}{// bottleneck}}
+\DoxyCodeLine{210         tmp.noalias()  = V\_k1.adjoint()  * v\_k;}
+\DoxyCodeLine{211         y\_k.noalias() -\/= Y\_k.leftCols(k) * tmp;}
+\DoxyCodeLine{212         tmp.noalias()  = X\_k1.adjoint()  * v\_k;}
+\DoxyCodeLine{213         y\_k.noalias() -\/= U\_k1.adjoint()  * tmp;}
+\DoxyCodeLine{214         y\_k *= numext::conj(tau\_v);}
+\DoxyCodeLine{215       \}}
+\DoxyCodeLine{216 }
+\DoxyCodeLine{217       \textcolor{comment}{// 4 -\/ update k-\/th row of A (it will become u\_k)}}
+\DoxyCodeLine{218       SubRowType u\_k( A.row(k).tail(remainingCols) );}
+\DoxyCodeLine{219       u\_k = u\_k.conjugate();}
+\DoxyCodeLine{220       \{}
+\DoxyCodeLine{221         u\_k -\/= Y\_k * A.row(k).head(k+1).adjoint();}
+\DoxyCodeLine{222         \textcolor{keywordflow}{if}(k) u\_k -\/= U\_k1.adjoint() * X.row(k).head(k).adjoint();}
+\DoxyCodeLine{223       \}}
+\DoxyCodeLine{224 }
+\DoxyCodeLine{225       \textcolor{comment}{// 5 -\/ construct right Householder transform in-\/place}}
+\DoxyCodeLine{226       u\_k.makeHouseholderInPlace(tau\_u, upper\_diagonal[k]);}
+\DoxyCodeLine{227 }
+\DoxyCodeLine{228       \textcolor{comment}{// this eases the application of Householder transformations}}
+\DoxyCodeLine{229       \textcolor{comment}{// A(k,k+1) will store tau\_u later}}
+\DoxyCodeLine{230       A(k,k+1) = Scalar(1);}
+\DoxyCodeLine{231 }
+\DoxyCodeLine{232       \textcolor{comment}{// 6 -\/ Compute x\_k = tau\_u * ( A*u\_k -\/ X\_k-\/1*U\_k-\/1\string^T*u\_k -\/ V\_k*Y\_k\string^T*u\_k )}}
+\DoxyCodeLine{233       \{}
+\DoxyCodeLine{234         SubColumnType x\_k ( X.col(k).tail(remainingRows-\/1) );}
+\DoxyCodeLine{235         }
+\DoxyCodeLine{236         \textcolor{comment}{// let's use the beginning of column k of X as a temporary vectors}}
+\DoxyCodeLine{237         \textcolor{comment}{// note that tmp0 and tmp1 overlaps}}
+\DoxyCodeLine{238         SubColumnType tmp0 ( X.col(k).head(k) ),}
+\DoxyCodeLine{239                       tmp1 ( X.col(k).head(k+1) );}
+\DoxyCodeLine{240                     }
+\DoxyCodeLine{241         x\_k.noalias()   = A.block(k+1,k+1, remainingRows-\/1,remainingCols) * u\_k.transpose(); \textcolor{comment}{// bottleneck}}
+\DoxyCodeLine{242         tmp0.noalias()  = U\_k1 * u\_k.transpose();}
+\DoxyCodeLine{243         x\_k.noalias()  -\/= X\_k1.bottomRows(remainingRows-\/1) * tmp0;}
+\DoxyCodeLine{244         tmp1.noalias()  = Y\_k.adjoint() * u\_k.transpose();}
+\DoxyCodeLine{245         x\_k.noalias()  -\/= A.block(k+1,0, remainingRows-\/1,k+1) * tmp1;}
+\DoxyCodeLine{246         x\_k *= numext::conj(tau\_u);}
+\DoxyCodeLine{247         tau\_u = numext::conj(tau\_u);}
+\DoxyCodeLine{248         u\_k = u\_k.conjugate();}
+\DoxyCodeLine{249       \}}
+\DoxyCodeLine{250 }
+\DoxyCodeLine{251       \textcolor{keywordflow}{if}(k>0) A.coeffRef(k-\/1,k) = tau\_u\_prev;}
+\DoxyCodeLine{252       tau\_u\_prev = tau\_u;}
+\DoxyCodeLine{253     \}}
+\DoxyCodeLine{254     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{255       A.coeffRef(k-\/1,k) = tau\_u\_prev;}
+\DoxyCodeLine{256 }
+\DoxyCodeLine{257     A.coeffRef(k,k) = tau\_v;}
+\DoxyCodeLine{258   \}}
+\DoxyCodeLine{259   }
+\DoxyCodeLine{260   \textcolor{keywordflow}{if}(bs<bcols)}
+\DoxyCodeLine{261     A.coeffRef(bs-\/1,bs) = tau\_u\_prev;}
+\DoxyCodeLine{262 }
+\DoxyCodeLine{263   \textcolor{comment}{// update A22}}
+\DoxyCodeLine{264   \textcolor{keywordflow}{if}(bcols>bs \&\& brows>bs)}
+\DoxyCodeLine{265   \{}
+\DoxyCodeLine{266     SubMatType A11( A.bottomRightCorner(brows-\/bs,bcols-\/bs) );}
+\DoxyCodeLine{267     SubMatType A10( A.block(bs,0, brows-\/bs,bs) );}
+\DoxyCodeLine{268     SubMatType A01( A.block(0,bs, bs,bcols-\/bs) );}
+\DoxyCodeLine{269     Scalar tmp = A01(bs-\/1,0);}
+\DoxyCodeLine{270     A01(bs-\/1,0) = Literal(1);}
+\DoxyCodeLine{271     A11.noalias() -\/= A10 * Y.topLeftCorner(bcols,bs).bottomRows(bcols-\/bs).adjoint();}
+\DoxyCodeLine{272     A11.noalias() -\/= X.topLeftCorner(brows,bs).bottomRows(brows-\/bs) * A01;}
+\DoxyCodeLine{273     A01(bs-\/1,0) = tmp;}
+\DoxyCodeLine{274   \}}
+\DoxyCodeLine{275 \}}
+\DoxyCodeLine{276 }
+\DoxyCodeLine{285 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keyword}{typename} B\textcolor{keywordtype}{id}iagType>}
+\DoxyCodeLine{286 \textcolor{keywordtype}{void} upperbidiagonalization\_inplace\_blocked(MatrixType\& A, BidiagType\& bidiagonal,}
+\DoxyCodeLine{287                                             \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} maxBlockSize=32,}
+\DoxyCodeLine{288                                             \textcolor{keyword}{typename} MatrixType::Scalar* \textcolor{comment}{/*tempData*/} = 0)}
+\DoxyCodeLine{289 \{}
+\DoxyCodeLine{290   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar Scalar;}
+\DoxyCodeLine{291   \textcolor{keyword}{typedef} Block<MatrixType,Dynamic,Dynamic> BlockType;}
+\DoxyCodeLine{292 }
+\DoxyCodeLine{293   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows = A.rows();}
+\DoxyCodeLine{294   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols = A.cols();}
+\DoxyCodeLine{295   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size = (std::min)(rows, cols);}
+\DoxyCodeLine{296 }
+\DoxyCodeLine{297   \textcolor{comment}{// X and Y are work space}}
+\DoxyCodeLine{298   \textcolor{keyword}{enum} \{ StorageOrder = traits<MatrixType>::Flags \& \mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}} \};}
+\DoxyCodeLine{299   Matrix<Scalar,}
+\DoxyCodeLine{300          MatrixType::RowsAtCompileTime,}
+\DoxyCodeLine{301          \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}},}
+\DoxyCodeLine{302          StorageOrder,}
+\DoxyCodeLine{303          MatrixType::MaxRowsAtCompileTime> X(rows,maxBlockSize);}
+\DoxyCodeLine{304   Matrix<Scalar,}
+\DoxyCodeLine{305          MatrixType::ColsAtCompileTime,}
+\DoxyCodeLine{306          \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}},}
+\DoxyCodeLine{307          StorageOrder,}
+\DoxyCodeLine{308          MatrixType::MaxColsAtCompileTime> Y(cols,maxBlockSize);}
+\DoxyCodeLine{309   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} blockSize = (std::min)(maxBlockSize,size);}
+\DoxyCodeLine{310 }
+\DoxyCodeLine{311   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} k = 0;}
+\DoxyCodeLine{312   \textcolor{keywordflow}{for}(k = 0; k < size; k += blockSize)}
+\DoxyCodeLine{313   \{}
+\DoxyCodeLine{314     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} bs = (std::min)(size-\/k,blockSize);  \textcolor{comment}{// actual size of the block}}
+\DoxyCodeLine{315     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} brows = rows -\/ k;                   \textcolor{comment}{// rows of the block}}
+\DoxyCodeLine{316     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} bcols = cols -\/ k;                   \textcolor{comment}{// columns of the block}}
+\DoxyCodeLine{317 }
+\DoxyCodeLine{318     \textcolor{comment}{// partition the matrix A:}}
+\DoxyCodeLine{319     \textcolor{comment}{// }}
+\DoxyCodeLine{320     \textcolor{comment}{//      | A00 A01 A02 |}}
+\DoxyCodeLine{321     \textcolor{comment}{//      |             |}}
+\DoxyCodeLine{322     \textcolor{comment}{// A  = | A10 A11 A12 |}}
+\DoxyCodeLine{323     \textcolor{comment}{//      |             |}}
+\DoxyCodeLine{324     \textcolor{comment}{//      | A20 A21 A22 |}}
+\DoxyCodeLine{325     \textcolor{comment}{//}}
+\DoxyCodeLine{326     \textcolor{comment}{// where A11 is a bs x bs diagonal block,}}
+\DoxyCodeLine{327     \textcolor{comment}{// and let:}}
+\DoxyCodeLine{328     \textcolor{comment}{//      | A11 A12 |}}
+\DoxyCodeLine{329     \textcolor{comment}{//  B = |         |}}
+\DoxyCodeLine{330     \textcolor{comment}{//      | A21 A22 |}}
+\DoxyCodeLine{331 }
+\DoxyCodeLine{332     BlockType B = A.block(k,k,brows,bcols);}
+\DoxyCodeLine{333     }
+\DoxyCodeLine{334     \textcolor{comment}{// This stage performs the bidiagonalization of A11, A21, A12, and updating of A22.}}
+\DoxyCodeLine{335     \textcolor{comment}{// Finally, the algorithm continue on the updated A22.}}
+\DoxyCodeLine{336     \textcolor{comment}{//}}
+\DoxyCodeLine{337     \textcolor{comment}{// However, if B is too small, or A22 empty, then let's use an unblocked strategy}}
+\DoxyCodeLine{338     \textcolor{keywordflow}{if}(k+bs==cols || bcols<48) \textcolor{comment}{// somewhat arbitrary threshold}}
+\DoxyCodeLine{339     \{}
+\DoxyCodeLine{340       upperbidiagonalization\_inplace\_unblocked(B,}
+\DoxyCodeLine{341                                                \&(bidiagonal.template diagonal<0>().coeffRef(k)),}
+\DoxyCodeLine{342                                                \&(bidiagonal.template diagonal<1>().coeffRef(k)),}
+\DoxyCodeLine{343                                                X.data()}
+\DoxyCodeLine{344                                               );}
+\DoxyCodeLine{345       \textcolor{keywordflow}{break}; \textcolor{comment}{// We're done}}
+\DoxyCodeLine{346     \}}
+\DoxyCodeLine{347     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{348     \{}
+\DoxyCodeLine{349       upperbidiagonalization\_blocked\_helper<BlockType>( B,}
+\DoxyCodeLine{350                                                         \&(bidiagonal.template diagonal<0>().coeffRef(k)),}
+\DoxyCodeLine{351                                                         \&(bidiagonal.template diagonal<1>().coeffRef(k)),}
+\DoxyCodeLine{352                                                         bs,}
+\DoxyCodeLine{353                                                         X.topLeftCorner(brows,bs),}
+\DoxyCodeLine{354                                                         Y.topLeftCorner(bcols,bs)}
+\DoxyCodeLine{355                                                       );}
+\DoxyCodeLine{356     \}}
+\DoxyCodeLine{357   \}}
+\DoxyCodeLine{358 \}}
+\DoxyCodeLine{359 }
+\DoxyCodeLine{360 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_>}
+\DoxyCodeLine{361 UpperBidiagonalization<MatrixType\_>\& UpperBidiagonalization<MatrixType\_>::computeUnblocked(\textcolor{keyword}{const} MatrixType\_\& matrix)}
+\DoxyCodeLine{362 \{}
+\DoxyCodeLine{363   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows = matrix.rows();}
+\DoxyCodeLine{364   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols = matrix.cols();}
+\DoxyCodeLine{365   EIGEN\_ONLY\_USED\_FOR\_DEBUG(cols);}
+\DoxyCodeLine{366 }
+\DoxyCodeLine{367   eigen\_assert(rows >= cols \&\& \textcolor{stringliteral}{"{}UpperBidiagonalization is only for Arices satisfying rows>=cols."{}});}
+\DoxyCodeLine{368 }
+\DoxyCodeLine{369   m\_householder = matrix;}
+\DoxyCodeLine{370 }
+\DoxyCodeLine{371   ColVectorType temp(rows);}
+\DoxyCodeLine{372 }
+\DoxyCodeLine{373   upperbidiagonalization\_inplace\_unblocked(m\_householder,}
+\DoxyCodeLine{374                                            \&(m\_bidiagonal.template diagonal<0>().coeffRef(0)),}
+\DoxyCodeLine{375                                            \&(m\_bidiagonal.template diagonal<1>().coeffRef(0)),}
+\DoxyCodeLine{376                                            temp.data());}
+\DoxyCodeLine{377 }
+\DoxyCodeLine{378   m\_isInitialized = \textcolor{keyword}{true};}
+\DoxyCodeLine{379   \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{380 \}}
+\DoxyCodeLine{381 }
+\DoxyCodeLine{382 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_>}
+\DoxyCodeLine{383 UpperBidiagonalization<MatrixType\_>\& UpperBidiagonalization<MatrixType\_>::compute(\textcolor{keyword}{const} MatrixType\_\& matrix)}
+\DoxyCodeLine{384 \{}
+\DoxyCodeLine{385   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows = matrix.rows();}
+\DoxyCodeLine{386   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols = matrix.cols();}
+\DoxyCodeLine{387   EIGEN\_ONLY\_USED\_FOR\_DEBUG(rows);}
+\DoxyCodeLine{388   EIGEN\_ONLY\_USED\_FOR\_DEBUG(cols);}
+\DoxyCodeLine{389 }
+\DoxyCodeLine{390   eigen\_assert(rows >= cols \&\& \textcolor{stringliteral}{"{}UpperBidiagonalization is only for Arices satisfying rows>=cols."{}});}
+\DoxyCodeLine{391 }
+\DoxyCodeLine{392   m\_householder = matrix;}
+\DoxyCodeLine{393   upperbidiagonalization\_inplace\_blocked(m\_householder, m\_bidiagonal);}
+\DoxyCodeLine{394             }
+\DoxyCodeLine{395   m\_isInitialized = \textcolor{keyword}{true};}
+\DoxyCodeLine{396   \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{397 \}}
+\DoxyCodeLine{398 }
+\DoxyCodeLine{399 \textcolor{preprocessor}{\#if 0}}
+\DoxyCodeLine{404 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{405 \textcolor{keyword}{const} UpperBidiagonalization<typename MatrixBase<Derived>::PlainObject>}
+\DoxyCodeLine{406 MatrixBase<Derived>::bidiagonalization()\textcolor{keyword}{ const}}
+\DoxyCodeLine{407 \textcolor{keyword}{}\{}
+\DoxyCodeLine{408   \textcolor{keywordflow}{return} UpperBidiagonalization<PlainObject>(eval());}
+\DoxyCodeLine{409 \}}
+\DoxyCodeLine{410 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{411 }
+\DoxyCodeLine{412 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{413 }
+\DoxyCodeLine{414 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{415 }
+\DoxyCodeLine{416 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_BIDIAGONALIZATION\_H}}
+
+\end{DoxyCode}

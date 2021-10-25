@@ -1,0 +1,132 @@
+\hypertarget{GeneralMatrixMatrix__BLAS_8h_source}{}\doxysection{General\+Matrix\+Matrix\+\_\+\+BLAS.\+h}
+\label{GeneralMatrixMatrix__BLAS_8h_source}\index{include/Eigen/src/Core/products/GeneralMatrixMatrix\_BLAS.h@{include/Eigen/src/Core/products/GeneralMatrixMatrix\_BLAS.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{/*}}
+\DoxyCodeLine{2 \textcolor{comment}{ Copyright (c) 2011, Intel Corporation. All rights reserved.}}
+\DoxyCodeLine{3 \textcolor{comment}{}}
+\DoxyCodeLine{4 \textcolor{comment}{ Redistribution and use in source and binary forms, with or without modification,}}
+\DoxyCodeLine{5 \textcolor{comment}{ are permitted provided that the following conditions are met:}}
+\DoxyCodeLine{6 \textcolor{comment}{}}
+\DoxyCodeLine{7 \textcolor{comment}{ * Redistributions of source code must retain the above copyright notice, this}}
+\DoxyCodeLine{8 \textcolor{comment}{   list of conditions and the following disclaimer.}}
+\DoxyCodeLine{9 \textcolor{comment}{ * Redistributions in binary form must reproduce the above copyright notice,}}
+\DoxyCodeLine{10 \textcolor{comment}{   this list of conditions and the following disclaimer in the documentation}}
+\DoxyCodeLine{11 \textcolor{comment}{   and/or other materials provided with the distribution.}}
+\DoxyCodeLine{12 \textcolor{comment}{ * Neither the name of Intel Corporation nor the names of its contributors may}}
+\DoxyCodeLine{13 \textcolor{comment}{   be used to endorse or promote products derived from this software without}}
+\DoxyCodeLine{14 \textcolor{comment}{   specific prior written permission.}}
+\DoxyCodeLine{15 \textcolor{comment}{}}
+\DoxyCodeLine{16 \textcolor{comment}{ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "{}AS IS"{} AND}}
+\DoxyCodeLine{17 \textcolor{comment}{ ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED}}
+\DoxyCodeLine{18 \textcolor{comment}{ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE}}
+\DoxyCodeLine{19 \textcolor{comment}{ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR}}
+\DoxyCodeLine{20 \textcolor{comment}{ ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES}}
+\DoxyCodeLine{21 \textcolor{comment}{ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;}}
+\DoxyCodeLine{22 \textcolor{comment}{ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON}}
+\DoxyCodeLine{23 \textcolor{comment}{ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT}}
+\DoxyCodeLine{24 \textcolor{comment}{ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS}}
+\DoxyCodeLine{25 \textcolor{comment}{ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.}}
+\DoxyCodeLine{26 \textcolor{comment}{}}
+\DoxyCodeLine{27 \textcolor{comment}{ ********************************************************************************}}
+\DoxyCodeLine{28 \textcolor{comment}{ *   Content : Eigen bindings to BLAS F77}}
+\DoxyCodeLine{29 \textcolor{comment}{ *   General matrix-\/matrix product functionality based on ?GEMM.}}
+\DoxyCodeLine{30 \textcolor{comment}{ ********************************************************************************}}
+\DoxyCodeLine{31 \textcolor{comment}{*/}}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33 \textcolor{preprocessor}{\#ifndef EIGEN\_GENERAL\_MATRIX\_MATRIX\_BLAS\_H}}
+\DoxyCodeLine{34 \textcolor{preprocessor}{\#define EIGEN\_GENERAL\_MATRIX\_MATRIX\_BLAS\_H}}
+\DoxyCodeLine{35 }
+\DoxyCodeLine{36 \textcolor{preprocessor}{\#include "{}../InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{37 }
+\DoxyCodeLine{38 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{39 }
+\DoxyCodeLine{40 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{41 }
+\DoxyCodeLine{42 \textcolor{comment}{/**********************************************************************}}
+\DoxyCodeLine{43 \textcolor{comment}{* This file implements general matrix-\/matrix multiplication using BLAS}}
+\DoxyCodeLine{44 \textcolor{comment}{* gemm function via partial specialization of}}
+\DoxyCodeLine{45 \textcolor{comment}{* general\_matrix\_matrix\_product::run(..) method for float, double,}}
+\DoxyCodeLine{46 \textcolor{comment}{* std::complex<float> and std::complex<double> types}}
+\DoxyCodeLine{47 \textcolor{comment}{**********************************************************************/}}
+\DoxyCodeLine{48 }
+\DoxyCodeLine{49 \textcolor{comment}{// gemm specialization}}
+\DoxyCodeLine{50 }
+\DoxyCodeLine{51 \textcolor{preprocessor}{\#define GEMM\_SPECIALIZATION(EIGTYPE, EIGPREFIX, BLASTYPE, BLASFUNC) \(\backslash\)}}
+\DoxyCodeLine{52 \textcolor{preprocessor}{template< \(\backslash\)}}
+\DoxyCodeLine{53 \textcolor{preprocessor}{  typename Index, \(\backslash\)}}
+\DoxyCodeLine{54 \textcolor{preprocessor}{  int LhsStorageOrder, bool ConjugateLhs, \(\backslash\)}}
+\DoxyCodeLine{55 \textcolor{preprocessor}{  int RhsStorageOrder, bool ConjugateRhs> \(\backslash\)}}
+\DoxyCodeLine{56 \textcolor{preprocessor}{struct general\_matrix\_matrix\_product<Index,EIGTYPE,LhsStorageOrder,ConjugateLhs,EIGTYPE,RhsStorageOrder,ConjugateRhs,ColMajor,1> \(\backslash\)}}
+\DoxyCodeLine{57 \textcolor{preprocessor}{\{ \(\backslash\)}}
+\DoxyCodeLine{58 \textcolor{preprocessor}{typedef gebp\_traits<EIGTYPE,EIGTYPE> Traits; \(\backslash\)}}
+\DoxyCodeLine{59 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{60 \textcolor{preprocessor}{static void run(Index rows, Index cols, Index depth, \(\backslash\)}}
+\DoxyCodeLine{61 \textcolor{preprocessor}{  const EIGTYPE* \_lhs, Index lhsStride, \(\backslash\)}}
+\DoxyCodeLine{62 \textcolor{preprocessor}{  const EIGTYPE* \_rhs, Index rhsStride, \(\backslash\)}}
+\DoxyCodeLine{63 \textcolor{preprocessor}{  EIGTYPE* res, Index resIncr, Index resStride, \(\backslash\)}}
+\DoxyCodeLine{64 \textcolor{preprocessor}{  EIGTYPE alpha, \(\backslash\)}}
+\DoxyCodeLine{65 \textcolor{preprocessor}{  level3\_blocking<EIGTYPE, EIGTYPE>\& }\textcolor{comment}{/*blocking*/}\textcolor{preprocessor}{, \(\backslash\)}}
+\DoxyCodeLine{66 \textcolor{preprocessor}{  GemmParallelInfo<Index>* }\textcolor{comment}{/*info = 0*/}\textcolor{preprocessor}{) \(\backslash\)}}
+\DoxyCodeLine{67 \textcolor{preprocessor}{\{ \(\backslash\)}}
+\DoxyCodeLine{68 \textcolor{preprocessor}{  using std::conj; \(\backslash\)}}
+\DoxyCodeLine{69 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{70 \textcolor{preprocessor}{  EIGEN\_ONLY\_USED\_FOR\_DEBUG(resIncr); \(\backslash\)}}
+\DoxyCodeLine{71 \textcolor{preprocessor}{  eigen\_assert(resIncr == 1); \(\backslash\)}}
+\DoxyCodeLine{72 \textcolor{preprocessor}{  char transa, transb; \(\backslash\)}}
+\DoxyCodeLine{73 \textcolor{preprocessor}{  BlasIndex m, n, k, lda, ldb, ldc; \(\backslash\)}}
+\DoxyCodeLine{74 \textcolor{preprocessor}{  const EIGTYPE *a, *b; \(\backslash\)}}
+\DoxyCodeLine{75 \textcolor{preprocessor}{  EIGTYPE beta(1); \(\backslash\)}}
+\DoxyCodeLine{76 \textcolor{preprocessor}{  MatrixX\#\#EIGPREFIX a\_tmp, b\_tmp; \(\backslash\)}}
+\DoxyCodeLine{77 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{78 \textcolor{preprocessor}{}\textcolor{comment}{/* Set transpose options */}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{79 \textcolor{preprocessor}{  transa = (LhsStorageOrder==RowMajor) ? ((ConjugateLhs) ? 'C' : 'T') : 'N'; \(\backslash\)}}
+\DoxyCodeLine{80 \textcolor{preprocessor}{  transb = (RhsStorageOrder==RowMajor) ? ((ConjugateRhs) ? 'C' : 'T') : 'N'; \(\backslash\)}}
+\DoxyCodeLine{81 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{82 \textcolor{preprocessor}{}\textcolor{comment}{/* Set m, n, k */}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{83 \textcolor{preprocessor}{  m = convert\_index<BlasIndex>(rows);  \(\backslash\)}}
+\DoxyCodeLine{84 \textcolor{preprocessor}{  n = convert\_index<BlasIndex>(cols);  \(\backslash\)}}
+\DoxyCodeLine{85 \textcolor{preprocessor}{  k = convert\_index<BlasIndex>(depth); \(\backslash\)}}
+\DoxyCodeLine{86 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{87 \textcolor{preprocessor}{}\textcolor{comment}{/* Set lda, ldb, ldc */}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{88 \textcolor{preprocessor}{  lda = convert\_index<BlasIndex>(lhsStride); \(\backslash\)}}
+\DoxyCodeLine{89 \textcolor{preprocessor}{  ldb = convert\_index<BlasIndex>(rhsStride); \(\backslash\)}}
+\DoxyCodeLine{90 \textcolor{preprocessor}{  ldc = convert\_index<BlasIndex>(resStride); \(\backslash\)}}
+\DoxyCodeLine{91 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{92 \textcolor{preprocessor}{}\textcolor{comment}{/* Set a, b, c */}\textcolor{preprocessor}{ \(\backslash\)}}
+\DoxyCodeLine{93 \textcolor{preprocessor}{  if ((LhsStorageOrder==ColMajor) \&\& (ConjugateLhs)) \{ \(\backslash\)}}
+\DoxyCodeLine{94 \textcolor{preprocessor}{    Map<const MatrixX\#\#EIGPREFIX, 0, OuterStride<> > lhs(\_lhs,m,k,OuterStride<>(lhsStride)); \(\backslash\)}}
+\DoxyCodeLine{95 \textcolor{preprocessor}{    a\_tmp = lhs.conjugate(); \(\backslash\)}}
+\DoxyCodeLine{96 \textcolor{preprocessor}{    a = a\_tmp.data(); \(\backslash\)}}
+\DoxyCodeLine{97 \textcolor{preprocessor}{    lda = convert\_index<BlasIndex>(a\_tmp.outerStride()); \(\backslash\)}}
+\DoxyCodeLine{98 \textcolor{preprocessor}{  \} else a = \_lhs; \(\backslash\)}}
+\DoxyCodeLine{99 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{100 \textcolor{preprocessor}{  if ((RhsStorageOrder==ColMajor) \&\& (ConjugateRhs)) \{ \(\backslash\)}}
+\DoxyCodeLine{101 \textcolor{preprocessor}{    Map<const MatrixX\#\#EIGPREFIX, 0, OuterStride<> > rhs(\_rhs,k,n,OuterStride<>(rhsStride)); \(\backslash\)}}
+\DoxyCodeLine{102 \textcolor{preprocessor}{    b\_tmp = rhs.conjugate(); \(\backslash\)}}
+\DoxyCodeLine{103 \textcolor{preprocessor}{    b = b\_tmp.data(); \(\backslash\)}}
+\DoxyCodeLine{104 \textcolor{preprocessor}{    ldb = convert\_index<BlasIndex>(b\_tmp.outerStride()); \(\backslash\)}}
+\DoxyCodeLine{105 \textcolor{preprocessor}{  \} else b = \_rhs; \(\backslash\)}}
+\DoxyCodeLine{106 \textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{107 \textcolor{preprocessor}{  BLASFUNC(\&transa, \&transb, \&m, \&n, \&k, (const BLASTYPE*)\&numext::real\_ref(alpha), (const BLASTYPE*)a, \&lda, (const BLASTYPE*)b, \&ldb, (const BLASTYPE*)\&numext::real\_ref(beta), (BLASTYPE*)res, \&ldc); \(\backslash\)}}
+\DoxyCodeLine{108 \textcolor{preprocessor}{\}\};}}
+\DoxyCodeLine{109 }
+\DoxyCodeLine{110 \textcolor{preprocessor}{\#ifdef EIGEN\_USE\_MKL}}
+\DoxyCodeLine{111 GEMM\_SPECIALIZATION(\textcolor{keywordtype}{double},   d,  \textcolor{keywordtype}{double}, dgemm)}
+\DoxyCodeLine{112 GEMM\_SPECIALIZATION(\textcolor{keywordtype}{float},    f,  \textcolor{keywordtype}{float},  sgemm)}
+\DoxyCodeLine{113 GEMM\_SPECIALIZATION(dcomplex, cd, MKL\_Complex16, zgemm)}
+\DoxyCodeLine{114 GEMM\_SPECIALIZATION(scomplex, cf, MKL\_Complex8,  cgemm)}
+\DoxyCodeLine{115 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{116 GEMM\_SPECIALIZATION(\textcolor{keywordtype}{double},   d,  \textcolor{keywordtype}{double}, dgemm\_)}
+\DoxyCodeLine{117 GEMM\_SPECIALIZATION(\textcolor{keywordtype}{float},    f,  \textcolor{keywordtype}{float},  sgemm\_)}
+\DoxyCodeLine{118 GEMM\_SPECIALIZATION(dcomplex, cd, \textcolor{keywordtype}{double}, zgemm\_)}
+\DoxyCodeLine{119 GEMM\_SPECIALIZATION(scomplex, cf, \textcolor{keywordtype}{float},  cgemm\_)}
+\DoxyCodeLine{120 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{121 }
+\DoxyCodeLine{122 \} \textcolor{comment}{// end namespase internal}}
+\DoxyCodeLine{123 }
+\DoxyCodeLine{124 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{125 }
+\DoxyCodeLine{126 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_GENERAL\_MATRIX\_MATRIX\_BLAS\_H}}
+
+\end{DoxyCode}

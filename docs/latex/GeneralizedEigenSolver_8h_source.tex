@@ -1,0 +1,279 @@
+\hypertarget{GeneralizedEigenSolver_8h_source}{}\doxysection{Generalized\+Eigen\+Solver.\+h}
+\label{GeneralizedEigenSolver_8h_source}\index{include/Eigen/src/Eigenvalues/GeneralizedEigenSolver.h@{include/Eigen/src/Eigenvalues/GeneralizedEigenSolver.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2012-\/2016 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2010,2012 Jitse Niesen <jitse@maths.leeds.ac.uk>}}
+\DoxyCodeLine{6 \textcolor{comment}{// Copyright (C) 2016 Tobias Wood <tobias@spinicist.org.uk>}}
+\DoxyCodeLine{7 \textcolor{comment}{//}}
+\DoxyCodeLine{8 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{9 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{10 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{11 }
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#ifndef EIGEN\_GENERALIZEDEIGENSOLVER\_H}}
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#define EIGEN\_GENERALIZEDEIGENSOLVER\_H}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{preprocessor}{\#include "{}./RealQZ.h"{}}}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{20 }
+\DoxyCodeLine{60 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver}{GeneralizedEigenSolver}}}
+\DoxyCodeLine{61 \{}
+\DoxyCodeLine{62   \textcolor{keyword}{public}:}
+\DoxyCodeLine{63 }
+\DoxyCodeLine{65     \textcolor{keyword}{typedef} MatrixType\_ \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_afca25f62cd5913edce7b6b1f2f01aea6}{MatrixType}};}
+\DoxyCodeLine{66 }
+\DoxyCodeLine{67     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{68       RowsAtCompileTime = MatrixType::RowsAtCompileTime,}
+\DoxyCodeLine{69       ColsAtCompileTime = MatrixType::ColsAtCompileTime,}
+\DoxyCodeLine{70       Options = MatrixType::Options,}
+\DoxyCodeLine{71       MaxRowsAtCompileTime = MatrixType::MaxRowsAtCompileTime,}
+\DoxyCodeLine{72       MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime}
+\DoxyCodeLine{73     \};}
+\DoxyCodeLine{74 }
+\DoxyCodeLine{76     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a81b71b590b3a2bbb84fb3aebf3cd2f98}{Scalar}};}
+\DoxyCodeLine{77     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::Real}} RealScalar;}
+\DoxyCodeLine{78     \textcolor{keyword}{typedef} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Eigen::Index}} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_aa41eaf99a4e965cf7b9d3dd3a4756405}{Index}}; }
+\DoxyCodeLine{79 }
+\DoxyCodeLine{86     \textcolor{keyword}{typedef} std::complex<RealScalar> \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a4f7fcede2f4a9b2035cd085699312ea8}{ComplexScalar}};}
+\DoxyCodeLine{87 }
+\DoxyCodeLine{93     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar, ColsAtCompileTime, 1, Options \& \string~RowMajor, MaxColsAtCompileTime, 1>}} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a69344c66c55a1e104b4d42c39e50d9de}{VectorType}};}
+\DoxyCodeLine{94 }
+\DoxyCodeLine{100     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<ComplexScalar, ColsAtCompileTime, 1, Options \& \string~RowMajor, MaxColsAtCompileTime, 1>}} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a653a8eb657e8e81a1addf236c8ac6fad}{ComplexVectorType}};}
+\DoxyCodeLine{101 }
+\DoxyCodeLine{104     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{CwiseBinaryOp<internal::scalar\_quotient\_op<ComplexScalar,Scalar>}},\mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a653a8eb657e8e81a1addf236c8ac6fad}{ComplexVectorType}},\mbox{\hyperlink{classEigen_1_1Matrix}{VectorType}}> \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a6c19ca74db8d5ee313db46748982299a}{EigenvalueType}};}
+\DoxyCodeLine{105 }
+\DoxyCodeLine{111     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<ComplexScalar, RowsAtCompileTime, ColsAtCompileTime, Options, MaxRowsAtCompileTime, MaxColsAtCompileTime>}} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_aea30f692795a188034454342519419bb}{EigenvectorsType}};}
+\DoxyCodeLine{112 }
+\DoxyCodeLine{120     \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a88b523545b3e852942f8f7c3f4996592}{GeneralizedEigenSolver}}()}
+\DoxyCodeLine{121       : m\_eivec(),}
+\DoxyCodeLine{122         m\_alphas(),}
+\DoxyCodeLine{123         m\_betas(),}
+\DoxyCodeLine{124         m\_valuesOkay(false),}
+\DoxyCodeLine{125         m\_vectorsOkay(false),}
+\DoxyCodeLine{126         m\_realQZ()}
+\DoxyCodeLine{127     \{\}}
+\DoxyCodeLine{128 }
+\DoxyCodeLine{135     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_acd9f42ef54df1823adb05e9330888e5f}{GeneralizedEigenSolver}}(\mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_aa41eaf99a4e965cf7b9d3dd3a4756405}{Index}} size)}
+\DoxyCodeLine{136       : m\_eivec(size, size),}
+\DoxyCodeLine{137         m\_alphas(size),}
+\DoxyCodeLine{138         m\_betas(size),}
+\DoxyCodeLine{139         m\_valuesOkay(false),}
+\DoxyCodeLine{140         m\_vectorsOkay(false),}
+\DoxyCodeLine{141         m\_realQZ(size),}
+\DoxyCodeLine{142         m\_tmp(size)}
+\DoxyCodeLine{143     \{\}}
+\DoxyCodeLine{144 }
+\DoxyCodeLine{157     \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_ab17a34ebafee8bf052f55b75f50b96a1}{GeneralizedEigenSolver}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_afca25f62cd5913edce7b6b1f2f01aea6}{MatrixType}}\& A, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_afca25f62cd5913edce7b6b1f2f01aea6}{MatrixType}}\& B, \textcolor{keywordtype}{bool} computeEigenvectors = \textcolor{keyword}{true})}
+\DoxyCodeLine{158       : m\_eivec(A.rows(), A.cols()),}
+\DoxyCodeLine{159         m\_alphas(A.cols()),}
+\DoxyCodeLine{160         m\_betas(A.cols()),}
+\DoxyCodeLine{161         m\_valuesOkay(false),}
+\DoxyCodeLine{162         m\_vectorsOkay(false),}
+\DoxyCodeLine{163         m\_realQZ(A.cols()),}
+\DoxyCodeLine{164         m\_tmp(A.cols())}
+\DoxyCodeLine{165     \{}
+\DoxyCodeLine{166       \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a275910b47dfe5f40211dcb59cfd68f3c}{compute}}(A, B, computeEigenvectors);}
+\DoxyCodeLine{167     \}}
+\DoxyCodeLine{168 }
+\DoxyCodeLine{169     \textcolor{comment}{/* \(\backslash\)brief Returns the computed generalized eigenvectors.}}
+\DoxyCodeLine{170 \textcolor{comment}{      *}}
+\DoxyCodeLine{171 \textcolor{comment}{      * \(\backslash\)returns  \%Matrix whose columns are the (possibly complex) right eigenvectors.}}
+\DoxyCodeLine{172 \textcolor{comment}{      * i.e. the eigenvectors that solve (A -\/ l*B)x = 0. The ordering matches the eigenvalues.}}
+\DoxyCodeLine{173 \textcolor{comment}{      *}}
+\DoxyCodeLine{174 \textcolor{comment}{      * \(\backslash\)pre Either the constructor }}
+\DoxyCodeLine{175 \textcolor{comment}{      * GeneralizedEigenSolver(const MatrixType\&,const MatrixType\&, bool) or the member function}}
+\DoxyCodeLine{176 \textcolor{comment}{      * compute(const MatrixType\&, const MatrixType\& bool) has been called before, and}}
+\DoxyCodeLine{177 \textcolor{comment}{      * \(\backslash\)p computeEigenvectors was set to true (the default).}}
+\DoxyCodeLine{178 \textcolor{comment}{      *}}
+\DoxyCodeLine{179 \textcolor{comment}{      * \(\backslash\)sa eigenvalues()}}
+\DoxyCodeLine{180 \textcolor{comment}{      */}}
+\DoxyCodeLine{181     \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_aea30f692795a188034454342519419bb}{EigenvectorsType}} eigenvectors()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{182       eigen\_assert(m\_vectorsOkay \&\& \textcolor{stringliteral}{"{}Eigenvectors for GeneralizedEigenSolver were not calculated."{}});}
+\DoxyCodeLine{183       \textcolor{keywordflow}{return} m\_eivec;}
+\DoxyCodeLine{184     \}}
+\DoxyCodeLine{185 }
+\DoxyCodeLine{204     \mbox{\hyperlink{classEigen_1_1CwiseBinaryOp}{EigenvalueType}} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_ac0544a47c14e611888496169fe097c1d}{eigenvalues}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{205 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{206       eigen\_assert(m\_valuesOkay \&\& \textcolor{stringliteral}{"{}GeneralizedEigenSolver is not initialized."{}});}
+\DoxyCodeLine{207       \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a6c19ca74db8d5ee313db46748982299a}{EigenvalueType}}(m\_alphas,m\_betas);}
+\DoxyCodeLine{208     \}}
+\DoxyCodeLine{209 }
+\DoxyCodeLine{215     \mbox{\hyperlink{classEigen_1_1Matrix}{ComplexVectorType}} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a87aaa43b1de61ced7cf35ba22a861001}{alphas}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{216 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{217       eigen\_assert(m\_valuesOkay \&\& \textcolor{stringliteral}{"{}GeneralizedEigenSolver is not initialized."{}});}
+\DoxyCodeLine{218       \textcolor{keywordflow}{return} m\_alphas;}
+\DoxyCodeLine{219     \}}
+\DoxyCodeLine{220 }
+\DoxyCodeLine{226     \mbox{\hyperlink{classEigen_1_1Matrix}{VectorType}} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a99b71d17484e88fbf6f48122555a08ca}{betas}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{227 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{228       eigen\_assert(m\_valuesOkay \&\& \textcolor{stringliteral}{"{}GeneralizedEigenSolver is not initialized."{}});}
+\DoxyCodeLine{229       \textcolor{keywordflow}{return} m\_betas;}
+\DoxyCodeLine{230     \}}
+\DoxyCodeLine{231 }
+\DoxyCodeLine{255     \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver}{GeneralizedEigenSolver}}\& \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a275910b47dfe5f40211dcb59cfd68f3c}{compute}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_afca25f62cd5913edce7b6b1f2f01aea6}{MatrixType}}\& A, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_afca25f62cd5913edce7b6b1f2f01aea6}{MatrixType}}\& B, \textcolor{keywordtype}{bool} computeEigenvectors = \textcolor{keyword}{true});}
+\DoxyCodeLine{256 }
+\DoxyCodeLine{257     \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} info()\textcolor{keyword}{ const}}
+\DoxyCodeLine{258 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{259       eigen\_assert(m\_valuesOkay \&\& \textcolor{stringliteral}{"{}EigenSolver is not initialized."{}});}
+\DoxyCodeLine{260       \textcolor{keywordflow}{return} m\_realQZ.info();}
+\DoxyCodeLine{261     \}}
+\DoxyCodeLine{262 }
+\DoxyCodeLine{265     \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver}{GeneralizedEigenSolver}}\& \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_ad044b199000ab9d72cc0de05005a41f3}{setMaxIterations}}(\mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_aa41eaf99a4e965cf7b9d3dd3a4756405}{Index}} maxIters)}
+\DoxyCodeLine{266     \{}
+\DoxyCodeLine{267       m\_realQZ.setMaxIterations(maxIters);}
+\DoxyCodeLine{268       \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{269     \}}
+\DoxyCodeLine{270 }
+\DoxyCodeLine{271   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{272 }
+\DoxyCodeLine{273     EIGEN\_STATIC\_ASSERT\_NON\_INTEGER(\mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a81b71b590b3a2bbb84fb3aebf3cd2f98}{Scalar}})}
+\DoxyCodeLine{274     EIGEN\_STATIC\_ASSERT(!\mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::IsComplex}}, NUMERIC\_TYPE\_MUST\_BE\_REAL)}
+\DoxyCodeLine{275 }
+\DoxyCodeLine{276     \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_aea30f692795a188034454342519419bb}{EigenvectorsType}} m\_eivec;}
+\DoxyCodeLine{277     \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a653a8eb657e8e81a1addf236c8ac6fad}{ComplexVectorType}} m\_alphas;}
+\DoxyCodeLine{278     \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a69344c66c55a1e104b4d42c39e50d9de}{VectorType}} m\_betas;}
+\DoxyCodeLine{279     \textcolor{keywordtype}{bool} m\_valuesOkay, m\_vectorsOkay;}
+\DoxyCodeLine{280     \mbox{\hyperlink{classEigen_1_1RealQZ}{RealQZ<MatrixType>}} m\_realQZ;}
+\DoxyCodeLine{281     \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a653a8eb657e8e81a1addf236c8ac6fad}{ComplexVectorType}} m\_tmp;}
+\DoxyCodeLine{282 \};}
+\DoxyCodeLine{283 }
+\DoxyCodeLine{284 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{285 GeneralizedEigenSolver<MatrixType>\&}
+\DoxyCodeLine{286 \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a275910b47dfe5f40211dcb59cfd68f3c}{GeneralizedEigenSolver<MatrixType>::compute}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_afca25f62cd5913edce7b6b1f2f01aea6}{MatrixType}}\& A, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_afca25f62cd5913edce7b6b1f2f01aea6}{MatrixType}}\& B, \textcolor{keywordtype}{bool} computeEigenvectors)}
+\DoxyCodeLine{287 \{}
+\DoxyCodeLine{288   \textcolor{keyword}{using} std::sqrt;}
+\DoxyCodeLine{289   \textcolor{keyword}{using} std::abs;}
+\DoxyCodeLine{290   eigen\_assert(A.cols() == A.rows() \&\& B.cols() == A.rows() \&\& B.cols() == B.rows());}
+\DoxyCodeLine{291   \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_aa41eaf99a4e965cf7b9d3dd3a4756405}{Index}} size = A.cols();}
+\DoxyCodeLine{292   m\_valuesOkay = \textcolor{keyword}{false};}
+\DoxyCodeLine{293   m\_vectorsOkay = \textcolor{keyword}{false};}
+\DoxyCodeLine{294   \textcolor{comment}{// Reduce to generalized real Schur form:}}
+\DoxyCodeLine{295   \textcolor{comment}{// A = Q S Z and B = Q T Z}}
+\DoxyCodeLine{296   m\_realQZ.compute(A, B, computeEigenvectors);}
+\DoxyCodeLine{297   \textcolor{keywordflow}{if} (m\_realQZ.info() == \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}})}
+\DoxyCodeLine{298   \{}
+\DoxyCodeLine{299     \textcolor{comment}{// Resize storage}}
+\DoxyCodeLine{300     m\_alphas.resize(size);}
+\DoxyCodeLine{301     m\_betas.resize(size);}
+\DoxyCodeLine{302     \textcolor{keywordflow}{if} (computeEigenvectors)}
+\DoxyCodeLine{303     \{}
+\DoxyCodeLine{304       m\_eivec.resize(size,size);}
+\DoxyCodeLine{305       m\_tmp.resize(size);}
+\DoxyCodeLine{306     \}}
+\DoxyCodeLine{307 }
+\DoxyCodeLine{308     \textcolor{comment}{// Aliases:}}
+\DoxyCodeLine{309     \mbox{\hyperlink{classEigen_1_1Map}{Map<VectorType>}} v(\textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a81b71b590b3a2bbb84fb3aebf3cd2f98}{Scalar}}*\textcolor{keyword}{>}(m\_tmp.data()), size);}
+\DoxyCodeLine{310     \mbox{\hyperlink{classEigen_1_1Matrix}{ComplexVectorType}} \&cv = m\_tmp;}
+\DoxyCodeLine{311     \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_afca25f62cd5913edce7b6b1f2f01aea6}{MatrixType}} \&mS = m\_realQZ.matrixS();}
+\DoxyCodeLine{312     \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_afca25f62cd5913edce7b6b1f2f01aea6}{MatrixType}} \&mT = m\_realQZ.matrixT();}
+\DoxyCodeLine{313 }
+\DoxyCodeLine{314     \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_aa41eaf99a4e965cf7b9d3dd3a4756405}{Index}} i = 0;}
+\DoxyCodeLine{315     \textcolor{keywordflow}{while} (i < size)}
+\DoxyCodeLine{316     \{}
+\DoxyCodeLine{317       \textcolor{keywordflow}{if} (i == size -\/ 1 || mS.coeff(i+1, i) == \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a81b71b590b3a2bbb84fb3aebf3cd2f98}{Scalar}}(0))}
+\DoxyCodeLine{318       \{}
+\DoxyCodeLine{319         \textcolor{comment}{// Real eigenvalue}}
+\DoxyCodeLine{320         m\_alphas.coeffRef(i) = mS.diagonal().coeff(i);}
+\DoxyCodeLine{321         m\_betas.coeffRef(i)  = mT.diagonal().coeff(i);}
+\DoxyCodeLine{322         \textcolor{keywordflow}{if} (computeEigenvectors)}
+\DoxyCodeLine{323         \{}
+\DoxyCodeLine{324           v.setConstant(\mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a81b71b590b3a2bbb84fb3aebf3cd2f98}{Scalar}}(0.0));}
+\DoxyCodeLine{325           v.coeffRef(i) = \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a81b71b590b3a2bbb84fb3aebf3cd2f98}{Scalar}}(1.0);}
+\DoxyCodeLine{326           \textcolor{comment}{// For singular eigenvalues do nothing more}}
+\DoxyCodeLine{327           \textcolor{keywordflow}{if}(abs(m\_betas.coeffRef(i)) >= (std::numeric\_limits<RealScalar>::min)())}
+\DoxyCodeLine{328           \{}
+\DoxyCodeLine{329             \textcolor{comment}{// Non-\/singular eigenvalue}}
+\DoxyCodeLine{330             \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a81b71b590b3a2bbb84fb3aebf3cd2f98}{Scalar}} alpha = real(m\_alphas.coeffRef(i));}
+\DoxyCodeLine{331             \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a81b71b590b3a2bbb84fb3aebf3cd2f98}{Scalar}} beta = m\_betas.coeffRef(i);}
+\DoxyCodeLine{332             \textcolor{keywordflow}{for} (\mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_aa41eaf99a4e965cf7b9d3dd3a4756405}{Index}} j = i-\/1; j >= 0; j-\/-\/)}
+\DoxyCodeLine{333             \{}
+\DoxyCodeLine{334               \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_aa41eaf99a4e965cf7b9d3dd3a4756405}{Index}} st = j+1;}
+\DoxyCodeLine{335               \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_aa41eaf99a4e965cf7b9d3dd3a4756405}{Index}} sz = i-\/j;}
+\DoxyCodeLine{336               \textcolor{keywordflow}{if} (j > 0 \&\& mS.coeff(j, j-\/1) != \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a81b71b590b3a2bbb84fb3aebf3cd2f98}{Scalar}}(0))}
+\DoxyCodeLine{337               \{}
+\DoxyCodeLine{338                 \textcolor{comment}{// 2x2 block}}
+\DoxyCodeLine{339                 \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar, 2, 1>}} rhs = (alpha*mT.template block<2,Dynamic>(j-\/1,st,2,sz) -\/ beta*mS.template block<2,Dynamic>(j-\/1,st,2,sz)) .lazyProduct( v.segment(st,sz) );}
+\DoxyCodeLine{340                 \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar, 2, 2>}} lhs = beta * mS.template block<2,2>(j-\/1,j-\/1) -\/ alpha * mT.template block<2,2>(j-\/1,j-\/1);}
+\DoxyCodeLine{341                 v.template segment<2>(j-\/1) = lhs.partialPivLu().solve(rhs);}
+\DoxyCodeLine{342                 j-\/-\/;}
+\DoxyCodeLine{343               \}}
+\DoxyCodeLine{344               \textcolor{keywordflow}{else}}
+\DoxyCodeLine{345               \{}
+\DoxyCodeLine{346                 v.coeffRef(j) = -\/v.segment(st,sz).transpose().cwiseProduct(beta*mS.block(j,st,1,sz) -\/ alpha*mT.block(j,st,1,sz)).sum() / (beta*mS.coeffRef(j,j) -\/ alpha*mT.coeffRef(j,j));}
+\DoxyCodeLine{347               \}}
+\DoxyCodeLine{348             \}}
+\DoxyCodeLine{349           \}}
+\DoxyCodeLine{350           m\_eivec.col(i).real().noalias() = m\_realQZ.matrixZ().transpose() * v;}
+\DoxyCodeLine{351           m\_eivec.col(i).real().normalize();}
+\DoxyCodeLine{352           m\_eivec.col(i).imag().setConstant(0);}
+\DoxyCodeLine{353         \}}
+\DoxyCodeLine{354         ++i;}
+\DoxyCodeLine{355       \}}
+\DoxyCodeLine{356       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{357       \{}
+\DoxyCodeLine{358         \textcolor{comment}{// We need to extract the generalized eigenvalues of the pair of a general 2x2 block S and a positive diagonal 2x2 block T}}
+\DoxyCodeLine{359         \textcolor{comment}{// Then taking beta=T\_00*T\_11, we can avoid any division, and alpha is the eigenvalues of A = (U\string^-\/1 * S * U) * diag(T\_11,T\_00):}}
+\DoxyCodeLine{360 }
+\DoxyCodeLine{361         \textcolor{comment}{// T =  [a 0]}}
+\DoxyCodeLine{362         \textcolor{comment}{//      [0 b]}}
+\DoxyCodeLine{363         RealScalar a = mT.diagonal().coeff(i),}
+\DoxyCodeLine{364                    b = mT.diagonal().coeff(i+1);}
+\DoxyCodeLine{365         \textcolor{keyword}{const} RealScalar beta = m\_betas.coeffRef(i) = m\_betas.coeffRef(i+1) = a*b;}
+\DoxyCodeLine{366 }
+\DoxyCodeLine{367         \textcolor{comment}{// \string^\string^ NOTE: using diagonal()(i) instead of coeff(i,i) workarounds a MSVC bug.}}
+\DoxyCodeLine{368         \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<RealScalar,2,2>}} S2 = mS.template block<2,2>(i,i) * \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar,2,1>}}(b,a).asDiagonal();}
+\DoxyCodeLine{369 }
+\DoxyCodeLine{370         \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a81b71b590b3a2bbb84fb3aebf3cd2f98}{Scalar}} p = \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a81b71b590b3a2bbb84fb3aebf3cd2f98}{Scalar}}(0.5) * (S2.coeff(0,0) -\/ S2.coeff(1,1));}
+\DoxyCodeLine{371         \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a81b71b590b3a2bbb84fb3aebf3cd2f98}{Scalar}} z = sqrt(abs(p * p + S2.coeff(1,0) * S2.coeff(0,1)));}
+\DoxyCodeLine{372         \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a4f7fcede2f4a9b2035cd085699312ea8}{ComplexScalar}} alpha = \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a4f7fcede2f4a9b2035cd085699312ea8}{ComplexScalar}}(S2.coeff(1,1) + p, (beta > 0) ? z : -\/z);}
+\DoxyCodeLine{373         m\_alphas.coeffRef(i)   = conj(alpha);}
+\DoxyCodeLine{374         m\_alphas.coeffRef(i+1) = alpha;}
+\DoxyCodeLine{375 }
+\DoxyCodeLine{376         \textcolor{keywordflow}{if} (computeEigenvectors) \{}
+\DoxyCodeLine{377           \textcolor{comment}{// Compute eigenvector in position (i+1) and then position (i) is just the conjugate}}
+\DoxyCodeLine{378           cv.\mbox{\hyperlink{classEigen_1_1PlainObjectBase_ac21ad5f989f320e46958b75ac8d9a1da}{setZero}}();}
+\DoxyCodeLine{379           cv.coeffRef(i+1) = \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a81b71b590b3a2bbb84fb3aebf3cd2f98}{Scalar}}(1.0);}
+\DoxyCodeLine{380           \textcolor{comment}{// here, the "{}static\_cast"{} workaound expression template issues.}}
+\DoxyCodeLine{381           cv.coeffRef(i) = -\/(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a81b71b590b3a2bbb84fb3aebf3cd2f98}{Scalar}}\textcolor{keyword}{>}(beta*mS.coeffRef(i,i+1)) -\/ alpha*mT.coeffRef(i,i+1))}
+\DoxyCodeLine{382                           / (\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a81b71b590b3a2bbb84fb3aebf3cd2f98}{Scalar}}\textcolor{keyword}{>}(beta*mS.coeffRef(i,i))   -\/ alpha*mT.coeffRef(i,i));}
+\DoxyCodeLine{383           \textcolor{keywordflow}{for} (\mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_aa41eaf99a4e965cf7b9d3dd3a4756405}{Index}} j = i-\/1; j >= 0; j-\/-\/)}
+\DoxyCodeLine{384           \{}
+\DoxyCodeLine{385             \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_aa41eaf99a4e965cf7b9d3dd3a4756405}{Index}} st = j+1;}
+\DoxyCodeLine{386             \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_aa41eaf99a4e965cf7b9d3dd3a4756405}{Index}} sz = i+1-\/j;}
+\DoxyCodeLine{387             \textcolor{keywordflow}{if} (j > 0 \&\& mS.coeff(j, j-\/1) != \mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a81b71b590b3a2bbb84fb3aebf3cd2f98}{Scalar}}(0))}
+\DoxyCodeLine{388             \{}
+\DoxyCodeLine{389               \textcolor{comment}{// 2x2 block}}
+\DoxyCodeLine{390               \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<ComplexScalar, 2, 1>}} rhs = (alpha*mT.template block<2,Dynamic>(j-\/1,st,2,sz) -\/ beta*mS.template block<2,Dynamic>(j-\/1,st,2,sz)) .lazyProduct( cv.segment(st,sz) );}
+\DoxyCodeLine{391               \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<ComplexScalar, 2, 2>}} lhs = beta * mS.template block<2,2>(j-\/1,j-\/1) -\/ alpha * mT.template block<2,2>(j-\/1,j-\/1);}
+\DoxyCodeLine{392               cv.template segment<2>(j-\/1) = lhs.partialPivLu().solve(rhs);}
+\DoxyCodeLine{393               j-\/-\/;}
+\DoxyCodeLine{394             \} \textcolor{keywordflow}{else} \{}
+\DoxyCodeLine{395               cv.coeffRef(j) =  cv.segment(st,sz).transpose().cwiseProduct(beta*mS.block(j,st,1,sz) -\/ alpha*mT.block(j,st,1,sz)).sum()}
+\DoxyCodeLine{396                               / (alpha*mT.coeffRef(j,j) -\/ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{classEigen_1_1GeneralizedEigenSolver_a81b71b590b3a2bbb84fb3aebf3cd2f98}{Scalar}}\textcolor{keyword}{>}(beta*mS.coeffRef(j,j)));}
+\DoxyCodeLine{397             \}}
+\DoxyCodeLine{398           \}}
+\DoxyCodeLine{399           m\_eivec.col(i+1).noalias() = (m\_realQZ.matrixZ().transpose() * cv);}
+\DoxyCodeLine{400           m\_eivec.col(i+1).normalize();}
+\DoxyCodeLine{401           m\_eivec.col(i) = m\_eivec.col(i+1).conjugate();}
+\DoxyCodeLine{402         \}}
+\DoxyCodeLine{403         i += 2;}
+\DoxyCodeLine{404       \}}
+\DoxyCodeLine{405     \}}
+\DoxyCodeLine{406 }
+\DoxyCodeLine{407     m\_valuesOkay = \textcolor{keyword}{true};}
+\DoxyCodeLine{408     m\_vectorsOkay = computeEigenvectors;}
+\DoxyCodeLine{409   \}}
+\DoxyCodeLine{410   \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{411 \}}
+\DoxyCodeLine{412 }
+\DoxyCodeLine{413 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{414 }
+\DoxyCodeLine{415 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_GENERALIZEDEIGENSOLVER\_H}}
+
+\end{DoxyCode}

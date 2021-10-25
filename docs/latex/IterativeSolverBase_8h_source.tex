@@ -1,0 +1,381 @@
+\hypertarget{IterativeSolverBase_8h_source}{}\doxysection{Iterative\+Solver\+Base.\+h}
+\label{IterativeSolverBase_8h_source}\index{include/Eigen/src/IterativeLinearSolvers/IterativeSolverBase.h@{include/Eigen/src/IterativeLinearSolvers/IterativeSolverBase.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2011-\/2014 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_ITERATIVE\_SOLVER\_BASE\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_ITERATIVE\_SOLVER\_BASE\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{20 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__ref__compatible__impl}{is\_ref\_compatible\_impl}}}
+\DoxyCodeLine{21 \{}
+\DoxyCodeLine{22 \textcolor{keyword}{private}:}
+\DoxyCodeLine{23   \textcolor{keyword}{template} <\textcolor{keyword}{typename} T0>}
+\DoxyCodeLine{24   \textcolor{keyword}{struct }any\_conversion}
+\DoxyCodeLine{25   \{}
+\DoxyCodeLine{26     \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> any\_conversion(\textcolor{keyword}{const} \textcolor{keyword}{volatile} T\&);}
+\DoxyCodeLine{27     \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> any\_conversion(T\&);}
+\DoxyCodeLine{28   \};}
+\DoxyCodeLine{29   \textcolor{keyword}{struct }yes \{\textcolor{keywordtype}{int} a[1];\};}
+\DoxyCodeLine{30   \textcolor{keyword}{struct }no  \{\textcolor{keywordtype}{int} a[2];\};}
+\DoxyCodeLine{31 }
+\DoxyCodeLine{32   \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{33   \textcolor{keyword}{static} yes test(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Ref}{Ref<const T>}}\&, \textcolor{keywordtype}{int});}
+\DoxyCodeLine{34   \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{35   \textcolor{keyword}{static} no  test(any\_conversion<T>, ...);}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{37 \textcolor{keyword}{public}:}
+\DoxyCodeLine{38   \textcolor{keyword}{static} MatrixType ms\_from;}
+\DoxyCodeLine{39   \textcolor{keyword}{enum} \{ value = \textcolor{keyword}{sizeof}(test<MatrixType>(ms\_from, 0))==\textcolor{keyword}{sizeof}(yes) \};}
+\DoxyCodeLine{40 \};}
+\DoxyCodeLine{41 }
+\DoxyCodeLine{42 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{43 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1is__ref__compatible}{is\_ref\_compatible}}}
+\DoxyCodeLine{44 \{}
+\DoxyCodeLine{45   \textcolor{keyword}{enum} \{ value = \mbox{\hyperlink{structEigen_1_1internal_1_1is__ref__compatible__impl}{is\_ref\_compatible\_impl<typename remove\_all<MatrixType>::type}}>::value \};}
+\DoxyCodeLine{46 \};}
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48 template<typename MatrixType, bool MatrixFree = !internal::is\_ref\_compatible<MatrixType>::value>}
+\DoxyCodeLine{49 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1generic__matrix__wrapper}{generic\_matrix\_wrapper}};}
+\DoxyCodeLine{50 }
+\DoxyCodeLine{51 \textcolor{comment}{// We have an explicit matrix at hand, compatible with Ref<>}}
+\DoxyCodeLine{52 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{53 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1generic__matrix__wrapper}{generic\_matrix\_wrapper}}<MatrixType,false>}
+\DoxyCodeLine{54 \{}
+\DoxyCodeLine{55 \textcolor{keyword}{public}:}
+\DoxyCodeLine{56   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Ref}{Ref<const MatrixType>}} \mbox{\hyperlink{classEigen_1_1Ref}{ActualMatrixType}};}
+\DoxyCodeLine{57   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} UpLo> \textcolor{keyword}{struct }ConstSelfAdjointViewReturnType \{}
+\DoxyCodeLine{58     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} ActualMatrixType::template ConstSelfAdjointViewReturnType<UpLo>::Type Type;}
+\DoxyCodeLine{59   \};}
+\DoxyCodeLine{60 }
+\DoxyCodeLine{61   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{62     MatrixFree = \textcolor{keyword}{false}}
+\DoxyCodeLine{63   \};}
+\DoxyCodeLine{64 }
+\DoxyCodeLine{65   \mbox{\hyperlink{classEigen_1_1internal_1_1generic__matrix__wrapper}{generic\_matrix\_wrapper}}()}
+\DoxyCodeLine{66     : m\_dummy(0,0), m\_matrix(m\_dummy)}
+\DoxyCodeLine{67   \{\}}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{69   \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputType>}
+\DoxyCodeLine{70   generic\_matrix\_wrapper(\textcolor{keyword}{const} InputType \&mat)}
+\DoxyCodeLine{71     : m\_matrix(mat)}
+\DoxyCodeLine{72   \{\}}
+\DoxyCodeLine{73 }
+\DoxyCodeLine{74   \textcolor{keyword}{const} ActualMatrixType\& matrix()\textcolor{keyword}{ const}}
+\DoxyCodeLine{75 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{76     \textcolor{keywordflow}{return} m\_matrix;}
+\DoxyCodeLine{77   \}}
+\DoxyCodeLine{78 }
+\DoxyCodeLine{79   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixDerived>}
+\DoxyCodeLine{80   \textcolor{keywordtype}{void} grab(\textcolor{keyword}{const} EigenBase<MatrixDerived> \&mat)}
+\DoxyCodeLine{81   \{}
+\DoxyCodeLine{82     m\_matrix.\string~Ref<\textcolor{keyword}{const} MatrixType>();}
+\DoxyCodeLine{83     ::new (\&m\_matrix) Ref<const MatrixType>(mat.derived());}
+\DoxyCodeLine{84   \}}
+\DoxyCodeLine{85 }
+\DoxyCodeLine{86   \textcolor{keywordtype}{void} grab(\textcolor{keyword}{const} Ref<const MatrixType> \&mat)}
+\DoxyCodeLine{87   \{}
+\DoxyCodeLine{88     \textcolor{keywordflow}{if}(\&(mat.derived()) != \&m\_matrix)}
+\DoxyCodeLine{89     \{}
+\DoxyCodeLine{90       m\_matrix.\string~Ref<\textcolor{keyword}{const} MatrixType>();}
+\DoxyCodeLine{91       ::new (\&m\_matrix) Ref<const MatrixType>(mat);}
+\DoxyCodeLine{92     \}}
+\DoxyCodeLine{93   \}}
+\DoxyCodeLine{94 }
+\DoxyCodeLine{95 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{96   MatrixType m\_dummy; \textcolor{comment}{// used to default initialize the Ref<> object}}
+\DoxyCodeLine{97   ActualMatrixType m\_matrix;}
+\DoxyCodeLine{98 \};}
+\DoxyCodeLine{99 }
+\DoxyCodeLine{100 \textcolor{comment}{// MatrixType is not compatible with Ref<> -\/> matrix-\/free wrapper}}
+\DoxyCodeLine{101 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType>}
+\DoxyCodeLine{102 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1generic__matrix__wrapper}{generic\_matrix\_wrapper}}<MatrixType,true>}
+\DoxyCodeLine{103 \{}
+\DoxyCodeLine{104 \textcolor{keyword}{public}:}
+\DoxyCodeLine{105   \textcolor{keyword}{typedef} MatrixType ActualMatrixType;}
+\DoxyCodeLine{106   \textcolor{keyword}{template}<\textcolor{keywordtype}{int} UpLo> \textcolor{keyword}{struct }ConstSelfAdjointViewReturnType}
+\DoxyCodeLine{107   \{}
+\DoxyCodeLine{108     \textcolor{keyword}{typedef} ActualMatrixType Type;}
+\DoxyCodeLine{109   \};}
+\DoxyCodeLine{110 }
+\DoxyCodeLine{111   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{112     MatrixFree = \textcolor{keyword}{true}}
+\DoxyCodeLine{113   \};}
+\DoxyCodeLine{114 }
+\DoxyCodeLine{115   \mbox{\hyperlink{classEigen_1_1internal_1_1generic__matrix__wrapper}{generic\_matrix\_wrapper}}()}
+\DoxyCodeLine{116     : mp\_matrix(0)}
+\DoxyCodeLine{117   \{\}}
+\DoxyCodeLine{118 }
+\DoxyCodeLine{119   generic\_matrix\_wrapper(\textcolor{keyword}{const} MatrixType \&mat)}
+\DoxyCodeLine{120     : mp\_matrix(\&mat)}
+\DoxyCodeLine{121   \{\}}
+\DoxyCodeLine{122 }
+\DoxyCodeLine{123   \textcolor{keyword}{const} ActualMatrixType\& matrix()\textcolor{keyword}{ const}}
+\DoxyCodeLine{124 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{125     \textcolor{keywordflow}{return} *mp\_matrix;}
+\DoxyCodeLine{126   \}}
+\DoxyCodeLine{127 }
+\DoxyCodeLine{128   \textcolor{keywordtype}{void} grab(\textcolor{keyword}{const} MatrixType \&mat)}
+\DoxyCodeLine{129   \{}
+\DoxyCodeLine{130     mp\_matrix = \&mat;}
+\DoxyCodeLine{131   \}}
+\DoxyCodeLine{132 }
+\DoxyCodeLine{133 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{134   \textcolor{keyword}{const} ActualMatrixType *mp\_matrix;}
+\DoxyCodeLine{135 \};}
+\DoxyCodeLine{136 }
+\DoxyCodeLine{137 \}}
+\DoxyCodeLine{138 }
+\DoxyCodeLine{144 \textcolor{keyword}{template}< \textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{145 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1IterativeSolverBase}{IterativeSolverBase}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{SparseSolverBase}}<Derived>}
+\DoxyCodeLine{146 \{}
+\DoxyCodeLine{147 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{148   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{SparseSolverBase<Derived>}} \mbox{\hyperlink{classEigen_1_1SparseSolverBase}{Base}};}
+\DoxyCodeLine{149   \textcolor{keyword}{using} Base::m\_isInitialized;}
+\DoxyCodeLine{150 }
+\DoxyCodeLine{151 \textcolor{keyword}{public}:}
+\DoxyCodeLine{152   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::MatrixType}} MatrixType;}
+\DoxyCodeLine{153   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::Preconditioner}} Preconditioner;}
+\DoxyCodeLine{154   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::Scalar Scalar;}
+\DoxyCodeLine{155   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::StorageIndex StorageIndex;}
+\DoxyCodeLine{156   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::RealScalar RealScalar;}
+\DoxyCodeLine{157 }
+\DoxyCodeLine{158   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{159     ColsAtCompileTime = MatrixType::ColsAtCompileTime,}
+\DoxyCodeLine{160     MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime}
+\DoxyCodeLine{161   \};}
+\DoxyCodeLine{162 }
+\DoxyCodeLine{163 \textcolor{keyword}{public}:}
+\DoxyCodeLine{164 }
+\DoxyCodeLine{165   \textcolor{keyword}{using} Base::derived;}
+\DoxyCodeLine{166 }
+\DoxyCodeLine{168   \mbox{\hyperlink{classEigen_1_1IterativeSolverBase_a0922f2be45082690d7734aa6732fc493}{IterativeSolverBase}}()}
+\DoxyCodeLine{169   \{}
+\DoxyCodeLine{170     init();}
+\DoxyCodeLine{171   \}}
+\DoxyCodeLine{172 }
+\DoxyCodeLine{183   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixDerived>}
+\DoxyCodeLine{184   \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1IterativeSolverBase_a3c68fe3cd929ea1ff8a0d4cbcd65ebad}{IterativeSolverBase}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<MatrixDerived>}}\& A)}
+\DoxyCodeLine{185     : m\_matrixWrapper(A.derived())}
+\DoxyCodeLine{186   \{}
+\DoxyCodeLine{187     init();}
+\DoxyCodeLine{188     \mbox{\hyperlink{classEigen_1_1IterativeSolverBase_a3b0d9691964793bd55937666426fefbf}{compute}}(matrix());}
+\DoxyCodeLine{189   \}}
+\DoxyCodeLine{190 }
+\DoxyCodeLine{191   \mbox{\hyperlink{classEigen_1_1IterativeSolverBase}{\string~IterativeSolverBase}}() \{\}}
+\DoxyCodeLine{192 }
+\DoxyCodeLine{198   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixDerived>}
+\DoxyCodeLine{199   Derived\& \mbox{\hyperlink{classEigen_1_1IterativeSolverBase_a7490c6531b523f768c0fb3b44f251dad}{analyzePattern}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<MatrixDerived>}}\& A)}
+\DoxyCodeLine{200   \{}
+\DoxyCodeLine{201     grab(A.derived());}
+\DoxyCodeLine{202     m\_preconditioner.analyzePattern(matrix());}
+\DoxyCodeLine{203     m\_isInitialized = \textcolor{keyword}{true};}
+\DoxyCodeLine{204     m\_analysisIsOk = \textcolor{keyword}{true};}
+\DoxyCodeLine{205     m\_info = m\_preconditioner.info();}
+\DoxyCodeLine{206     \textcolor{keywordflow}{return} derived();}
+\DoxyCodeLine{207   \}}
+\DoxyCodeLine{208 }
+\DoxyCodeLine{218   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixDerived>}
+\DoxyCodeLine{219   Derived\& \mbox{\hyperlink{classEigen_1_1IterativeSolverBase_a86f8f9865bedacfdf2322f52dde78e23}{factorize}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<MatrixDerived>}}\& A)}
+\DoxyCodeLine{220   \{}
+\DoxyCodeLine{221     eigen\_assert(m\_analysisIsOk \&\& \textcolor{stringliteral}{"{}You must first call analyzePattern()"{}});}
+\DoxyCodeLine{222     grab(A.derived());}
+\DoxyCodeLine{223     m\_preconditioner.factorize(matrix());}
+\DoxyCodeLine{224     m\_factorizationIsOk = \textcolor{keyword}{true};}
+\DoxyCodeLine{225     m\_info = m\_preconditioner.info();}
+\DoxyCodeLine{226     \textcolor{keywordflow}{return} derived();}
+\DoxyCodeLine{227   \}}
+\DoxyCodeLine{228 }
+\DoxyCodeLine{239   \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixDerived>}
+\DoxyCodeLine{240   Derived\& \mbox{\hyperlink{classEigen_1_1IterativeSolverBase_a3b0d9691964793bd55937666426fefbf}{compute}}(\textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<MatrixDerived>}}\& A)}
+\DoxyCodeLine{241   \{}
+\DoxyCodeLine{242     grab(A.derived());}
+\DoxyCodeLine{243     m\_preconditioner.compute(matrix());}
+\DoxyCodeLine{244     m\_isInitialized = \textcolor{keyword}{true};}
+\DoxyCodeLine{245     m\_analysisIsOk = \textcolor{keyword}{true};}
+\DoxyCodeLine{246     m\_factorizationIsOk = \textcolor{keyword}{true};}
+\DoxyCodeLine{247     m\_info = m\_preconditioner.info();}
+\DoxyCodeLine{248     \textcolor{keywordflow}{return} derived();}
+\DoxyCodeLine{249   \}}
+\DoxyCodeLine{250 }
+\DoxyCodeLine{252   EIGEN\_CONSTEXPR \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows() const EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} matrix().rows(); \}}
+\DoxyCodeLine{253 }
+\DoxyCodeLine{255   EIGEN\_CONSTEXPR \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols() const EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} matrix().cols(); \}}
+\DoxyCodeLine{256 }
+\DoxyCodeLine{260   RealScalar \mbox{\hyperlink{classEigen_1_1IterativeSolverBase_acb442c19b5858d6b9be813dd7d36cc62}{tolerance}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_tolerance; \}}
+\DoxyCodeLine{261 }
+\DoxyCodeLine{267   Derived\& \mbox{\hyperlink{classEigen_1_1IterativeSolverBase_ac43c50c69a5b621cb5a9991a1005750d}{setTolerance}}(\textcolor{keyword}{const} RealScalar\& \mbox{\hyperlink{classEigen_1_1IterativeSolverBase_acb442c19b5858d6b9be813dd7d36cc62}{tolerance}})}
+\DoxyCodeLine{268   \{}
+\DoxyCodeLine{269     m\_tolerance = \mbox{\hyperlink{classEigen_1_1IterativeSolverBase_acb442c19b5858d6b9be813dd7d36cc62}{tolerance}};}
+\DoxyCodeLine{270     \textcolor{keywordflow}{return} derived();}
+\DoxyCodeLine{271   \}}
+\DoxyCodeLine{272 }
+\DoxyCodeLine{274   Preconditioner\& \mbox{\hyperlink{classEigen_1_1IterativeSolverBase_ab30e1bca8ebbd91d977306bb94e093b9}{preconditioner}}() \{ \textcolor{keywordflow}{return} m\_preconditioner; \}}
+\DoxyCodeLine{275 }
+\DoxyCodeLine{277   \textcolor{keyword}{const} Preconditioner\& \mbox{\hyperlink{classEigen_1_1IterativeSolverBase_a640bfaf268c64f35ac3996beece46021}{preconditioner}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_preconditioner; \}}
+\DoxyCodeLine{278 }
+\DoxyCodeLine{283   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \mbox{\hyperlink{classEigen_1_1IterativeSolverBase_a168a74c8dceb6233b220031fdd756ba0}{maxIterations}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{284 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{285     \textcolor{keywordflow}{return} (m\_maxIterations<0) ? 2*matrix().cols() : m\_maxIterations;}
+\DoxyCodeLine{286   \}}
+\DoxyCodeLine{287 }
+\DoxyCodeLine{291   Derived\& \mbox{\hyperlink{classEigen_1_1IterativeSolverBase_a1bbaf86b7df6d54e78ced4da6ed2dac1}{setMaxIterations}}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} maxIters)}
+\DoxyCodeLine{292   \{}
+\DoxyCodeLine{293     m\_maxIterations = maxIters;}
+\DoxyCodeLine{294     \textcolor{keywordflow}{return} derived();}
+\DoxyCodeLine{295   \}}
+\DoxyCodeLine{296 }
+\DoxyCodeLine{298   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \mbox{\hyperlink{classEigen_1_1IterativeSolverBase_ae778dd098bd5e6655625b20b1e9f15da}{iterations}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{299 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{300     eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}ConjugateGradient is not initialized."{}});}
+\DoxyCodeLine{301     \textcolor{keywordflow}{return} m\_iterations;}
+\DoxyCodeLine{302   \}}
+\DoxyCodeLine{303 }
+\DoxyCodeLine{307   RealScalar \mbox{\hyperlink{classEigen_1_1IterativeSolverBase_a117c241af3fb1141ad0916a3cf3157ec}{error}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{308 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{309     eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}ConjugateGradient is not initialized."{}});}
+\DoxyCodeLine{310     \textcolor{keywordflow}{return} m\_error;}
+\DoxyCodeLine{311   \}}
+\DoxyCodeLine{312 }
+\DoxyCodeLine{318   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs,\textcolor{keyword}{typename} Guess>}
+\DoxyCodeLine{319   \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SolveWithGuess}{SolveWithGuess<Derived, Rhs, Guess>}}}
+\DoxyCodeLine{320   \mbox{\hyperlink{classEigen_1_1IterativeSolverBase_ad8b889910ed260591652f22c640d6a20}{solveWithGuess}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Rhs>}}\& b, \textcolor{keyword}{const} Guess\& x0)\textcolor{keyword}{ const}}
+\DoxyCodeLine{321 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{322     eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}Solver is not initialized."{}});}
+\DoxyCodeLine{323     eigen\_assert(derived().rows()==b.rows() \&\& \textcolor{stringliteral}{"{}solve(): invalid number of rows of the right hand side matrix b"{}});}
+\DoxyCodeLine{324     \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1SolveWithGuess}{SolveWithGuess<Derived, Rhs, Guess>}}(derived(), b.derived(), x0);}
+\DoxyCodeLine{325   \}}
+\DoxyCodeLine{326 }
+\DoxyCodeLine{328   \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} \mbox{\hyperlink{classEigen_1_1IterativeSolverBase_a0d6b459433a316b4f12d48e5c80d61fe}{info}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{329 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{330     eigen\_assert(m\_isInitialized \&\& \textcolor{stringliteral}{"{}IterativeSolverBase is not initialized."{}});}
+\DoxyCodeLine{331     \textcolor{keywordflow}{return} m\_info;}
+\DoxyCodeLine{332   \}}
+\DoxyCodeLine{333 }
+\DoxyCodeLine{335   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} DestDerived>}
+\DoxyCodeLine{336   \textcolor{keywordtype}{void} \_solve\_with\_guess\_impl(\textcolor{keyword}{const} Rhs\& b, \mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{SparseMatrixBase<DestDerived>}} \&aDest)\textcolor{keyword}{ const}}
+\DoxyCodeLine{337 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{338     eigen\_assert(rows()==b.rows());}
+\DoxyCodeLine{339 }
+\DoxyCodeLine{340     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rhsCols = b.cols();}
+\DoxyCodeLine{341     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} size = b.rows();}
+\DoxyCodeLine{342     DestDerived\& dest(aDest.derived());}
+\DoxyCodeLine{343     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} DestDerived::Scalar DestScalar;}
+\DoxyCodeLine{344     \mbox{\hyperlink{classEigen_1_1Matrix}{Eigen::Matrix<DestScalar,Dynamic,1>}} tb(size);}
+\DoxyCodeLine{345     \mbox{\hyperlink{classEigen_1_1Matrix}{Eigen::Matrix<DestScalar,Dynamic,1>}} tx(cols());}
+\DoxyCodeLine{346     \textcolor{comment}{// We do not directly fill dest because sparse expressions have to be free of aliasing issue.}}
+\DoxyCodeLine{347     \textcolor{comment}{// For non square least-\/square problems, b and dest might not have the same size whereas they might alias each-\/other.}}
+\DoxyCodeLine{348     \textcolor{keyword}{typename} DestDerived::PlainObject tmp(cols(),rhsCols);}
+\DoxyCodeLine{349     \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} global\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}};}
+\DoxyCodeLine{350     \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} k=0; k<rhsCols; ++k)}
+\DoxyCodeLine{351     \{}
+\DoxyCodeLine{352       tb = b.col(k);}
+\DoxyCodeLine{353       tx = dest.col(k);}
+\DoxyCodeLine{354       derived().\_solve\_vector\_with\_guess\_impl(tb,tx);}
+\DoxyCodeLine{355       tmp.col(k) = tx.sparseView(0);}
+\DoxyCodeLine{356 }
+\DoxyCodeLine{357       \textcolor{comment}{// The call to \_solve\_vector\_with\_guess\_impl updates m\_info, so if it failed for a previous column}}
+\DoxyCodeLine{358       \textcolor{comment}{// we need to restore it to the worst value.}}
+\DoxyCodeLine{359       \textcolor{keywordflow}{if}(m\_info==\mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea1c6e20706575a629b27a105f07f1883b}{NumericalIssue}})}
+\DoxyCodeLine{360         global\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea1c6e20706575a629b27a105f07f1883b}{NumericalIssue}};}
+\DoxyCodeLine{361       \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(m\_info==\mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea6a68dfb88a8336108a30588bdf356c57}{NoConvergence}})}
+\DoxyCodeLine{362         global\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea6a68dfb88a8336108a30588bdf356c57}{NoConvergence}};}
+\DoxyCodeLine{363     \}}
+\DoxyCodeLine{364     m\_info = global\_info;}
+\DoxyCodeLine{365     dest.swap(tmp);}
+\DoxyCodeLine{366   \}}
+\DoxyCodeLine{367 }
+\DoxyCodeLine{368   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} DestDerived>}
+\DoxyCodeLine{369   \textcolor{keyword}{typename} internal::enable\_if<Rhs::ColsAtCompileTime!=1 \&\& DestDerived::ColsAtCompileTime!=1>::type}
+\DoxyCodeLine{370   \_solve\_with\_guess\_impl(\textcolor{keyword}{const} Rhs\& b, MatrixBase<DestDerived> \&aDest)\textcolor{keyword}{ const}}
+\DoxyCodeLine{371 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{372     eigen\_assert(rows()==b.rows());}
+\DoxyCodeLine{373 }
+\DoxyCodeLine{374     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rhsCols = b.cols();}
+\DoxyCodeLine{375     DestDerived\& dest(aDest.derived());}
+\DoxyCodeLine{376     \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} global\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea671a2aeb0f527802806a441d58a80fcf}{Success}};}
+\DoxyCodeLine{377     \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} k=0; k<rhsCols; ++k)}
+\DoxyCodeLine{378     \{}
+\DoxyCodeLine{379       \textcolor{keyword}{typename} DestDerived::ColXpr xk(dest,k);}
+\DoxyCodeLine{380       \textcolor{keyword}{typename} Rhs::ConstColXpr bk(b,k);}
+\DoxyCodeLine{381       derived().\_solve\_vector\_with\_guess\_impl(bk,xk);}
+\DoxyCodeLine{382 }
+\DoxyCodeLine{383       \textcolor{comment}{// The call to \_solve\_vector\_with\_guess updates m\_info, so if it failed for a previous column}}
+\DoxyCodeLine{384       \textcolor{comment}{// we need to restore it to the worst value.}}
+\DoxyCodeLine{385       \textcolor{keywordflow}{if}(m\_info==\mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea1c6e20706575a629b27a105f07f1883b}{NumericalIssue}})}
+\DoxyCodeLine{386         global\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea1c6e20706575a629b27a105f07f1883b}{NumericalIssue}};}
+\DoxyCodeLine{387       \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(m\_info==\mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea6a68dfb88a8336108a30588bdf356c57}{NoConvergence}})}
+\DoxyCodeLine{388         global\_info = \mbox{\hyperlink{group__enums_gga85fad7b87587764e5cf6b513a9e0ee5ea6a68dfb88a8336108a30588bdf356c57}{NoConvergence}};}
+\DoxyCodeLine{389     \}}
+\DoxyCodeLine{390     m\_info = global\_info;}
+\DoxyCodeLine{391   \}}
+\DoxyCodeLine{392 }
+\DoxyCodeLine{393   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} DestDerived>}
+\DoxyCodeLine{394   \textcolor{keyword}{typename} internal::enable\_if<Rhs::ColsAtCompileTime==1 || DestDerived::ColsAtCompileTime==1>::type}
+\DoxyCodeLine{395   \_solve\_with\_guess\_impl(\textcolor{keyword}{const} Rhs\& b, MatrixBase<DestDerived> \&dest)\textcolor{keyword}{ const}}
+\DoxyCodeLine{396 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{397     derived().\_solve\_vector\_with\_guess\_impl(b,dest.derived());}
+\DoxyCodeLine{398   \}}
+\DoxyCodeLine{399 }
+\DoxyCodeLine{401   \textcolor{keyword}{template}<\textcolor{keyword}{typename} Rhs,\textcolor{keyword}{typename} Dest>}
+\DoxyCodeLine{402   \textcolor{keywordtype}{void} \_solve\_impl(\textcolor{keyword}{const} Rhs\& b, Dest\& x)\textcolor{keyword}{ const}}
+\DoxyCodeLine{403 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{404     x.setZero();}
+\DoxyCodeLine{405     derived().\_solve\_with\_guess\_impl(b,x);}
+\DoxyCodeLine{406   \}}
+\DoxyCodeLine{407 }
+\DoxyCodeLine{408 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{409   \textcolor{keywordtype}{void} init()}
+\DoxyCodeLine{410   \{}
+\DoxyCodeLine{411     m\_isInitialized = \textcolor{keyword}{false};}
+\DoxyCodeLine{412     m\_analysisIsOk = \textcolor{keyword}{false};}
+\DoxyCodeLine{413     m\_factorizationIsOk = \textcolor{keyword}{false};}
+\DoxyCodeLine{414     m\_maxIterations = -\/1;}
+\DoxyCodeLine{415     m\_tolerance = NumTraits<Scalar>::epsilon();}
+\DoxyCodeLine{416   \}}
+\DoxyCodeLine{417 }
+\DoxyCodeLine{418   \textcolor{keyword}{typedef} internal::generic\_matrix\_wrapper<MatrixType> MatrixWrapper;}
+\DoxyCodeLine{419   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixWrapper::ActualMatrixType ActualMatrixType;}
+\DoxyCodeLine{420 }
+\DoxyCodeLine{421   \textcolor{keyword}{const} ActualMatrixType\& matrix()\textcolor{keyword}{ const}}
+\DoxyCodeLine{422 \textcolor{keyword}{  }\{}
+\DoxyCodeLine{423     \textcolor{keywordflow}{return} m\_matrixWrapper.matrix();}
+\DoxyCodeLine{424   \}}
+\DoxyCodeLine{425 }
+\DoxyCodeLine{426   \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputType>}
+\DoxyCodeLine{427   \textcolor{keywordtype}{void} grab(\textcolor{keyword}{const} InputType \&A)}
+\DoxyCodeLine{428   \{}
+\DoxyCodeLine{429     m\_matrixWrapper.grab(A);}
+\DoxyCodeLine{430   \}}
+\DoxyCodeLine{431 }
+\DoxyCodeLine{432   MatrixWrapper m\_matrixWrapper;}
+\DoxyCodeLine{433   Preconditioner m\_preconditioner;}
+\DoxyCodeLine{434 }
+\DoxyCodeLine{435   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m\_maxIterations;}
+\DoxyCodeLine{436   RealScalar m\_tolerance;}
+\DoxyCodeLine{437 }
+\DoxyCodeLine{438   \textcolor{keyword}{mutable} RealScalar m\_error;}
+\DoxyCodeLine{439   \textcolor{keyword}{mutable} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} m\_iterations;}
+\DoxyCodeLine{440   \textcolor{keyword}{mutable} \mbox{\hyperlink{group__enums_ga85fad7b87587764e5cf6b513a9e0ee5e}{ComputationInfo}} m\_info;}
+\DoxyCodeLine{441   \textcolor{keyword}{mutable} \textcolor{keywordtype}{bool} m\_analysisIsOk, m\_factorizationIsOk;}
+\DoxyCodeLine{442 \};}
+\DoxyCodeLine{443 }
+\DoxyCodeLine{444 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{445 }
+\DoxyCodeLine{446 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_ITERATIVE\_SOLVER\_BASE\_H}}
+
+\end{DoxyCode}

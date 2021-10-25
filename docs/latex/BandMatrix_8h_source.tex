@@ -1,0 +1,309 @@
+\hypertarget{BandMatrix_8h_source}{}\doxysection{Band\+Matrix.\+h}
+\label{BandMatrix_8h_source}\index{include/Eigen/src/Core/BandMatrix.h@{include/Eigen/src/Core/BandMatrix.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_BANDMATRIX\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_BANDMATRIX\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{20 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase}{BandMatrixBase}} : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase}}<Derived>}
+\DoxyCodeLine{21 \{}
+\DoxyCodeLine{22   \textcolor{keyword}{public}:}
+\DoxyCodeLine{23 }
+\DoxyCodeLine{24     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{25       Flags = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::Flags}},}
+\DoxyCodeLine{26       CoeffReadCost = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::CoeffReadCost}},}
+\DoxyCodeLine{27       RowsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::RowsAtCompileTime}},}
+\DoxyCodeLine{28       ColsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::ColsAtCompileTime}},}
+\DoxyCodeLine{29       MaxRowsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::MaxRowsAtCompileTime}},}
+\DoxyCodeLine{30       MaxColsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::MaxColsAtCompileTime}},}
+\DoxyCodeLine{31       Supers = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::Supers}},}
+\DoxyCodeLine{32       Subs   = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::Subs}},}
+\DoxyCodeLine{33       Options = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::Options}}}
+\DoxyCodeLine{34     \};}
+\DoxyCodeLine{35     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::Scalar}} Scalar;}
+\DoxyCodeLine{36     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar,RowsAtCompileTime,ColsAtCompileTime>}} \mbox{\hyperlink{classEigen_1_1Matrix}{DenseMatrixType}};}
+\DoxyCodeLine{37     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} DenseMatrixType::StorageIndex StorageIndex;}
+\DoxyCodeLine{38     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::CoefficientsType}} CoefficientsType;}
+\DoxyCodeLine{39     \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase<Derived>}} \mbox{\hyperlink{structEigen_1_1EigenBase}{Base}};}
+\DoxyCodeLine{40 }
+\DoxyCodeLine{41   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{42     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{43       DataRowsAtCompileTime = ((Supers!=\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}) \&\& (Subs!=\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}))}
+\DoxyCodeLine{44                             ? 1 + Supers + Subs}
+\DoxyCodeLine{45                             : \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}},}
+\DoxyCodeLine{46       SizeAtCompileTime = EIGEN\_SIZE\_MIN\_PREFER\_DYNAMIC(RowsAtCompileTime,ColsAtCompileTime)}
+\DoxyCodeLine{47     \};}
+\DoxyCodeLine{48 }
+\DoxyCodeLine{49   \textcolor{keyword}{public}:}
+\DoxyCodeLine{50 }
+\DoxyCodeLine{51     \textcolor{keyword}{using} \mbox{\hyperlink{structEigen_1_1EigenBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{Base::derived}};}
+\DoxyCodeLine{52     \textcolor{keyword}{using} \mbox{\hyperlink{structEigen_1_1EigenBase_af1d12fdb3361e150427e1fd94ebb1f14}{Base::rows}};}
+\DoxyCodeLine{53     \textcolor{keyword}{using} \mbox{\hyperlink{structEigen_1_1EigenBase_a50c19c45f15acdfe1cb66ab5e879b8e3}{Base::cols}};}
+\DoxyCodeLine{54 }
+\DoxyCodeLine{56     \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a58617da0d75d22b1f8dfdfde702ebb4a}{supers}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}().supers(); \}}
+\DoxyCodeLine{57 }
+\DoxyCodeLine{59     \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a1115fe9b5a07d5218dacc15655a413cb}{subs}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}().subs(); \}}
+\DoxyCodeLine{60 }
+\DoxyCodeLine{62     \textcolor{keyword}{inline} \textcolor{keyword}{const} CoefficientsType\& \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a6d7907b36aee1c3b9da1412b565e4936}{coeffs}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}().coeffs(); \}}
+\DoxyCodeLine{63 }
+\DoxyCodeLine{65     \textcolor{keyword}{inline} CoefficientsType\& \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a9ce29768f413dc222ca4da3be4c3850e}{coeffs}}() \{ \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_ab4cf3e6bb046a94a46b69b857bd3dbc9}{derived}}().coeffs(); \}}
+\DoxyCodeLine{66 }
+\DoxyCodeLine{70     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Block}{Block<CoefficientsType,Dynamic,1>}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a30685b7021fc61bdc10e75873923dfab}{col}}(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} i)}
+\DoxyCodeLine{71     \{}
+\DoxyCodeLine{72       EIGEN\_STATIC\_ASSERT((\textcolor{keywordtype}{int}(Options) \& \textcolor{keywordtype}{int}(\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}})) == 0, THIS\_METHOD\_IS\_ONLY\_FOR\_COLUMN\_MAJOR\_MATRICES);}
+\DoxyCodeLine{73       \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} start = 0;}
+\DoxyCodeLine{74       \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} len = \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a6d7907b36aee1c3b9da1412b565e4936}{coeffs}}().rows();}
+\DoxyCodeLine{75       \textcolor{keywordflow}{if} (i<=\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a58617da0d75d22b1f8dfdfde702ebb4a}{supers}}())}
+\DoxyCodeLine{76       \{}
+\DoxyCodeLine{77         start = \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a58617da0d75d22b1f8dfdfde702ebb4a}{supers}}()-\/i;}
+\DoxyCodeLine{78         len = (std::min)(\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_af1d12fdb3361e150427e1fd94ebb1f14}{rows}}(),std::max<Index>(0,\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a6d7907b36aee1c3b9da1412b565e4936}{coeffs}}().\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_af1d12fdb3361e150427e1fd94ebb1f14}{rows}}() -\/ (\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a58617da0d75d22b1f8dfdfde702ebb4a}{supers}}()-\/i)));}
+\DoxyCodeLine{79       \}}
+\DoxyCodeLine{80       \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (i>=\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_af1d12fdb3361e150427e1fd94ebb1f14}{rows}}()-\/\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a1115fe9b5a07d5218dacc15655a413cb}{subs}}())}
+\DoxyCodeLine{81         len = std::max<Index>(0,\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a6d7907b36aee1c3b9da1412b565e4936}{coeffs}}().rows() -\/ (i + 1 -\/ \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_af1d12fdb3361e150427e1fd94ebb1f14}{rows}}() + \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a1115fe9b5a07d5218dacc15655a413cb}{subs}}()));}
+\DoxyCodeLine{82       \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Block}{Block<CoefficientsType,Dynamic,1>}}(\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a6d7907b36aee1c3b9da1412b565e4936}{coeffs}}(), start, i, len, 1);}
+\DoxyCodeLine{83     \}}
+\DoxyCodeLine{84 }
+\DoxyCodeLine{86     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Block}{Block<CoefficientsType,1,SizeAtCompileTime>}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_ac3a1a4c883004778d0540ce54d1901ca}{diagonal}}()}
+\DoxyCodeLine{87     \{ \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Block}{Block<CoefficientsType,1,SizeAtCompileTime>}}(\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a6d7907b36aee1c3b9da1412b565e4936}{coeffs}}(),\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a58617da0d75d22b1f8dfdfde702ebb4a}{supers}}(),0,1,(std::min)(\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_af1d12fdb3361e150427e1fd94ebb1f14}{rows}}(),\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a50c19c45f15acdfe1cb66ab5e879b8e3}{cols}}())); \}}
+\DoxyCodeLine{88 }
+\DoxyCodeLine{90     \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Block}{Block<const CoefficientsType,1,SizeAtCompileTime>}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_afe8b339abeca5197541cfe9ae036ffcd}{diagonal}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{91 \textcolor{keyword}{    }\{ \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Block}{Block<const CoefficientsType,1,SizeAtCompileTime>}}(\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a6d7907b36aee1c3b9da1412b565e4936}{coeffs}}(),\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a58617da0d75d22b1f8dfdfde702ebb4a}{supers}}(),0,1,(std::min)(\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_af1d12fdb3361e150427e1fd94ebb1f14}{rows}}(),\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a50c19c45f15acdfe1cb66ab5e879b8e3}{cols}}())); \}}
+\DoxyCodeLine{92 }
+\DoxyCodeLine{93     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Index> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1BandMatrixBase_1_1DiagonalIntReturnType}{DiagonalIntReturnType}} \{}
+\DoxyCodeLine{94       \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{95         ReturnOpposite = (int(Options) \& int(\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdacf9ccb2016f8b9c0f3268f05a1e75821}{SelfAdjoint}})) \&\& (((\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}}) > 0 \&\& Supers == 0) || ((\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}}) < 0 \&\& Subs == 0)),}
+\DoxyCodeLine{96         \mbox{\hyperlink{classEigen_1_1Conjugate}{Conjugate}} = ReturnOpposite \&\& \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::IsComplex}},}
+\DoxyCodeLine{97         ActualIndex = ReturnOpposite ? -\/\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} : \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}},}
+\DoxyCodeLine{98         DiagonalSize = (RowsAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}} || ColsAtCompileTime==\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}})}
+\DoxyCodeLine{99                      ? \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}}
+\DoxyCodeLine{100                      : (ActualIndex<0}
+\DoxyCodeLine{101                      ? EIGEN\_SIZE\_MIN\_PREFER\_DYNAMIC(ColsAtCompileTime, RowsAtCompileTime + ActualIndex)}
+\DoxyCodeLine{102                      : EIGEN\_SIZE\_MIN\_PREFER\_DYNAMIC(RowsAtCompileTime, ColsAtCompileTime -\/ ActualIndex))}
+\DoxyCodeLine{103       \};}
+\DoxyCodeLine{104       \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Block}{Block<CoefficientsType,1, DiagonalSize>}} \mbox{\hyperlink{classEigen_1_1Block}{BuildType}};}
+\DoxyCodeLine{105       \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1conditional}{internal::conditional}}<\mbox{\hyperlink{classEigen_1_1Conjugate}{Conjugate}},}
+\DoxyCodeLine{106                  \mbox{\hyperlink{classEigen_1_1CwiseUnaryOp}{CwiseUnaryOp<internal::scalar\_conjugate\_op<Scalar>}},\mbox{\hyperlink{classEigen_1_1Block}{BuildType}} >,}
+\DoxyCodeLine{107                  \mbox{\hyperlink{classEigen_1_1Block}{BuildType}}>::type \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{Type}};}
+\DoxyCodeLine{108     \};}
+\DoxyCodeLine{109 }
+\DoxyCodeLine{111     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} N> \textcolor{keyword}{inline} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{DiagonalIntReturnType<N>::Type}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_aac728fa92b5381f238785947270439f9}{diagonal}}()}
+\DoxyCodeLine{112     \{}
+\DoxyCodeLine{113       \textcolor{keywordflow}{return} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Block}{DiagonalIntReturnType<N>::BuildType}}(\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a6d7907b36aee1c3b9da1412b565e4936}{coeffs}}(), \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a58617da0d75d22b1f8dfdfde702ebb4a}{supers}}()-\/N, (std::max)(0,N), 1, diagonalLength(N));}
+\DoxyCodeLine{114     \}}
+\DoxyCodeLine{115 }
+\DoxyCodeLine{117     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} N> \textcolor{keyword}{inline} \textcolor{keyword}{const} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{DiagonalIntReturnType<N>::Type}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a68c645022231461e07abbc2895b7a5fd}{diagonal}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{118 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{119       \textcolor{keywordflow}{return} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1Block}{DiagonalIntReturnType<N>::BuildType}}(\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a6d7907b36aee1c3b9da1412b565e4936}{coeffs}}(), \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a58617da0d75d22b1f8dfdfde702ebb4a}{supers}}()-\/N, (std::max)(0,N), 1, diagonalLength(N));}
+\DoxyCodeLine{120     \}}
+\DoxyCodeLine{121 }
+\DoxyCodeLine{123     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1Block}{Block<CoefficientsType,1,Dynamic>}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_ad824b64076d3a6879e75220c12742bb4}{diagonal}}(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} i)}
+\DoxyCodeLine{124     \{}
+\DoxyCodeLine{125       eigen\_assert((i<0 \&\& -\/i<=\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a1115fe9b5a07d5218dacc15655a413cb}{subs}}()) || (i>=0 \&\& i<=\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a58617da0d75d22b1f8dfdfde702ebb4a}{supers}}()));}
+\DoxyCodeLine{126       \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Block}{Block<CoefficientsType,1,Dynamic>}}(\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a6d7907b36aee1c3b9da1412b565e4936}{coeffs}}(), \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a58617da0d75d22b1f8dfdfde702ebb4a}{supers}}()-\/i, std::max<Index>(0,i), 1, diagonalLength(i));}
+\DoxyCodeLine{127     \}}
+\DoxyCodeLine{128 }
+\DoxyCodeLine{130     \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Block}{Block<const CoefficientsType,1,Dynamic>}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a5f488a3136419f6ab9cf6056fa268006}{diagonal}}(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} i)\textcolor{keyword}{ const}}
+\DoxyCodeLine{131 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{132       eigen\_assert((i<0 \&\& -\/i<=\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a1115fe9b5a07d5218dacc15655a413cb}{subs}}()) || (i>=0 \&\& i<=\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a58617da0d75d22b1f8dfdfde702ebb4a}{supers}}()));}
+\DoxyCodeLine{133       \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Block}{Block<const CoefficientsType,1,Dynamic>}}(\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a6d7907b36aee1c3b9da1412b565e4936}{coeffs}}(), \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a58617da0d75d22b1f8dfdfde702ebb4a}{supers}}()-\/i, std::max<Index>(0,i), 1, diagonalLength(i));}
+\DoxyCodeLine{134     \}}
+\DoxyCodeLine{135 }
+\DoxyCodeLine{136     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Dest> \textcolor{keyword}{inline} \textcolor{keywordtype}{void} evalTo(Dest\& dst)\textcolor{keyword}{ const}}
+\DoxyCodeLine{137 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{138       dst.resize(\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_af1d12fdb3361e150427e1fd94ebb1f14}{rows}}(),\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a50c19c45f15acdfe1cb66ab5e879b8e3}{cols}}());}
+\DoxyCodeLine{139       dst.setZero();}
+\DoxyCodeLine{140       dst.diagonal() = \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_ac3a1a4c883004778d0540ce54d1901ca}{diagonal}}();}
+\DoxyCodeLine{141       \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i=1; i<=\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a58617da0d75d22b1f8dfdfde702ebb4a}{supers}}();++i)}
+\DoxyCodeLine{142         dst.diagonal(i) = \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_ac3a1a4c883004778d0540ce54d1901ca}{diagonal}}(i);}
+\DoxyCodeLine{143       \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i=1; i<=\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a1115fe9b5a07d5218dacc15655a413cb}{subs}}();++i)}
+\DoxyCodeLine{144         dst.diagonal(-\/i) = \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_ac3a1a4c883004778d0540ce54d1901ca}{diagonal}}(-\/i);}
+\DoxyCodeLine{145     \}}
+\DoxyCodeLine{146 }
+\DoxyCodeLine{147     DenseMatrixType toDenseMatrix()\textcolor{keyword}{ const}}
+\DoxyCodeLine{148 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{149       DenseMatrixType res(\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_af1d12fdb3361e150427e1fd94ebb1f14}{rows}}(),\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a50c19c45f15acdfe1cb66ab5e879b8e3}{cols}}());}
+\DoxyCodeLine{150       evalTo(res);}
+\DoxyCodeLine{151       \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{152     \}}
+\DoxyCodeLine{153 }
+\DoxyCodeLine{154   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{155 }
+\DoxyCodeLine{156     \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} diagonalLength(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} i)\textcolor{keyword}{ const}}
+\DoxyCodeLine{157 \textcolor{keyword}{    }\{ \textcolor{keywordflow}{return} i<0 ? (std::min)(\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a50c19c45f15acdfe1cb66ab5e879b8e3}{cols}}(),\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_af1d12fdb3361e150427e1fd94ebb1f14}{rows}}()+i) : (std::min)(\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_af1d12fdb3361e150427e1fd94ebb1f14}{rows}}(),\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_a50c19c45f15acdfe1cb66ab5e879b8e3}{cols}}()-\/i); \}}
+\DoxyCodeLine{158 \};}
+\DoxyCodeLine{159 }
+\DoxyCodeLine{179 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar\_, \textcolor{keywordtype}{int} Rows\_, \textcolor{keywordtype}{int} Cols\_, \textcolor{keywordtype}{int} Supers\_, \textcolor{keywordtype}{int} Subs\_, \textcolor{keywordtype}{int} Options\_>}
+\DoxyCodeLine{180 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrix}{BandMatrix}}<Scalar\_,Rows\_,Cols\_,Supers\_,Subs\_,Options\_> >}
+\DoxyCodeLine{181 \{}
+\DoxyCodeLine{182   \textcolor{keyword}{typedef} Scalar\_ Scalar;}
+\DoxyCodeLine{183   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1Dense}{Dense}} \mbox{\hyperlink{structEigen_1_1Dense}{StorageKind}};}
+\DoxyCodeLine{184   \textcolor{keyword}{typedef} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Eigen::Index}} StorageIndex;}
+\DoxyCodeLine{185   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{186     CoeffReadCost = \mbox{\hyperlink{structEigen_1_1NumTraits}{NumTraits<Scalar>::ReadCost}},}
+\DoxyCodeLine{187     RowsAtCompileTime = Rows\_,}
+\DoxyCodeLine{188     ColsAtCompileTime = Cols\_,}
+\DoxyCodeLine{189     MaxRowsAtCompileTime = Rows\_,}
+\DoxyCodeLine{190     MaxColsAtCompileTime = Cols\_,}
+\DoxyCodeLine{191     Flags = \mbox{\hyperlink{group__flags_gae2c323957f20dfdc6cb8f44428eaec1a}{LvalueBit}},}
+\DoxyCodeLine{192     Supers = Supers\_,}
+\DoxyCodeLine{193     Subs = Subs\_,}
+\DoxyCodeLine{194     Options = Options\_,}
+\DoxyCodeLine{195     DataRowsAtCompileTime = ((Supers!=\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}) \&\& (Subs!=\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}})) ? 1 + Supers + Subs : \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}}
+\DoxyCodeLine{196   \};}
+\DoxyCodeLine{197   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix}}<Scalar, DataRowsAtCompileTime, ColsAtCompileTime, int(Options) \& int(\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}}) ? \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}} : \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}> \mbox{\hyperlink{classEigen_1_1Matrix}{CoefficientsType}};}
+\DoxyCodeLine{198 \};}
+\DoxyCodeLine{199 }
+\DoxyCodeLine{200 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar\_, \textcolor{keywordtype}{int} Rows, \textcolor{keywordtype}{int} Cols, \textcolor{keywordtype}{int} Supers, \textcolor{keywordtype}{int} Subs, \textcolor{keywordtype}{int} Options>}
+\DoxyCodeLine{201 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrix}{BandMatrix}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase}{BandMatrixBase}}<BandMatrix<Scalar\_,Rows,Cols,Supers,Subs,Options> >}
+\DoxyCodeLine{202 \{}
+\DoxyCodeLine{203   \textcolor{keyword}{public}:}
+\DoxyCodeLine{204 }
+\DoxyCodeLine{205     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<BandMatrix>::Scalar}} Scalar;}
+\DoxyCodeLine{206     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<BandMatrix>::StorageIndex}} StorageIndex;}
+\DoxyCodeLine{207     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<BandMatrix>::CoefficientsType}} CoefficientsType;}
+\DoxyCodeLine{208 }
+\DoxyCodeLine{209     \textcolor{keyword}{explicit} \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrix}{BandMatrix}}(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrix_afc60d58b161b272c5d1f6931cd196f6e}{rows}}=Rows, \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrix_a9e0ad38f052a854a61c776f53045a1ff}{cols}}=Cols, \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrix_a93cba3058e1b98f20cff347e69f4fb99}{supers}}=Supers, \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrix_a0f793b088781536e955fbf60790d56e3}{subs}}=Subs)}
+\DoxyCodeLine{210       : m\_coeffs(1+\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrix_a93cba3058e1b98f20cff347e69f4fb99}{supers}}+\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrix_a0f793b088781536e955fbf60790d56e3}{subs}},\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrix_a9e0ad38f052a854a61c776f53045a1ff}{cols}}),}
+\DoxyCodeLine{211         m\_rows(\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrix_afc60d58b161b272c5d1f6931cd196f6e}{rows}}), m\_supers(\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrix_a93cba3058e1b98f20cff347e69f4fb99}{supers}}), m\_subs(\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrix_a0f793b088781536e955fbf60790d56e3}{subs}})}
+\DoxyCodeLine{212     \{}
+\DoxyCodeLine{213     \}}
+\DoxyCodeLine{214 }
+\DoxyCodeLine{216     \textcolor{keyword}{inline} EIGEN\_CONSTEXPR \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrix_afc60d58b161b272c5d1f6931cd196f6e}{rows}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_rows.value(); \}}
+\DoxyCodeLine{217 }
+\DoxyCodeLine{219     \textcolor{keyword}{inline} EIGEN\_CONSTEXPR \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrix_a9e0ad38f052a854a61c776f53045a1ff}{cols}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_coeffs.cols(); \}}
+\DoxyCodeLine{220 }
+\DoxyCodeLine{222     \textcolor{keyword}{inline} EIGEN\_CONSTEXPR \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrix_a93cba3058e1b98f20cff347e69f4fb99}{supers}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_supers.value(); \}}
+\DoxyCodeLine{223 }
+\DoxyCodeLine{225     \textcolor{keyword}{inline} EIGEN\_CONSTEXPR \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrix_a0f793b088781536e955fbf60790d56e3}{subs}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_subs.value(); \}}
+\DoxyCodeLine{226 }
+\DoxyCodeLine{227     \textcolor{keyword}{inline} \textcolor{keyword}{const} CoefficientsType\& coeffs()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_coeffs; \}}
+\DoxyCodeLine{228     \textcolor{keyword}{inline} CoefficientsType\& coeffs() \{ \textcolor{keywordflow}{return} m\_coeffs; \}}
+\DoxyCodeLine{229 }
+\DoxyCodeLine{230   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{231 }
+\DoxyCodeLine{232     CoefficientsType m\_coeffs;}
+\DoxyCodeLine{233     internal::variable\_if\_dynamic<Index, Rows>   m\_rows;}
+\DoxyCodeLine{234     internal::variable\_if\_dynamic<Index, Supers> m\_supers;}
+\DoxyCodeLine{235     internal::variable\_if\_dynamic<Index, Subs>   m\_subs;}
+\DoxyCodeLine{236 \};}
+\DoxyCodeLine{237 }
+\DoxyCodeLine{238 \textcolor{keyword}{template}<\textcolor{keyword}{typename} \_CoefficientsType,\textcolor{keywordtype}{int} Rows\_, \textcolor{keywordtype}{int} Cols\_, \textcolor{keywordtype}{int} Supers\_, \textcolor{keywordtype}{int} Subs\_,\textcolor{keywordtype}{int} Options\_>}
+\DoxyCodeLine{239 \textcolor{keyword}{class }BandMatrixWrapper;}
+\DoxyCodeLine{240 }
+\DoxyCodeLine{241 \textcolor{keyword}{template}<\textcolor{keyword}{typename} \_CoefficientsType,\textcolor{keywordtype}{int} Rows\_, \textcolor{keywordtype}{int} Cols\_, \textcolor{keywordtype}{int} Supers\_, \textcolor{keywordtype}{int} Subs\_,\textcolor{keywordtype}{int} Options\_>}
+\DoxyCodeLine{242 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixWrapper}{BandMatrixWrapper}}<\_CoefficientsType,Rows\_,Cols\_,Supers\_,Subs\_,Options\_> >}
+\DoxyCodeLine{243 \{}
+\DoxyCodeLine{244   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \_CoefficientsType::Scalar Scalar;}
+\DoxyCodeLine{245   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \_CoefficientsType::StorageKind StorageKind;}
+\DoxyCodeLine{246   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \_CoefficientsType::StorageIndex StorageIndex;}
+\DoxyCodeLine{247   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{248     CoeffReadCost = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<\_CoefficientsType>::CoeffReadCost}},}
+\DoxyCodeLine{249     RowsAtCompileTime = Rows\_,}
+\DoxyCodeLine{250     ColsAtCompileTime = Cols\_,}
+\DoxyCodeLine{251     MaxRowsAtCompileTime = Rows\_,}
+\DoxyCodeLine{252     MaxColsAtCompileTime = Cols\_,}
+\DoxyCodeLine{253     Flags = \mbox{\hyperlink{group__flags_gae2c323957f20dfdc6cb8f44428eaec1a}{LvalueBit}},}
+\DoxyCodeLine{254     Supers = Supers\_,}
+\DoxyCodeLine{255     Subs = Subs\_,}
+\DoxyCodeLine{256     Options = Options\_,}
+\DoxyCodeLine{257     DataRowsAtCompileTime = ((Supers!=\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}) \&\& (Subs!=\mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}})) ? 1 + Supers + Subs : \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}}
+\DoxyCodeLine{258   \};}
+\DoxyCodeLine{259   \textcolor{keyword}{typedef} \_CoefficientsType CoefficientsType;}
+\DoxyCodeLine{260 \};}
+\DoxyCodeLine{261 }
+\DoxyCodeLine{262 \textcolor{keyword}{template}<\textcolor{keyword}{typename} \_CoefficientsType,\textcolor{keywordtype}{int} Rows\_, \textcolor{keywordtype}{int} Cols\_, \textcolor{keywordtype}{int} Supers\_, \textcolor{keywordtype}{int} Subs\_,\textcolor{keywordtype}{int} Options\_>}
+\DoxyCodeLine{263 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixWrapper}{BandMatrixWrapper}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase}{BandMatrixBase}}<BandMatrixWrapper<\_CoefficientsType,Rows\_,Cols\_,Supers\_,Subs\_,Options\_> >}
+\DoxyCodeLine{264 \{}
+\DoxyCodeLine{265   \textcolor{keyword}{public}:}
+\DoxyCodeLine{266 }
+\DoxyCodeLine{267     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<BandMatrixWrapper>::Scalar}} Scalar;}
+\DoxyCodeLine{268     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<BandMatrixWrapper>::CoefficientsType}} CoefficientsType;}
+\DoxyCodeLine{269     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<BandMatrixWrapper>::StorageIndex}} StorageIndex;}
+\DoxyCodeLine{270 }
+\DoxyCodeLine{271     \textcolor{keyword}{explicit} \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixWrapper}{BandMatrixWrapper}}(\textcolor{keyword}{const} CoefficientsType\& coeffs, \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixWrapper_a9e1933f3ba954ba961955108b8f64b40}{rows}}=Rows\_, \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixWrapper_a937e5ae0afb168faf2468098feb823c0}{cols}}=Cols\_, \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixWrapper_a1d1bb3d29ed63d0675b6b69271529ac5}{supers}}=Supers\_, \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixWrapper_aec0ba7ddeb3104af0700d714956f65c3}{subs}}=Subs\_)}
+\DoxyCodeLine{272       : m\_coeffs(coeffs),}
+\DoxyCodeLine{273         m\_rows(\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixWrapper_a9e1933f3ba954ba961955108b8f64b40}{rows}}), m\_supers(\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixWrapper_a1d1bb3d29ed63d0675b6b69271529ac5}{supers}}), m\_subs(\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixWrapper_aec0ba7ddeb3104af0700d714956f65c3}{subs}})}
+\DoxyCodeLine{274     \{}
+\DoxyCodeLine{275       EIGEN\_UNUSED\_VARIABLE(\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixWrapper_a937e5ae0afb168faf2468098feb823c0}{cols}});}
+\DoxyCodeLine{276       \textcolor{comment}{//internal::assert(coeffs.cols()==cols() \&\& (supers()+subs()+1)==coeffs.rows());}}
+\DoxyCodeLine{277     \}}
+\DoxyCodeLine{278 }
+\DoxyCodeLine{280     \textcolor{keyword}{inline} EIGEN\_CONSTEXPR \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixWrapper_a9e1933f3ba954ba961955108b8f64b40}{rows}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_rows.value(); \}}
+\DoxyCodeLine{281 }
+\DoxyCodeLine{283     \textcolor{keyword}{inline} EIGEN\_CONSTEXPR \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixWrapper_a937e5ae0afb168faf2468098feb823c0}{cols}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_coeffs.cols(); \}}
+\DoxyCodeLine{284 }
+\DoxyCodeLine{286     \textcolor{keyword}{inline} EIGEN\_CONSTEXPR \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixWrapper_a1d1bb3d29ed63d0675b6b69271529ac5}{supers}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_supers.value(); \}}
+\DoxyCodeLine{287 }
+\DoxyCodeLine{289     \textcolor{keyword}{inline} EIGEN\_CONSTEXPR \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixWrapper_aec0ba7ddeb3104af0700d714956f65c3}{subs}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_subs.value(); \}}
+\DoxyCodeLine{290 }
+\DoxyCodeLine{291     \textcolor{keyword}{inline} \textcolor{keyword}{const} CoefficientsType\& coeffs()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_coeffs; \}}
+\DoxyCodeLine{292 }
+\DoxyCodeLine{293   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{294 }
+\DoxyCodeLine{295     \textcolor{keyword}{const} CoefficientsType\& m\_coeffs;}
+\DoxyCodeLine{296     \mbox{\hyperlink{classEigen_1_1internal_1_1variable__if__dynamic}{internal::variable\_if\_dynamic<Index, Rows\_>}}   m\_rows;}
+\DoxyCodeLine{297     \mbox{\hyperlink{classEigen_1_1internal_1_1variable__if__dynamic}{internal::variable\_if\_dynamic<Index, Supers\_>}} m\_supers;}
+\DoxyCodeLine{298     \mbox{\hyperlink{classEigen_1_1internal_1_1variable__if__dynamic}{internal::variable\_if\_dynamic<Index, Subs\_>}}   m\_subs;}
+\DoxyCodeLine{299 \};}
+\DoxyCodeLine{300 }
+\DoxyCodeLine{313 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar, \textcolor{keywordtype}{int} Size, \textcolor{keywordtype}{int} Options>}
+\DoxyCodeLine{314 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1TridiagonalMatrix}{TridiagonalMatrix}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrix}{BandMatrix}}<Scalar,Size,Size,Options\&SelfAdjoint?0:1,1,Options|RowMajor>}
+\DoxyCodeLine{315 \{}
+\DoxyCodeLine{316     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrix}{BandMatrix<Scalar,Size,Size,Options\&SelfAdjoint?0:1,1,Options|RowMajor>}} \mbox{\hyperlink{structEigen_1_1EigenBase}{Base}};}
+\DoxyCodeLine{317     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::StorageIndex StorageIndex;}
+\DoxyCodeLine{318   \textcolor{keyword}{public}:}
+\DoxyCodeLine{319     \textcolor{keyword}{explicit} \mbox{\hyperlink{classEigen_1_1internal_1_1TridiagonalMatrix}{TridiagonalMatrix}}(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{structEigen_1_1EigenBase_a9f40726259520d7e9c5ce58d19d62e79}{size}} = Size) : \mbox{\hyperlink{structEigen_1_1EigenBase}{Base}}(\mbox{\hyperlink{structEigen_1_1EigenBase_a9f40726259520d7e9c5ce58d19d62e79}{size}},\mbox{\hyperlink{structEigen_1_1EigenBase_a9f40726259520d7e9c5ce58d19d62e79}{size}},Options\&\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdacf9ccb2016f8b9c0f3268f05a1e75821}{SelfAdjoint}}?0:1,1) \{\}}
+\DoxyCodeLine{320 }
+\DoxyCodeLine{321     \textcolor{keyword}{inline} \textcolor{keyword}{typename} Base::template \mbox{\hyperlink{structEigen_1_1internal_1_1BandMatrixBase_1_1DiagonalIntReturnType}{DiagonalIntReturnType<1>::Type}} super()}
+\DoxyCodeLine{322     \{ \textcolor{keywordflow}{return} Base::template diagonal<1>(); \}}
+\DoxyCodeLine{323     \textcolor{keyword}{inline} \textcolor{keyword}{const} \textcolor{keyword}{typename} Base::template \mbox{\hyperlink{structEigen_1_1internal_1_1BandMatrixBase_1_1DiagonalIntReturnType}{DiagonalIntReturnType<1>::Type}} super()\textcolor{keyword}{ const}}
+\DoxyCodeLine{324 \textcolor{keyword}{    }\{ \textcolor{keywordflow}{return} Base::template diagonal<1>(); \}}
+\DoxyCodeLine{325     \textcolor{keyword}{inline} \textcolor{keyword}{typename} Base::template \mbox{\hyperlink{structEigen_1_1internal_1_1BandMatrixBase_1_1DiagonalIntReturnType}{DiagonalIntReturnType}}<-\/1>::Type sub()}
+\DoxyCodeLine{326     \{ \textcolor{keywordflow}{return} Base::template \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_ac3a1a4c883004778d0540ce54d1901ca}{diagonal}}<-\/1>(); \}}
+\DoxyCodeLine{327     \textcolor{keyword}{inline} \textcolor{keyword}{const} \textcolor{keyword}{typename} Base::template \mbox{\hyperlink{structEigen_1_1internal_1_1BandMatrixBase_1_1DiagonalIntReturnType}{DiagonalIntReturnType}}<-\/1>::Type sub()\textcolor{keyword}{ const}}
+\DoxyCodeLine{328 \textcolor{keyword}{    }\{ \textcolor{keywordflow}{return} Base::template \mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixBase_ac3a1a4c883004778d0540ce54d1901ca}{diagonal}}<-\/1>(); \}}
+\DoxyCodeLine{329   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{330 \};}
+\DoxyCodeLine{331 }
+\DoxyCodeLine{332 }
+\DoxyCodeLine{333 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1BandShape}{BandShape}} \{\};}
+\DoxyCodeLine{334 }
+\DoxyCodeLine{335 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar\_, \textcolor{keywordtype}{int} Rows\_, \textcolor{keywordtype}{int} Cols\_, \textcolor{keywordtype}{int} Supers\_, \textcolor{keywordtype}{int} Subs\_, \textcolor{keywordtype}{int} Options\_>}
+\DoxyCodeLine{336 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__traits}{evaluator\_traits}}<\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrix}{BandMatrix}}<Scalar\_,Rows\_,Cols\_,Supers\_,Subs\_,Options\_> >}
+\DoxyCodeLine{337   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__traits__base}{evaluator\_traits\_base}}<BandMatrix<Scalar\_,Rows\_,Cols\_,Supers\_,Subs\_,Options\_> >}
+\DoxyCodeLine{338 \{}
+\DoxyCodeLine{339   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1BandShape}{BandShape}} \mbox{\hyperlink{structEigen_1_1internal_1_1BandShape}{Shape}};}
+\DoxyCodeLine{340 \};}
+\DoxyCodeLine{341 }
+\DoxyCodeLine{342 \textcolor{keyword}{template}<\textcolor{keyword}{typename} \_CoefficientsType,\textcolor{keywordtype}{int} Rows\_, \textcolor{keywordtype}{int} Cols\_, \textcolor{keywordtype}{int} Supers\_, \textcolor{keywordtype}{int} Subs\_,\textcolor{keywordtype}{int} Options\_>}
+\DoxyCodeLine{343 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__traits}{evaluator\_traits}}<\mbox{\hyperlink{classEigen_1_1internal_1_1BandMatrixWrapper}{BandMatrixWrapper}}<\_CoefficientsType,Rows\_,Cols\_,Supers\_,Subs\_,Options\_> >}
+\DoxyCodeLine{344   : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__traits__base}{evaluator\_traits\_base}}<BandMatrixWrapper<\_CoefficientsType,Rows\_,Cols\_,Supers\_,Subs\_,Options\_> >}
+\DoxyCodeLine{345 \{}
+\DoxyCodeLine{346   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1BandShape}{BandShape}} \mbox{\hyperlink{structEigen_1_1internal_1_1BandShape}{Shape}};}
+\DoxyCodeLine{347 \};}
+\DoxyCodeLine{348 }
+\DoxyCodeLine{349 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1AssignmentKind}{AssignmentKind}}<\mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}},\mbox{\hyperlink{structEigen_1_1internal_1_1BandShape}{BandShape}}> \{ \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1EigenBase2EigenBase}{EigenBase2EigenBase}} \mbox{\hyperlink{structEigen_1_1internal_1_1EigenBase2EigenBase}{Kind}}; \};}
+\DoxyCodeLine{350 }
+\DoxyCodeLine{351 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{352 }
+\DoxyCodeLine{353 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{354 }
+\DoxyCodeLine{355 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_BANDMATRIX\_H}}
+
+\end{DoxyCode}

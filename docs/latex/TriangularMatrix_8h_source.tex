@@ -1,0 +1,866 @@
+\hypertarget{TriangularMatrix_8h_source}{}\doxysection{Triangular\+Matrix.\+h}
+\label{TriangularMatrix_8h_source}\index{include/Eigen/src/Core/TriangularMatrix.h@{include/Eigen/src/Core/TriangularMatrix.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2008 Benoit Jacob <jacob.benoit.1@gmail.com>}}
+\DoxyCodeLine{5 \textcolor{comment}{// Copyright (C) 2008-\/2009 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{6 \textcolor{comment}{//}}
+\DoxyCodeLine{7 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{8 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{9 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifndef EIGEN\_TRIANGULARMATRIX\_H}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define EIGEN\_TRIANGULARMATRIX\_H}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{19 }
+\DoxyCodeLine{20 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} S\textcolor{keywordtype}{id}e, \textcolor{keyword}{typename} TriangularType, \textcolor{keyword}{typename} Rhs> \textcolor{keyword}{struct }triangular\_solve\_retval;}
+\DoxyCodeLine{21 }
+\DoxyCodeLine{22 \}}
+\DoxyCodeLine{23 }
+\DoxyCodeLine{29 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1TriangularBase}{TriangularBase}} : \textcolor{keyword}{public} \mbox{\hyperlink{structEigen_1_1EigenBase}{EigenBase}}<Derived>}
+\DoxyCodeLine{30 \{}
+\DoxyCodeLine{31   \textcolor{keyword}{public}:}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{34       Mode = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::Mode}},}
+\DoxyCodeLine{35       RowsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::RowsAtCompileTime}},}
+\DoxyCodeLine{36       ColsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::ColsAtCompileTime}},}
+\DoxyCodeLine{37       MaxRowsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::MaxRowsAtCompileTime}},}
+\DoxyCodeLine{38       MaxColsAtCompileTime = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::MaxColsAtCompileTime}},}
+\DoxyCodeLine{39 }
+\DoxyCodeLine{40       \mbox{\hyperlink{classEigen_1_1TriangularBase_a1a949686d3a5bb0933972c3499080673a41d03efb5f764a9e647974c83581ca0e}{SizeAtCompileTime}} = (\mbox{\hyperlink{structEigen_1_1internal_1_1size__at__compile__time}{internal::size\_at\_compile\_time<internal::traits<Derived>::RowsAtCompileTime}},}
+\DoxyCodeLine{41                                                    \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::ColsAtCompileTime}}>::ret),}
+\DoxyCodeLine{46       MaxSizeAtCompileTime = (\mbox{\hyperlink{structEigen_1_1internal_1_1size__at__compile__time}{internal::size\_at\_compile\_time}}<\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::MaxRowsAtCompileTime}},}
+\DoxyCodeLine{47                                                    \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::MaxColsAtCompileTime}}>::ret)}
+\DoxyCodeLine{48 }
+\DoxyCodeLine{49     \};}
+\DoxyCodeLine{50     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::Scalar}} Scalar;}
+\DoxyCodeLine{51     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::StorageKind}} StorageKind;}
+\DoxyCodeLine{52     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::StorageIndex}} StorageIndex;}
+\DoxyCodeLine{53     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Derived>::FullMatrixType}} DenseMatrixType;}
+\DoxyCodeLine{54     \textcolor{keyword}{typedef} DenseMatrixType DenseType;}
+\DoxyCodeLine{55     \textcolor{keyword}{typedef} Derived \textcolor{keyword}{const}\& Nested;}
+\DoxyCodeLine{56 }
+\DoxyCodeLine{57     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{58     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1TriangularBase}{TriangularBase}}() \{ eigen\_assert(!((\textcolor{keywordtype}{int}(Mode) \& \textcolor{keywordtype}{int}(\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cda2ef430bff6cc12c2d1e0ef01b95f7ff3}{UnitDiag}})) \&\& (\textcolor{keywordtype}{int}(Mode) \& \textcolor{keywordtype}{int}(\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdac4dc554a61510151ddd5bafaf6040223}{ZeroDiag}})))); \}}
+\DoxyCodeLine{59 }
+\DoxyCodeLine{60     EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{61     \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} rows() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} derived().rows(); \}}
+\DoxyCodeLine{62     EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{63     \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} cols() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} derived().cols(); \}}
+\DoxyCodeLine{64     EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{65     \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} outerStride() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} derived().outerStride(); \}}
+\DoxyCodeLine{66     EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{67     \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} innerStride() \textcolor{keyword}{const} EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} derived().innerStride(); \}}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{69     \textcolor{comment}{// dummy resize function}}
+\DoxyCodeLine{70     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{71     \textcolor{keywordtype}{void} resize(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} rows, \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} cols)}
+\DoxyCodeLine{72     \{}
+\DoxyCodeLine{73       EIGEN\_UNUSED\_VARIABLE(rows);}
+\DoxyCodeLine{74       EIGEN\_UNUSED\_VARIABLE(cols);}
+\DoxyCodeLine{75       eigen\_assert(rows==this-\/>rows() \&\& cols==this-\/>cols());}
+\DoxyCodeLine{76     \}}
+\DoxyCodeLine{77 }
+\DoxyCodeLine{78     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{79     \textcolor{keyword}{inline} Scalar coeff(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} row, \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} col)\textcolor{keyword}{ const  }\{ \textcolor{keywordflow}{return} derived().coeff(row,col); \}}
+\DoxyCodeLine{80     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{81     \textcolor{keyword}{inline} Scalar\& coeffRef(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} row, \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} col) \{ \textcolor{keywordflow}{return} derived().coeffRef(row,col); \}}
+\DoxyCodeLine{82 }
+\DoxyCodeLine{85     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Other>}
+\DoxyCodeLine{86     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{87     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1TriangularBase_ae93491f8454e133ff48202bf7c0c59e7}{copyCoeff}}(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} row, \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} col, Other\& other)}
+\DoxyCodeLine{88     \{}
+\DoxyCodeLine{89       derived().coeffRef(row, col) = other.coeff(row, col);}
+\DoxyCodeLine{90     \}}
+\DoxyCodeLine{91 }
+\DoxyCodeLine{92     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{93     \textcolor{keyword}{inline} Scalar operator()(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{94 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{95       check\_coordinates(row, col);}
+\DoxyCodeLine{96       \textcolor{keywordflow}{return} coeff(row,col);}
+\DoxyCodeLine{97     \}}
+\DoxyCodeLine{98     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{99     \textcolor{keyword}{inline} Scalar\& operator()(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} row, \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} col)}
+\DoxyCodeLine{100     \{}
+\DoxyCodeLine{101       check\_coordinates(row, col);}
+\DoxyCodeLine{102       \textcolor{keywordflow}{return} coeffRef(row,col);}
+\DoxyCodeLine{103     \}}
+\DoxyCodeLine{104 }
+\DoxyCodeLine{105 \textcolor{preprocessor}{    \#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{106     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{107     \textcolor{keyword}{inline} \textcolor{keyword}{const} Derived\& derived()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} *\textcolor{keyword}{static\_cast<}\textcolor{keyword}{const }Derived*\textcolor{keyword}{>}(\textcolor{keyword}{this}); \}}
+\DoxyCodeLine{108     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{109     \textcolor{keyword}{inline} Derived\& derived() \{ \textcolor{keywordflow}{return} *\textcolor{keyword}{static\_cast<}Derived*\textcolor{keyword}{>}(\textcolor{keyword}{this}); \}}
+\DoxyCodeLine{110 \textcolor{preprocessor}{    \#endif }\textcolor{comment}{// not EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{111 }
+\DoxyCodeLine{112     \textcolor{keyword}{template}<\textcolor{keyword}{typename} DenseDerived>}
+\DoxyCodeLine{113     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{114     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1TriangularBase_a829eee4c087fa168426d183a8ea7ae23}{evalTo}}(\mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<DenseDerived>}} \&other) \textcolor{keyword}{const};}
+\DoxyCodeLine{115     \textcolor{keyword}{template}<\textcolor{keyword}{typename} DenseDerived>}
+\DoxyCodeLine{116     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{117     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1TriangularBase_ad05367709c25defe72371a9fa83b9697}{evalToLazy}}(\mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<DenseDerived>}} \&other) \textcolor{keyword}{const};}
+\DoxyCodeLine{118 }
+\DoxyCodeLine{119     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{120     DenseMatrixType toDenseMatrix()\textcolor{keyword}{ const}}
+\DoxyCodeLine{121 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{122       DenseMatrixType res(rows(), cols());}
+\DoxyCodeLine{123       \mbox{\hyperlink{classEigen_1_1TriangularBase_ad05367709c25defe72371a9fa83b9697}{evalToLazy}}(res);}
+\DoxyCodeLine{124       \textcolor{keywordflow}{return} res;}
+\DoxyCodeLine{125     \}}
+\DoxyCodeLine{126 }
+\DoxyCodeLine{127   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{128 }
+\DoxyCodeLine{129     \textcolor{keywordtype}{void} check\_coordinates(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{130 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{131       EIGEN\_ONLY\_USED\_FOR\_DEBUG(row);}
+\DoxyCodeLine{132       EIGEN\_ONLY\_USED\_FOR\_DEBUG(col);}
+\DoxyCodeLine{133       eigen\_assert(col>=0 \&\& col<cols() \&\& row>=0 \&\& row<rows());}
+\DoxyCodeLine{134       \textcolor{keyword}{const} \textcolor{keywordtype}{int} mode = int(Mode) \& \string~SelfAdjoint;}
+\DoxyCodeLine{135       EIGEN\_ONLY\_USED\_FOR\_DEBUG(mode);}
+\DoxyCodeLine{136       eigen\_assert((mode==\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}} \&\& col>=row)}
+\DoxyCodeLine{137                 || (mode==\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}} \&\& col<=row)}
+\DoxyCodeLine{138                 || ((mode==\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cda7b37877e0b9b0df28c9c2b669a633265}{StrictlyUpper}} || mode==\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdadd28224d7ea92689930be73c1b50b0ad}{UnitUpper}}) \&\& col>row)}
+\DoxyCodeLine{139                 || ((mode==\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cda2424988b6fca98be70b595632753ba81}{StrictlyLower}} || mode==\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cda8f40b928c10a71ba03e5f75ad2a72fda}{UnitLower}}) \&\& col<row));}
+\DoxyCodeLine{140     \}}
+\DoxyCodeLine{141 }
+\DoxyCodeLine{142 \textcolor{preprocessor}{    \#ifdef EIGEN\_INTERNAL\_DEBUGGING}}
+\DoxyCodeLine{143     \textcolor{keywordtype}{void} check\_coordinates\_internal(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} row, \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{144 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{145       check\_coordinates(row, col);}
+\DoxyCodeLine{146     \}}
+\DoxyCodeLine{147 \textcolor{preprocessor}{    \#else}}
+\DoxyCodeLine{148     \textcolor{keywordtype}{void} check\_coordinates\_internal(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} , \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} )\textcolor{keyword}{ const }\{\}}
+\DoxyCodeLine{149 \textcolor{preprocessor}{    \#endif}}
+\DoxyCodeLine{150 }
+\DoxyCodeLine{151 \};}
+\DoxyCodeLine{152 }
+\DoxyCodeLine{170 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{171 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} Mode\_>}
+\DoxyCodeLine{172 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<\mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView}}<MatrixType, Mode\_> > : \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits}}<MatrixType>}
+\DoxyCodeLine{173 \{}
+\DoxyCodeLine{174   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1ref__selector}{ref\_selector<MatrixType>::non\_const\_type}} MatrixTypeNested;}
+\DoxyCodeLine{175   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_reference<MatrixTypeNested>::type MatrixTypeNestedNonRef;}
+\DoxyCodeLine{176   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<MatrixTypeNested>::type MatrixTypeNestedCleaned;}
+\DoxyCodeLine{177   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::PlainObject FullMatrixType;}
+\DoxyCodeLine{178   \textcolor{keyword}{typedef} MatrixType ExpressionType;}
+\DoxyCodeLine{179   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{180     Mode = Mode\_,}
+\DoxyCodeLine{181     FlagsLvalueBit = \mbox{\hyperlink{structEigen_1_1internal_1_1is__lvalue}{is\_lvalue<MatrixType>::value}} ? \mbox{\hyperlink{group__flags_gae2c323957f20dfdc6cb8f44428eaec1a}{LvalueBit}} : 0,}
+\DoxyCodeLine{182     Flags = (MatrixTypeNestedCleaned::Flags \& (HereditaryBits | FlagsLvalueBit) \& (\string~(\mbox{\hyperlink{group__flags_ga1a306a438e1ab074e8be59512e887b9f}{PacketAccessBit}} | \mbox{\hyperlink{group__flags_gabf1e9d0516a933445a4c307ad8f14915}{DirectAccessBit}} | \mbox{\hyperlink{group__flags_ga4b983a15d57cd55806df618ac544d09e}{LinearAccessBit}})))}
+\DoxyCodeLine{183   \};}
+\DoxyCodeLine{184 \};}
+\DoxyCodeLine{185 \}}
+\DoxyCodeLine{186 }
+\DoxyCodeLine{187 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} Mode\_, \textcolor{keyword}{typename} StorageKind> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1TriangularViewImpl}{TriangularViewImpl}};}
+\DoxyCodeLine{188 }
+\DoxyCodeLine{189 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} Mode\_> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView}}}
+\DoxyCodeLine{190   : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1TriangularViewImpl}{TriangularViewImpl}}<MatrixType\_, Mode\_, typename internal::traits<MatrixType\_>::StorageKind >}
+\DoxyCodeLine{191 \{}
+\DoxyCodeLine{192   \textcolor{keyword}{public}:}
+\DoxyCodeLine{193 }
+\DoxyCodeLine{194     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1TriangularViewImpl}{TriangularViewImpl<MatrixType\_, Mode\_, typename internal::traits<MatrixType\_>::StorageKind}} > \mbox{\hyperlink{classEigen_1_1TriangularViewImpl}{Base}};}
+\DoxyCodeLine{195     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<TriangularView>::Scalar}} Scalar;}
+\DoxyCodeLine{196     \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{197 }
+\DoxyCodeLine{198   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{199     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<TriangularView>::MatrixTypeNested}} MatrixTypeNested;}
+\DoxyCodeLine{200     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<TriangularView>::MatrixTypeNestedNonRef}} MatrixTypeNestedNonRef;}
+\DoxyCodeLine{201 }
+\DoxyCodeLine{202     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} internal::remove\_all<typename MatrixType::ConjugateReturnType>::type MatrixConjugateReturnType;}
+\DoxyCodeLine{203     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView<typename internal::add\_const<MatrixType>::type}}, Mode\_> \mbox{\hyperlink{classEigen_1_1TriangularView}{ConstTriangularView}};}
+\DoxyCodeLine{204 }
+\DoxyCodeLine{205   \textcolor{keyword}{public}:}
+\DoxyCodeLine{206 }
+\DoxyCodeLine{207     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<TriangularView>::StorageKind}} StorageKind;}
+\DoxyCodeLine{208     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<TriangularView>::MatrixTypeNestedCleaned}} NestedExpression;}
+\DoxyCodeLine{209 }
+\DoxyCodeLine{210     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{211       Mode = Mode\_,}
+\DoxyCodeLine{212       Flags = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<TriangularView>::Flags}},}
+\DoxyCodeLine{213       TransposeMode = (Mode \& \mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}} ? \mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}} : 0)}
+\DoxyCodeLine{214                     | (Mode \& \mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}} ? \mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}} : 0)}
+\DoxyCodeLine{215                     | (Mode \& (\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cda2ef430bff6cc12c2d1e0ef01b95f7ff3}{UnitDiag}}))}
+\DoxyCodeLine{216                     | (Mode \& (\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdac4dc554a61510151ddd5bafaf6040223}{ZeroDiag}})),}
+\DoxyCodeLine{217       IsVectorAtCompileTime = \textcolor{keyword}{false}}
+\DoxyCodeLine{218     \};}
+\DoxyCodeLine{219 }
+\DoxyCodeLine{220     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{221     \textcolor{keyword}{explicit} \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView}}(MatrixType\& matrix) : m\_matrix(matrix)}
+\DoxyCodeLine{222     \{\}}
+\DoxyCodeLine{223 }
+\DoxyCodeLine{224     EIGEN\_INHERIT\_ASSIGNMENT\_OPERATORS(\mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView}})}
+\DoxyCodeLine{225 }
+\DoxyCodeLine{226     }
+\DoxyCodeLine{227     EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{228     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \mbox{\hyperlink{classEigen_1_1TriangularView_adc518516e0e587501ec7468ccc9b4e57}{rows}}() const EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_matrix.rows(); \}}
+\DoxyCodeLine{230     EIGEN\_DEVICE\_FUNC EIGEN\_CONSTEXPR}
+\DoxyCodeLine{231     \textcolor{keyword}{inline} \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \mbox{\hyperlink{classEigen_1_1TriangularView_a98257facc100f0949feb61a94e4e030c}{cols}}() const EIGEN\_NOEXCEPT \{ \textcolor{keywordflow}{return} m\_matrix.cols(); \}}
+\DoxyCodeLine{232 }
+\DoxyCodeLine{234     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{235     \textcolor{keyword}{const} NestedExpression\& \mbox{\hyperlink{classEigen_1_1TriangularView_a2b70e70011b9e18fc6e8f859e3f3dc76}{nestedExpression}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_matrix; \}}
+\DoxyCodeLine{236 }
+\DoxyCodeLine{238     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{239     NestedExpression\& \mbox{\hyperlink{classEigen_1_1TriangularView_aaecd5634e0ab425a8998972136235936}{nestedExpression}}() \{ \textcolor{keywordflow}{return} m\_matrix; \}}
+\DoxyCodeLine{240 }
+\DoxyCodeLine{241     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView<const MatrixConjugateReturnType,Mode>}} ConjugateReturnType;}
+\DoxyCodeLine{243     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{244     \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1TriangularView}{ConjugateReturnType}} \mbox{\hyperlink{classEigen_1_1TriangularView_a81c2efb814434ce455b0e84b952cc750}{conjugate}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{245 \textcolor{keyword}{    }\{ \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1TriangularView}{ConjugateReturnType}}(m\_matrix.conjugate()); \}}
+\DoxyCodeLine{246 }
+\DoxyCodeLine{250     \textcolor{keyword}{template}<\textcolor{keywordtype}{bool} Cond>}
+\DoxyCodeLine{251     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{252     \textcolor{keyword}{inline} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::conditional<Cond,ConjugateReturnType,ConstTriangularView>::type}}}
+\DoxyCodeLine{253     \mbox{\hyperlink{classEigen_1_1TriangularView_ab31fc74a3f7acf967d6238c7ceba1a73}{conjugateIf}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{254 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{255       \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1true__type}{internal::conditional<Cond,ConjugateReturnType,ConstTriangularView>::type}} ReturnType;}
+\DoxyCodeLine{256       \textcolor{keywordflow}{return} ReturnType(m\_matrix.template conjugateIf<Cond>());}
+\DoxyCodeLine{257     \}}
+\DoxyCodeLine{258 }
+\DoxyCodeLine{259     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView<const typename MatrixType::AdjointReturnType,TransposeMode>}} AdjointReturnType;}
+\DoxyCodeLine{261     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{262     \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1TriangularView}{AdjointReturnType}} \mbox{\hyperlink{classEigen_1_1TriangularView_adb93c45949f76717721e6f6f261e0160}{adjoint}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{263 \textcolor{keyword}{    }\{ \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1TriangularView}{AdjointReturnType}}(m\_matrix.adjoint()); \}}
+\DoxyCodeLine{264 }
+\DoxyCodeLine{265     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView<typename MatrixType::TransposeReturnType,TransposeMode>}} TransposeReturnType;}
+\DoxyCodeLine{267     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{268     \textcolor{keyword}{inline} \mbox{\hyperlink{classEigen_1_1TriangularView}{TransposeReturnType}} \mbox{\hyperlink{classEigen_1_1TriangularView_adbcf587602a32dcb68cc0d2573d89375}{transpose}}()}
+\DoxyCodeLine{269     \{}
+\DoxyCodeLine{270       EIGEN\_STATIC\_ASSERT\_LVALUE(MatrixType)}
+\DoxyCodeLine{271       \textcolor{keyword}{typename} MatrixType::TransposeReturnType tmp(m\_matrix);}
+\DoxyCodeLine{272       \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1TriangularView}{TransposeReturnType}}(tmp);}
+\DoxyCodeLine{273     \}}
+\DoxyCodeLine{274 }
+\DoxyCodeLine{275     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView<const typename MatrixType::ConstTransposeReturnType,TransposeMode>}} ConstTransposeReturnType;}
+\DoxyCodeLine{277     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{278     \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1TriangularView}{ConstTransposeReturnType}} \mbox{\hyperlink{classEigen_1_1TriangularView_afc8bfe109d88028531906a624d4b5ccd}{transpose}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{279 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{280       \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Diagonal}{ConstTransposeReturnType}}(m\_matrix.transpose());}
+\DoxyCodeLine{281     \}}
+\DoxyCodeLine{282 }
+\DoxyCodeLine{283     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Other>}
+\DoxyCodeLine{284     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{285     \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Solve}{Solve<TriangularView, Other>}}}
+\DoxyCodeLine{286     solve(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Other>}}\& other)\textcolor{keyword}{ const}}
+\DoxyCodeLine{287 \textcolor{keyword}{    }\{ \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Solve}{Solve<TriangularView, Other>}}(*\textcolor{keyword}{this}, other.derived()); \}}
+\DoxyCodeLine{288 }
+\DoxyCodeLine{289   \textcolor{comment}{// workaround MSVC ICE}}
+\DoxyCodeLine{290 \textcolor{preprocessor}{  \#if EIGEN\_COMP\_MSVC}}
+\DoxyCodeLine{291     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} S\textcolor{keywordtype}{id}e, \textcolor{keyword}{typename} Other>}
+\DoxyCodeLine{292     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{293     \textcolor{keyword}{inline} \textcolor{keyword}{const} internal::triangular\_solve\_retval<Side,TriangularView, Other>}
+\DoxyCodeLine{294     solve(\textcolor{keyword}{const} MatrixBase<Other>\& other)\textcolor{keyword}{ const}}
+\DoxyCodeLine{295 \textcolor{keyword}{    }\{ \textcolor{keywordflow}{return} Base::template solve<Side>(other); \}}
+\DoxyCodeLine{296 \textcolor{preprocessor}{  \#else}}
+\DoxyCodeLine{297     \textcolor{keyword}{using} Base::solve;}
+\DoxyCodeLine{298 \textcolor{preprocessor}{  \#endif}}
+\DoxyCodeLine{299 }
+\DoxyCodeLine{304     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{305     \mbox{\hyperlink{classEigen_1_1SelfAdjointView}{SelfAdjointView<MatrixTypeNestedNonRef,Mode>}} \mbox{\hyperlink{classEigen_1_1TriangularView_a8a68b4d3be9340747b02d0fbdd358a56}{selfadjointView}}()}
+\DoxyCodeLine{306     \{}
+\DoxyCodeLine{307       EIGEN\_STATIC\_ASSERT((Mode\&(\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cda2ef430bff6cc12c2d1e0ef01b95f7ff3}{UnitDiag}}|\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdac4dc554a61510151ddd5bafaf6040223}{ZeroDiag}}))==0,PROGRAMMING\_ERROR);}
+\DoxyCodeLine{308       \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1SelfAdjointView}{SelfAdjointView<MatrixTypeNestedNonRef,Mode>}}(m\_matrix);}
+\DoxyCodeLine{309     \}}
+\DoxyCodeLine{310 }
+\DoxyCodeLine{312     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{313     \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1SelfAdjointView}{SelfAdjointView<MatrixTypeNestedNonRef,Mode>}} \mbox{\hyperlink{classEigen_1_1TriangularView_a345e9398e37215863d0c6b6603a84723}{selfadjointView}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{314 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{315       EIGEN\_STATIC\_ASSERT((Mode\&(\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cda2ef430bff6cc12c2d1e0ef01b95f7ff3}{UnitDiag}}|\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdac4dc554a61510151ddd5bafaf6040223}{ZeroDiag}}))==0,PROGRAMMING\_ERROR);}
+\DoxyCodeLine{316       \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1SelfAdjointView}{SelfAdjointView<MatrixTypeNestedNonRef,Mode>}}(m\_matrix);}
+\DoxyCodeLine{317     \}}
+\DoxyCodeLine{318 }
+\DoxyCodeLine{319 }
+\DoxyCodeLine{322     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{323     Scalar \mbox{\hyperlink{classEigen_1_1TriangularView_a2cb9d490961c74f59d8e469672e9d3bc}{determinant}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{324 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{325       \textcolor{keywordflow}{if} (Mode \& \mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cda2ef430bff6cc12c2d1e0ef01b95f7ff3}{UnitDiag}})}
+\DoxyCodeLine{326         \textcolor{keywordflow}{return} 1;}
+\DoxyCodeLine{327       \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (Mode \& \mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdac4dc554a61510151ddd5bafaf6040223}{ZeroDiag}})}
+\DoxyCodeLine{328         \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{329       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{330         \textcolor{keywordflow}{return} m\_matrix.diagonal().prod();}
+\DoxyCodeLine{331     \}}
+\DoxyCodeLine{332 }
+\DoxyCodeLine{333   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{334 }
+\DoxyCodeLine{335     MatrixTypeNested m\_matrix;}
+\DoxyCodeLine{336 \};}
+\DoxyCodeLine{337 }
+\DoxyCodeLine{347 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType\_, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} Mode\_> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1TriangularViewImpl}{TriangularViewImpl}}<MatrixType\_,Mode\_,\mbox{\hyperlink{structEigen_1_1Dense}{Dense}}>}
+\DoxyCodeLine{348   : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1TriangularBase}{TriangularBase}}<TriangularView<MatrixType\_, Mode\_> >}
+\DoxyCodeLine{349 \{}
+\DoxyCodeLine{350   \textcolor{keyword}{public}:}
+\DoxyCodeLine{351 }
+\DoxyCodeLine{352     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView<MatrixType\_, Mode\_>}} \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularViewType}};}
+\DoxyCodeLine{353 }
+\DoxyCodeLine{354     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1TriangularBase}{TriangularBase<TriangularViewType>}} \mbox{\hyperlink{classEigen_1_1TriangularBase}{Base}};}
+\DoxyCodeLine{355     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<TriangularViewType>::Scalar}} Scalar;}
+\DoxyCodeLine{356 }
+\DoxyCodeLine{357     \textcolor{keyword}{typedef} MatrixType\_ MatrixType;}
+\DoxyCodeLine{358     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} MatrixType::PlainObject DenseMatrixType;}
+\DoxyCodeLine{359     \textcolor{keyword}{typedef} DenseMatrixType PlainObject;}
+\DoxyCodeLine{360 }
+\DoxyCodeLine{361   \textcolor{keyword}{public}:}
+\DoxyCodeLine{362     \textcolor{keyword}{using} Base::evalToLazy;}
+\DoxyCodeLine{363     \textcolor{keyword}{using} Base::derived;}
+\DoxyCodeLine{364 }
+\DoxyCodeLine{365     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<TriangularViewType>::StorageKind}} StorageKind;}
+\DoxyCodeLine{366 }
+\DoxyCodeLine{367     \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{368       Mode = Mode\_,}
+\DoxyCodeLine{369       Flags = \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<TriangularViewType>::Flags}}}
+\DoxyCodeLine{370     \};}
+\DoxyCodeLine{371 }
+\DoxyCodeLine{374     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{375     \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType___00_01Mode___00_01Dense_01_4_ae57dd07e14967dc46efeb5f5810315ef}{outerStride}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} derived().nestedExpression().outerStride(); \}}
+\DoxyCodeLine{378     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{379     \textcolor{keyword}{inline} \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType___00_01Mode___00_01Dense_01_4_a19ed82f7aa0dc836cec955316665b29e}{innerStride}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} derived().nestedExpression().innerStride(); \}}
+\DoxyCodeLine{380 }
+\DoxyCodeLine{382     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Other>}
+\DoxyCodeLine{383     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{384     \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularViewType}}\&  \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType___00_01Mode___00_01Dense_01_4_abd871f807d536edbcbc03674483aa7c9}{operator+=}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1DenseBase}{DenseBase<Other>}}\& other) \{}
+\DoxyCodeLine{385       internal::call\_assignment\_no\_alias(derived(), other.derived(), \mbox{\hyperlink{structEigen_1_1internal_1_1add__assign__op}{internal::add\_assign\_op<Scalar,typename Other::Scalar>}}());}
+\DoxyCodeLine{386       \textcolor{keywordflow}{return} derived();}
+\DoxyCodeLine{387     \}}
+\DoxyCodeLine{389     \textcolor{keyword}{template}<\textcolor{keyword}{typename} Other>}
+\DoxyCodeLine{390     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{391     \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularViewType}}\&  \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType___00_01Mode___00_01Dense_01_4_a7d612bd6c2ce3197a35314303a88bae7}{operator-\/=}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1DenseBase}{DenseBase<Other>}}\& other) \{}
+\DoxyCodeLine{392       internal::call\_assignment\_no\_alias(derived(), other.derived(), \mbox{\hyperlink{structEigen_1_1internal_1_1sub__assign__op}{internal::sub\_assign\_op<Scalar,typename Other::Scalar>}}());}
+\DoxyCodeLine{393       \textcolor{keywordflow}{return} derived();}
+\DoxyCodeLine{394     \}}
+\DoxyCodeLine{395 }
+\DoxyCodeLine{397     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{398     \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularViewType}}\&  \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType___00_01Mode___00_01Dense_01_4_a89826a66fc0dff0278693e8387fa9d5a}{operator*=}}(\textcolor{keyword}{const} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<MatrixType>::Scalar}}\& other) \{ \textcolor{keywordflow}{return} *\textcolor{keyword}{this} = derived().\mbox{\hyperlink{classEigen_1_1TriangularView_a2b70e70011b9e18fc6e8f859e3f3dc76}{nestedExpression}}() * other; \}}
+\DoxyCodeLine{400     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{401     \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularViewType}}\&  \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType___00_01Mode___00_01Dense_01_4_aaa7b4a6d61234c90b02452381a426296}{operator/=}}(\textcolor{keyword}{const} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<MatrixType>::Scalar}}\& other) \{ \textcolor{keywordflow}{return} *\textcolor{keyword}{this} = derived().\mbox{\hyperlink{classEigen_1_1TriangularView_a2b70e70011b9e18fc6e8f859e3f3dc76}{nestedExpression}}() / other; \}}
+\DoxyCodeLine{402 }
+\DoxyCodeLine{404     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{405     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType___00_01Mode___00_01Dense_01_4_adb176191f56139578ee7a0ef80ea99dc}{fill}}(\textcolor{keyword}{const} Scalar\& value) \{ setConstant(value); \}}
+\DoxyCodeLine{407     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{408     \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularViewType}}\& \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType___00_01Mode___00_01Dense_01_4_ae49f6b5108c86fe4ed5372c9e0e83221}{setConstant}}(\textcolor{keyword}{const} Scalar\& value)}
+\DoxyCodeLine{409     \{ \textcolor{keywordflow}{return} *\textcolor{keyword}{this} = MatrixType::Constant(derived().rows(), derived().cols(), value); \}}
+\DoxyCodeLine{411     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{412     \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularViewType}}\& \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType___00_01Mode___00_01Dense_01_4_a7eb969e14582266d20ef564d6a940fd3}{setZero}}() \{ \textcolor{keywordflow}{return} setConstant(Scalar(0)); \}}
+\DoxyCodeLine{414     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{415     \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularViewType}}\& \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType___00_01Mode___00_01Dense_01_4_ae86fe17f98afa2270a904d4cec47522d}{setOnes}}() \{ \textcolor{keywordflow}{return} setConstant(Scalar(1)); \}}
+\DoxyCodeLine{416 }
+\DoxyCodeLine{420     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{421     \textcolor{keyword}{inline} Scalar \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType___00_01Mode___00_01Dense_01_4_aafc135233120ae3d1aa3a9fabb7dbcde}{coeff}}(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} row, \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} col)\textcolor{keyword}{ const}}
+\DoxyCodeLine{422 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{423       Base::check\_coordinates\_internal(row, col);}
+\DoxyCodeLine{424       \textcolor{keywordflow}{return} derived().nestedExpression().coeff(row, col);}
+\DoxyCodeLine{425     \}}
+\DoxyCodeLine{426 }
+\DoxyCodeLine{430     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{431     \textcolor{keyword}{inline} Scalar\& \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType___00_01Mode___00_01Dense_01_4_ac56239ccd988e54137829e3a459f0d5a}{coeffRef}}(\mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} row, \mbox{\hyperlink{structEigen_1_1EigenBase_a554f30542cc2316add4b1ea0a492ff02}{Index}} col)}
+\DoxyCodeLine{432     \{}
+\DoxyCodeLine{433       EIGEN\_STATIC\_ASSERT\_LVALUE(\mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularViewType}});}
+\DoxyCodeLine{434       Base::check\_coordinates\_internal(row, col);}
+\DoxyCodeLine{435       \textcolor{keywordflow}{return} derived().nestedExpression().coeffRef(row, col);}
+\DoxyCodeLine{436     \}}
+\DoxyCodeLine{437 }
+\DoxyCodeLine{439     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{440     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{441     \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularViewType}}\& \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType___00_01Mode___00_01Dense_01_4_ab0c8d204e577275aa66a280809180160}{operator=}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1TriangularBase}{TriangularBase<OtherDerived>}}\& other);}
+\DoxyCodeLine{442 }
+\DoxyCodeLine{444     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{445     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{446     \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularViewType}}\& \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType___00_01Mode___00_01Dense_01_4_acbac7c289e5e8757a0287092a058638b}{operator=}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<OtherDerived>}}\& other);}
+\DoxyCodeLine{447 }
+\DoxyCodeLine{448 \textcolor{preprocessor}{\#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{449     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{450     \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularViewType}}\& operator=(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1TriangularViewImpl}{TriangularViewImpl}}\& other)}
+\DoxyCodeLine{451     \{ \textcolor{keywordflow}{return} *\textcolor{keyword}{this} = other.derived().nestedExpression(); \}}
+\DoxyCodeLine{452 }
+\DoxyCodeLine{453     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{455     EIGEN\_DEPRECATED EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{456     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType___00_01Mode___00_01Dense_01_4_a1a21f84977c39275b9eca81541e256cc}{lazyAssign}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1TriangularBase}{TriangularBase<OtherDerived>}}\& other);}
+\DoxyCodeLine{457 }
+\DoxyCodeLine{458     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{460     EIGEN\_DEPRECATED EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{461     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType___00_01Mode___00_01Dense_01_4_a0e283c5b6facda09b69d13dbd64ced8c}{lazyAssign}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<OtherDerived>}}\& other);}
+\DoxyCodeLine{462 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{463 }
+\DoxyCodeLine{465     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{466     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{467     \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Product}{Product<TriangularViewType,OtherDerived>}}}
+\DoxyCodeLine{468     \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType___00_01Mode___00_01Dense_01_4_ad588431928d2ce0c9e7dce4610aa373d}{operator*}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<OtherDerived>}}\& rhs)\textcolor{keyword}{ const}}
+\DoxyCodeLine{469 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{470       \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Product}{Product<TriangularViewType,OtherDerived>}}(derived(), rhs.derived());}
+\DoxyCodeLine{471     \}}
+\DoxyCodeLine{472 }
+\DoxyCodeLine{474     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived> \textcolor{keyword}{friend}}
+\DoxyCodeLine{475     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{476     \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Product}{Product<OtherDerived,TriangularViewType>}}}
+\DoxyCodeLine{477     \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType___00_01Mode___00_01Dense_01_4_a4c246eca080f5a92ebd439ecaf32319d}{operator*}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<OtherDerived>}}\& lhs, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1TriangularViewImpl}{TriangularViewImpl}}\& rhs)}
+\DoxyCodeLine{478     \{}
+\DoxyCodeLine{479       \textcolor{keywordflow}{return} \mbox{\hyperlink{classEigen_1_1Product}{Product<OtherDerived,TriangularViewType>}}(lhs.derived(),rhs.derived());}
+\DoxyCodeLine{480     \}}
+\DoxyCodeLine{481 }
+\DoxyCodeLine{505     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} S\textcolor{keywordtype}{id}e, \textcolor{keyword}{typename} Other>}
+\DoxyCodeLine{506     \textcolor{keyword}{inline} \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1triangular__solve__retval}{internal::triangular\_solve\_retval<Side,TriangularViewType, Other>}}}
+\DoxyCodeLine{507     \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType___00_01Mode___00_01Dense_01_4_ae81da15d94adf0c5497d2fe9a3f3c912}{solve}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Other>}}\& other) \textcolor{keyword}{const};}
+\DoxyCodeLine{508 }
+\DoxyCodeLine{518     \textcolor{keyword}{template}<\textcolor{keywordtype}{int} S\textcolor{keywordtype}{id}e, \textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{519     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{520     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType___00_01Mode___00_01Dense_01_4_a943481fcdee624d4ad9b5939aea46fe1}{solveInPlace}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<OtherDerived>}}\& other) \textcolor{keyword}{const};}
+\DoxyCodeLine{521 }
+\DoxyCodeLine{522     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{523     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{524     \textcolor{keywordtype}{void} solveInPlace(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<OtherDerived>}}\& other)\textcolor{keyword}{ const}}
+\DoxyCodeLine{525 \textcolor{keyword}{    }\{ \textcolor{keywordflow}{return} solveInPlace<OnTheLeft>(other); \}}
+\DoxyCodeLine{526 }
+\DoxyCodeLine{528     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{529     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{530 \textcolor{preprocessor}{\#ifdef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{531     \textcolor{keywordtype}{void} swap(\mbox{\hyperlink{classEigen_1_1TriangularBase}{TriangularBase<OtherDerived>}} \&other)}
+\DoxyCodeLine{532 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{533     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType___00_01Mode___00_01Dense_01_4_aca58a4ab072df89ecaa88b59b7342168}{swap}}(\mbox{\hyperlink{classEigen_1_1TriangularBase}{TriangularBase<OtherDerived>}} \textcolor{keyword}{const} \& other)}
+\DoxyCodeLine{534 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{535     \{}
+\DoxyCodeLine{536       EIGEN\_STATIC\_ASSERT\_LVALUE(OtherDerived);}
+\DoxyCodeLine{537       call\_assignment(derived(), other.const\_cast\_derived(), \mbox{\hyperlink{structEigen_1_1internal_1_1swap__assign__op}{internal::swap\_assign\_op<Scalar>}}());}
+\DoxyCodeLine{538     \}}
+\DoxyCodeLine{539 }
+\DoxyCodeLine{541     \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{543     EIGEN\_DEPRECATED EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{544     \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1TriangularViewImpl_3_01MatrixType___00_01Mode___00_01Dense_01_4_a74904675d1f22c2a08c9382f6dc49817}{swap}}(\mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<OtherDerived>}} \textcolor{keyword}{const} \& other)}
+\DoxyCodeLine{545     \{}
+\DoxyCodeLine{546       EIGEN\_STATIC\_ASSERT\_LVALUE(OtherDerived);}
+\DoxyCodeLine{547       call\_assignment(derived(), other.const\_cast\_derived(), \mbox{\hyperlink{structEigen_1_1internal_1_1swap__assign__op}{internal::swap\_assign\_op<Scalar>}}());}
+\DoxyCodeLine{548     \}}
+\DoxyCodeLine{549 }
+\DoxyCodeLine{550     \textcolor{keyword}{template}<\textcolor{keyword}{typename} RhsType, \textcolor{keyword}{typename} DstType>}
+\DoxyCodeLine{551     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{552     EIGEN\_STRONG\_INLINE \textcolor{keywordtype}{void} \_solve\_impl(\textcolor{keyword}{const} RhsType \&rhs, DstType \&dst)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{553       \textcolor{keywordflow}{if}(!internal::is\_same\_dense(dst,rhs))}
+\DoxyCodeLine{554         dst = rhs;}
+\DoxyCodeLine{555       this-\/>solveInPlace(dst);}
+\DoxyCodeLine{556     \}}
+\DoxyCodeLine{557 }
+\DoxyCodeLine{558     \textcolor{keyword}{template}<\textcolor{keyword}{typename} ProductType>}
+\DoxyCodeLine{559     EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{560     EIGEN\_STRONG\_INLINE TriangularViewType\& \_assignProduct(\textcolor{keyword}{const} ProductType\& prod, \textcolor{keyword}{const} Scalar\& alpha, \textcolor{keywordtype}{bool} beta);}
+\DoxyCodeLine{561   \textcolor{keyword}{protected}:}
+\DoxyCodeLine{562     EIGEN\_DEFAULT\_COPY\_CONSTRUCTOR(TriangularViewImpl)}
+\DoxyCodeLine{563     EIGEN\_DEFAULT\_EMPTY\_CONSTRUCTOR\_AND\_DESTRUCTOR(TriangularViewImpl)}
+\DoxyCodeLine{564 }
+\DoxyCodeLine{565 \};}
+\DoxyCodeLine{566 }
+\DoxyCodeLine{567 \textcolor{comment}{/***************************************************************************}}
+\DoxyCodeLine{568 \textcolor{comment}{* Implementation of triangular evaluation/assignment}}
+\DoxyCodeLine{569 \textcolor{comment}{***************************************************************************/}}
+\DoxyCodeLine{570 }
+\DoxyCodeLine{571 \textcolor{preprocessor}{\#ifndef EIGEN\_PARSED\_BY\_DOXYGEN}}
+\DoxyCodeLine{572 \textcolor{comment}{// FIXME should we keep that possibility}}
+\DoxyCodeLine{573 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} Mode>}
+\DoxyCodeLine{574 \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{575 EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} TriangularView<MatrixType, Mode>\&}
+\DoxyCodeLine{576 TriangularViewImpl<MatrixType, Mode, Dense>::operator=(\textcolor{keyword}{const} MatrixBase<OtherDerived>\& other)}
+\DoxyCodeLine{577 \{}
+\DoxyCodeLine{578   internal::call\_assignment\_no\_alias(derived(), other.derived(), internal::assign\_op<Scalar,typename OtherDerived::Scalar>());}
+\DoxyCodeLine{579   \textcolor{keywordflow}{return} derived();}
+\DoxyCodeLine{580 \}}
+\DoxyCodeLine{581 }
+\DoxyCodeLine{582 \textcolor{comment}{// FIXME should we keep that possibility}}
+\DoxyCodeLine{583 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} Mode>}
+\DoxyCodeLine{584 \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{585 EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{void} TriangularViewImpl<MatrixType, Mode, Dense>::lazyAssign(\textcolor{keyword}{const} MatrixBase<OtherDerived>\& other)}
+\DoxyCodeLine{586 \{}
+\DoxyCodeLine{587   internal::call\_assignment\_no\_alias(derived(), other.template triangularView<Mode>());}
+\DoxyCodeLine{588 \}}
+\DoxyCodeLine{589 }
+\DoxyCodeLine{590 }
+\DoxyCodeLine{591 }
+\DoxyCodeLine{592 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} Mode>}
+\DoxyCodeLine{593 \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{594 EIGEN\_DEVICE\_FUNC \textcolor{keyword}{inline} TriangularView<MatrixType, Mode>\&}
+\DoxyCodeLine{595 TriangularViewImpl<MatrixType, Mode, Dense>::operator=(\textcolor{keyword}{const} TriangularBase<OtherDerived>\& other)}
+\DoxyCodeLine{596 \{}
+\DoxyCodeLine{597   eigen\_assert(Mode == \textcolor{keywordtype}{int}(OtherDerived::Mode));}
+\DoxyCodeLine{598   internal::call\_assignment(derived(), other.derived());}
+\DoxyCodeLine{599   \textcolor{keywordflow}{return} derived();}
+\DoxyCodeLine{600 \}}
+\DoxyCodeLine{601 }
+\DoxyCodeLine{602 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} Mode>}
+\DoxyCodeLine{603 \textcolor{keyword}{template}<\textcolor{keyword}{typename} OtherDerived>}
+\DoxyCodeLine{604 EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{void} TriangularViewImpl<MatrixType, Mode, Dense>::lazyAssign(\textcolor{keyword}{const} TriangularBase<OtherDerived>\& other)}
+\DoxyCodeLine{605 \{}
+\DoxyCodeLine{606   eigen\_assert(Mode == \textcolor{keywordtype}{int}(OtherDerived::Mode));}
+\DoxyCodeLine{607   internal::call\_assignment\_no\_alias(derived(), other.derived());}
+\DoxyCodeLine{608 \}}
+\DoxyCodeLine{609 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{610 }
+\DoxyCodeLine{611 \textcolor{comment}{/***************************************************************************}}
+\DoxyCodeLine{612 \textcolor{comment}{* Implementation of TriangularBase methods}}
+\DoxyCodeLine{613 \textcolor{comment}{***************************************************************************/}}
+\DoxyCodeLine{614 }
+\DoxyCodeLine{617 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{618 \textcolor{keyword}{template}<\textcolor{keyword}{typename} DenseDerived>}
+\DoxyCodeLine{619 EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1TriangularBase_a829eee4c087fa168426d183a8ea7ae23}{TriangularBase<Derived>::evalTo}}(\mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<DenseDerived>}} \&other)\textcolor{keyword}{ const}}
+\DoxyCodeLine{620 \textcolor{keyword}{}\{}
+\DoxyCodeLine{621   evalToLazy(other.derived());}
+\DoxyCodeLine{622 \}}
+\DoxyCodeLine{623 }
+\DoxyCodeLine{624 \textcolor{comment}{/***************************************************************************}}
+\DoxyCodeLine{625 \textcolor{comment}{* Implementation of TriangularView methods}}
+\DoxyCodeLine{626 \textcolor{comment}{***************************************************************************/}}
+\DoxyCodeLine{627 }
+\DoxyCodeLine{628 \textcolor{comment}{/***************************************************************************}}
+\DoxyCodeLine{629 \textcolor{comment}{* Implementation of MatrixBase methods}}
+\DoxyCodeLine{630 \textcolor{comment}{***************************************************************************/}}
+\DoxyCodeLine{631 }
+\DoxyCodeLine{643 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{644 \textcolor{keyword}{template}<\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} Mode>}
+\DoxyCodeLine{645 EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{646 \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Derived>::template}} TriangularViewReturnType<Mode>::Type}
+\DoxyCodeLine{647 \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Derived>::triangularView}}()}
+\DoxyCodeLine{648 \{}
+\DoxyCodeLine{649   \textcolor{keywordflow}{return} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularViewReturnType<Mode>::Type}}(derived());}
+\DoxyCodeLine{650 \}}
+\DoxyCodeLine{651 }
+\DoxyCodeLine{653 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{654 \textcolor{keyword}{template}<\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} Mode>}
+\DoxyCodeLine{655 EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{656 \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Derived>::template}} ConstTriangularViewReturnType<Mode>::Type}
+\DoxyCodeLine{657 \mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<Derived>::triangularView}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{658 \textcolor{keyword}{}\{}
+\DoxyCodeLine{659   \textcolor{keywordflow}{return} \textcolor{keyword}{typename} \mbox{\hyperlink{classEigen_1_1TriangularView}{ConstTriangularViewReturnType<Mode>::Type}}(derived());}
+\DoxyCodeLine{660 \}}
+\DoxyCodeLine{661 }
+\DoxyCodeLine{667 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{668 \textcolor{keywordtype}{bool} \mbox{\hyperlink{classEigen_1_1MatrixBase_aae3ec1660bb4ac584220481c54ab4a64}{MatrixBase<Derived>::isUpperTriangular}}(\textcolor{keyword}{const} RealScalar\& prec)\textcolor{keyword}{ const}}
+\DoxyCodeLine{669 \textcolor{keyword}{}\{}
+\DoxyCodeLine{670   RealScalar maxAbsOnUpperPart = \textcolor{keyword}{static\_cast<}RealScalar\textcolor{keyword}{>}(-\/1);}
+\DoxyCodeLine{671   \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < cols(); ++j)}
+\DoxyCodeLine{672   \{}
+\DoxyCodeLine{673     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} maxi = numext::mini(j, rows()-\/1);}
+\DoxyCodeLine{674     \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = 0; i <= maxi; ++i)}
+\DoxyCodeLine{675     \{}
+\DoxyCodeLine{676       RealScalar absValue = numext::abs(coeff(i,j));}
+\DoxyCodeLine{677       \textcolor{keywordflow}{if}(absValue > maxAbsOnUpperPart) maxAbsOnUpperPart = absValue;}
+\DoxyCodeLine{678     \}}
+\DoxyCodeLine{679   \}}
+\DoxyCodeLine{680   RealScalar threshold = maxAbsOnUpperPart * prec;}
+\DoxyCodeLine{681   \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < cols(); ++j)}
+\DoxyCodeLine{682     \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = j+1; i < rows(); ++i)}
+\DoxyCodeLine{683       \textcolor{keywordflow}{if}(numext::abs(coeff(i, j)) > threshold) \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{684   \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
+\DoxyCodeLine{685 \}}
+\DoxyCodeLine{686 }
+\DoxyCodeLine{692 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{693 \textcolor{keywordtype}{bool} \mbox{\hyperlink{classEigen_1_1MatrixBase_a1e96c42d79a56f0a6ade30ce031e17eb}{MatrixBase<Derived>::isLowerTriangular}}(\textcolor{keyword}{const} RealScalar\& prec)\textcolor{keyword}{ const}}
+\DoxyCodeLine{694 \textcolor{keyword}{}\{}
+\DoxyCodeLine{695   RealScalar maxAbsOnLowerPart = \textcolor{keyword}{static\_cast<}RealScalar\textcolor{keyword}{>}(-\/1);}
+\DoxyCodeLine{696   \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < cols(); ++j)}
+\DoxyCodeLine{697     \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = j; i < rows(); ++i)}
+\DoxyCodeLine{698     \{}
+\DoxyCodeLine{699       RealScalar absValue = numext::abs(coeff(i,j));}
+\DoxyCodeLine{700       \textcolor{keywordflow}{if}(absValue > maxAbsOnLowerPart) maxAbsOnLowerPart = absValue;}
+\DoxyCodeLine{701     \}}
+\DoxyCodeLine{702   RealScalar threshold = maxAbsOnLowerPart * prec;}
+\DoxyCodeLine{703   \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 1; j < cols(); ++j)}
+\DoxyCodeLine{704   \{}
+\DoxyCodeLine{705     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} maxi = numext::mini(j, rows()-\/1);}
+\DoxyCodeLine{706     \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = 0; i < maxi; ++i)}
+\DoxyCodeLine{707       \textcolor{keywordflow}{if}(numext::abs(coeff(i, j)) > threshold) \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{708   \}}
+\DoxyCodeLine{709   \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
+\DoxyCodeLine{710 \}}
+\DoxyCodeLine{711 }
+\DoxyCodeLine{712 }
+\DoxyCodeLine{713 \textcolor{comment}{/***************************************************************************}}
+\DoxyCodeLine{714 \textcolor{comment}{****************************************************************************}}
+\DoxyCodeLine{715 \textcolor{comment}{* Evaluators and Assignment of triangular expressions}}
+\DoxyCodeLine{716 \textcolor{comment}{***************************************************************************}}
+\DoxyCodeLine{717 \textcolor{comment}{***************************************************************************/}}
+\DoxyCodeLine{718 }
+\DoxyCodeLine{719 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{720 }
+\DoxyCodeLine{721 }
+\DoxyCodeLine{722 \textcolor{comment}{// TODO currently a triangular expression has the form TriangularView<.,.>}}
+\DoxyCodeLine{723 \textcolor{comment}{//      in the future triangular-\/ness should be defined by the expression traits}}
+\DoxyCodeLine{724 \textcolor{comment}{//      such that Transpose<TriangularView<.,.> > is valid. (currently TriangularBase::transpose() is overloaded to make it work)}}
+\DoxyCodeLine{725 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} Mode>}
+\DoxyCodeLine{726 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator__traits}{evaluator\_traits}}<\mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView}}<MatrixType,Mode> >}
+\DoxyCodeLine{727 \{}
+\DoxyCodeLine{728   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{storage\_kind\_to\_evaluator\_kind<typename MatrixType::StorageKind>::Kind}} \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{Kind}};}
+\DoxyCodeLine{729   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1glue__shapes}{glue\_shapes<typename evaluator\_traits<MatrixType>::Shape}}, \mbox{\hyperlink{structEigen_1_1TriangularShape}{TriangularShape}}>::type Shape;}
+\DoxyCodeLine{730 \};}
+\DoxyCodeLine{731 }
+\DoxyCodeLine{732 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} Mode>}
+\DoxyCodeLine{733 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}<\mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView}}<MatrixType,Mode>, \mbox{\hyperlink{structEigen_1_1internal_1_1IndexBased}{IndexBased}}>}
+\DoxyCodeLine{734  : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator}}<typename internal::remove\_all<MatrixType>::type>}
+\DoxyCodeLine{735 \{}
+\DoxyCodeLine{736   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1TriangularView}{TriangularView<MatrixType,Mode>}} \mbox{\hyperlink{classEigen_1_1TriangularView}{XprType}};}
+\DoxyCodeLine{737   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<typename internal::remove\_all<MatrixType>::type}}> \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}};}
+\DoxyCodeLine{738   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{739   \mbox{\hyperlink{structEigen_1_1internal_1_1unary__evaluator}{unary\_evaluator}}(\textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1TriangularView}{XprType}} \&xpr) : \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{Base}}(xpr.\mbox{\hyperlink{classEigen_1_1TriangularView_a2b70e70011b9e18fc6e8f859e3f3dc76}{nestedExpression}}()) \{\}}
+\DoxyCodeLine{740 \};}
+\DoxyCodeLine{741 }
+\DoxyCodeLine{742 \textcolor{comment}{// Additional assignment kinds:}}
+\DoxyCodeLine{743 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1Triangular2Triangular}{Triangular2Triangular}}    \{\};}
+\DoxyCodeLine{744 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1Triangular2Dense}{Triangular2Dense}}         \{\};}
+\DoxyCodeLine{745 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1Dense2Triangular}{Dense2Triangular}}         \{\};}
+\DoxyCodeLine{746 }
+\DoxyCodeLine{747 }
+\DoxyCodeLine{748 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Kernel, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} Mode, \textcolor{keywordtype}{int} UnrollCount, \textcolor{keywordtype}{bool} ClearOpposite> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1triangular__assignment__loop}{triangular\_assignment\_loop}};}
+\DoxyCodeLine{749 }
+\DoxyCodeLine{750 }
+\DoxyCodeLine{756 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} UpLo, \textcolor{keywordtype}{int} Mode, \textcolor{keywordtype}{int} SetOpposite, \textcolor{keyword}{typename} DstEvaluatorTypeT, \textcolor{keyword}{typename} SrcEvaluatorTypeT, \textcolor{keyword}{typename} Functor, \textcolor{keywordtype}{int} Version = Specialized>}
+\DoxyCodeLine{757 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1internal_1_1triangular__dense__assignment__kernel}{triangular\_dense\_assignment\_kernel}} : \textcolor{keyword}{public} \mbox{\hyperlink{classEigen_1_1internal_1_1generic__dense__assignment__kernel}{generic\_dense\_assignment\_kernel}}<DstEvaluatorTypeT, SrcEvaluatorTypeT, Functor, Version>}
+\DoxyCodeLine{758 \{}
+\DoxyCodeLine{759 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{760   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1internal_1_1generic__dense__assignment__kernel}{generic\_dense\_assignment\_kernel<DstEvaluatorTypeT, SrcEvaluatorTypeT, Functor, Version>}} \mbox{\hyperlink{classEigen_1_1internal_1_1generic__dense__assignment__kernel}{Base}};}
+\DoxyCodeLine{761   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::DstXprType DstXprType;}
+\DoxyCodeLine{762   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::SrcXprType SrcXprType;}
+\DoxyCodeLine{763   \textcolor{keyword}{using} Base::m\_dst;}
+\DoxyCodeLine{764   \textcolor{keyword}{using} Base::m\_src;}
+\DoxyCodeLine{765   \textcolor{keyword}{using} Base::m\_functor;}
+\DoxyCodeLine{766 \textcolor{keyword}{public}:}
+\DoxyCodeLine{767 }
+\DoxyCodeLine{768   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::DstEvaluatorType DstEvaluatorType;}
+\DoxyCodeLine{769   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::SrcEvaluatorType SrcEvaluatorType;}
+\DoxyCodeLine{770   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Base::Scalar Scalar;}
+\DoxyCodeLine{771   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1copy__using__evaluator__traits}{Base::AssignmentTraits}} \mbox{\hyperlink{structEigen_1_1internal_1_1copy__using__evaluator__traits}{AssignmentTraits}};}
+\DoxyCodeLine{772 }
+\DoxyCodeLine{773 }
+\DoxyCodeLine{774   EIGEN\_DEVICE\_FUNC \mbox{\hyperlink{classEigen_1_1internal_1_1triangular__dense__assignment__kernel}{triangular\_dense\_assignment\_kernel}}(DstEvaluatorType \&dst, \textcolor{keyword}{const} SrcEvaluatorType \&src, \textcolor{keyword}{const} Functor \&func, DstXprType\& dstExpr)}
+\DoxyCodeLine{775     : \mbox{\hyperlink{classEigen_1_1internal_1_1generic__dense__assignment__kernel}{Base}}(dst, src, func, dstExpr)}
+\DoxyCodeLine{776   \{\}}
+\DoxyCodeLine{777 }
+\DoxyCodeLine{778 \textcolor{preprocessor}{\#ifdef EIGEN\_INTERNAL\_DEBUGGING}}
+\DoxyCodeLine{779   EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1internal_1_1generic__dense__assignment__kernel_a7ca974cc4049f1ef3d6f2feac94ea35b}{assignCoeff}}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)}
+\DoxyCodeLine{780   \{}
+\DoxyCodeLine{781     eigen\_internal\_assert(row!=col);}
+\DoxyCodeLine{782     \mbox{\hyperlink{classEigen_1_1internal_1_1generic__dense__assignment__kernel_a7ca974cc4049f1ef3d6f2feac94ea35b}{Base::assignCoeff}}(row,col);}
+\DoxyCodeLine{783   \}}
+\DoxyCodeLine{784 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{785   \textcolor{keyword}{using} \mbox{\hyperlink{classEigen_1_1internal_1_1generic__dense__assignment__kernel_a7ca974cc4049f1ef3d6f2feac94ea35b}{Base::assignCoeff}};}
+\DoxyCodeLine{786 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{787 }
+\DoxyCodeLine{788   EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{void} assignDiagonalCoeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} \textcolor{keywordtype}{id})}
+\DoxyCodeLine{789   \{}
+\DoxyCodeLine{790          \textcolor{keywordflow}{if}(Mode==\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cda2ef430bff6cc12c2d1e0ef01b95f7ff3}{UnitDiag}} \&\& SetOpposite) m\_functor.assignCoeff(m\_dst.coeffRef(\textcolor{keywordtype}{id},\textcolor{keywordtype}{id}), Scalar(1));}
+\DoxyCodeLine{791     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(Mode==\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdac4dc554a61510151ddd5bafaf6040223}{ZeroDiag}} \&\& SetOpposite) m\_functor.assignCoeff(m\_dst.coeffRef(\textcolor{keywordtype}{id},\textcolor{keywordtype}{id}), Scalar(0));}
+\DoxyCodeLine{792     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(Mode==0)                       \mbox{\hyperlink{classEigen_1_1internal_1_1generic__dense__assignment__kernel_a7ca974cc4049f1ef3d6f2feac94ea35b}{Base::assignCoeff}}(\textcolor{keywordtype}{id},\textcolor{keywordtype}{id});}
+\DoxyCodeLine{793   \}}
+\DoxyCodeLine{794 }
+\DoxyCodeLine{795   EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{void} assignOppositeCoeff(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} row, \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} col)}
+\DoxyCodeLine{796   \{}
+\DoxyCodeLine{797     eigen\_internal\_assert(row!=col);}
+\DoxyCodeLine{798     \textcolor{keywordflow}{if}(SetOpposite)}
+\DoxyCodeLine{799       m\_functor.assignCoeff(m\_dst.coeffRef(row,col), Scalar(0));}
+\DoxyCodeLine{800   \}}
+\DoxyCodeLine{801 \};}
+\DoxyCodeLine{802 }
+\DoxyCodeLine{803 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Mode, \textcolor{keywordtype}{bool} SetOpposite, \textcolor{keyword}{typename} DstXprType, \textcolor{keyword}{typename} SrcXprType, \textcolor{keyword}{typename} Functor>}
+\DoxyCodeLine{804 EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{805 \textcolor{keywordtype}{void} call\_triangular\_assignment\_loop(DstXprType\& dst, \textcolor{keyword}{const} SrcXprType\& src, \textcolor{keyword}{const} Functor \&func)}
+\DoxyCodeLine{806 \{}
+\DoxyCodeLine{807   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<DstXprType>}} DstEvaluatorType;}
+\DoxyCodeLine{808   \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<SrcXprType>}} SrcEvaluatorType;}
+\DoxyCodeLine{809 }
+\DoxyCodeLine{810   SrcEvaluatorType srcEvaluator(src);}
+\DoxyCodeLine{811 }
+\DoxyCodeLine{812   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} dstRows = src.rows();}
+\DoxyCodeLine{813   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} dstCols = src.cols();}
+\DoxyCodeLine{814   \textcolor{keywordflow}{if}((dst.rows()!=dstRows) || (dst.cols()!=dstCols))}
+\DoxyCodeLine{815     dst.resize(dstRows, dstCols);}
+\DoxyCodeLine{816   DstEvaluatorType dstEvaluator(dst);}
+\DoxyCodeLine{817 }
+\DoxyCodeLine{818   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1internal_1_1triangular__dense__assignment__kernel}{triangular\_dense\_assignment\_kernel}}< Mode\&(\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}}|\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}}),Mode\&(\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cda2ef430bff6cc12c2d1e0ef01b95f7ff3}{UnitDiag}}|\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdac4dc554a61510151ddd5bafaf6040223}{ZeroDiag}}|\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdacf9ccb2016f8b9c0f3268f05a1e75821}{SelfAdjoint}}),SetOpposite,}
+\DoxyCodeLine{819                                               DstEvaluatorType,SrcEvaluatorType,Functor> Kernel;}
+\DoxyCodeLine{820   Kernel kernel(dstEvaluator, srcEvaluator, func, dst.const\_cast\_derived());}
+\DoxyCodeLine{821 }
+\DoxyCodeLine{822   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{823       unroll = DstXprType::SizeAtCompileTime != \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}}
+\DoxyCodeLine{824             \&\& SrcEvaluatorType::CoeffReadCost < \mbox{\hyperlink{namespaceEigen_a3163430a1c13173faffde69016b48aaf}{HugeCost}}}
+\DoxyCodeLine{825             \&\& DstXprType::SizeAtCompileTime * (int(DstEvaluatorType::CoeffReadCost) + int(SrcEvaluatorType::CoeffReadCost)) / 2 <= EIGEN\_UNROLLING\_LIMIT}
+\DoxyCodeLine{826     \};}
+\DoxyCodeLine{827 }
+\DoxyCodeLine{828   triangular\_assignment\_loop<Kernel, Mode, unroll ? int(DstXprType::SizeAtCompileTime) : \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}, SetOpposite>::run(kernel);}
+\DoxyCodeLine{829 \}}
+\DoxyCodeLine{830 }
+\DoxyCodeLine{831 \textcolor{keyword}{template}<\textcolor{keywordtype}{int} Mode, \textcolor{keywordtype}{bool} SetOpposite, \textcolor{keyword}{typename} DstXprType, \textcolor{keyword}{typename} SrcXprType>}
+\DoxyCodeLine{832 EIGEN\_DEVICE\_FUNC EIGEN\_STRONG\_INLINE}
+\DoxyCodeLine{833 \textcolor{keywordtype}{void} call\_triangular\_assignment\_loop(DstXprType\& dst, \textcolor{keyword}{const} SrcXprType\& src)}
+\DoxyCodeLine{834 \{}
+\DoxyCodeLine{835   call\_triangular\_assignment\_loop<Mode,SetOpposite>(dst, src, internal::assign\_op<typename DstXprType::Scalar,typename SrcXprType::Scalar>());}
+\DoxyCodeLine{836 \}}
+\DoxyCodeLine{837 }
+\DoxyCodeLine{838 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1AssignmentKind}{AssignmentKind}}<\mbox{\hyperlink{structEigen_1_1TriangularShape}{TriangularShape}},\mbox{\hyperlink{structEigen_1_1TriangularShape}{TriangularShape}}> \{ \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1Triangular2Triangular}{Triangular2Triangular}} \mbox{\hyperlink{structEigen_1_1internal_1_1Triangular2Triangular}{Kind}}; \};}
+\DoxyCodeLine{839 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1AssignmentKind}{AssignmentKind}}<\mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}},\mbox{\hyperlink{structEigen_1_1TriangularShape}{TriangularShape}}>      \{ \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1Triangular2Dense}{Triangular2Dense}}      \mbox{\hyperlink{structEigen_1_1internal_1_1Triangular2Dense}{Kind}}; \};}
+\DoxyCodeLine{840 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1AssignmentKind}{AssignmentKind}}<\mbox{\hyperlink{structEigen_1_1TriangularShape}{TriangularShape}},\mbox{\hyperlink{structEigen_1_1DenseShape}{DenseShape}}>      \{ \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1Dense2Triangular}{Dense2Triangular}}      \mbox{\hyperlink{structEigen_1_1internal_1_1Dense2Triangular}{Kind}}; \};}
+\DoxyCodeLine{841 }
+\DoxyCodeLine{842 }
+\DoxyCodeLine{843 \textcolor{keyword}{template}< \textcolor{keyword}{typename} DstXprType, \textcolor{keyword}{typename} SrcXprType, \textcolor{keyword}{typename} Functor>}
+\DoxyCodeLine{844 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1Assignment}{Assignment}}<DstXprType, SrcXprType, Functor, \mbox{\hyperlink{structEigen_1_1internal_1_1Triangular2Triangular}{Triangular2Triangular}}>}
+\DoxyCodeLine{845 \{}
+\DoxyCodeLine{846   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(DstXprType \&dst, \textcolor{keyword}{const} SrcXprType \&src, \textcolor{keyword}{const} Functor \&func)}
+\DoxyCodeLine{847   \{}
+\DoxyCodeLine{848     eigen\_assert(\textcolor{keywordtype}{int}(DstXprType::Mode) == \textcolor{keywordtype}{int}(SrcXprType::Mode));}
+\DoxyCodeLine{849 }
+\DoxyCodeLine{850     call\_triangular\_assignment\_loop<DstXprType::Mode, false>(dst, src, func);}
+\DoxyCodeLine{851   \}}
+\DoxyCodeLine{852 \};}
+\DoxyCodeLine{853 }
+\DoxyCodeLine{854 \textcolor{keyword}{template}< \textcolor{keyword}{typename} DstXprType, \textcolor{keyword}{typename} SrcXprType, \textcolor{keyword}{typename} Functor>}
+\DoxyCodeLine{855 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1Assignment}{Assignment}}<DstXprType, SrcXprType, Functor, \mbox{\hyperlink{structEigen_1_1internal_1_1Triangular2Dense}{Triangular2Dense}}>}
+\DoxyCodeLine{856 \{}
+\DoxyCodeLine{857   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(DstXprType \&dst, \textcolor{keyword}{const} SrcXprType \&src, \textcolor{keyword}{const} Functor \&func)}
+\DoxyCodeLine{858   \{}
+\DoxyCodeLine{859     call\_triangular\_assignment\_loop<SrcXprType::Mode, (int(SrcXprType::Mode) \& int(SelfAdjoint)) == 0>(dst, src, func);}
+\DoxyCodeLine{860   \}}
+\DoxyCodeLine{861 \};}
+\DoxyCodeLine{862 }
+\DoxyCodeLine{863 \textcolor{keyword}{template}< \textcolor{keyword}{typename} DstXprType, \textcolor{keyword}{typename} SrcXprType, \textcolor{keyword}{typename} Functor>}
+\DoxyCodeLine{864 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1Assignment}{Assignment}}<DstXprType, SrcXprType, Functor, \mbox{\hyperlink{structEigen_1_1internal_1_1Dense2Triangular}{Dense2Triangular}}>}
+\DoxyCodeLine{865 \{}
+\DoxyCodeLine{866   EIGEN\_DEVICE\_FUNC \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(DstXprType \&dst, \textcolor{keyword}{const} SrcXprType \&src, \textcolor{keyword}{const} Functor \&func)}
+\DoxyCodeLine{867   \{}
+\DoxyCodeLine{868     call\_triangular\_assignment\_loop<DstXprType::Mode, false>(dst, src, func);}
+\DoxyCodeLine{869   \}}
+\DoxyCodeLine{870 \};}
+\DoxyCodeLine{871 }
+\DoxyCodeLine{872 }
+\DoxyCodeLine{873 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Kernel, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} Mode, \textcolor{keywordtype}{int} UnrollCount, \textcolor{keywordtype}{bool} SetOpposite>}
+\DoxyCodeLine{874 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1triangular__assignment__loop}{triangular\_assignment\_loop}}}
+\DoxyCodeLine{875 \{}
+\DoxyCodeLine{876   \textcolor{comment}{// FIXME: this is not very clean, perhaps this information should be provided by the kernel?}}
+\DoxyCodeLine{877   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Kernel::DstEvaluatorType DstEvaluatorType;}
+\DoxyCodeLine{878   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} DstEvaluatorType::XprType DstXprType;}
+\DoxyCodeLine{879 }
+\DoxyCodeLine{880   \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{881     col = (UnrollCount-\/1) / DstXprType::RowsAtCompileTime,}
+\DoxyCodeLine{882     row = (UnrollCount-\/1) \% DstXprType::RowsAtCompileTime}
+\DoxyCodeLine{883   \};}
+\DoxyCodeLine{884 }
+\DoxyCodeLine{885   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Kernel::Scalar Scalar;}
+\DoxyCodeLine{886 }
+\DoxyCodeLine{887   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{888   \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{void} run(Kernel \&kernel)}
+\DoxyCodeLine{889   \{}
+\DoxyCodeLine{890     \mbox{\hyperlink{structEigen_1_1internal_1_1triangular__assignment__loop}{triangular\_assignment\_loop<Kernel, Mode, UnrollCount-\/1, SetOpposite>::run}}(kernel);}
+\DoxyCodeLine{891 }
+\DoxyCodeLine{892     \textcolor{keywordflow}{if}(row==col)}
+\DoxyCodeLine{893       kernel.assignDiagonalCoeff(row);}
+\DoxyCodeLine{894     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}( ((Mode\&\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}}) \&\& row>col) || ((Mode\&\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}}) \&\& row<col) )}
+\DoxyCodeLine{895       kernel.assignCoeff(row,col);}
+\DoxyCodeLine{896     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(SetOpposite)}
+\DoxyCodeLine{897       kernel.assignOppositeCoeff(row,col);}
+\DoxyCodeLine{898   \}}
+\DoxyCodeLine{899 \};}
+\DoxyCodeLine{900 }
+\DoxyCodeLine{901 \textcolor{comment}{// prevent buggy user code from causing an infinite recursion}}
+\DoxyCodeLine{902 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Kernel, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} Mode, \textcolor{keywordtype}{bool} SetOpposite>}
+\DoxyCodeLine{903 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1triangular__assignment__loop}{triangular\_assignment\_loop}}<Kernel, Mode, 0, SetOpposite>}
+\DoxyCodeLine{904 \{}
+\DoxyCodeLine{905   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{906   \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{void} run(Kernel \&) \{\}}
+\DoxyCodeLine{907 \};}
+\DoxyCodeLine{908 }
+\DoxyCodeLine{909 }
+\DoxyCodeLine{910 }
+\DoxyCodeLine{911 \textcolor{comment}{// TODO: experiment with a recursive assignment procedure splitting the current}}
+\DoxyCodeLine{912 \textcolor{comment}{//       triangular part into one rectangular and two triangular parts.}}
+\DoxyCodeLine{913 }
+\DoxyCodeLine{914 }
+\DoxyCodeLine{915 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Kernel, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} Mode, \textcolor{keywordtype}{bool} SetOpposite>}
+\DoxyCodeLine{916 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1triangular__assignment__loop}{triangular\_assignment\_loop}}<Kernel, Mode, \mbox{\hyperlink{namespaceEigen_ad81fa7195215a0ce30017dfac309f0b2}{Dynamic}}, SetOpposite>}
+\DoxyCodeLine{917 \{}
+\DoxyCodeLine{918   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} Kernel::Scalar Scalar;}
+\DoxyCodeLine{919   EIGEN\_DEVICE\_FUNC}
+\DoxyCodeLine{920   \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{void} run(Kernel \&kernel)}
+\DoxyCodeLine{921   \{}
+\DoxyCodeLine{922     \textcolor{keywordflow}{for}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j = 0; j < kernel.cols(); ++j)}
+\DoxyCodeLine{923     \{}
+\DoxyCodeLine{924       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} maxi = numext::mini(j, kernel.rows());}
+\DoxyCodeLine{925       \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} i = 0;}
+\DoxyCodeLine{926       \textcolor{keywordflow}{if} (((Mode\&\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}}) \&\& SetOpposite) || (Mode\&\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}}))}
+\DoxyCodeLine{927       \{}
+\DoxyCodeLine{928         \textcolor{keywordflow}{for}(; i < maxi; ++i)}
+\DoxyCodeLine{929           \textcolor{keywordflow}{if}(Mode\&\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}}) kernel.assignCoeff(i, j);}
+\DoxyCodeLine{930           \textcolor{keywordflow}{else}           kernel.assignOppositeCoeff(i, j);}
+\DoxyCodeLine{931       \}}
+\DoxyCodeLine{932       \textcolor{keywordflow}{else}}
+\DoxyCodeLine{933         i = maxi;}
+\DoxyCodeLine{934 }
+\DoxyCodeLine{935       \textcolor{keywordflow}{if}(i<kernel.rows()) \textcolor{comment}{// then i==j}}
+\DoxyCodeLine{936         kernel.assignDiagonalCoeff(i++);}
+\DoxyCodeLine{937 }
+\DoxyCodeLine{938       \textcolor{keywordflow}{if} (((Mode\&\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdafca2ccebb604f171656deb53e8c083c1}{Upper}}) \&\& SetOpposite) || (Mode\&\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}}))}
+\DoxyCodeLine{939       \{}
+\DoxyCodeLine{940         \textcolor{keywordflow}{for}(; i < kernel.rows(); ++i)}
+\DoxyCodeLine{941           \textcolor{keywordflow}{if}(Mode\&\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdaf581029282d421eee5aae14238c6f749}{Lower}}) kernel.assignCoeff(i, j);}
+\DoxyCodeLine{942           \textcolor{keywordflow}{else}           kernel.assignOppositeCoeff(i, j);}
+\DoxyCodeLine{943       \}}
+\DoxyCodeLine{944     \}}
+\DoxyCodeLine{945   \}}
+\DoxyCodeLine{946 \};}
+\DoxyCodeLine{947 }
+\DoxyCodeLine{948 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{949 }
+\DoxyCodeLine{952 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{953 \textcolor{keyword}{template}<\textcolor{keyword}{typename} DenseDerived>}
+\DoxyCodeLine{954 EIGEN\_DEVICE\_FUNC \textcolor{keywordtype}{void} \mbox{\hyperlink{classEigen_1_1TriangularBase_ad05367709c25defe72371a9fa83b9697}{TriangularBase<Derived>::evalToLazy}}(\mbox{\hyperlink{classEigen_1_1MatrixBase}{MatrixBase<DenseDerived>}} \&other)\textcolor{keyword}{ const}}
+\DoxyCodeLine{955 \textcolor{keyword}{}\{}
+\DoxyCodeLine{956   other.derived().\mbox{\hyperlink{classEigen_1_1DenseBase_a13027a493a68a13496610caf3d81bd3e}{resize}}(this-\/>rows(), this-\/>cols());}
+\DoxyCodeLine{957   internal::call\_triangular\_assignment\_loop<Derived::Mode, (int(Derived::Mode) \& int(\mbox{\hyperlink{group__enums_gga39e3366ff5554d731e7dc8bb642f83cdacf9ccb2016f8b9c0f3268f05a1e75821}{SelfAdjoint}})) == 0 \textcolor{comment}{/* SetOpposite */}>(other.derived(), derived().nestedExpression());}
+\DoxyCodeLine{958 \}}
+\DoxyCodeLine{959 }
+\DoxyCodeLine{960 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{961 }
+\DoxyCodeLine{962 \textcolor{comment}{// Triangular = Product}}
+\DoxyCodeLine{963 \textcolor{keyword}{template}< \textcolor{keyword}{typename} DstXprType, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{964 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1Assignment}{Assignment}}<DstXprType, \mbox{\hyperlink{classEigen_1_1Product}{Product}}<Lhs,Rhs,DefaultProduct>, internal::\mbox{\hyperlink{structEigen_1_1internal_1_1assign__op}{assign\_op}}<Scalar,typename Product<Lhs,Rhs,DefaultProduct>::Scalar>, \mbox{\hyperlink{structEigen_1_1internal_1_1Dense2Triangular}{Dense2Triangular}}>}
+\DoxyCodeLine{965 \{}
+\DoxyCodeLine{966   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs,Rhs,DefaultProduct>}} \mbox{\hyperlink{classEigen_1_1Product}{SrcXprType}};}
+\DoxyCodeLine{967   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(DstXprType \&dst, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Product}{SrcXprType}} \&src, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1assign__op}{internal::assign\_op<Scalar,typename SrcXprType::Scalar>}} \&)}
+\DoxyCodeLine{968   \{}
+\DoxyCodeLine{969     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} dstRows = src.rows();}
+\DoxyCodeLine{970     \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} dstCols = src.cols();}
+\DoxyCodeLine{971     \textcolor{keywordflow}{if}((dst.rows()!=dstRows) || (dst.cols()!=dstCols))}
+\DoxyCodeLine{972       dst.resize(dstRows, dstCols);}
+\DoxyCodeLine{973 }
+\DoxyCodeLine{974     dst.\_assignProduct(src, Scalar(1), \textcolor{keyword}{false});}
+\DoxyCodeLine{975   \}}
+\DoxyCodeLine{976 \};}
+\DoxyCodeLine{977 }
+\DoxyCodeLine{978 \textcolor{comment}{// Triangular += Product}}
+\DoxyCodeLine{979 \textcolor{keyword}{template}< \textcolor{keyword}{typename} DstXprType, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{980 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1Assignment}{Assignment}}<DstXprType, \mbox{\hyperlink{classEigen_1_1Product}{Product}}<Lhs,Rhs,DefaultProduct>, internal::\mbox{\hyperlink{structEigen_1_1internal_1_1add__assign__op}{add\_assign\_op}}<Scalar,typename Product<Lhs,Rhs,DefaultProduct>::Scalar>, \mbox{\hyperlink{structEigen_1_1internal_1_1Dense2Triangular}{Dense2Triangular}}>}
+\DoxyCodeLine{981 \{}
+\DoxyCodeLine{982   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs,Rhs,DefaultProduct>}} \mbox{\hyperlink{classEigen_1_1Product}{SrcXprType}};}
+\DoxyCodeLine{983   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(DstXprType \&dst, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Product}{SrcXprType}} \&src, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1add__assign__op}{internal::add\_assign\_op<Scalar,typename SrcXprType::Scalar>}} \&)}
+\DoxyCodeLine{984   \{}
+\DoxyCodeLine{985     dst.\_assignProduct(src, Scalar(1), \textcolor{keyword}{true});}
+\DoxyCodeLine{986   \}}
+\DoxyCodeLine{987 \};}
+\DoxyCodeLine{988 }
+\DoxyCodeLine{989 \textcolor{comment}{// Triangular -\/= Product}}
+\DoxyCodeLine{990 \textcolor{keyword}{template}< \textcolor{keyword}{typename} DstXprType, \textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} Scalar>}
+\DoxyCodeLine{991 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1Assignment}{Assignment}}<DstXprType, \mbox{\hyperlink{classEigen_1_1Product}{Product}}<Lhs,Rhs,DefaultProduct>, internal::\mbox{\hyperlink{structEigen_1_1internal_1_1sub__assign__op}{sub\_assign\_op}}<Scalar,typename Product<Lhs,Rhs,DefaultProduct>::Scalar>, \mbox{\hyperlink{structEigen_1_1internal_1_1Dense2Triangular}{Dense2Triangular}}>}
+\DoxyCodeLine{992 \{}
+\DoxyCodeLine{993   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Product}{Product<Lhs,Rhs,DefaultProduct>}} \mbox{\hyperlink{classEigen_1_1Product}{SrcXprType}};}
+\DoxyCodeLine{994   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(DstXprType \&dst, \textcolor{keyword}{const} \mbox{\hyperlink{classEigen_1_1Product}{SrcXprType}} \&src, \textcolor{keyword}{const} \mbox{\hyperlink{structEigen_1_1internal_1_1sub__assign__op}{internal::sub\_assign\_op<Scalar,typename SrcXprType::Scalar>}} \&)}
+\DoxyCodeLine{995   \{}
+\DoxyCodeLine{996     dst.\_assignProduct(src, Scalar(-\/1), \textcolor{keyword}{true});}
+\DoxyCodeLine{997   \}}
+\DoxyCodeLine{998 \};}
+\DoxyCodeLine{999 }
+\DoxyCodeLine{1000 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{1001 }
+\DoxyCodeLine{1002 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{1003 }
+\DoxyCodeLine{1004 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_TRIANGULARMATRIX\_H}}
+
+\end{DoxyCode}

@@ -1,0 +1,182 @@
+\hypertarget{SparseUtil_8h_source}{}\doxysection{Sparse\+Util.\+h}
+\label{SparseUtil_8h_source}\index{include/Eigen/src/SparseCore/SparseUtil.h@{include/Eigen/src/SparseCore/SparseUtil.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2008-\/2014 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_SPARSEUTIL\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_SPARSEUTIL\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{preprocessor}{\#ifdef NDEBUG}}
+\DoxyCodeLine{18 \textcolor{preprocessor}{\#define EIGEN\_DBG\_SPARSE(X)}}
+\DoxyCodeLine{19 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{20 \textcolor{preprocessor}{\#define EIGEN\_DBG\_SPARSE(X) X}}
+\DoxyCodeLine{21 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{22 }
+\DoxyCodeLine{23 \textcolor{preprocessor}{\#define EIGEN\_SPARSE\_INHERIT\_ASSIGNMENT\_OPERATOR(Derived, Op) \(\backslash\)}}
+\DoxyCodeLine{24 \textcolor{preprocessor}{template<typename OtherDerived> \(\backslash\)}}
+\DoxyCodeLine{25 \textcolor{preprocessor}{EIGEN\_STRONG\_INLINE Derived\& operator Op(const Eigen::SparseMatrixBase<OtherDerived>\& other) \(\backslash\)}}
+\DoxyCodeLine{26 \textcolor{preprocessor}{\{ \(\backslash\)}}
+\DoxyCodeLine{27 \textcolor{preprocessor}{  return Base::operator Op(other.derived()); \(\backslash\)}}
+\DoxyCodeLine{28 \textcolor{preprocessor}{\} \(\backslash\)}}
+\DoxyCodeLine{29 \textcolor{preprocessor}{EIGEN\_STRONG\_INLINE Derived\& operator Op(const Derived\& other) \(\backslash\)}}
+\DoxyCodeLine{30 \textcolor{preprocessor}{\{ \(\backslash\)}}
+\DoxyCodeLine{31 \textcolor{preprocessor}{  return Base::operator Op(other); \(\backslash\)}}
+\DoxyCodeLine{32 \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{33 }
+\DoxyCodeLine{34 \textcolor{preprocessor}{\#define EIGEN\_SPARSE\_INHERIT\_SCALAR\_ASSIGNMENT\_OPERATOR(Derived, Op) \(\backslash\)}}
+\DoxyCodeLine{35 \textcolor{preprocessor}{template<typename Other> \(\backslash\)}}
+\DoxyCodeLine{36 \textcolor{preprocessor}{EIGEN\_STRONG\_INLINE Derived\& operator Op(const Other\& scalar) \(\backslash\)}}
+\DoxyCodeLine{37 \textcolor{preprocessor}{\{ \(\backslash\)}}
+\DoxyCodeLine{38 \textcolor{preprocessor}{  return Base::operator Op(scalar); \(\backslash\)}}
+\DoxyCodeLine{39 \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{40 }
+\DoxyCodeLine{41 \textcolor{preprocessor}{\#define EIGEN\_SPARSE\_INHERIT\_ASSIGNMENT\_OPERATORS(Derived) \(\backslash\)}}
+\DoxyCodeLine{42 \textcolor{preprocessor}{EIGEN\_SPARSE\_INHERIT\_ASSIGNMENT\_OPERATOR(Derived, =)}}
+\DoxyCodeLine{43 }
+\DoxyCodeLine{44 }
+\DoxyCodeLine{45 \textcolor{preprocessor}{\#define EIGEN\_SPARSE\_PUBLIC\_INTERFACE(Derived) \(\backslash\)}}
+\DoxyCodeLine{46 \textcolor{preprocessor}{  EIGEN\_GENERIC\_PUBLIC\_INTERFACE(Derived)}}
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48   }
+\DoxyCodeLine{49 \textcolor{keyword}{const} \textcolor{keywordtype}{int} CoherentAccessPattern     = 0x1;}
+\DoxyCodeLine{50 \textcolor{keyword}{const} \textcolor{keywordtype}{int} InnerRandomAccessPattern  = 0x2 | CoherentAccessPattern;}
+\DoxyCodeLine{51 \textcolor{keyword}{const} \textcolor{keywordtype}{int} OuterRandomAccessPattern  = 0x4 | CoherentAccessPattern;}
+\DoxyCodeLine{52 \textcolor{keyword}{const} \textcolor{keywordtype}{int} RandomAccessPattern       = 0x8 | OuterRandomAccessPattern | InnerRandomAccessPattern;}
+\DoxyCodeLine{53 }
+\DoxyCodeLine{54 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar\_, \textcolor{keywordtype}{int} \_Flags = 0, \textcolor{keyword}{typename} StorageIndex\_ = \textcolor{keywordtype}{int}>  \textcolor{keyword}{class }SparseMatrix;}
+\DoxyCodeLine{55 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar\_, \textcolor{keywordtype}{int} \_Flags = 0, \textcolor{keyword}{typename} StorageIndex\_ = \textcolor{keywordtype}{int}>  \textcolor{keyword}{class }SparseVector;}
+\DoxyCodeLine{56 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Scalar\_, \textcolor{keywordtype}{int} \_Flags = 0, \textcolor{keyword}{typename} StorageIndex\_ = \textcolor{keywordtype}{int}>  \textcolor{keyword}{class }MappedSparseMatrix;}
+\DoxyCodeLine{57 }
+\DoxyCodeLine{58 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} UpLo>  \textcolor{keyword}{class }SparseSelfAdjointView;}
+\DoxyCodeLine{59 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>              \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1SparseDiagonalProduct}{SparseDiagonalProduct}};}
+\DoxyCodeLine{60 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1SparseView}{SparseView}};}
+\DoxyCodeLine{61 }
+\DoxyCodeLine{62 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>        \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1SparseSparseProduct}{SparseSparseProduct}};}
+\DoxyCodeLine{63 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>        \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1SparseTimeDenseProduct}{SparseTimeDenseProduct}};}
+\DoxyCodeLine{64 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs>        \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1DenseTimeSparseProduct}{DenseTimeSparseProduct}};}
+\DoxyCodeLine{65 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keywordtype}{bool} Transpose> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1SparseDenseOuterProduct}{SparseDenseOuterProduct}};}
+\DoxyCodeLine{66 }
+\DoxyCodeLine{67 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1SparseSparseProductReturnType}{SparseSparseProductReturnType}};}
+\DoxyCodeLine{68 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs,}
+\DoxyCodeLine{69          \textcolor{keywordtype}{int} InnerSize = EIGEN\_SIZE\_MIN\_PREFER\_FIXED(\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Lhs>::ColsAtCompileTime}},\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Rhs>::RowsAtCompileTime}})> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1DenseSparseProductReturnType}{DenseSparseProductReturnType}};}
+\DoxyCodeLine{70          }
+\DoxyCodeLine{71 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs,}
+\DoxyCodeLine{72          \textcolor{keywordtype}{int} InnerSize = EIGEN\_SIZE\_MIN\_PREFER\_FIXED(\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Lhs>::ColsAtCompileTime}},\mbox{\hyperlink{structEigen_1_1internal_1_1traits}{internal::traits<Rhs>::RowsAtCompileTime}})> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1SparseDenseProductReturnType}{SparseDenseProductReturnType}};}
+\DoxyCodeLine{73 \textcolor{keyword}{template}<\textcolor{keyword}{typename} MatrixType,\textcolor{keywordtype}{int} UpLo> \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1SparseSymmetricPermutationProduct}{SparseSymmetricPermutationProduct}};}
+\DoxyCodeLine{74 }
+\DoxyCodeLine{75 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{76 }
+\DoxyCodeLine{77 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T,\textcolor{keywordtype}{int} Rows,\textcolor{keywordtype}{int} Cols,\textcolor{keywordtype}{int} Flags> \textcolor{keyword}{struct }sparse\_eval;}
+\DoxyCodeLine{78 }
+\DoxyCodeLine{79 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1eval}{eval}}<T,\mbox{\hyperlink{structEigen_1_1Sparse}{Sparse}}>}
+\DoxyCodeLine{80   : \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__eval}{sparse\_eval}}<T, traits<T>::RowsAtCompileTime,traits<T>::ColsAtCompileTime,traits<T>::Flags>}
+\DoxyCodeLine{81 \{\};}
+\DoxyCodeLine{82 }
+\DoxyCodeLine{83 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T,\textcolor{keywordtype}{int} Cols,\textcolor{keywordtype}{int} Flags> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1sparse__eval}{sparse\_eval}}<T,1,Cols,Flags> \{}
+\DoxyCodeLine{84     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<T>::Scalar}} Scalar\_;}
+\DoxyCodeLine{85     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<T>::StorageIndex}} StorageIndex\_;}
+\DoxyCodeLine{86   \textcolor{keyword}{public}:}
+\DoxyCodeLine{87     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseVector}{SparseVector<Scalar\_, RowMajor, StorageIndex\_>}} \mbox{\hyperlink{classEigen_1_1SparseVector}{type}};}
+\DoxyCodeLine{88 \};}
+\DoxyCodeLine{89 }
+\DoxyCodeLine{90 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T,\textcolor{keywordtype}{int} Rows,\textcolor{keywordtype}{int} Flags> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1sparse__eval}{sparse\_eval}}<T,Rows,1,Flags> \{}
+\DoxyCodeLine{91     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<T>::Scalar}} Scalar\_;}
+\DoxyCodeLine{92     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<T>::StorageIndex}} StorageIndex\_;}
+\DoxyCodeLine{93   \textcolor{keyword}{public}:}
+\DoxyCodeLine{94     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseVector}{SparseVector<Scalar\_, ColMajor, StorageIndex\_>}} \mbox{\hyperlink{classEigen_1_1SparseVector}{type}};}
+\DoxyCodeLine{95 \};}
+\DoxyCodeLine{96 }
+\DoxyCodeLine{97 \textcolor{comment}{// TODO this seems almost identical to plain\_matrix\_type<T, Sparse>}}
+\DoxyCodeLine{98 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T,\textcolor{keywordtype}{int} Rows,\textcolor{keywordtype}{int} Cols,\textcolor{keywordtype}{int} Flags> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1sparse__eval}{sparse\_eval}} \{}
+\DoxyCodeLine{99     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<T>::Scalar}} Scalar\_;}
+\DoxyCodeLine{100     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<T>::StorageIndex}} StorageIndex\_;}
+\DoxyCodeLine{101     \textcolor{keyword}{enum} \{ Options\_ = ((Flags\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})==\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) ? \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}} : \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}} \};}
+\DoxyCodeLine{102   \textcolor{keyword}{public}:}
+\DoxyCodeLine{103     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<Scalar\_, Options\_, StorageIndex\_>}} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{type}};}
+\DoxyCodeLine{104 \};}
+\DoxyCodeLine{105 }
+\DoxyCodeLine{106 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T,\textcolor{keywordtype}{int} Flags> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1sparse__eval}{sparse\_eval}}<T,1,1,Flags> \{}
+\DoxyCodeLine{107     \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<T>::Scalar}} Scalar\_;}
+\DoxyCodeLine{108   \textcolor{keyword}{public}:}
+\DoxyCodeLine{109     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1Matrix}{Matrix<Scalar\_, 1, 1>}} \mbox{\hyperlink{classEigen_1_1Matrix}{type}};}
+\DoxyCodeLine{110 \};}
+\DoxyCodeLine{111 }
+\DoxyCodeLine{112 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1plain__matrix__type}{plain\_matrix\_type}}<T,\mbox{\hyperlink{structEigen_1_1Sparse}{Sparse}}>}
+\DoxyCodeLine{113 \{}
+\DoxyCodeLine{114   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<T>::Scalar}} Scalar\_;}
+\DoxyCodeLine{115   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1traits}{traits<T>::StorageIndex}} StorageIndex\_;}
+\DoxyCodeLine{116   \textcolor{keyword}{enum} \{ Options\_ = ((\mbox{\hyperlink{structEigen_1_1internal_1_1evaluator}{evaluator<T>::Flags}}\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}})==\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}) ? \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}} : \mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}} \};}
+\DoxyCodeLine{117   \textcolor{keyword}{public}:}
+\DoxyCodeLine{118     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<Scalar\_, Options\_, StorageIndex\_>}} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{type}};}
+\DoxyCodeLine{119 \};}
+\DoxyCodeLine{120 }
+\DoxyCodeLine{121 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
+\DoxyCodeLine{122 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1plain__object__eval}{plain\_object\_eval}}<T,\mbox{\hyperlink{structEigen_1_1Sparse}{Sparse}}>}
+\DoxyCodeLine{123   : \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__eval}{sparse\_eval}}<T, traits<T>::RowsAtCompileTime,traits<T>::ColsAtCompileTime, evaluator<T>::Flags>}
+\DoxyCodeLine{124 \{\};}
+\DoxyCodeLine{125 }
+\DoxyCodeLine{126 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Decomposition, \textcolor{keyword}{typename} RhsType>}
+\DoxyCodeLine{127 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1solve__traits}{solve\_traits}}<Decomposition,RhsType,\mbox{\hyperlink{structEigen_1_1Sparse}{Sparse}}>}
+\DoxyCodeLine{128 \{}
+\DoxyCodeLine{129   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__eval}{sparse\_eval<RhsType, RhsType::RowsAtCompileTime, RhsType::ColsAtCompileTime,traits<RhsType>::Flags}}>::type \mbox{\hyperlink{classEigen_1_1SparseMatrix}{PlainObject}};}
+\DoxyCodeLine{130 \};}
+\DoxyCodeLine{131 }
+\DoxyCodeLine{132 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Derived>}
+\DoxyCodeLine{133 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1generic__xpr__base}{generic\_xpr\_base}}<Derived, \mbox{\hyperlink{structEigen_1_1MatrixXpr}{MatrixXpr}}, \mbox{\hyperlink{structEigen_1_1Sparse}{Sparse}}>}
+\DoxyCodeLine{134 \{}
+\DoxyCodeLine{135   \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{SparseMatrixBase<Derived>}} \mbox{\hyperlink{classEigen_1_1SparseMatrixBase}{type}};}
+\DoxyCodeLine{136 \};}
+\DoxyCodeLine{137 }
+\DoxyCodeLine{138 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1SparseTriangularShape}{SparseTriangularShape}}  \{ \textcolor{keyword}{static} std::string debugName() \{ \textcolor{keywordflow}{return} \textcolor{stringliteral}{"{}SparseTriangularShape"{}}; \} \};}
+\DoxyCodeLine{139 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1SparseSelfAdjointShape}{SparseSelfAdjointShape}} \{ \textcolor{keyword}{static} std::string debugName() \{ \textcolor{keywordflow}{return} \textcolor{stringliteral}{"{}SparseSelfAdjointShape"{}}; \} \};}
+\DoxyCodeLine{140 }
+\DoxyCodeLine{141 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1glue__shapes}{glue\_shapes}}<\mbox{\hyperlink{structEigen_1_1SparseShape}{SparseShape}},\mbox{\hyperlink{structEigen_1_1SelfAdjointShape}{SelfAdjointShape}}> \{ \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1SparseSelfAdjointShape}{SparseSelfAdjointShape}} \mbox{\hyperlink{structEigen_1_1internal_1_1SparseSelfAdjointShape}{type}};  \};}
+\DoxyCodeLine{142 \textcolor{keyword}{template}<> \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1glue__shapes}{glue\_shapes}}<\mbox{\hyperlink{structEigen_1_1SparseShape}{SparseShape}},\mbox{\hyperlink{structEigen_1_1TriangularShape}{TriangularShape}} > \{ \textcolor{keyword}{typedef} \mbox{\hyperlink{structEigen_1_1internal_1_1SparseTriangularShape}{SparseTriangularShape}}  \mbox{\hyperlink{structEigen_1_1internal_1_1SparseTriangularShape}{type}};  \};}
+\DoxyCodeLine{143 }
+\DoxyCodeLine{144 \textcolor{comment}{// return type of SparseCompressedBase::lower\_bound;}}
+\DoxyCodeLine{145 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1LowerBoundIndex}{LowerBoundIndex}} \{}
+\DoxyCodeLine{146   \mbox{\hyperlink{structEigen_1_1internal_1_1LowerBoundIndex}{LowerBoundIndex}}() : value(-\/1), found(\textcolor{keyword}{false}) \{\}}
+\DoxyCodeLine{147   \mbox{\hyperlink{structEigen_1_1internal_1_1LowerBoundIndex}{LowerBoundIndex}}(\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} val, \textcolor{keywordtype}{bool} ok) : value(val), found(ok) \{\}}
+\DoxyCodeLine{148   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} value;}
+\DoxyCodeLine{149   \textcolor{keywordtype}{bool} found;}
+\DoxyCodeLine{150 \};}
+\DoxyCodeLine{151 }
+\DoxyCodeLine{152 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{153 }
+\DoxyCodeLine{162 template<typename Scalar, typename StorageIndex=typename SparseMatrix<Scalar>::StorageIndex >}
+\DoxyCodeLine{163 \textcolor{keyword}{class }\mbox{\hyperlink{classEigen_1_1Triplet}{Triplet}}}
+\DoxyCodeLine{164 \{}
+\DoxyCodeLine{165 \textcolor{keyword}{public}:}
+\DoxyCodeLine{166   \mbox{\hyperlink{classEigen_1_1Triplet}{Triplet}}() : m\_row(0), m\_col(0), m\_value(0) \{\}}
+\DoxyCodeLine{167 }
+\DoxyCodeLine{168   \mbox{\hyperlink{classEigen_1_1Triplet}{Triplet}}(\textcolor{keyword}{const} StorageIndex\& i, \textcolor{keyword}{const} StorageIndex\& j, \textcolor{keyword}{const} Scalar\& v = Scalar(0))}
+\DoxyCodeLine{169     : m\_row(i), m\_col(j), m\_value(v)}
+\DoxyCodeLine{170   \{\}}
+\DoxyCodeLine{171 }
+\DoxyCodeLine{173   \textcolor{keyword}{const} StorageIndex\& \mbox{\hyperlink{classEigen_1_1Triplet_afd4ff20977ddb3385c7fc66629b91231}{row}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_row; \}}
+\DoxyCodeLine{174 }
+\DoxyCodeLine{176   \textcolor{keyword}{const} StorageIndex\& \mbox{\hyperlink{classEigen_1_1Triplet_a220a0476a592596c2d295f698bee9067}{col}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_col; \}}
+\DoxyCodeLine{177 }
+\DoxyCodeLine{179   \textcolor{keyword}{const} Scalar\& \mbox{\hyperlink{classEigen_1_1Triplet_ab11e2110141dc8f144992b0693e00580}{value}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} m\_value; \}}
+\DoxyCodeLine{180 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{181   StorageIndex m\_row, m\_col;}
+\DoxyCodeLine{182   Scalar m\_value;}
+\DoxyCodeLine{183 \};}
+\DoxyCodeLine{184 }
+\DoxyCodeLine{185 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{186 }
+\DoxyCodeLine{187 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_SPARSEUTIL\_H}}
+
+\end{DoxyCode}

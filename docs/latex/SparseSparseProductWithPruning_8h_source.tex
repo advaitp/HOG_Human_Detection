@@ -1,0 +1,206 @@
+\hypertarget{SparseSparseProductWithPruning_8h_source}{}\doxysection{Sparse\+Sparse\+Product\+With\+Pruning.\+h}
+\label{SparseSparseProductWithPruning_8h_source}\index{include/Eigen/src/SparseCore/SparseSparseProductWithPruning.h@{include/Eigen/src/SparseCore/SparseSparseProductWithPruning.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// This file is part of Eigen, a lightweight C++ template library}}
+\DoxyCodeLine{2 \textcolor{comment}{// for linear algebra.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 \textcolor{comment}{// Copyright (C) 2008-\/2014 Gael Guennebaud <gael.guennebaud@inria.fr>}}
+\DoxyCodeLine{5 \textcolor{comment}{//}}
+\DoxyCodeLine{6 \textcolor{comment}{// This Source Code Form is subject to the terms of the Mozilla}}
+\DoxyCodeLine{7 \textcolor{comment}{// Public License v. 2.0. If a copy of the MPL was not distributed}}
+\DoxyCodeLine{8 \textcolor{comment}{// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef EIGEN\_SPARSESPARSEPRODUCTWITHPRUNING\_H}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define EIGEN\_SPARSESPARSEPRODUCTWITHPRUNING\_H}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}./InternalHeaderCheck.h"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceEigen}{Eigen}} \{ }
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{namespace }internal \{}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 }
+\DoxyCodeLine{20 \textcolor{comment}{// perform a pseudo in-\/place sparse * sparse product assuming all matrices are col major}}
+\DoxyCodeLine{21 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} ResultType>}
+\DoxyCodeLine{22 \textcolor{keyword}{static} \textcolor{keywordtype}{void} sparse\_sparse\_product\_with\_pruning\_impl(\textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, ResultType\& res, \textcolor{keyword}{const} \textcolor{keyword}{typename} ResultType::RealScalar\& tolerance)}
+\DoxyCodeLine{23 \{}
+\DoxyCodeLine{24   \textcolor{comment}{// return sparse\_sparse\_product\_with\_pruning\_impl2(lhs,rhs,res);}}
+\DoxyCodeLine{25 }
+\DoxyCodeLine{26   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<Rhs>::type::Scalar RhsScalar;}
+\DoxyCodeLine{27   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<ResultType>::type::Scalar ResScalar;}
+\DoxyCodeLine{28   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} remove\_all<Lhs>::type::StorageIndex StorageIndex;}
+\DoxyCodeLine{29 }
+\DoxyCodeLine{30   \textcolor{comment}{// make sure to call innerSize/outerSize since we fake the storage order.}}
+\DoxyCodeLine{31   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} rows = lhs.innerSize();}
+\DoxyCodeLine{32   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} cols = rhs.outerSize();}
+\DoxyCodeLine{33   \textcolor{comment}{//Index size = lhs.outerSize();}}
+\DoxyCodeLine{34   eigen\_assert(lhs.outerSize() == rhs.innerSize());}
+\DoxyCodeLine{35 }
+\DoxyCodeLine{36   \textcolor{comment}{// allocate a temporary buffer}}
+\DoxyCodeLine{37   AmbiVector<ResScalar,StorageIndex> tempVector(rows);}
+\DoxyCodeLine{38 }
+\DoxyCodeLine{39   \textcolor{comment}{// mimics a resizeByInnerOuter:}}
+\DoxyCodeLine{40   \textcolor{keywordflow}{if}(ResultType::IsRowMajor)}
+\DoxyCodeLine{41     res.resize(cols, rows);}
+\DoxyCodeLine{42   \textcolor{keywordflow}{else}}
+\DoxyCodeLine{43     res.resize(rows, cols);}
+\DoxyCodeLine{44   }
+\DoxyCodeLine{45   evaluator<Lhs> lhsEval(lhs);}
+\DoxyCodeLine{46   evaluator<Rhs> rhsEval(rhs);}
+\DoxyCodeLine{47   }
+\DoxyCodeLine{48   \textcolor{comment}{// estimate the number of non zero entries}}
+\DoxyCodeLine{49   \textcolor{comment}{// given a rhs column containing Y non zeros, we assume that the respective Y columns}}
+\DoxyCodeLine{50   \textcolor{comment}{// of the lhs differs in average of one non zeros, thus the number of non zeros for}}
+\DoxyCodeLine{51   \textcolor{comment}{// the product of a rhs column with the lhs is X+Y where X is the average number of non zero}}
+\DoxyCodeLine{52   \textcolor{comment}{// per column of the lhs.}}
+\DoxyCodeLine{53   \textcolor{comment}{// Therefore, we have nnz(lhs*rhs) = nnz(lhs) + nnz(rhs)}}
+\DoxyCodeLine{54   \mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} estimated\_nnz\_prod = lhsEval.nonZerosEstimate() + rhsEval.nonZerosEstimate();}
+\DoxyCodeLine{55 }
+\DoxyCodeLine{56   res.reserve(estimated\_nnz\_prod);}
+\DoxyCodeLine{57   \textcolor{keywordtype}{double} ratioColRes = double(estimated\_nnz\_prod)/(double(lhs.rows())*double(rhs.cols()));}
+\DoxyCodeLine{58   \textcolor{keywordflow}{for} (\mbox{\hyperlink{namespaceEigen_a62e77e0933482dafde8fe197d9a2cfde}{Index}} j=0; j<cols; ++j)}
+\DoxyCodeLine{59   \{}
+\DoxyCodeLine{60     \textcolor{comment}{// FIXME:}}
+\DoxyCodeLine{61     \textcolor{comment}{//double ratioColRes = (double(rhs.innerVector(j).nonZeros()) + double(lhs.nonZeros())/double(lhs.cols()))/double(lhs.rows());}}
+\DoxyCodeLine{62     \textcolor{comment}{// let's do a more accurate determination of the nnz ratio for the current column j of res}}
+\DoxyCodeLine{63     tempVector.init(ratioColRes);}
+\DoxyCodeLine{64     tempVector.setZero();}
+\DoxyCodeLine{65     \textcolor{keywordflow}{for} (\textcolor{keyword}{typename} evaluator<Rhs>::InnerIterator rhsIt(rhsEval, j); rhsIt; ++rhsIt)}
+\DoxyCodeLine{66     \{}
+\DoxyCodeLine{67       \textcolor{comment}{// FIXME should be written like this: tmp += rhsIt.value() * lhs.col(rhsIt.index())}}
+\DoxyCodeLine{68       tempVector.restart();}
+\DoxyCodeLine{69       RhsScalar x = rhsIt.value();}
+\DoxyCodeLine{70       \textcolor{keywordflow}{for} (\textcolor{keyword}{typename} evaluator<Lhs>::InnerIterator lhsIt(lhsEval, rhsIt.index()); lhsIt; ++lhsIt)}
+\DoxyCodeLine{71       \{}
+\DoxyCodeLine{72         tempVector.coeffRef(lhsIt.index()) += lhsIt.value() * x;}
+\DoxyCodeLine{73       \}}
+\DoxyCodeLine{74     \}}
+\DoxyCodeLine{75     res.startVec(j);}
+\DoxyCodeLine{76     \textcolor{keywordflow}{for} (\textcolor{keyword}{typename} AmbiVector<ResScalar,StorageIndex>::Iterator it(tempVector,tolerance); it; ++it)}
+\DoxyCodeLine{77       res.insertBackByOuterInner(j,it.index()) = it.value();}
+\DoxyCodeLine{78   \}}
+\DoxyCodeLine{79   res.finalize();}
+\DoxyCodeLine{80 \}}
+\DoxyCodeLine{81 }
+\DoxyCodeLine{82 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} ResultType,}
+\DoxyCodeLine{83   \textcolor{keywordtype}{int} LhsStorageOrder = traits<Lhs>::Flags\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}},}
+\DoxyCodeLine{84   \textcolor{keywordtype}{int} RhsStorageOrder = traits<Rhs>::Flags\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}},}
+\DoxyCodeLine{85   \textcolor{keywordtype}{int} ResStorageOrder = traits<ResultType>::Flags\&\mbox{\hyperlink{group__flags_gae4f56c2a60bbe4bd2e44c5b19cbe8762}{RowMajorBit}}>}
+\DoxyCodeLine{86 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1sparse__sparse__product__with__pruning__selector}{sparse\_sparse\_product\_with\_pruning\_selector}};}
+\DoxyCodeLine{87 }
+\DoxyCodeLine{88 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} ResultType>}
+\DoxyCodeLine{89 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1sparse__sparse__product__with__pruning__selector}{sparse\_sparse\_product\_with\_pruning\_selector}}<Lhs,Rhs,ResultType,\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}},\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}},\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}>}
+\DoxyCodeLine{90 \{}
+\DoxyCodeLine{91   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} ResultType::RealScalar RealScalar;}
+\DoxyCodeLine{92 }
+\DoxyCodeLine{93   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(\textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, ResultType\& res, \textcolor{keyword}{const} RealScalar\& tolerance)}
+\DoxyCodeLine{94   \{}
+\DoxyCodeLine{95     \textcolor{keyword}{typename} remove\_all<ResultType>::type \_res(res.rows(), res.cols());}
+\DoxyCodeLine{96     internal::sparse\_sparse\_product\_with\_pruning\_impl<Lhs,Rhs,ResultType>(lhs, rhs, \_res, tolerance);}
+\DoxyCodeLine{97     res.swap(\_res);}
+\DoxyCodeLine{98   \}}
+\DoxyCodeLine{99 \};}
+\DoxyCodeLine{100 }
+\DoxyCodeLine{101 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} ResultType>}
+\DoxyCodeLine{102 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1sparse__sparse__product__with__pruning__selector}{sparse\_sparse\_product\_with\_pruning\_selector}}<Lhs,Rhs,ResultType,\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}},\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}},\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}}>}
+\DoxyCodeLine{103 \{}
+\DoxyCodeLine{104   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} ResultType::RealScalar RealScalar;}
+\DoxyCodeLine{105   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(\textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, ResultType\& res, \textcolor{keyword}{const} RealScalar\& tolerance)}
+\DoxyCodeLine{106   \{}
+\DoxyCodeLine{107     \textcolor{comment}{// we need a col-\/major matrix to hold the result}}
+\DoxyCodeLine{108     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<typename ResultType::Scalar,ColMajor,typename ResultType::StorageIndex>}} SparseTemporaryType;}
+\DoxyCodeLine{109     SparseTemporaryType \_res(res.rows(), res.cols());}
+\DoxyCodeLine{110     internal::sparse\_sparse\_product\_with\_pruning\_impl<Lhs,Rhs,SparseTemporaryType>(lhs, rhs, \_res, tolerance);}
+\DoxyCodeLine{111     res = \_res;}
+\DoxyCodeLine{112   \}}
+\DoxyCodeLine{113 \};}
+\DoxyCodeLine{114 }
+\DoxyCodeLine{115 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} ResultType>}
+\DoxyCodeLine{116 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1sparse__sparse__product__with__pruning__selector}{sparse\_sparse\_product\_with\_pruning\_selector}}<Lhs,Rhs,ResultType,\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}},\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}},\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}}>}
+\DoxyCodeLine{117 \{}
+\DoxyCodeLine{118   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} ResultType::RealScalar RealScalar;}
+\DoxyCodeLine{119   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(\textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, ResultType\& res, \textcolor{keyword}{const} RealScalar\& tolerance)}
+\DoxyCodeLine{120   \{}
+\DoxyCodeLine{121     \textcolor{comment}{// let's transpose the product to get a column x column product}}
+\DoxyCodeLine{122     \textcolor{keyword}{typename} remove\_all<ResultType>::type \_res(res.rows(), res.cols());}
+\DoxyCodeLine{123     internal::sparse\_sparse\_product\_with\_pruning\_impl<Rhs,Lhs,ResultType>(rhs, lhs, \_res, tolerance);}
+\DoxyCodeLine{124     res.swap(\_res);}
+\DoxyCodeLine{125   \}}
+\DoxyCodeLine{126 \};}
+\DoxyCodeLine{127 }
+\DoxyCodeLine{128 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} ResultType>}
+\DoxyCodeLine{129 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1sparse__sparse__product__with__pruning__selector}{sparse\_sparse\_product\_with\_pruning\_selector}}<Lhs,Rhs,ResultType,\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}},\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}},\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}>}
+\DoxyCodeLine{130 \{}
+\DoxyCodeLine{131   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} ResultType::RealScalar RealScalar;}
+\DoxyCodeLine{132   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(\textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, ResultType\& res, \textcolor{keyword}{const} RealScalar\& tolerance)}
+\DoxyCodeLine{133   \{}
+\DoxyCodeLine{134     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<typename Lhs::Scalar,ColMajor,typename Lhs::StorageIndex>}} ColMajorMatrixLhs;}
+\DoxyCodeLine{135     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<typename Rhs::Scalar,ColMajor,typename Lhs::StorageIndex>}} ColMajorMatrixRhs;}
+\DoxyCodeLine{136     ColMajorMatrixLhs colLhs(lhs);}
+\DoxyCodeLine{137     ColMajorMatrixRhs colRhs(rhs);}
+\DoxyCodeLine{138     internal::sparse\_sparse\_product\_with\_pruning\_impl<ColMajorMatrixLhs,ColMajorMatrixRhs,ResultType>(colLhs, colRhs, res, tolerance);}
+\DoxyCodeLine{139 }
+\DoxyCodeLine{140     \textcolor{comment}{// let's transpose the product to get a column x column product}}
+\DoxyCodeLine{141 \textcolor{comment}{//     typedef SparseMatrix<typename ResultType::Scalar> SparseTemporaryType;}}
+\DoxyCodeLine{142 \textcolor{comment}{//     SparseTemporaryType \_res(res.cols(), res.rows());}}
+\DoxyCodeLine{143 \textcolor{comment}{//     sparse\_sparse\_product\_with\_pruning\_impl<Rhs,Lhs,SparseTemporaryType>(rhs, lhs, \_res);}}
+\DoxyCodeLine{144 \textcolor{comment}{//     res = \_res.transpose();}}
+\DoxyCodeLine{145   \}}
+\DoxyCodeLine{146 \};}
+\DoxyCodeLine{147 }
+\DoxyCodeLine{148 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} ResultType>}
+\DoxyCodeLine{149 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1sparse__sparse__product__with__pruning__selector}{sparse\_sparse\_product\_with\_pruning\_selector}}<Lhs,Rhs,ResultType,\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}},\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}},\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}}>}
+\DoxyCodeLine{150 \{}
+\DoxyCodeLine{151   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} ResultType::RealScalar RealScalar;}
+\DoxyCodeLine{152   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(\textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, ResultType\& res, \textcolor{keyword}{const} RealScalar\& tolerance)}
+\DoxyCodeLine{153   \{}
+\DoxyCodeLine{154     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<typename Lhs::Scalar,RowMajor,typename Lhs::StorageIndex>}} RowMajorMatrixLhs;}
+\DoxyCodeLine{155     RowMajorMatrixLhs rowLhs(lhs);}
+\DoxyCodeLine{156     \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__sparse__product__with__pruning__selector}{sparse\_sparse\_product\_with\_pruning\_selector<RowMajorMatrixLhs,Rhs,ResultType,RowMajor,RowMajor>}}(rowLhs,rhs,res,tolerance);}
+\DoxyCodeLine{157   \}}
+\DoxyCodeLine{158 \};}
+\DoxyCodeLine{159 }
+\DoxyCodeLine{160 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} ResultType>}
+\DoxyCodeLine{161 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1sparse__sparse__product__with__pruning__selector}{sparse\_sparse\_product\_with\_pruning\_selector}}<Lhs,Rhs,ResultType,\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}},\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}},\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}}>}
+\DoxyCodeLine{162 \{}
+\DoxyCodeLine{163   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} ResultType::RealScalar RealScalar;}
+\DoxyCodeLine{164   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(\textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, ResultType\& res, \textcolor{keyword}{const} RealScalar\& tolerance)}
+\DoxyCodeLine{165   \{}
+\DoxyCodeLine{166     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<typename Rhs::Scalar,RowMajor,typename Lhs::StorageIndex>}} RowMajorMatrixRhs;}
+\DoxyCodeLine{167     RowMajorMatrixRhs rowRhs(rhs);}
+\DoxyCodeLine{168     \mbox{\hyperlink{structEigen_1_1internal_1_1sparse__sparse__product__with__pruning__selector}{sparse\_sparse\_product\_with\_pruning\_selector<Lhs,RowMajorMatrixRhs,ResultType,RowMajor,RowMajor,RowMajor>}}(lhs,rowRhs,res,tolerance);}
+\DoxyCodeLine{169   \}}
+\DoxyCodeLine{170 \};}
+\DoxyCodeLine{171 }
+\DoxyCodeLine{172 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} ResultType>}
+\DoxyCodeLine{173 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1sparse__sparse__product__with__pruning__selector}{sparse\_sparse\_product\_with\_pruning\_selector}}<Lhs,Rhs,ResultType,\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}},\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}},\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}>}
+\DoxyCodeLine{174 \{}
+\DoxyCodeLine{175   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} ResultType::RealScalar RealScalar;}
+\DoxyCodeLine{176   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(\textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, ResultType\& res, \textcolor{keyword}{const} RealScalar\& tolerance)}
+\DoxyCodeLine{177   \{}
+\DoxyCodeLine{178     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<typename Rhs::Scalar,ColMajor,typename Lhs::StorageIndex>}} ColMajorMatrixRhs;}
+\DoxyCodeLine{179     ColMajorMatrixRhs colRhs(rhs);}
+\DoxyCodeLine{180     internal::sparse\_sparse\_product\_with\_pruning\_impl<Lhs,ColMajorMatrixRhs,ResultType>(lhs, colRhs, res, tolerance);}
+\DoxyCodeLine{181   \}}
+\DoxyCodeLine{182 \};}
+\DoxyCodeLine{183 }
+\DoxyCodeLine{184 \textcolor{keyword}{template}<\textcolor{keyword}{typename} Lhs, \textcolor{keyword}{typename} Rhs, \textcolor{keyword}{typename} ResultType>}
+\DoxyCodeLine{185 \textcolor{keyword}{struct }\mbox{\hyperlink{structEigen_1_1internal_1_1sparse__sparse__product__with__pruning__selector}{sparse\_sparse\_product\_with\_pruning\_selector}}<Lhs,Rhs,ResultType,\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a77c993a8d9f6efe5c1159fb2ab07dd4f}{RowMajor}},\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}},\mbox{\hyperlink{group__enums_ggaacded1a18ae58b0f554751f6cdf9eb13a0103672ae41005ab03b4176c765afd62}{ColMajor}}>}
+\DoxyCodeLine{186 \{}
+\DoxyCodeLine{187   \textcolor{keyword}{typedef} \textcolor{keyword}{typename} ResultType::RealScalar RealScalar;}
+\DoxyCodeLine{188   \textcolor{keyword}{static} \textcolor{keywordtype}{void} run(\textcolor{keyword}{const} Lhs\& lhs, \textcolor{keyword}{const} Rhs\& rhs, ResultType\& res, \textcolor{keyword}{const} RealScalar\& tolerance)}
+\DoxyCodeLine{189   \{}
+\DoxyCodeLine{190     \textcolor{keyword}{typedef} \mbox{\hyperlink{classEigen_1_1SparseMatrix}{SparseMatrix<typename Lhs::Scalar,ColMajor,typename Lhs::StorageIndex>}} ColMajorMatrixLhs;}
+\DoxyCodeLine{191     ColMajorMatrixLhs colLhs(lhs);}
+\DoxyCodeLine{192     internal::sparse\_sparse\_product\_with\_pruning\_impl<ColMajorMatrixLhs,Rhs,ResultType>(colLhs, rhs, res, tolerance);}
+\DoxyCodeLine{193   \}}
+\DoxyCodeLine{194 \};}
+\DoxyCodeLine{195 }
+\DoxyCodeLine{196 \} \textcolor{comment}{// end namespace internal}}
+\DoxyCodeLine{197 }
+\DoxyCodeLine{198 \} \textcolor{comment}{// end namespace Eigen}}
+\DoxyCodeLine{199 }
+\DoxyCodeLine{200 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// EIGEN\_SPARSESPARSEPRODUCTWITHPRUNING\_H}}
+
+\end{DoxyCode}
