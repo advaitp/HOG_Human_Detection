@@ -11,26 +11,26 @@
 #define INCLUDE_HUMAN_H_
 
 #include "Box.h"
-#include <vector>
 #include <Eigen/Geometry>
 #include <Eigen/Dense>
 #include <Eigen/Core>
+#include <vector>
 
 class Human{
  private:
-  /// Average height of human
+  // Average height of human
   int height;
 
-  /// Dots per inches(DPI) of device
+  // Dots per inches(DPI) of device
   int DPI;
 
-  /// Camera Viewing angle
+  // Camera Viewing angle
   int angle;
 
  public:
   Human();
 
-  /// Centre of gravity of human
+  // Centre of gravity of human
   int centre[2];
 
   /// @fn double pixel_to_mm(int pixel)

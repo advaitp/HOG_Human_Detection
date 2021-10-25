@@ -138,8 +138,7 @@ void Detection :: drawboxes(cv::Mat frame) {
 
 bool Detection::is_same(int x[2], int y[2]) {
   try {
-    if (x[0] - y[0] < 2 && x[1] - y[1] < 2) {return true;}
-    else {
+    if (x[0] - y[0] < 2 && x[1] - y[1] < 2) {return true;} else {
       return false;
     }
   }
@@ -151,13 +150,13 @@ bool Detection::is_same(int x[2], int y[2]) {
 void Detection::track(cv::Mat img) {
     try {
       std::cout << "Starting tracker\n";
-      int d_size = static_cast<int>(detections.size());
+      int dsize = static_cast<int>(detections.size());
       if (!indices.empty()) {
         std::cout << "indices not empty works\n";
         // Condition 1: Check if storage is empty
        if (storage.empty()) {
           std::cout << "storage empty works\n";
-          for (int i = 0 ; i < d_size; i++) {
+          for (int i = 0 ; i < dsize; i++) {
             Human sam;
             sam.calc_centre(detections[i]);
             std::cout << "Centre" <<
@@ -165,16 +164,15 @@ void Detection::track(cv::Mat img) {
             std::vector<int> psh = {i, sam.centre[0], sam.centre[1]};
             storage.push_back(psh);
           }
-        }
-       else {
-         for (int j = 0 ; j < d_size; j++) {
+        } else {
+         for (int j = 0 ; j < dsize; j++) {
              Human sam;
              sam.calc_centre(detections[j]);
              auto temp = storage;
              storage.clear();
              for (auto i : temp) {
                int tem[2] = {i[1] , i[2]};
-               if (is_same(sam.centre,tem)) {
+               if (is_same(sam.centre, tem)) {
                  std::vector<int> psh = {j, sam.centre[0], sam.centre[1]};
                  storage.push_back(psh);
                }
@@ -183,10 +181,10 @@ void Detection::track(cv::Mat img) {
          }
         for (auto o : storage) {
           std::string text = "ID " + std::to_string(o[0]);
-          cv::putText(img, text, cv::Point(o[1],o[2]), cv::FONT_HERSHEY_DUPLEX, 1.0, CV_RGB(0, 255, 0), 2);
+          cv::putText(img, text, cv::Point(o[1], o[2]),
+                      cv::FONT_HERSHEY_DUPLEX, 1.0, CV_RGB(0, 255, 0), 2);
         }
-      }
-      else {
+      } else {
         storage.clear();
         std::cout << "Condition not satisfied\n";
       }
