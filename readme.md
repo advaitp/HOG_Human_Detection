@@ -7,6 +7,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/gauraut/HOG_Human_Detection/badge.svg?branch=main)](https://coveralls.io/github/gauraut/HOG_Human_Detection?branch=main)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ## License
+```
 MIT License
 
 Copyright (c) 2021 Gaurav Raut, Advait Patole
@@ -28,7 +29,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
+```
 ## Planning and management documents
 
 - Product and Iteration backlogs, Work logs - https://docs.google.com/spreadsheets/d/1AqmzROpvQzZs42nM-5xIrxISOKAmEnqSZvvMMRmAUtc/edit?usp=sharing
@@ -38,8 +39,12 @@ SOFTWARE.
 ## Overview
 
 Our design uses monocular camera to detect humans and get their positions in the robot’s reference frame. The module is developed in such a way that it detects humans (N>=1) and then creates bounding box around it. The distance of human is calculated from the pixel values of the bounding boxes. This system is perfect for use in robots like autonomous caddies in malls or airports for transportation which is under-development by Acme. The module detects humans and if the distance is below a threshold, the vehicle slows down. The distance measurements can be fed to the odometry of the robot in order to control its motion. The project could be easily expanded and trained to detect more objects and take actions based on the type of the object. The AIP design process allows continuous development. Because of this, new features and modules could be added over new sprints and thus making the module highly customizable.
-![Working](https://user-images.githubusercontent.com/77606010/137706393-67343fd5-1710-4a32-9f64-be3928fdef69.gif)
+### After
+ ![Final_implementation](https://user-images.githubusercontent.com/77606010/138638749-d5c46202-e909-4283-a89b-54ec13606687.gif)
+ 
+### Before
 
+ ![Working](https://user-images.githubusercontent.com/77606010/137706393-67343fd5-1710-4a32-9f64-be3928fdef69.gif)
 ## Algorithm
 
 The HOG descriptors convert image into a feature vector. The input image (641283) is converted to a 3780-length vector. The SVM classifier is trained by fitting appropriate parameters to train whether image has human or not. Once it is trained, a sliding window is created of size 64*128 which creates different image patches each of length 3780 feature vector. The SVM is used on each of the feature vector to get whether human is found in that image or not. If it is found, then we store the coordinates to create the bounding boxes. In-order to solve the problem of multiple bounding boxes, we can use a non max suppression to remove overlapping boxes.
@@ -48,6 +53,13 @@ The HOG descriptors convert image into a feature vector. The input image (641283
 
 The monocular camera inputs a stream of images, i.e., video, to our microprocessor. Every frame in the image will be converted into a feature vector by our custom-made HOG feature descriptor. The feature vector will be given as an input to our pre-trained custom-made linear SVM which will classify the features as Human and Non-Human. Further, if there is a human in the frame, the algorithm will calculate the distance of the human from the caddy based on the pixel location and pre-defined equations and assumptions.
 ![Technology](https://user-images.githubusercontent.com/77606010/137650666-c4d7e0d4-4021-4aa9-a76d-2000d07be1b2.png)
+
+## Future Updates
+- Algorithm can be refined for faster functioning.
+
+- The API can be implemented for any interface that needs the Human detection functionality.
+
+- The Algorithm can be trained and refined to increase it’s accuracy.
 
 ## Risks and Mitigation: 
  
@@ -71,6 +83,10 @@ use non max suppression to solve that problem.
 - CMake (Build System)
 - OpenCV library (new BSD License)
 - Eigen library (new BSD License)
+
+## Importance of OpenCV and Eigen
+- OpenCV is the huge open-source library for the computer vision, machine learning, and image processing and now it plays a major role in real-time operation which is very important in today’s systems. By using it, one can process images and videos to identify objects, faces, or even detect humans.In this project we have used HOG and SVM human detector to detect humans.
+- Eigen library is used for transformation of human coordinates from camera frame to world frame.We are using transformation matrix to transform the coordinates to world frame.
 
 ## Standard install via command-line
 ```
