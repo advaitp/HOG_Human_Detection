@@ -1,7 +1,7 @@
 # HOG_Human_Detection
 ## Project Contributors
-- Gaurav Raut - M.Eng. Robotics student. I like to make puns.
-- Advait Patole - Graduate student at University of Maryland pursuing M.Eng. Robotics. Likes rock music.
+- [Gaurav Raut](https://github.com/gauraut) - M.Eng. Robotics student. I like to make puns.
+- [Advait Patole](https://github.com/advaitp) - Graduate student at University of Maryland pursuing M.Eng. Robotics. Likes rock music.
 # Build Status Coverage Status
 [![Build Status](https://app.travis-ci.com/gauraut/HOG_Human_Detection.svg?branch=main)](https://app.travis-ci.com/gauraut/HOG_Human_Detection)
 [![Coverage Status](https://coveralls.io/repos/github/gauraut/HOG_Human_Detection/badge.svg?branch=main)](https://coveralls.io/github/gauraut/HOG_Human_Detection?branch=main)
@@ -53,6 +53,18 @@ The HOG descriptors convert image into a feature vector. The input image (641283
 
 The monocular camera inputs a stream of images, i.e., video, to our microprocessor. Every frame in the image will be converted into a feature vector by our custom-made HOG feature descriptor. The feature vector will be given as an input to our pre-trained custom-made linear SVM which will classify the features as Human and Non-Human. Further, if there is a human in the frame, the algorithm will calculate the distance of the human from the caddy based on the pixel location and pre-defined equations and assumptions.
 ![Technology](https://user-images.githubusercontent.com/77606010/137650666-c4d7e0d4-4021-4aa9-a76d-2000d07be1b2.png)
+
+## Known Issues and Bugs
+- The Human detection module can detect humans if they are standing only if they are present in any other the detection module will fail to detect it.We plan to fix this by training the model to detect humans in different pose.
+
+## Dependencies
+- Eigen 3.3.7
+- OpenCV 3.3.0
+
+Install dependencies like OpenCV for the project by using the following command.
+```
+source ./dependencies.sh
+```
 
 ## Future Updates
 - Algorithm can be refined for faster functioning.
